@@ -30,6 +30,15 @@
 
         </div>
         <div class="flex items-center gap-4">
+            <x-button 
+                title="{{ __('We\'re open source!') }}"
+                class="btn-circle btn-ghost btn-sm"
+                link="https://github.com/hackeresq/investbrain"
+                external
+            >
+                <x-github-icon />
+            </x-button>
+
             <x-theme-toggle 
                 title="{{ __('Toggle Theme') }}" 
                 class="btn-circle btn-ghost btn-sm" 
