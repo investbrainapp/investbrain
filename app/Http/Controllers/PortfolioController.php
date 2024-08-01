@@ -2,15 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Holding;
 use App\Models\Portfolio;
-use App\Models\DailyChange;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Http\Requests\PortfolioRequest;
-use Asantibanez\LivewireCharts\Models\LineChartModel;
-use Livewire\Livewire;
-use Livewire\Volt\Volt;
 
 class PortfolioController extends Controller
 {
