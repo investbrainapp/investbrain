@@ -6,7 +6,7 @@ Investbrain helps you manage and track the performance of your investments.
 
 ## Contributing
 
-Thank you for considering a contribution to Investbrain! 
+Thank you for considering a contribution to Investbrain! Please open a pull request on our [Github repository](https://github.com/hackerESQ/investbrain).
 
 ## Code of Conduct
 
