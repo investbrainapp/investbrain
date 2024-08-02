@@ -5,7 +5,7 @@ import typography from '@tailwindcss/typography';
 /** @type {import('tailwindcss').Config} */
 export default {
 	daisyui: {
-		themes: ["nord", "dark"
+		themes: ["business", "corporate"
 			// {
 			// 	dark: {	
 			// 		"primary": "#60a5fa",	
@@ -46,7 +46,7 @@ export default {
             },
         },
     },
-	darkMode: ['class', '[data-theme="dark"]'],
+	darkMode: ['class', '[data-theme="business"]'],
     plugins: [
 		forms,
 		typography,

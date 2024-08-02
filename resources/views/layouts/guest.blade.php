@@ -3,7 +3,7 @@
 
         {{ $slot }}
 
-        <x-theme-toggle class="hidden" darkTheme="dark" lightTheme="nord"/>
+        <x-theme-toggle class="hidden" darkTheme="business" lightTheme="corporate"/>
 
     </x-slot:body>
 </x-common-layout>
