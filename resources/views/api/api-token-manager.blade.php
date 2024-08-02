@@ -41,7 +41,7 @@
                 {{ __('Created.') }}
             </x-forms.action-message>
 
-            <x-button>
+            <x-button type="submit">
                 {{ __('Create') }}
             </x-button>
         </x-slot>
