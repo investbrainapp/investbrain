@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Category;
 use App\Models\Portfolio;
-use App\Models\User;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
@@ -12,8 +10,8 @@ new class extends Component {
     use Toast;
 
     public string $submit;
-
     public ?Portfolio $portfolio;
+    public Bool $hideCancel = false;
 
     #[Rule('required|min:5')]
     public string $title;
@@ -79,14 +77,16 @@ new class extends Component {
 
 <div class="grid lg:grid-cols-4 gap-10">
     <x-form wire:submit="{{ $submit }}" class="col-span-3">
-        <x-input label="Title" wire:model="title" />
+        <x-input label="Title" wire:model="title" required />
 
         {{-- <x-select label="Category" wire:model="category_id" placeholder="Select a category" :options="$categories" /> --}}
 
         <x-textarea label="Body" wire:model="notes" rows="5"  />
 
         <x-slot:actions>
+            @if (!$hideCancel)
             <x-button label="Cancel" link="{{ url()->previous() }}" />
+            @endif
             <x-button label="{{ $submit == 'save' ? 'Create' : 'Update' }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
         </x-slot:actions>
     </x-form>
