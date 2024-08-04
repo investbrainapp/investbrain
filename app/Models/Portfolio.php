@@ -45,7 +45,9 @@ class Portfolio extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'wishlist' => 'boolean'
+    ];
 
     /**
      * The relationships that should always be eagerly loaded.

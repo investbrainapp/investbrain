@@ -19,12 +19,16 @@ new class extends Component {
     #[Rule('sometimes|nullable')]
     public ?string $notes;
 
+    #[Rule('sometimes|boolean')]
+    public ?bool $wishlist;
+
     public function mount() {
 
         if (isset($this->portfolio)) {
 
             $this->title = $this->portfolio->title;
             $this->notes = $this->portfolio->notes;
+            $this->wishlist = $this->portfolio->wishlist;
         }
     }
 
@@ -39,13 +43,11 @@ new class extends Component {
         // $this->portfolio->owner_id = auth()->user()->id;
         $this->portfolio->save();
 
-        $this->success('Portfolio updated.', redirectTo: "/portfolio/{$this->portfolio->id}");
+        $this->success('Portfolio updated', redirectTo: "/portfolio/{$this->portfolio->id}");
     }
 
     public function save()
     {
-
-        
 
         // // get stats
         // $key = 'portfolio-metrics-' . $portfolio->id;
@@ -64,7 +66,7 @@ new class extends Component {
         // $portfolio->owner_id = auth()->user()->id;
         $portfolio->save();
 
-        $this->success('Portfolio created.', redirectTo: "/portfolio/{$portfolio->id}");
+        $this->success('Portfolio created', redirectTo: "/portfolio/{$portfolio->id}");
     }
 
     public function with(): array
@@ -81,7 +83,9 @@ new class extends Component {
 
         {{-- <x-select label="Category" wire:model="category_id" placeholder="Select a category" :options="$categories" /> --}}
 
-        <x-textarea label="Body" wire:model="notes" rows="5"  />
+        <x-textarea label="Notes" wire:model="notes" rows="5" />
+
+        <x-toggle label="Wishlist" wire:model="wishlist" />
 
         <x-slot:actions>
             @if (!$hideCancel)
