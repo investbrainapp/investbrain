@@ -52,7 +52,8 @@
             <x-theme-toggle 
                 title="{{ __('Toggle Theme') }}" 
                 class="btn-circle btn-ghost btn-sm" 
-                darkTheme="business" lightTheme="corporate"
+                darkTheme="business" 
+                lightTheme="corporate"
             />
         </div>
     </div>
