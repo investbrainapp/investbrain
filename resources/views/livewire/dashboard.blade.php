@@ -21,7 +21,7 @@ new class extends Component {
 
     public  $options =  [
         ['id' => '1M', 'name' => '1 month'],
-        ['id' => '3M', 'name' => '3 months'],
+        ['id' => '2M', 'name' => '3 months'],
         ['id' => 'YTD', 'name' => 'Year to date'],
         ['id' => '1Y', 'name' => '1 year'],
         ['id' => '3Y', 'name' => '3 years'],
@@ -46,36 +46,44 @@ new class extends Component {
                 
             ]
         ],
+        'options' => [
+            'scales' => [
+                // 'y' => [
+                //     'display' => false,
+                // ],
+                'x' => [
+                    // 'type' => 'time',
+                    'time' => [
+                        // Luxon format string
+                        // 'tooltipFormat' => 'DD'
+                    ],
+                ],
+            ],
+            'aspectRatio' => 0,
+            'plugins' => [
+                'htmlLegend' => [
+                    // ID of the container to put the legend in
+                    'containerID' => 'chart-legend',
+                ],
+                'legend' => [
+                    'display' => false,
+                    // 'position' => 'right'
+                ]
+            ]
+        ]
+
     ];
+
+    
 }; ?>
   
 <div x-data>
-
-    <x-ib-drawer 
-        key="manage-portfolio"
-        title="{{ $portfolio->title }}"
-    >
-
-        <livewire:portfolio.manage-portfolio-form :portfolio="$portfolio" submit="update" hide-cancel />
-
-    </x-ib-drawer>
-
-    <x-ib-toolbar :title="$portfolio->title">
-
-        <x-button 
-            title="Edit Portfolio" 
-            icon="o-pencil" 
-            class="btn-circle btn-ghost btn-sm text-secondary" 
-            @click="$dispatch('toggle-manage-portfolio')"
-        />
-    </x-ib-toolbar>
 
     <div class="grid mb-6 gap-5">
 
         <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg ">
 
-            
-
+    
             <div class="flex justify-between items-center mb-2">
                     
                 <div class="flex items-center">
@@ -103,10 +111,10 @@ new class extends Component {
             
             <div
                 class="relative h-[280px]"
-                
             >
                 <x-ib-apex-chart :data="[]" name="portfolio" />
             </div>
+    
 
         </x-card>
 
@@ -148,7 +156,7 @@ new class extends Component {
 
     <div class="mt-6 grid md:grid-cols-7 gap-5">
 
-        <x-ib-card title="All portfolio holdings" class="md:col-span-4">
+        <x-ib-card title="My portfolios" class="md:col-span-4">
          
             @php
                 $users = App\Models\User::take(3)->get();
