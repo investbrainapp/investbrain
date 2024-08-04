@@ -12,5 +12,8 @@ new class extends Component {
     
 }; ?>
 <div>  
+
+    <x-ib-toolbar title="Create Portfolio" />
+
     <livewire:portfolio.manage-portfolio-form submit="save" />
 </div>
