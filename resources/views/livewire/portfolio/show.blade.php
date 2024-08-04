@@ -81,7 +81,7 @@ new class extends Component {
                 <div class="flex items-center">
                     
                     <h2 class="text-xl mr-4">Performance</h2>
-                    <div id="chart-legend" class="flex space-around"></div>
+                    <div id="chart-legend-portfolio-{{ $portfolio->id }}" class="flex space-around"></div>
                     
                 </div>
 
@@ -101,12 +101,12 @@ new class extends Component {
                 
             </div>
             
-            <div
-                class="relative h-[280px]"
+            {{-- <div
+                class="h-[280px]"
                 
-            >
-                <x-ib-apex-chart :data="[]" name="portfolio" />
-            </div>
+            > --}}
+                <x-ib-apex-chart :data="[]" name="portfolio-{{ $portfolio->id }}" />
+            {{-- </div> --}}
 
         </x-card>
 

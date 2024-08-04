@@ -89,7 +89,7 @@ new class extends Component {
                 <div class="flex items-center">
                     
                     <h2 class="text-xl mr-4">Performance</h2>
-                    <div id="chart-legend" class="flex space-around"></div>
+                    <div id="chart-legend-dashboard" class="flex space-around"></div>
                     
                 </div>
 
@@ -110,9 +110,9 @@ new class extends Component {
             </div>
             
             <div
-                class="relative h-[280px]"
+                class="h-[280px] mb-5"
             >
-                <x-ib-apex-chart :data="[]" name="portfolio" />
+                <x-ib-apex-chart :data="[]" name="dashboard"  />
             </div>
     
 

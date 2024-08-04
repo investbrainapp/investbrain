@@ -14,7 +14,6 @@
             'show' => false,
         ],
       ],
-      
       'colors' => ['#00E396', '#0090FF'],
       'stroke' => [
         'curve' => "smooth",
@@ -55,17 +54,16 @@
         ]
       ],
       'grid' => [
+        'strokeColor' => "#000",
         'padding' => [
             'top' => 0,
             'left' => -30,
             'right' => 0,
-            'bottom' => 15
+            'bottom' => -5
         ]
       ],
       'legend' => [
         'show' => false,
-        // 'position' => 'top',
-        // 'horizontalAlign' => 'left'
       ],
     ], $data);
     $data = json_encode($data)
@@ -94,13 +92,16 @@
                         renderCustomLegend(chartContext);
                     }
                 }
-                
+
                 var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
 
                 chart.render();
 
                 async function renderCustomLegend(chartContext) {
-                    var legendContainer = document.querySelector('#chart-legend');
+                    var legendContainer = document.querySelector('#chart-legend-{{ $name }}');
+
+                    if (!legendContainer) return;
+
                     legendContainer.innerHTML = ''; // Clear any existing legend items
                     
                     chartContext.w.globals.seriesNames.forEach(function (seriesName, i) {
@@ -123,13 +124,13 @@
                         legendContainer.appendChild(legendItem);
 
                         // Initial visibility state
-                        console.log(chartContext.w.globals.collapsedSeriesIndices.includes(i))
                         var isCollapsed = chartContext.w.globals.collapsedSeriesIndices.includes(i);
                         if (isCollapsed) {
                             legendItem.classList.add('opacity-50');
                         }
 
                         legendItem.addEventListener('click', function () {
+                          
                             var seriesIndex = parseInt(this.getAttribute('data-series-index'), 10);
                             var isCurrentlyCollapsed = chartContext.w.globals.collapsedSeriesIndices.includes(seriesIndex);
 
@@ -144,12 +145,19 @@
                     });
                 }
 
+                function generateRandomArray(length, min, max) {
+                  const randomArray = [];
+                  for (let i = 0; i < length; i++) {
+                    randomArray.push(Math.floor(Math.random() * (max - min + 1)) + min);
+                  }
+                  return randomArray;
+                }
+
                 function generateDayWiseTimeSeries(s, count) {
-                    var values = [[
-                        4,3,10,9,29,19,25,9,12,7,19,5,13,9,17,2,7,5
-                    ], [
-                        2,3,8,7,22,16,23,7,11,5,12,5,10,4,15,2,6,2
-                    ]];
+                    var values = [
+                      generateRandomArray(20, 2, 60), 
+                      generateRandomArray(20, 2, 60)
+                    ];
                     var i = 0;
                     var series = [];
                     var x = new Date('11 Nov 2012').getTime();
