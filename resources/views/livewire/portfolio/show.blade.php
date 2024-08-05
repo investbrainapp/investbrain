@@ -30,23 +30,47 @@ new class extends Component {
 
     public ?Portfolio $portfolio;
 
-    public array $myChart = [
-        'type' => 'line',
-        'data' => [
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-            'datasets' => [
+    private function generateDateSeries($startDate, $endDate) {
+        $dateArray = [];
+        $currentDate = strtotime($startDate);
+        $endDate = strtotime($endDate);
+
+        while ($currentDate <= $endDate) {
+            // Generate a random integer
+            $randomInt = rand(1000, 3000);
+
+            // Format the current date to 'Y-m-d'
+            $formattedDate = date('Y-m-d', $currentDate);
+
+            // Append the date and random integer to the array
+            $dateArray[] = [$formattedDate, $randomInt];
+
+            // Move to the next day
+            $currentDate = strtotime("+1 day", $currentDate);
+        }
+
+        return $dateArray;
+    }
+
+    public array $myChart;
+
+    public function mount() {
+
+        $this->myChart = [
+            'series' => [
                 [
-                    'label' => '# of Votes',
-                    'data' => [2000, 2204, 3001, 2981, 2845],
-                    'tension' => 0.4,
-                    'pointStyle' => 'rect',
-                    'pointRadius' => 4,
-                    'pointHoverRadius' => 6
-                ],
-                
-            ]
-        ],
-    ];
+                    'name' => 'Total Views',
+                    'data' => $this->generateDateSeries('2024-01-01', '2024-08-01')
+                ],      
+                [
+                    'name' => 'Second Views',
+                    'data' => $this->generateDateSeries('2024-01-01', '2024-08-01')
+                ],    
+            ],
+
+        ];
+
+    }
 }; ?>
   
 <div x-data>
@@ -62,6 +86,10 @@ new class extends Component {
 
     <x-ib-toolbar :title="$portfolio->title">
 
+        @if($portfolio->wishlist)
+        <x-badge value="Wishlist" class="badge-primary mr-3" />
+        @endif
+
         <x-button 
             title="Edit Portfolio" 
             icon="o-pencil" 
@@ -70,48 +98,42 @@ new class extends Component {
         />
     </x-ib-toolbar>
 
-    <div class="grid mb-6 gap-5">
+    <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">
 
-        <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg ">
-
-            
-
-            <div class="flex justify-between items-center mb-2">
-                    
-                <div class="flex items-center">
-                    
-                    <h2 class="text-xl mr-4">Performance</h2>
-                    <div id="chart-legend-portfolio-{{ $portfolio->id }}" class="flex space-around"></div>
-                    
-                </div>
-
-                <x-dropdown label="{{ $scope }}" class="btn-ghost btn-sm" >
-                        
-                    <x-menu >
-                        @foreach($options as $option)
-
-                            <x-menu-item 
-                                title="{{ $option['name'] }}" 
-                                x-on:click="$wire.changeScope('{{ $option['id'] }}')"
-                            />
-                    
-                        @endforeach
-                    </x-menu>
-                </x-dropdown>
+        <div class="flex justify-between items-center mb-2">
+                
+            <div class="flex items-center">
+                
+                <h2 class="text-xl mr-4">Performance</h2>
+                <div id="chart-legend-portfolio-{{ $portfolio->id }}" class="flex space-around"></div>
                 
             </div>
-            
-            {{-- <div
-                class="h-[280px]"
+
+            <x-dropdown label="{{ $scope }}" class="btn-ghost btn-sm" >
+                    
+                <x-menu >
+                    @foreach($options as $option)
+
+                        <x-menu-item 
+                            title="{{ $option['name'] }}" 
+                            x-on:click="$wire.changeScope('{{ $option['id'] }}')"
+                        />
                 
-            > --}}
-                <x-ib-apex-chart :data="[]" name="portfolio-{{ $portfolio->id }}" />
-            {{-- </div> --}}
+                    @endforeach
+                </x-menu>
+            </x-dropdown>
+            
+        </div>
+        
+        <div
+            class="h-[280px] mb-5"
+            
+        >
+            <x-ib-apex-chart :series-data="$myChart" :key="Str::uuid()" name="portfolio-{{ $portfolio->id }}" />
+        </div>
 
-        </x-card>
+    </x-card>
 
-    </div>
-    
     <div class="grid md:grid-cols-5 gap-5">
         <x-stat
             class="bg-slate-100 dark:bg-base-200"

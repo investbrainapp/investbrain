@@ -1,7 +1,7 @@
-@props(['data' => [], 'name' => 'apex-chart' ])
+@props(['seriesData' => [], 'name' => 'apex-chart' ])
 
 @php
-    $data = array_merge([
+    $seriesData = array_merge([
       'chart' => [
         'type' => "area",
         'stacked' => true,
@@ -40,6 +40,10 @@
         'axisTicks' => [
           'show' => false
         ],
+        'labels' => [
+          'offsetX' => 15,
+          'offsetY' => 0
+        ],
         'tooltip' => [
           'enabled' => false
         ]
@@ -65,30 +69,37 @@
       'legend' => [
         'show' => false,
       ],
-    ], $data);
-    $data = json_encode($data)
+    ], $seriesData);
+    $seriesData = json_encode($seriesData)
 @endphp
 
     <div 
         id="chart"
         wire:key="{{ rand() }}"
         x-data="{
-            data: {{ $data }},
+            data: {{ $seriesData }},
             init(){
-                
-                this.data.series = [{
-                    'name': 'Total Views',
-                    'data': generateDayWiseTimeSeries(0, 18)
-                },{
-                    'name': 'Unique Views',
-                    'data': generateDayWiseTimeSeries(1, 18)
-                }]
+
+                var charts = document.querySelectorAll('.apex-chart')
+                charts.forEach((chart)=>{
+                  console.log(chart)
+                })
+
+                var existingChart = ApexCharts.getChartByID('{{ $name }}');
+                if (existingChart) {
+                console.log('found it')
+                    existingChart.destroy();
+                }
+
+                console.log('did not find')
 
                 this.data.chart.events = {
                     mounted: function (chartContext, config) {
+                        console.log('moount', chartContext)
                         renderCustomLegend(chartContext);
                     },
                     updated: function (chartContext, config) {
+                        console.log('update')
                         renderCustomLegend(chartContext);
                     }
                 }
@@ -97,7 +108,7 @@
 
                 chart.render();
 
-                async function renderCustomLegend(chartContext) {
+                function renderCustomLegend(chartContext) {
                     var legendContainer = document.querySelector('#chart-legend-{{ $name }}');
 
                     if (!legendContainer) return;
@@ -145,37 +156,9 @@
                     });
                 }
 
-                function generateRandomArray(length, min, max) {
-                  const randomArray = [];
-                  for (let i = 0; i < length; i++) {
-                    randomArray.push(Math.floor(Math.random() * (max - min + 1)) + min);
-                  }
-                  return randomArray;
-                }
-
-                function generateDayWiseTimeSeries(s, count) {
-                    var values = [
-                      generateRandomArray(20, 2, 60), 
-                      generateRandomArray(20, 2, 60)
-                    ];
-                    var i = 0;
-                    var series = [];
-                    var x = new Date('11 Nov 2012').getTime();
-                    while (i < count) {
-                        series.push([x, values[s][i]]);
-                        x += 86400000;
-                        i++;
-                    }
-                    return series;
-                }
-
-
-
-
-
             }
         }"
     >
-        <div id="chart-{{ $name }}"></div>
+        <div id="chart-{{ $name }}" class="apex-chart"></div>
     </div>
     

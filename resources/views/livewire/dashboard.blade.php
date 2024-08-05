@@ -30,96 +30,92 @@ new class extends Component {
 
     public ?Portfolio $portfolio;
 
-    public array $myChart = [
-        'type' => 'line',
-        'data' => [
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-            'datasets' => [
-                [
-                    'label' => '# of Votes',
-                    'data' => [2000, 2204, 3001, 2981, 2845],
-                    'tension' => 0.4,
-                    'pointStyle' => 'rect',
-                    'pointRadius' => 4,
-                    'pointHoverRadius' => 6
-                ],
-                
-            ]
-        ],
-        'options' => [
-            'scales' => [
-                // 'y' => [
-                //     'display' => false,
-                // ],
-                'x' => [
-                    // 'type' => 'time',
-                    'time' => [
-                        // Luxon format string
-                        // 'tooltipFormat' => 'DD'
-                    ],
-                ],
-            ],
-            'aspectRatio' => 0,
-            'plugins' => [
-                'htmlLegend' => [
-                    // ID of the container to put the legend in
-                    'containerID' => 'chart-legend',
-                ],
-                'legend' => [
-                    'display' => false,
-                    // 'position' => 'right'
-                ]
-            ]
-        ]
 
-    ];
+    private function generateDateSeries($startDate, $endDate) {
+        $dateArray = [];
+        $currentDate = strtotime($startDate);
+        $endDate = strtotime($endDate);
+
+        while ($currentDate <= $endDate) {
+            // Generate a random integer
+            $randomInt = rand(1000, 3000);
+
+            // Format the current date to 'Y-m-d'
+            $formattedDate = date('Y-m-d', $currentDate);
+
+            // Append the date and random integer to the array
+            $dateArray[] = [$formattedDate, $randomInt];
+
+            // Move to the next day
+            $currentDate = strtotime("+1 day", $currentDate);
+        }
+
+        return $dateArray;
+    }
+
+    public array $myChart;
+
+    public function mount() {
+
+        $this->myChart = [
+            'series' => [
+                [
+                    'name' => 'Total Views',
+                    'data' => $this->generateDateSeries('2024-01-01', '2024-08-01')
+                ],      
+                [
+                    'name' => 'Second Views',
+                    'data' => $this->generateDateSeries('2024-01-01', '2024-08-01')
+                ],    
+            ],
+
+        ];
+
+    }
 
     
 }; ?>
   
 <div x-data>
 
-    <div class="grid mb-6 gap-5">
 
-        <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg ">
+    <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">
 
-    
-            <div class="flex justify-between items-center mb-2">
-                    
-                <div class="flex items-center">
-                    
-                    <h2 class="text-xl mr-4">Performance</h2>
-                    <div id="chart-legend-dashboard" class="flex space-around"></div>
-                    
-                </div>
 
-                <x-dropdown label="{{ $scope }}" class="btn-ghost btn-sm" >
-                        
-                    <x-menu >
-                        @foreach($options as $option)
-
-                            <x-menu-item 
-                                title="{{ $option['name'] }}" 
-                                x-on:click="$wire.changeScope('{{ $option['id'] }}')"
-                            />
-                    
-                        @endforeach
-                    </x-menu>
-                </x-dropdown>
+        <div class="flex justify-between items-center mb-2">
+                
+            <div class="flex items-center">
+                
+                <h2 class="text-xl mr-4">Performance</h2>
+                <div id="chart-legend-dashboard" class="flex space-around"></div>
                 
             </div>
+
+            <x-dropdown label="{{ $scope }}" class="btn-ghost btn-sm" >
+                    
+                <x-menu >
+                    @foreach($options as $option)
+
+                        <x-menu-item 
+                            title="{{ $option['name'] }}" 
+                            x-on:click="$wire.changeScope('{{ $option['id'] }}')"
+                        />
+                
+                    @endforeach
+                </x-menu>
+            </x-dropdown>
             
-            <div
-                class="h-[280px] mb-5"
-            >
-                <x-ib-apex-chart :data="[]" name="dashboard"  />
-            </div>
-    
+        </div>
+        
+        <div
+            class="h-[280px] mb-5"
+        >
+            <x-ib-apex-chart :key="Str::uuid()" :series-data="$myChart" name="dashboard"  />
+        </div>
 
-        </x-card>
 
-    </div>
-    
+    </x-card>
+
     <div class="grid md:grid-cols-5 gap-5">
         <x-stat
             class="bg-slate-100 dark:bg-base-200"
