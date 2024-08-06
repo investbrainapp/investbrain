@@ -43,10 +43,7 @@ new class extends Component {
         // $this->portfolio->owner_id = auth()->user()->id;
         $this->portfolio->save();
 
-        $this->success('Portfolio updated');
-
-        $this->dispatch('portfolio-updated', $this->portfolio); 
-        $this->dispatch('close-drawer'); 
+        $this->success('Portfolio updated', redirectTo: "/portfolio/{$this->portfolio->id}");
     }
 
     public function save()

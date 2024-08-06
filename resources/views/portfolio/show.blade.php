@@ -74,9 +74,7 @@ new class extends Component {
 }; ?>
 
 <x-app-layout>
-    <div >
-
-        
+    <div x-data>
 
         <x-ib-drawer 
             key="manage-portfolio"
