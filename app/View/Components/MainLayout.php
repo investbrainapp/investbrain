@@ -5,7 +5,7 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class CommonLayout extends Component
+class MainLayout extends Component
 {
     public function __construct(
 
@@ -18,6 +18,6 @@ class CommonLayout extends Component
      */
     public function render(): View
     {
-        return view('layouts.common');
+        return view('layouts.main-layout');
     }
 }
