@@ -9,20 +9,24 @@ use Mary\Traits\Toast;
 new class extends Component {
     use Toast;
 
-    public string $submit;
+    // props
     public ?Portfolio $portfolio;
     public Bool $hideCancel = false;
 
     #[Rule('required|min:5')]
-    public string $title;
+    public String $title;
 
     #[Rule('sometimes|nullable')]
-    public ?string $notes;
+    public ?String $notes;
 
-    #[Rule('sometimes|boolean')]
-    public ?bool $wishlist;
+    #[Rule('sometimes|nullable|boolean')]
+    public Bool $wishlist = false;
 
-    public function mount() {
+    public Bool $confirmingPortfolioDeletion = false;
+
+    // methods
+    public function mount() 
+    {
 
         if (isset($this->portfolio)) {
 
@@ -30,11 +34,6 @@ new class extends Component {
             $this->notes = $this->portfolio->notes;
             $this->wishlist = $this->portfolio->wishlist;
         }
-    }
-
-    public function categories(): Collection
-    {
-        return Category::all();
     }
 
     public function update()
@@ -69,29 +68,57 @@ new class extends Component {
         $this->success('Portfolio created', redirectTo: "/portfolio/{$portfolio->id}");
     }
 
-    public function with(): array
+    public function delete()
     {
-        return [
-        //     'categories' => $this->categories()
-        ];
+
+        $this->portfolio->delete();
+
+        $this->success('Portfolio deleted', redirectTo: "/dashboard");
     }
 }; ?>
 
 <div class="grid lg:grid-cols-4 gap-10">
-    <x-form wire:submit="{{ $submit }}" class="col-span-3">
+    <x-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" class="col-span-3">
         <x-input label="Title" wire:model="title" required />
-
-        {{-- <x-select label="Category" wire:model="category_id" placeholder="Select a category" :options="$categories" /> --}}
 
         <x-textarea label="Notes" wire:model="notes" rows="5" />
 
         <x-toggle label="Wishlist" wire:model="wishlist" />
 
         <x-slot:actions>
-            @if (!$hideCancel)
-            <x-button label="Cancel" link="{{ url()->previous() }}" />
+            @if ($portfolio)
+            <x-button 
+                class="ms-3 btn-error btn-outline text-white float-left" 
+                wire:click="$toggle('confirmingPortfolioDeletion')" 
+                wire:loading.attr="disabled"
+                icon="o-trash"
+            />
             @endif
-            <x-button label="{{ $submit == 'save' ? 'Create' : 'Update' }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
+
+            @if (!$hideCancel)
+            <x-button label="Cancel" link="/dashboard" />
+            @endif
+            <x-button label="{{ $portfolio ? 'Update' : 'Create' }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
         </x-slot:actions>
     </x-form>
+
+    <x-confirmation-modal wire:model.live="confirmingPortfolioDeletion">
+        <x-slot name="title">
+            {{ __('Delete Portfolio') }}
+        </x-slot>
+
+        <x-slot name="content">
+            {{ __('Are you sure you want to delete this portfolio? Once a portfolio is deleted, all of its holdings and other data will be permanently deleted.') }}
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-button class="btn-outline" wire:click="$toggle('confirmingPortfolioDeletion')" wire:loading.attr="disabled">
+                {{ __('Cancel') }}
+            </x-secondary-button>
+
+            <x-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
+                {{ __('Delete Portfolio') }}
+            </x-button>
+        </x-slot>
+    </x-confirmation-modal>
 </div>

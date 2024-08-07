@@ -3,6 +3,6 @@
 
         <x-ib-toolbar title="Create Portfolio" />
 
-        @livewire('manage-portfolio-form', ['submit' => 'save'])
+        @livewire('manage-portfolio-form')
     </div>
 </x-app-layout>

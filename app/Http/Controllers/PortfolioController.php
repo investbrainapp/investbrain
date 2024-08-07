@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Portfolio;
-use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
 {
@@ -23,5 +22,4 @@ class PortfolioController extends Controller
     {
         return view('portfolio.show', compact('portfolio'));
     }
-
 }
