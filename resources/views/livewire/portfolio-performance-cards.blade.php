@@ -94,16 +94,15 @@ new class extends Component {
 
             <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-ghost btn-sm">
                     
-                <x-menu>
-                    @foreach($options as $option)
+                @foreach($options as $option)
 
-                        <x-menu-item 
-                            title="{{ $option['name'] }}" 
-                            x-on:click="$wire.changeScope('{{ $option['id'] }}')"
-                        />
-                
-                    @endforeach
-                </x-menu>
+                    <x-menu-item 
+                        title="{{ $option['name'] }}" 
+                        x-on:click="$wire.changeScope('{{ $option['id'] }}')"
+                    />
+            
+                @endforeach
+
             </x-dropdown>
         </div>
     </div>
