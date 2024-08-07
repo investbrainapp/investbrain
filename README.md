@@ -18,4 +18,4 @@ If you discover a security vulnerability within Investbrain, please create an is
 
 ## License
 
-Investbrain is open-sourced software licensed under the [CC-BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
+Investbrain is open-sourced software licensed under the [CC-BY-NC 4.0](https://github.com/hackeresq/investbrain?tab=License-1-ov-file).
