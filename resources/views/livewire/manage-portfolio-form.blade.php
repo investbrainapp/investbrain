@@ -83,7 +83,11 @@ new class extends Component {
 
         <x-textarea label="{{ __('Notes') }}" wire:model="notes" rows="5" />
 
-        <x-toggle label="{{ __('Wishlist') }}" wire:model="wishlist" />
+        <x-toggle label="{{ __('Wishlist') }}" wire:model="wishlist">
+            <x-slot:hint>
+                {{ __('Treat this portfolio as a "wishlist" (holdings will be excluded from realized gains, unrealized gains, and dividends)') }}
+            </x-slot:hint>
+        </x-toggle>
 
         <x-slot:actions>
             @if ($portfolio)

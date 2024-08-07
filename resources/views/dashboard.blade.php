@@ -39,6 +39,12 @@
     <div class="mt-6 grid md:grid-cols-7 gap-5">
 
         <x-ib-card title="{{ __('My portfolios') }}" class="md:col-span-4">
+
+            @if (empty($user->portfolos))
+                <div class="flex justify-center items-center h-[100px] mb-8">
+                    <x-button label="{{ __('Create your first portfolio!') }}" class="btn-primary" link="{{ route('portfolio.create') }}" />
+                </div>
+            @endif
             
             @foreach($user->portfolios as $portfolio)
                 <x-list-item no-separator :item="$portfolio" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}">
@@ -53,6 +59,7 @@
 
         </x-ib-card>
 
+        @if (!empty($user->portfolos))
         <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
          
             @php
@@ -64,7 +71,9 @@
             @endforeach
 
         </x-ib-card>
+        @endif
         
+        @if (!empty($user->portfolos))
         <x-ib-card title="{{ __('Top headlines') }}" class="md:col-span-3">
          
             @php
@@ -76,7 +85,9 @@
             @endforeach
 
         </x-ib-card>
+        @endif
 
+        @if (!empty($user->portfolos))
         <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-4">
          
             @php
@@ -88,6 +99,7 @@
             @endforeach
 
         </x-ib-card>
+        @endif
 
     </div>
     
