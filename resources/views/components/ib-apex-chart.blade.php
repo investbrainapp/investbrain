@@ -69,6 +69,7 @@
       'legend' => [
         'show' => false,
       ],
+      
     ], $seriesData);
     $seriesData = json_encode($seriesData)
 @endphp
@@ -87,6 +88,18 @@
                 updated: function (chartContext, config) {
                     renderLegend(chartContext);
                 }
+            }
+
+            this.data.tooltip = {
+                enabled: true,
+                y: {
+                    formatter: (value, { series, seriesIndex, dataPointIndex, w }) => {
+                    
+                        const firstDataPoint = this.data.series[seriesIndex].data[1][1]
+                        const percentageChange = ((value - firstDataPoint) / firstDataPoint) * 100;
+                        return `${value} (${percentageChange.toFixed(2)}%)`;
+                    }
+                },
             }
 
             var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
