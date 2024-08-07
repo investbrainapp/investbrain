@@ -40,14 +40,14 @@
 
         <x-ib-card title="{{ __('My portfolios') }}" class="md:col-span-4">
 
-            @if (empty($user->portfolos))
+            @if ($user->portfolios->isEmpty())
                 <div class="flex justify-center items-center h-[100px] mb-8">
                     <x-button label="{{ __('Create your first portfolio!') }}" class="btn-primary" link="{{ route('portfolio.create') }}" />
                 </div>
             @endif
             
             @foreach($user->portfolios as $portfolio)
-                <x-list-item no-separator :item="$portfolio" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}">
+                <x-list-item :item="$portfolio" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}">
                     <x-slot:value>
                         {{ $portfolio->title }}
                         @if($portfolio->wishlist)
@@ -59,7 +59,7 @@
 
         </x-ib-card>
 
-        @if (!empty($user->portfolos))
+        @if (!$user->portfolios->isEmpty())
         <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
          
             @php
@@ -73,7 +73,7 @@
         </x-ib-card>
         @endif
         
-        @if (!empty($user->portfolos))
+        @if (!$user->portfolios->isEmpty())
         <x-ib-card title="{{ __('Top headlines') }}" class="md:col-span-3">
          
             @php
@@ -87,7 +87,7 @@
         </x-ib-card>
         @endif
 
-        @if (!empty($user->portfolos))
+        @if (!$user->portfolios->isEmpty())
         <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-4">
          
             @php
