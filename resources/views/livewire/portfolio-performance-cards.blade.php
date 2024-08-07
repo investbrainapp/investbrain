@@ -88,21 +88,24 @@ new class extends Component {
             <div id="chart-legend-{{ $name }}" class="flex space-between"></div>
             
         </div>
-
-        <x-dropdown label="{{ $scope }}" class="btn-ghost btn-sm">
-                
-            <x-menu>
-                @foreach($options as $option)
-
-                    <x-menu-item 
-                        title="{{ $option['name'] }}" 
-                        x-on:click="$wire.changeScope('{{ $option['id'] }}')"
-                    />
-            
-                @endforeach
-            </x-menu>
-        </x-dropdown>
         
+        <div class="flex items-center">
+            <x-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" />
+
+            <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-ghost btn-sm">
+                    
+                <x-menu>
+                    @foreach($options as $option)
+
+                        <x-menu-item 
+                            title="{{ $option['name'] }}" 
+                            x-on:click="$wire.changeScope('{{ $option['id'] }}')"
+                        />
+                
+                    @endforeach
+                </x-menu>
+            </x-dropdown>
+        </div>
     </div>
 
     <div

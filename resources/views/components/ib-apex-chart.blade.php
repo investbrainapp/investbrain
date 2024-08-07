@@ -82,12 +82,10 @@
 
             this.data.chart.events = {
                 mounted: function (chartContext, config) {
-                    console.log('moount', chartContext)
-                    renderCustomLegend(chartContext);
+                    renderLegend(chartContext);
                 },
                 updated: function (chartContext, config) {
-                    console.log('update')
-                    renderCustomLegend(chartContext);
+                    renderLegend(chartContext);
                 }
             }
 
@@ -95,7 +93,15 @@
 
             chart.render();
 
-            function renderCustomLegend(chartContext) {
+            // reset custom zoom button
+            var resetZoomButton = document.querySelector('#chart-reset-zoom-{{ $name }}');
+            resetZoomButton.addEventListener('click', function () {
+              chart.resetSeries()
+                        
+            });
+
+            // generate custom legend view
+            function renderLegend(chartContext) {
                 var legendContainer = document.querySelector('#chart-legend-{{ $name }}');
 
                 if (!legendContainer) return;
@@ -146,6 +152,6 @@
         }
     }"
 >
-    <div id="chart-{{ $name }}" class="apex-chart"></div>
+  <div id="chart-{{ $name }}" class="apex-chart"></div>
 </div>
 
