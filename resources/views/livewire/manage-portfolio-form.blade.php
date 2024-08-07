@@ -42,7 +42,7 @@ new class extends Component {
         // $this->portfolio->owner_id = auth()->user()->id;
         $this->portfolio->save();
 
-        $this->success('Portfolio updated', redirectTo: "/portfolio/{$this->portfolio->id}");
+        $this->success(__('Portfolio updated'), redirectTo: "/portfolio/{$this->portfolio->id}");
     }
 
     public function save()
@@ -65,7 +65,7 @@ new class extends Component {
         // $portfolio->owner_id = auth()->user()->id;
         $portfolio->save();
 
-        $this->success('Portfolio created', redirectTo: "/portfolio/{$portfolio->id}");
+        $this->success(__('Portfolio created'), redirectTo: "/portfolio/{$portfolio->id}");
     }
 
     public function delete()
@@ -73,17 +73,17 @@ new class extends Component {
 
         $this->portfolio->delete();
 
-        $this->success('Portfolio deleted', redirectTo: "/dashboard");
+        $this->success(__('Portfolio deleted'), redirectTo: "/dashboard");
     }
 }; ?>
 
 <div class="grid lg:grid-cols-4 gap-10">
     <x-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" class="col-span-3">
-        <x-input label="Title" wire:model="title" required />
+        <x-input label="{{ __('Title') }}" wire:model="title" required />
 
-        <x-textarea label="Notes" wire:model="notes" rows="5" />
+        <x-textarea label="{{ __('Notes') }}" wire:model="notes" rows="5" />
 
-        <x-toggle label="Wishlist" wire:model="wishlist" />
+        <x-toggle label="{{ __('Wishlist') }}" wire:model="wishlist" />
 
         <x-slot:actions>
             @if ($portfolio)
@@ -96,7 +96,7 @@ new class extends Component {
             @endif
 
             @if (!$hideCancel)
-            <x-button label="Cancel" link="/dashboard" />
+            <x-button label="{{ __('Cancel') }}" link="/dashboard" />
             @endif
             <x-button label="{{ $portfolio ? 'Update' : 'Create' }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
         </x-slot:actions>

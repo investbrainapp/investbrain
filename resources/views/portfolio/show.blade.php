@@ -27,49 +27,43 @@
             />
         </x-ib-toolbar>
 
-        <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">
+        @livewire('portfolio-performance-cards', [
+            'name' => 'portfolio-'.$portfolio->id,
+            'portfolio' => $portfolio
+        ])
 
-            @livewire('portfolio-performance-chart', [
-                'name' => 'portfolio-'.$portfolio->id,
-                'portfolio' => $portfolio
-            ])
+        <div class="grid sm:grid-cols-5 gap-5">
+            @php
+                $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
+            @endphp
 
-        </x-card>
-
-        <div class="grid md:grid-cols-5 gap-5">
-            @livewire('portfolio-performance-card')
-            {{-- <x-stat
-                class="bg-slate-100 dark:bg-base-200"
-                title="Market Gain/Loss"
-                value="22.124"
-                icon="o-arrow-trending-up"
-            /> --}}
-            <x-stat
-                class="bg-slate-100 dark:bg-base-200"
-                title="Total Cost Basis"
-                value="22.124"
-                icon="o-arrow-trending-up"
-            />
-            <x-stat
-                class="bg-slate-100 dark:bg-base-200"
-                title="Total Market Value"
-                value="22.124"
-                icon="o-arrow-trending-up"
-            />
-            <x-stat
-                class="bg-slate-100 dark:bg-base-200"
-                title="Realized Gain/Loss"
-                value="22.124"
-                icon="o-arrow-trending-up"
-            />
-            <x-stat
-                class="bg-slate-100 dark:bg-base-200"
-                title="Dividends Earned"
-                value="22.124"
-                icon="o-arrow-trending-up"
-            />
+            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
+                <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Market Gain/Loss') }}</div>
+                <div class="font-black text-xl"> {{ $formatter->formatCurrency($portfolio->marketGainLoss, 'USD') }} </div>
+            </x-card>
             
+            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
+                <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Cost Basis') }}</div>
+                <div class="font-black text-xl"> {{ $formatter->formatCurrency($portfolio->totalCostBasis, 'USD') }} </div>
+            </x-card>
+            
+            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
+                <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Market Value') }}</div>
+                <div class="font-black text-xl"> {{ $formatter->formatCurrency($portfolio->totalMarketValue, 'USD') }} </div>
+            </x-card>
+            
+            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
+                <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Realized Gain/Loss') }}</div>
+                <div class="font-black text-xl"> {{ $formatter->formatCurrency($portfolio->realizedGainLoss, 'USD') }} </div>
+            </x-card>
+
+            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
+                <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Dividends Earned') }}</div>
+                <div class="font-black text-xl"> {{ $formatter->formatCurrency($portfolio->dividendsEarned, 'USD') }} </div>
+            </x-card>
+                
         </div>
+
 
         <div class="mt-6 grid md:grid-cols-7 gap-5">
 

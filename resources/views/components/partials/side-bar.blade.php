@@ -3,7 +3,15 @@
     <x-menu-item title="{{ __('Dashboard') }}" icon="o-home" link="{{ @route('dashboard') }}" />
     <x-menu-sub title="{{ __('Portfolios') }}" icon="o-document-duplicate">
         @foreach (auth()->user()->portfolios as $portfolio)
-            <x-menu-item title="{{ $portfolio->title }}" icon="o-document" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" />
+        <x-menu-item  icon="o-document" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" exact>
+            <x-slot:title> 
+                {{ $portfolio->title }} 
+                @if($portfolio->wishlist)
+                <x-badge value="{{ __('Wishlist') }}" class="badge-primary badge-sm ml-2" />
+                @endif
+            </x-slot:title>
+            
+        </x-menu-item>
         @endforeach
 
         <x-menu-item title="{{ __('Create Portfolio') }}" icon="o-document-plus" link="{{ @route('portfolio.create') }}" />

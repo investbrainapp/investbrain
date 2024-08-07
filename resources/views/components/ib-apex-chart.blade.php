@@ -73,92 +73,79 @@
     $seriesData = json_encode($seriesData)
 @endphp
 
-    <div 
-        id="chart"
-        wire:key="{{ rand() }}"
-        x-data="{
-            data: {{ $seriesData }},
-            init(){
+<div 
+    id="chart"
+    wire:key="{{ rand() }}"
+    x-data="{
+        data: {{ $seriesData }},
+        init(){
 
-                var charts = document.querySelectorAll('.apex-chart')
-                charts.forEach((chart)=>{
-                  console.log(chart)
-                })
-
-                var existingChart = ApexCharts.getChartByID('{{ $name }}');
-                if (existingChart) {
-                console.log('found it')
-                    existingChart.destroy();
+            this.data.chart.events = {
+                mounted: function (chartContext, config) {
+                    console.log('moount', chartContext)
+                    renderCustomLegend(chartContext);
+                },
+                updated: function (chartContext, config) {
+                    console.log('update')
+                    renderCustomLegend(chartContext);
                 }
-
-                console.log('did not find')
-
-                this.data.chart.events = {
-                    mounted: function (chartContext, config) {
-                        console.log('moount', chartContext)
-                        renderCustomLegend(chartContext);
-                    },
-                    updated: function (chartContext, config) {
-                        console.log('update')
-                        renderCustomLegend(chartContext);
-                    }
-                }
-
-                var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
-
-                chart.render();
-
-                function renderCustomLegend(chartContext) {
-                    var legendContainer = document.querySelector('#chart-legend-{{ $name }}');
-
-                    if (!legendContainer) return;
-
-                    legendContainer.innerHTML = ''; // Clear any existing legend items
-                    
-                    chartContext.w.globals.seriesNames.forEach(function (seriesName, i) {
-                    
-                        var seriesColor = chartContext.w.config.colors[i];
-                        var legendItem = document.createElement('div');
-                        legendItem.classList.add('flex', 'items-center', 'm-2', 'cursor-pointer');
-                        legendItem.setAttribute('data-series-index', i);
-
-                        var colorBox = document.createElement('span');
-                        colorBox.id = seriesName
-                        colorBox.classList.add('w-4', 'h-4', 'inline-block', 'mr-2');
-                        colorBox.style.backgroundColor = seriesColor;
-
-                        var labelText = document.createElement('span');
-                        labelText.textContent = seriesName;
-
-                        legendItem.appendChild(colorBox);
-                        legendItem.appendChild(labelText);
-                        legendContainer.appendChild(legendItem);
-
-                        // Initial visibility state
-                        var isCollapsed = chartContext.w.globals.collapsedSeriesIndices.includes(i);
-                        if (isCollapsed) {
-                            legendItem.classList.add('opacity-50');
-                        }
-
-                        legendItem.addEventListener('click', function () {
-                          
-                            var seriesIndex = parseInt(this.getAttribute('data-series-index'), 10);
-                            var isCurrentlyCollapsed = chartContext.w.globals.collapsedSeriesIndices.includes(seriesIndex);
-
-                            chart.toggleSeries(chartContext.w.globals.seriesNames[seriesIndex]);
-
-                            if (isCurrentlyCollapsed) {
-                                this.classList.remove('opacity-50');
-                            } else {
-                                this.classList.add('opacity-50');
-                            }
-                        });
-                    });
-                }
-
             }
-        }"
-    >
-        <div id="chart-{{ $name }}" class="apex-chart"></div>
-    </div>
-    
+
+            var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
+
+            chart.render();
+
+            function renderCustomLegend(chartContext) {
+                var legendContainer = document.querySelector('#chart-legend-{{ $name }}');
+
+                if (!legendContainer) return;
+
+                legendContainer.innerHTML = ''; // Clear any existing legend items
+                
+                chartContext.w.globals.seriesNames.forEach(function (seriesName, i) {
+                
+                    var seriesColor = chartContext.w.config.colors[i];
+                    var legendItem = document.createElement('div');
+                    legendItem.classList.add('flex', 'items-center', 'm-2', 'cursor-pointer');
+                    legendItem.setAttribute('data-series-index', i);
+
+                    var colorBox = document.createElement('span');
+                    colorBox.id = seriesName
+                    colorBox.classList.add('w-4', 'h-4', 'inline-block', 'mr-2');
+                    colorBox.style.backgroundColor = seriesColor;
+
+                    var labelText = document.createElement('span');
+                    labelText.textContent = seriesName;
+
+                    legendItem.appendChild(colorBox);
+                    legendItem.appendChild(labelText);
+                    legendContainer.appendChild(legendItem);
+
+                    // Initial visibility state
+                    var isCollapsed = chartContext.w.globals.collapsedSeriesIndices.includes(i);
+                    if (isCollapsed) {
+                        legendItem.classList.add('opacity-50');
+                    }
+
+                    legendItem.addEventListener('click', function () {
+                      
+                        var seriesIndex = parseInt(this.getAttribute('data-series-index'), 10);
+                        var isCurrentlyCollapsed = chartContext.w.globals.collapsedSeriesIndices.includes(seriesIndex);
+
+                        chart.toggleSeries(chartContext.w.globals.seriesNames[seriesIndex]);
+
+                        if (isCurrentlyCollapsed) {
+                            this.classList.remove('opacity-50');
+                        } else {
+                            this.classList.add('opacity-50');
+                        }
+                    });
+                });
+            }
+
+        }
+    }"
+>
+    <div id="chart-{{ $name }}" class="apex-chart"></div>
+</div>
+

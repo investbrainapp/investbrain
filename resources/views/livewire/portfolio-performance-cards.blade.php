@@ -38,6 +38,8 @@ new class extends Component {
             ],
 
         ];
+        
+        // $this->marketGainLoss = rand(-200, 3999);
     }
 
     public function changeScope($scope)
@@ -77,7 +79,7 @@ new class extends Component {
 
 }; ?>
 
-<div>
+<x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">
     <div class="flex justify-between items-center mb-2">
                     
         <div class="flex items-center">
@@ -109,4 +111,4 @@ new class extends Component {
         <x-ib-apex-chart :series-data="$myChart" :name="$name" />
     </div>
 
-</div>
+</x-card>

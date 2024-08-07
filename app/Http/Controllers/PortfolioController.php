@@ -20,6 +20,13 @@ class PortfolioController extends Controller
      */
     public function show(Portfolio $portfolio)
     {
+
+        $portfolio->marketGainLoss = rand(-200, 3999);
+        $portfolio->totalCostBasis = rand(-200, 3999);
+        $portfolio->totalMarketValue = rand(-200, 3999);
+        $portfolio->realizedGainLoss = rand(-200, 3999);
+        $portfolio->dividendsEarned = rand(-200, 3999);
+
         return view('portfolio.show', compact('portfolio'));
     }
 }
