@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
         "livewire/volt": "^1.6",
+        "predis/predis": "^2.2",
         "robsontenorio/mary": "^1.35"
     },
     "require-dev": {
