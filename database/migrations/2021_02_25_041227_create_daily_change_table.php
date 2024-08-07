@@ -22,7 +22,7 @@ class CreateDailyChangeTable extends Migration
             $table->float('total_gain_loss', 12, 4)->nullable();
             $table->float('total_dividends', 12, 4)->nullable();
             $table->float('realized_gains', 12, 4)->nullable();
-            $table->text('notes')->nullable();
+            $table->text('annotation')->nullable();
 
             $table->primary(['date', 'portfolio_id']);
         });

@@ -15,10 +15,10 @@ class CreateTransactionsTable extends Migration
     public function up()
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->string('symbol');
+            $table->uuid('id')->primary(); 
+            $table->string('symbol', 15);
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->onDelete('cascade');
-            $table->string('transaction_type');
+            $table->string('transaction_type', 15);
             $table->float('quantity', 12, 4);
             $table->float('cost_basis', 12, 4);
             $table->float('sale_price', 12, 4)->nullable();

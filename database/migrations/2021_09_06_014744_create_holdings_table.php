@@ -15,9 +15,9 @@ class CreateHoldingsTable extends Migration
     public function up()
     {
         Schema::create('holdings', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary(); 
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->onDelete('cascade');
-            $table->string('symbol');
+            $table->string('symbol', 15);
             $table->float('quantity', 12, 4);
             $table->float('average_cost_basis', 12, 4);
             $table->float('total_cost_basis', 12, 4)->nullable();

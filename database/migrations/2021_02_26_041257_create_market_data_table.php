@@ -14,7 +14,7 @@ class CreateMarketDataTable extends Migration
     public function up()
     {
         Schema::create('market_data', function (Blueprint $table) {
-            $table->string('symbol')->primary();
+            $table->string('symbol', 15)->primary();
             $table->string('name');
             $table->float('market_value', 12, 4);
             $table->float('fifty_two_week_low', 12, 4);

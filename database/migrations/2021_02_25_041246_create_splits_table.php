@@ -14,9 +14,9 @@ class CreateSplitsTable extends Migration
     public function up()
     {
         Schema::create('splits', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary(); 
             $table->date('date');
-            $table->string('symbol');
+            $table->string('symbol', 15);
             $table->float('split_amount', 12, 4);
             $table->timestamps();
         });
