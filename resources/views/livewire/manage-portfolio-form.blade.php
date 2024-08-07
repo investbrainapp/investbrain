@@ -88,7 +88,7 @@ new class extends Component {
         <x-slot:actions>
             @if ($portfolio)
             <x-button 
-                class="ms-3 btn-error btn-outline text-white float-left" 
+                class="ms-3 btn-error btn-outline text-white" 
                 wire:click="$toggle('confirmingPortfolioDeletion')" 
                 wire:loading.attr="disabled"
                 icon="o-trash"
