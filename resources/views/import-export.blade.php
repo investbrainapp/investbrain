@@ -14,8 +14,7 @@
                     
                     <!-- Name -->
                     <div class="col-span-6 sm:col-span-4">
-                        {{-- <x-file wire:model="file" label="Receipt" hint="Only PDF" accept="application/pdf" /> --}}
-                        <input type="file" />
+                        @livewire('import-portfolios-field')
                     </div>
             
                 </x-slot>
@@ -23,7 +22,7 @@
                 <x-slot name="actions">
               
                     <x-button type="submit">
-                        {{ __('Save') }}
+                        {{ __('Import') }}
                     </x-button>
                 </x-slot>
             </x-forms.form-section>
@@ -45,9 +44,8 @@
                     
                     <!-- Name -->
                     <div class="col-span-6 sm:col-span-4">
-                        <x-button type="submit">
-                            {{ __('Download Export') }}
-                        </x-button>
+                        @livewire('export-portfolios-button')
+                        
 
                     </div>
             
