@@ -1,10 +1,12 @@
 <?php
 
+use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 
 new class extends Component {
     use Toast;
+    use WithFileUploads;
 
     // props
     public $file;
