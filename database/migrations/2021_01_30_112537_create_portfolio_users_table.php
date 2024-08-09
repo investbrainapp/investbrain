@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->onDelete('cascade');
             $table->foreignIdFor(User::class, 'user_id')->onDelete('cascade');
             $table->boolean('owner')->default(false);
-            $table->boolean('read')->default(false);
             $table->boolean('write')->default(false);
             $table->primary(['portfolio_id', 'user_id']);
         });
