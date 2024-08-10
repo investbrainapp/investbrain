@@ -7,27 +7,27 @@
     <div class="grid sm:grid-cols-5 gap-5">
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Market Gain/Loss') }}</div>
-            <div class="font-black text-xl"> {{ formatMoney($dashboard->marketGainLoss) }} </div>
+            <div class="font-black text-xl"> {{ Number::currency($dashboard->marketGainLoss) }} </div>
         </x-card>
         
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Cost Basis') }}</div>
-            <div class="font-black text-xl"> {{ formatMoney($dashboard->totalCostBasis) }} </div>
+            <div class="font-black text-xl"> {{ Number::currency($dashboard->totalCostBasis) }} </div>
         </x-card>
         
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Market Value') }}</div>
-            <div class="font-black text-xl"> {{ formatMoney($dashboard->totalMarketValue) }} </div>
+            <div class="font-black text-xl"> {{ Number::currency($dashboard->totalMarketValue) }} </div>
         </x-card>
         
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Realized Gain/Loss') }}</div>
-            <div class="font-black text-xl"> {{ formatMoney($dashboard->realizedGainLoss) }} </div>
+            <div class="font-black text-xl"> {{ Number::currency($dashboard->realizedGainLoss) }} </div>
         </x-card>
 
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Dividends Earned') }}</div>
-            <div class="font-black text-xl"> {{ formatMoney($dashboard->dividendsEarned) }} </div>
+            <div class="font-black text-xl"> {{ Number::currency($dashboard->dividendsEarned) }} </div>
         </x-card>
             
     </div>

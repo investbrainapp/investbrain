@@ -36,27 +36,27 @@
 
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Market Gain/Loss') }}</div>
-                <div class="font-black text-xl"> {{ formatMoney($portfolio->marketGainLoss) }} </div>
+                <div class="font-black text-xl"> {{ Number::currency($portfolio->marketGainLoss) }} </div>
             </x-card>
             
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Cost Basis') }}</div>
-                <div class="font-black text-xl"> {{ formatMoney($portfolio->totalCostBasis) }} </div>
+                <div class="font-black text-xl"> {{ Number::currency($portfolio->totalCostBasis) }} </div>
             </x-card>
             
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Market Value') }}</div>
-                <div class="font-black text-xl"> {{ formatMoney($portfolio->totalMarketValue) }} </div>
+                <div class="font-black text-xl"> {{ Number::currency($portfolio->totalMarketValue) }} </div>
             </x-card>
             
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Realized Gain/Loss') }}</div>
-                <div class="font-black text-xl"> {{ formatMoney($portfolio->realizedGainLoss) }} </div>
+                <div class="font-black text-xl"> {{ Number::currency($portfolio->realizedGainLoss) }} </div>
             </x-card>
 
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Dividends Earned') }}</div>
-                <div class="font-black text-xl"> {{ formatMoney($portfolio->dividendsEarned) }} </div>
+                <div class="font-black text-xl"> {{ Number::currency($portfolio->dividendsEarned) }} </div>
             </x-card>
                 
         </div>
