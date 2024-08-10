@@ -1,9 +1,9 @@
 {
-    "name": "laravel/laravel",
+    "name": "hackeresq/investbrain",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
-    "license": "MIT",
+    "keywords": ["stocks", "dividends", "investments", "tracking"],
+    "license": "CC-BY-NC 4.0",
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.9",
@@ -25,6 +25,9 @@
         "phpunit/phpunit": "^11.0.1"
     },
     "autoload": {
+        "files": [
+            "app/Support/Helpers.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
