@@ -5,33 +5,29 @@
     ])
 
     <div class="grid sm:grid-cols-5 gap-5">
-        @php
-            $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
-        @endphp
-
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Market Gain/Loss') }}</div>
-            <div class="font-black text-xl"> {{ $formatter->formatCurrency($dashboard->marketGainLoss, 'USD') }} </div>
+            <div class="font-black text-xl"> {{ formatMoney($dashboard->marketGainLoss) }} </div>
         </x-card>
         
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Cost Basis') }}</div>
-            <div class="font-black text-xl"> {{ $formatter->formatCurrency($dashboard->totalCostBasis, 'USD') }} </div>
+            <div class="font-black text-xl"> {{ formatMoney($dashboard->totalCostBasis) }} </div>
         </x-card>
         
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Total Market Value') }}</div>
-            <div class="font-black text-xl"> {{ $formatter->formatCurrency($dashboard->totalMarketValue, 'USD') }} </div>
+            <div class="font-black text-xl"> {{ formatMoney($dashboard->totalMarketValue) }} </div>
         </x-card>
         
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Realized Gain/Loss') }}</div>
-            <div class="font-black text-xl"> {{ $formatter->formatCurrency($dashboard->realizedGainLoss, 'USD') }} </div>
+            <div class="font-black text-xl"> {{ formatMoney($dashboard->realizedGainLoss) }} </div>
         </x-card>
 
         <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
             <div class="text-sm text-gray-400 whitespace-nowrap">{{ __('Dividends Earned') }}</div>
-            <div class="font-black text-xl"> {{ $formatter->formatCurrency($dashboard->dividendsEarned, 'USD') }} </div>
+            <div class="font-black text-xl"> {{ formatMoney($dashboard->dividendsEarned) }} </div>
         </x-card>
             
     </div>
