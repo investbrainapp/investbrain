@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
     Route::view('/import-export', 'import-export')->name('import-export');
 
+    Route::redirect('/portfolio', '/portfolio/create', 301);
     Route::get('/portfolio/create', [PortfolioController::class, 'create'])->name('portfolio.create');
     Route::get('/portfolio/{portfolio}', [PortfolioController::class, 'show'])->name('portfolio.show');
-
 });
