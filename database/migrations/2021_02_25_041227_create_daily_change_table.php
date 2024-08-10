@@ -16,7 +16,7 @@ class CreateDailyChangeTable extends Migration
     {
         Schema::create('daily_change', function (Blueprint $table) {
             $table->date('date');
-            $table->foreignIdFor(Portfolio::class, 'portfolio_id')->onDelete('cascade');
+            $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
             $table->float('total_market_value', 12, 4)->nullable();
             $table->float('total_cost_basis', 12, 4)->nullable();
             $table->float('total_gain_loss', 12, 4)->nullable();

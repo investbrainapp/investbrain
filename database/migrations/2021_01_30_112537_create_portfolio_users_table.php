@@ -16,8 +16,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('portfolio_user', function (Blueprint $table) {
-            $table->foreignIdFor(Portfolio::class, 'portfolio_id')->onDelete('cascade');
-            $table->foreignIdFor(User::class, 'user_id')->onDelete('cascade');
+            $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(User::class, 'user_id')->constrained()->onDelete('cascade');
             $table->boolean('owner')->default(false);
             $table->boolean('write')->default(false);
             $table->primary(['portfolio_id', 'user_id']);

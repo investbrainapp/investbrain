@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Portfolio;
+use App\Models\MarketData;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -16,8 +17,8 @@ class CreateTransactionsTable extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary(); 
-            $table->string('symbol', 15);
-            $table->foreignIdFor(Portfolio::class, 'portfolio_id')->onDelete('cascade');
+            $table->foreignIdFor(MarketData::class, 'symbol');
+            $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
             $table->string('transaction_type', 15);
             $table->float('quantity', 12, 4);
             $table->float('cost_basis', 12, 4);
