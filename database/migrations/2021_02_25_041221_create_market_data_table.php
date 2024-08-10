@@ -20,7 +20,7 @@ class CreateMarketDataTable extends Migration
             $table->float('fifty_two_week_low', 12, 4);
             $table->float('fifty_two_week_high', 12, 4);
             $table->timestamp('last_dividend_date')->nullable();
-            $table->float('last_dividend_amount', 12, 4);
+            $table->float('last_dividend_amount', 12, 4)->nullable();
             $table->timestamps();
         });
     }
