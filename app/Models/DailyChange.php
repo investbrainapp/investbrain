@@ -63,4 +63,9 @@ class DailyChange extends Model
         return $query->where('user_id', auth()->user()->id);
     }
 
+    public function portfolio()
+    {
+        return $this->belongsTo(Portfolio::class);
+    }
+
 }

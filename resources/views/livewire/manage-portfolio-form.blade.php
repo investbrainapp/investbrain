@@ -73,7 +73,7 @@ new class extends Component {
 
         $this->portfolio->delete();
 
-        $this->success(__('Portfolio deleted'), redirectTo: "/dashboard");
+        $this->success(__('Portfolio deleted'), redirectTo: route('dashboard'));
     }
 }; ?>
 
@@ -92,10 +92,11 @@ new class extends Component {
         <x-slot:actions>
             @if ($portfolio)
             <x-button 
-                class="ms-3 btn-error btn-outline text-white" 
+                class="ms-3 btn btn-ghost text-error" 
                 wire:click="$toggle('confirmingPortfolioDeletion')" 
                 wire:loading.attr="disabled"
-                icon="o-trash"
+                label="{{ __('Delete') }}"
+                title="{{ __('Delete Portfolio') }}"
             />
             @endif
 

@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    @livewire('portfolio-performance-cards', [
+    @livewire('portfolio-performance-chart', [
         'name' => 'dashboard'
     ])
 
@@ -47,7 +47,7 @@
                     <x-slot:value>
                         {{ $portfolio->title }}
                         @if($portfolio->wishlist)
-                            <x-badge value="{{ __('Wishlist') }}" class="badge-primary badge-sm ml-2" />
+                            <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-sm ml-2" />
                         @endif
                     </x-slot:value>
                 </x-list-item>
@@ -69,7 +69,7 @@
         </x-ib-card>
         @endif
         
-        @if (!$user->portfolios->isEmpty())
+        {{-- @if (!$user->portfolios->isEmpty())
         <x-ib-card title="{{ __('Top headlines') }}" class="md:col-span-3">
          
             @php
@@ -81,7 +81,7 @@
             @endforeach
 
         </x-ib-card>
-        @endif
+        @endif --}}
 
         @if (!$user->portfolios->isEmpty())
         <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-4">

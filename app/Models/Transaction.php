@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Models\MarketData;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Transaction extends Model
 {
     use HasFactory;
+    use HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -53,33 +55,44 @@ class Transaction extends Model
     {
         parent::boot();
 
-        static::saved(function ($model) {
+        static::saving(function ($transaction) {
 
-            static::syncHolding($model);
+            // if sale, move cost basis to sale price 
+            if ($transaction->transaction_type == 'SELL') {
+
+                $transaction->sale_price = $transaction->cost_basis;
+                $transaction->cost_basis = $transaction->holding->average_cost_basis ?? $transaction->cost_basis;
+            }
         });
 
-        static::deleted(function ($model) {
-            static::syncHolding($model);
+        static::saved(function ($transaction) {
+
+            // static::syncHolding($transaction);
+        });
+
+        static::deleted(function ($transaction) {
+
+            // static::syncHolding($transaction);
         });
     }
 
-    public static function syncHolding($model) {
+    public static function syncHolding($transaction) {
         // get the holding for a symbol and portfolio (or create one)
         $holding = Holding::firstOrNew([
-            'portfolio_id' => $model->portfolio_id,
-            'symbol' => $model->symbol
+            'portfolio_id' => $transaction->portfolio_id,
+            'symbol' => $transaction->symbol
         ], [
-            'portfolio_id' => $model->portfolio_id,
-            'symbol' => $model->symbol,
-            'quantity' => $model->quantity,
-            'average_cost_basis' => $model->cost_basis,
-            'total_cost_basis' => $model->quantity * $model->cost_basis,
+            'portfolio_id' => $transaction->portfolio_id,
+            'symbol' => $transaction->symbol,
+            'quantity' => $transaction->quantity,
+            'average_cost_basis' => $transaction->cost_basis,
+            'total_cost_basis' => $transaction->quantity * $transaction->cost_basis,
         ]);
 
         // pull existing transaction data
         $query = self::where([
-            'portfolio_id' => $model->portfolio_id,
-            'symbol' => $model->symbol,
+            'portfolio_id' => $transaction->portfolio_id,
+            'symbol' => $transaction->symbol,
         ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
         ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
         ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `cost_basis`')
@@ -102,10 +115,10 @@ class Transaction extends Model
         $holding->save();
 
         // load market data while we're here
-        $model->refreshMarketData();
+        $transaction->refreshMarketData();
 
         // sync dividends to holding
-        $model->syncDividendsToHolding();
+        $transaction->syncDividendsToHolding();
     }
 
     public function setSymbolAttribute($value) 

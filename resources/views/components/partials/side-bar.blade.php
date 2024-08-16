@@ -1,23 +1,23 @@
 <x-menu activate-by-route>
 
-    <x-menu-item title="{{ __('Dashboard') }}" icon="o-home" link="{{ @route('dashboard') }}" />
+    <x-menu-item title="{{ __('Dashboard') }}" icon="o-home" link="{{ route('dashboard') }}" />
     <x-menu-sub title="{{ __('Portfolios') }}" icon="o-document-duplicate">
         @foreach (auth()->user()->portfolios as $portfolio)
-        <x-menu-item  icon="o-document" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" exact>
+        <x-menu-item  icon="o-document" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" >
             <x-slot:title> 
                 {{ $portfolio->title }} 
                 @if($portfolio->wishlist)
-                <x-badge value="{{ __('Wishlist') }}" class="badge-primary badge-sm ml-2" />
+                <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-sm ml-2" />
                 @endif
             </x-slot:title>
             
         </x-menu-item>
         @endforeach
 
-        <x-menu-item title="{{ __('Create Portfolio') }}" icon="o-document-plus" link="{{ @route('portfolio.create') }}" />
+        <x-menu-item title="{{ __('Create Portfolio') }}" icon="o-document-plus" link="{{ route('portfolio.create') }}" />
     </x-menu-sub>
-    <x-menu-item title="{{ __('Transactions') }}" icon="o-banknotes" link="####" />
-    <x-menu-item title="{{ __('Reporting') }}" icon="o-chart-bar-square" link="####" />
+    <x-menu-item title="{{ __('Transactions') }}" icon="o-banknotes" link="{{ route('transaction.index') }}" />
+    {{-- <x-menu-item title="{{ __('Reporting') }}" icon="o-chart-bar-square" link="####" /> --}}
 
 </x-menu>
 

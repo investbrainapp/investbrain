@@ -1,11 +1,20 @@
 <x-app-layout>
     <div x-data>
 
+        <x-ib-modal 
+            key="new-transaction"
+            title="New Transaction"
+        >
+            @livewire('manage-transaction-form', [
+                'portfolio' => $portfolio, 
+            ])
+
+        </x-ib-modal>
+
         <x-ib-drawer 
             key="manage-portfolio"
             title="{{ $portfolio->title }}"
         >
-
             @livewire('manage-portfolio-form', [
                 'portfolio' => $portfolio, 
                 'hideCancel' => true
@@ -16,7 +25,7 @@
         <x-ib-toolbar :title="$portfolio->title">
 
             @if($portfolio->wishlist)
-            <x-badge value="{{ __('Wishlist') }}" class="badge-primary mr-3" />
+            <x-badge value="{{ __('Wishlist') }}" class="badge-secondary mr-3" />
             @endif
 
             <x-button 
@@ -25,9 +34,19 @@
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-manage-portfolio')"
             />
+
+            <x-ib-flex-spacer />
+            
+            <div>
+                <x-button 
+                    label="{{ __('Create Transaction') }}" 
+                    class="btn-sm btn-primary" 
+                    @click="$dispatch('toggle-new-transaction')"
+                />
+            </div>
         </x-ib-toolbar>
 
-        @livewire('portfolio-performance-cards', [
+        @livewire('portfolio-performance-chart', [
             'name' => 'portfolio-'.$portfolio->id,
             'portfolio' => $portfolio
         ])
@@ -64,7 +83,7 @@
 
         <div class="mt-6 grid md:grid-cols-7 gap-5">
 
-            <x-ib-card title="All portfolio holdings" class="md:col-span-4">
+            <x-ib-card title="{{ __('Holdings') }}" class="md:col-span-4">
             
                 @php
                     $users = App\Models\User::take(3)->get();
@@ -76,7 +95,7 @@
 
             </x-ib-card>
 
-            <x-ib-card title="Top performers" class="md:col-span-3">
+            <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
             
                 @php
                     $users = App\Models\User::take(3)->get();
@@ -88,7 +107,7 @@
 
             </x-ib-card>
             
-            <x-ib-card title="Top headlines" class="md:col-span-3">
+            {{-- <x-ib-card title="{{ __('Top headlines') }}" class="md:col-span-3">
             
                 @php
                     $users = App\Models\User::take(3)->get();
@@ -98,21 +117,17 @@
                     <x-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
                 @endforeach
 
-            </x-ib-card>
+            </x-ib-card> --}}
 
-            <x-ib-card title="Recent activity" class="md:col-span-4">
-            
-                @php
-                    $users = App\Models\User::take(3)->get();
-                @endphp
+            <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-4">
                 
-                @foreach($users as $user)
-                    <x-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
-                @endforeach
+                @livewire('transactions-list', [
+                    'transactions' => $portfolio->transactions,
+                    'portfolio' => $portfolio
+                ])
 
             </x-ib-card>
 
         </div>
-        
     </div>
 </x-app-layout>

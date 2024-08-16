@@ -56,7 +56,7 @@ class Portfolio extends Model
      *
      * @var array
      */
-    protected $with = ['users'];
+    protected $with = ['users', 'transactions'];
 
     /**
      * The attributes that should be appended.
@@ -70,15 +70,20 @@ class Portfolio extends Model
         return $this->belongsToMany(User::class)->withPivot('owner');
     }
 
-    // public function holdings()
-    // {
-    //     return $this->hasMany(Holding::class, 'portfolio_id', 'id');
-    // }
+    public function holdings()
+    {
+        return $this->hasMany(Holding::class, 'portfolio_id', 'id');
+    }
 
-    // public function transactions()
-    // {
-    //     return $this->hasMany(Transaction::class);
-    // }
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function daily_change()
+    {
+        return $this->hasMany(DailyChange::class);
+    }
 
     public function scopeMyPortfolios()
     {

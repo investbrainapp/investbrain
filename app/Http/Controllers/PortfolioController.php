@@ -27,6 +27,6 @@ class PortfolioController extends Controller
         $portfolio->realizedGainLoss = rand(-200, 3999);
         $portfolio->dividendsEarned = rand(-200, 3999);
 
-        return view('portfolio.show', compact('portfolio'));
+        return view('portfolio.show', compact(['portfolio']));
     }
 }
