@@ -40,12 +40,16 @@ new class extends Component {
                 <x-slot:value class="flex items-center">
                     <x-badge 
                         :value="$transaction->transaction_type" 
-                        class="{{ $transaction->transaction_type == 'BUY' ? 'badge-success' : 'badge-error' }} badge-sm mr-3" 
+                        class="{{ $transaction->transaction_type == 'BUY' 
+                            ? 'badge-success' 
+                            : 'badge-error' }} badge-sm mr-3" 
                     />
                     {{ $transaction->date->format('M j, Y') }} 
                     {{ $transaction->symbol }} 
                     ({{ $transaction->quantity }} 
-                    @ {{ Number::currency($transaction->cost_basis) }})
+                    @ {{ $transaction->transaction_type == 'BUY' 
+                        ? Number::currency($transaction->cost_basis)
+                        : Number::currency($transaction->sale_price) }})
 
                     <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
                 </x-slot:value>

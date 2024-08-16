@@ -25,22 +25,15 @@ new class extends Component {
     public String $date;
 
     #[Rule('required|numeric')]
-    public String $quantity;
+    public Float $quantity;
 
-    #[Rule('required|numeric')]
-    public String $cost_basis;
+    #[Rule('exclude_if:transaction_type,SELL|numeric')]
+    public ?Float $cost_basis;
+
+    #[Rule('exclude_if:transaction_type,BUY|numeric')]
+    public ?Float $sale_price;
 
     public Bool $confirmingTransactionDeletion = false;
-
-    #[Computed]
-    public function cost_basis_label()
-    {
-        if (isset($this->transaction_type) && $this->transaction_type == 'SELL') {
-            return __('Sale Price');
-        }
-        
-        return __('Cost Basis');
-    }
 
     // methods
     public function mount() 
@@ -51,9 +44,8 @@ new class extends Component {
             $this->transaction_type = $this->transaction->transaction_type;
             $this->date = $this->transaction->date->format('Y-m-d');
             $this->quantity = $this->transaction->quantity;
-            $this->cost_basis = $this->transaction_type == 'SELL' 
-                ? $this->transaction->sale_price
-                : $this->transaction->cost_basis;
+            $this->cost_basis = $this->transaction->cost_basis;
+            $this->sale_price = $this->transaction->sale_price;
             
         } else {
             $this->transaction_type = 'BUY';
@@ -89,7 +81,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="">
+<div class="" x-data="{ transaction_type: @entangle('transaction_type') }">
     <x-form wire:submit="{{ $transaction ? 'update' : 'save' }}" class="">
 
         <x-input label="{{ __('Symbol') }}" wire:model="symbol" required />
@@ -103,15 +95,28 @@ new class extends Component {
         
         <x-input label="{{ __('Quantity') }}" type="number" step="any" wire:model="quantity" required />
         
-        <x-input 
-            label="{{ $this->cost_basis_label }}" 
-            wire:model="cost_basis" 
-            required 
-            prefix="USD" 
-            money
-            type="number"
-            step="any"
-        />
+        @if($transaction_type == 'SELL')
+            <x-input 
+                label="Sale Price" 
+                wire:model.number="sale_price" 
+                required 
+                prefix="USD" 
+                money
+                type="number"
+                step="any"
+                
+            />
+        @else
+            <x-input 
+                label="Cost Basis" 
+                wire:model.number="cost_basis" 
+                required 
+                prefix="USD" 
+                money
+                type="number"
+                step="any"
+            />
+        @endif
 
         <x-slot:actions>
             @if ($transaction)

@@ -60,7 +60,6 @@ class Transaction extends Model
             // if sale, move cost basis to sale price 
             if ($transaction->transaction_type == 'SELL') {
 
-                $transaction->sale_price = $transaction->cost_basis;
                 $transaction->cost_basis = $transaction->holding->average_cost_basis ?? $transaction->cost_basis;
             }
         });
