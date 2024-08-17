@@ -6,11 +6,13 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Split extends Model
 {
     use HasFactory;
+    use HasUuids;
 
     /**
      * The attributes that are mass assignable.
