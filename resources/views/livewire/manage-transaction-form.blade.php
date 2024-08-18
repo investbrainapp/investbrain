@@ -21,16 +21,16 @@ new class extends Component {
     #[Rule('required|string|in:BUY,SELL')]
     public String $transaction_type;
 
-    #[Rule('required|date')]
+    #[Rule('required|date_format:Y-m-d')]
     public String $date;
 
-    #[Rule('required|numeric')]
+    #[Rule('required|min:0|numeric')]
     public Float $quantity;
 
-    #[Rule('exclude_if:transaction_type,SELL|numeric')]
+    #[Rule('exclude_if:transaction_type,SELL|min:0|numeric')]
     public ?Float $cost_basis;
 
-    #[Rule('exclude_if:transaction_type,BUY|numeric')]
+    #[Rule('exclude_if:transaction_type,BUY|min:0|numeric')]
     public ?Float $sale_price;
 
     public Bool $confirmingTransactionDeletion = false;

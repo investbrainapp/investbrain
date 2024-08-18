@@ -84,6 +84,15 @@
         <div class="mt-6 grid md:grid-cols-7 gap-5">
 
             <x-ib-card title="{{ __('Holdings') }}" class="md:col-span-4">
+
+
+                @livewire('holdings-table', [
+                    'portfolio' => $portfolio
+                ])
+
+            </x-ib-card>
+
+            {{-- <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
             
                 @php
                     $users = App\Models\User::take(3)->get();
@@ -93,19 +102,7 @@
                     <x-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
                 @endforeach
 
-            </x-ib-card>
-
-            <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
-            
-                @php
-                    $users = App\Models\User::take(3)->get();
-                @endphp
-                
-                @foreach($users as $user)
-                    <x-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
-                @endforeach
-
-            </x-ib-card>
+            </x-ib-card> --}}
             
             {{-- <x-ib-card title="{{ __('Top headlines') }}" class="md:col-span-3">
             
@@ -119,10 +116,9 @@
 
             </x-ib-card> --}}
 
-            <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-4">
+            <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
                 
                 @livewire('transactions-list', [
-                    'transactions' => $portfolio->transactions,
                     'portfolio' => $portfolio
                 ])
 

@@ -12,7 +12,7 @@ class Holding extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $with = [];
+    protected $with = ['market_data'];
 
     /**
      * The attributes that are mass assignable.
@@ -42,7 +42,7 @@ class Holding extends Model
     ];
 
     /**
-     * get market data for holding
+     * Market data for holding
      *
      * @return void
      */
@@ -52,7 +52,7 @@ class Holding extends Model
     }
 
     /**
-     * get related transactions for holding
+     * Related transactions for holding
      *
      * @return void
      */
@@ -62,7 +62,7 @@ class Holding extends Model
     }
 
     /**
-     * get related dividends for holding
+     * Related dividends for holding
      *
      * @return void
      */
@@ -72,7 +72,7 @@ class Holding extends Model
     }
 
     /**
-     * get related portfolio for holding
+     * Related portfolio for holding
      *
      * @return void
      */
@@ -82,7 +82,7 @@ class Holding extends Model
     }
 
     /**
-     * get related splits for holding
+     * Related splits for holding
      *
      * @return void
      */

@@ -11,58 +11,30 @@ class Portfolio extends Model
     use HasFactory;
     use HasUuids;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'title',
         'notes',
         'wishlist',
     ];
 
-     /**
-     *
-     * @return void
-     */
     protected static function boot()
     {
         parent::boot();
         
         static::saved(function ($model) {
+
             self::syncUsers($model);
         });
     }
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'wishlist' => 'boolean'
     ];
 
-    /**
-     * The relationships that should always be eagerly loaded.
-     *
-     * @var array
-     */
     protected $with = ['users', 'transactions'];
 
-    /**
-     * The attributes that should be appended.
-     *
-     * @var array
-     */
     protected $appends = ['owner_id'];
 
     public function users()
@@ -77,7 +49,7 @@ class Portfolio extends Model
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Transaction::class)->orderBy('created_at', 'DESC');
     }
 
     public function daily_change()

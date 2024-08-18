@@ -8,7 +8,6 @@ use Livewire\Volt\Component;
 new class extends Component {
 
     // props
-    public ?Collection $transactions;
     public Portfolio $portfolio;
     public ?Transaction $editingTransaction;
 
@@ -23,38 +22,39 @@ new class extends Component {
 
 <div class="">
 
-    @foreach($transactions as $transaction)
-        <div x-data="{ loading: false, timeout: null }">
-            <x-list-item 
-                no-separator 
-                :item="$transaction" 
-                class="cursor-pointer"
-                @click="
-                    timeout = setTimeout(() => { loading = true }, 200);
-                    $wire.showTransactionDialog('{{ $transaction->id }}').then(() => {
-                        clearTimeout(timeout);
-                        loading = false;
-                    })
-                "
-            >
-                <x-slot:value class="flex items-center">
-                    <x-badge 
-                        :value="$transaction->transaction_type" 
-                        class="{{ $transaction->transaction_type == 'BUY' 
-                            ? 'badge-success' 
-                            : 'badge-error' }} badge-sm mr-3" 
-                    />
-                    {{ $transaction->date->format('M j, Y') }} 
-                    {{ $transaction->symbol }} 
-                    ({{ $transaction->quantity }} 
-                    @ {{ $transaction->transaction_type == 'BUY' 
-                        ? Number::currency($transaction->cost_basis)
-                        : Number::currency($transaction->sale_price) }})
+    @foreach($portfolio->transactions->take(10) as $transaction)
 
-                    <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
-                </x-slot:value>
-            </x-list-item>
-        </div>
+        <x-list-item 
+            no-separator 
+            :item="$transaction" 
+            class="cursor-pointer"
+            x-data="{ loading: false, timeout: null }"
+            @click="
+                timeout = setTimeout(() => { loading = true }, 200);
+                $wire.showTransactionDialog('{{ $transaction->id }}').then(() => {
+                    clearTimeout(timeout);
+                    loading = false;
+                })
+            "
+        >
+            <x-slot:value class="flex items-center">
+                <x-badge 
+                    :value="$transaction->transaction_type" 
+                    class="{{ $transaction->transaction_type == 'BUY' 
+                        ? 'badge-success' 
+                        : 'badge-error' }} badge-sm mr-3" 
+                />
+                {{ $transaction->date->format('M j, Y') }} 
+                {{ $transaction->symbol }} 
+                ({{ $transaction->quantity }} 
+                @ {{ $transaction->transaction_type == 'BUY' 
+                    ? Number::currency($transaction->cost_basis)
+                    : Number::currency($transaction->sale_price) }})
+
+                <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+            </x-slot:value>
+        </x-list-item>
+
     @endforeach
 
     <x-ib-modal 
