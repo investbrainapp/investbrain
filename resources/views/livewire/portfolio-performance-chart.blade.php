@@ -37,7 +37,9 @@ new class extends Component {
 
         if (isset($this->portfolio)) {
             $dailyChangeQuery->portfolio($this->portfolio->id);
+
         } else {
+            
             $dailyChangeQuery->selectRaw('date, 
                 SUM(total_market_value) as total_market_value, 
                 SUM(total_cost_basis) as total_cost_basis, 
@@ -48,11 +50,12 @@ new class extends Component {
         }
 
         if ($filterMethod['method']) {
+            
             $dailyChangeQuery->whereDate('date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
         
         $dailyChange = $dailyChangeQuery->get();
-        
+
         return [
             'series' => [
                 [

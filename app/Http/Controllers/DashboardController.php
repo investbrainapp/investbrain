@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use stdClass;
+use App\Models\Holding;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -14,13 +15,18 @@ class DashboardController extends Controller
     {
         $user = $request->user()->load('portfolios');
 
-        $dashboard = new stdClass;
-        $dashboard->marketGainLoss = rand(-200, 3999);
-        $dashboard->totalCostBasis = rand(-200, 3999);
-        $dashboard->totalMarketValue = rand(-200, 3999);
-        $dashboard->realizedGainLoss = rand(-200, 3999);
-        $dashboard->dividendsEarned = rand(-200, 3999);
+        // get portfolio metrics
+        $metrics = cache()->remember(
+            'dashboard-metrics-' . $user->id, 
+            10, 
+            function () {
+                return
+                 Holding::query()
+                    ->getPortfolioMetrics()
+                    ->first();
+            }
+        );
 
-        return view('dashboard', compact('user', 'dashboard'));
+        return view('dashboard', compact('user', 'metrics'));
     }
 }
