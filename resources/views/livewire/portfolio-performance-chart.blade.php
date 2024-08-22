@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DailyChange;
 use App\Models\Portfolio;
 use Livewire\Attributes\{Title, Rule};
 use Livewire\Volt\Component;
@@ -11,70 +12,83 @@ new class extends Component {
     public String $name = 'portfolio';
     public String $scope = 'YTD';
     public Array $options = [
-        ['id' => '1M', 'name' => '1 month'],
-        ['id' => '3M', 'name' => '3 months'],
-        ['id' => 'YTD', 'name' => 'Year to date'],
-        ['id' => '1Y', 'name' => '1 year'],
-        ['id' => '3Y', 'name' => '3 years'],
-        ['id' => 'ALL', 'name' => 'All time']
+        ['id' => '1M', 'name' => '1 month', 'method' => 'subMonths', 'args' => [1]],
+        ['id' => '3M', 'name' => '3 months', 'method' => 'subMonths', 'args' => [3]],
+        ['id' => 'YTD', 'name' => 'Year to date', 'method' => 'startOfYear', 'args' => []],
+        ['id' => '1Y', 'name' => '1 year', 'method' => 'subYears', 'args' => [1]],
+        ['id' => '3Y', 'name' => '3 years', 'method' => 'subYears', 'args' => [3]],
+        ['id' => 'ALL', 'name' => 'All time', 'method' => null]
     ];
 
     // data
-    public Array $myChart;
+    public Array $chartSeries;
 
     // methods
     public function mount() 
     {
-        $this->myChart = [
+        $this->chartSeries = $this->generatePerformanceData();
+    }
+
+    public function generatePerformanceData()
+    {
+        $filterMethod = collect($this->options)->where('id', $this->scope)->first();
+
+        $dailyChangeQuery = DailyChange::query();
+
+        if (isset($this->portfolio)) {
+            $dailyChangeQuery->portfolio($this->portfolio->id);
+        } else {
+            $dailyChangeQuery->selectRaw('date, 
+                SUM(total_market_value) as total_market_value, 
+                SUM(total_cost_basis) as total_cost_basis, 
+                SUM(total_gain) as total_gain, 
+                SUM(total_dividends_earned) as total_dividends_earned, 
+                SUM(realized_gains) as realized_gains'
+            )->groupBy('date');
+        }
+
+        if ($filterMethod['method']) {
+            $dailyChangeQuery->whereDate('date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
+        }
+        
+        $dailyChange = $dailyChangeQuery->get();
+        
+        return [
             'series' => [
                 [
-                    'name' => __('Total Views'),
-                    'data' => $this->generateDateSeries('2024-01-01', '2024-08-01')
-                ],      
+                    'name' => __('Market Value'),
+                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_market_value])->toArray(),
+                ],
                 [
-                    'name' => __('Second Views'),
-                    'data' => $this->generateDateSeries('2024-01-01', '2024-08-01')
-                ],    
-            ],
-
+                    'name' => __('Cost Basis'),
+                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_cost_basis])->toArray(),
+                ],
+                [
+                    'name' => __('Market Gain'),
+                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_gain])->toArray()
+                ],
+                [
+                    'name' => __('Dividends Earned'),
+                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
+                ],
+                [
+                    'name' => __('Realized Gains'),
+                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->realized_gains])->toArray()
+                ],
+            ]
         ];
-        
-        // $this->marketGainLoss = rand(-200, 3999);
     }
 
     public function changeScope($scope)
     {
         $this->scope = $scope;
 
-        $this->dispatch('data-scope-updated', $scope);
+        $this->chartSeries = $this->generatePerformanceData();
     }
 
     public function getScopeName($scope)
     {
-        return collect($this->options)->where('id', $scope)['name'];
-    }
-
-    private function generateDateSeries($startDate, $endDate) 
-    {
-        $dateArray = [];
-        $currentDate = strtotime($startDate);
-        $endDate = strtotime($endDate);
-
-        while ($currentDate <= $endDate) {
-            // Generate a random integer
-            $randomInt = rand(1000, 3000);
-
-            // Format the current date to 'Y-m-d'
-            $formattedDate = date('Y-m-d', $currentDate);
-
-            // Append the date and random integer to the array
-            $dateArray[] = [$formattedDate, $randomInt];
-
-            // Move to the next day
-            $currentDate = strtotime("+1 day", $currentDate);
-        }
-
-        return $dateArray;
+        return collect($this->options)->where('id', $scope)->first()['name'];
     }
 
 }; ?>
@@ -90,7 +104,7 @@ new class extends Component {
         </div>
         
         <div class="flex items-center">
-            <x-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" />
+            {{-- <x-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
 
             <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-ghost btn-sm">
                     
@@ -110,7 +124,7 @@ new class extends Component {
     <div
         class="h-[280px] mb-5"
     >
-        <x-ib-apex-chart :series-data="$myChart" :name="$name" />
+        <x-ib-apex-chart :series-data="$chartSeries" :name="$name" />
     </div>
 
 </x-card>

@@ -28,8 +28,8 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 'date' => $row['date'],
                 'total_market_value' => $row['total_market_value'],
                 'total_cost_basis' => $row['total_cost_basis'],
-                'total_gain_loss' => $row['total_gain_loss'],
-                'total_dividends' => $row['total_dividends'],
+                'total_gain' => $row['total_gain'],
+                'total_dividends_earned' => $row['total_dividends_earned'],
                 'realized_gains' => $row['realized_gains'],
                 'notes' => $row['notes'],
             ]);

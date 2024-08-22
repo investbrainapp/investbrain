@@ -22,7 +22,7 @@ class CreateHoldingsTable extends Migration
             $table->float('quantity', 12, 4);
             $table->float('average_cost_basis', 12, 4);
             $table->float('total_cost_basis', 12, 4)->nullable();
-            $table->float('realized_gain_loss_dollars', 12, 4)->nullable();
+            $table->float('realized_gain_dollars', 12, 4)->nullable();
             $table->float('dividends_earned', 12, 4)->nullable();
             $table->timestamp('splits_synced_at')->nullable();
             $table->timestamp('dividends_synced_at')->nullable();

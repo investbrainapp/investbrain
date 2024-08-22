@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Holding;
 use App\Models\Portfolio;
+use App\Models\DailyChange;
 
 class PortfolioController extends Controller
 {
@@ -21,12 +23,19 @@ class PortfolioController extends Controller
     public function show(Portfolio $portfolio)
     {
 
-        $portfolio->marketGainLoss = rand(-200, 3999);
-        $portfolio->totalCostBasis = rand(-200, 3999);
-        $portfolio->totalMarketValue = rand(-200, 3999);
-        $portfolio->realizedGainLoss = rand(-200, 3999);
-        $portfolio->dividendsEarned = rand(-200, 3999);
-
-        return view('portfolio.show', compact(['portfolio']));
+        // get portfolio metrics
+        $metrics = cache()->remember(
+            'portfolio-metrics-' . $portfolio->id, 
+            60, 
+            function () use ($portfolio) {
+                return
+                 Holding::query()
+                    ->portfolio($portfolio->id)
+                    ->getPortfolioMetrics()
+                    ->first();
+            }
+        );
+        
+        return view('portfolio.show', compact(['portfolio', 'metrics']));
     }
 }

@@ -4,7 +4,7 @@
     $seriesData = array_merge([
       'chart' => [
         'type' => "area",
-        'stacked' => true,
+        'stacked' => false,
         'height' => 300,
         'foreColor' => "#999",
         'dropShadow' => [
@@ -13,8 +13,11 @@
         'toolbar' => [
             'show' => false,
         ],
+        'zoom' => [
+          'enabled' => false
+        ]
       ],
-      'colors' => ['#00E396', '#0090FF'],
+      'colors' => ['#3185FC', '#48435C', '#9792E3', '#00E396', '#B74F6F', ],
       'stroke' => [
         'curve' => "smooth",
         'width' => 3
@@ -122,7 +125,7 @@
                 legendContainer.innerHTML = ''; // Clear any existing legend items
                 
                 chartContext.w.globals.seriesNames.forEach(function (seriesName, i) {
-                
+
                     var seriesColor = chartContext.w.config.colors[i];
                     var legendItem = document.createElement('div');
                     legendItem.classList.add('flex', 'items-center', 'm-2', 'cursor-pointer');

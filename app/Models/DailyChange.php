@@ -36,8 +36,8 @@ class DailyChange extends Model
         'date',
         'total_market_value',
         'total_cost_basis',
-        'total_gain_loss',
-        'total_dividends',
+        'total_gain',
+        'total_dividends_earned',
         'realized_gains',
         'notes',
     ];
@@ -62,7 +62,11 @@ class DailyChange extends Model
     {
         return $query->where('user_id', auth()->user()->id);
     }
-
+    
+    public function scopePortfolio($query, $portfolio)
+    {
+        return $query->where('portfolio_id', $portfolio);
+    }
     public function portfolio()
     {
         return $this->belongsTo(Portfolio::class);

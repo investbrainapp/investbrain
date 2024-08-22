@@ -44,11 +44,15 @@ class Transaction extends Model
         static::saved(function ($transaction) {
 
             $transaction->syncHolding();
+
+            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
         });
 
         static::deleted(function ($transaction) {
 
             $transaction->syncHolding();
+
+            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
         });
     }
 
@@ -171,7 +175,7 @@ class Transaction extends Model
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_loss_dollars' => $query->realized_gains,
+            'realized_gain_dollars' => $query->realized_gains,
         ]);
 
         $holding->save();

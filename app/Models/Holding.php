@@ -25,7 +25,7 @@ class Holding extends Model
         'quantity',
         'average_cost_basis',
         'total_cost_basis',
-        'realized_gain_loss_dollars',
+        'realized_gain_dollars',
         'dividends_earned',
         'splits_synced_at',
         'dividends_synced_at'
@@ -110,14 +110,14 @@ class Holding extends Model
 
     public function scopeGetPortfolioMetrics($query) 
     {
-        $query->selectRaw('SUM(holdings.dividends_earned) AS total_dividends_earned')
-            ->selectRaw('SUM(holdings.realized_gain_loss_dollars) AS realized_gain_loss_dollars')
-            ->selectRaw('@total_market_value:=SUM(holdings.quantity * market_data.market_value) AS total_market_value')
-            ->selectRaw('@sum_total_cost_basis:=SUM(holdings.total_cost_basis) AS total_cost_basis')
-            ->selectRaw('@total_gain_loss_dollars:=(@total_market_value - @sum_total_cost_basis) AS total_gain_loss_dollars')
-            ->selectRaw('(@total_gain_loss_dollars / @sum_total_cost_basis) * 100 AS total_gain_loss_percent')
+
+        $query->selectRaw('COALESCE(SUM(holdings.dividends_earned),0) AS total_dividends_earned')
+            ->selectRaw('COALESCE(SUM(holdings.realized_gain_dollars),0) AS realized_gain_dollars')
+            ->selectRaw('@total_market_value:=COALESCE(SUM(holdings.quantity * market_data.market_value),0) AS total_market_value')
+            ->selectRaw('@sum_total_cost_basis:=COALESCE(SUM(holdings.total_cost_basis),0) AS total_cost_basis')
+            ->selectRaw('@total_gain_dollars:=COALESCE((@total_market_value - @sum_total_cost_basis),0) AS total_gain_dollars')
+            ->selectRaw('COALESCE((@total_gain_dollars / @sum_total_cost_basis) * 100,0) AS total_gain_percent')
             ->join('market_data', 'market_data.symbol', 'holdings.symbol');
-            // =(VLOOKUP(if(today or end of year),'Daily Change'!$A:$B,2,false) - VLOOKUP(first of year),'Daily Change'!$A:$C,3,false)) / (SUMIFS(transactions.cost_basis_lot,transactions.date,"<"&date(left(D19,4)+1,1,1),transactions.type,"Buy")-SUMIFS(transactions.cost_basis_lot,transactions.date,"<"&date(left(D19,4)+1,1,1),transactions.type,"Sell"))-1
     }
 
     public function scopeSymbol($query, $symbol)

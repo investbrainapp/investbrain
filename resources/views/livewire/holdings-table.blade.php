@@ -25,9 +25,9 @@ new class extends Component {
             ['key' => 'total_cost_basis', 'label' => __('Total Cost Basis')],
             ['key' => 'market_data_market_value', 'label' => __('Market Value')],
             ['key' => 'total_market_value', 'label' => __('Total Market Value')],
-            ['key' => 'market_gain_loss_dollars', 'label' => __('Market Gain/Loss')],
-            ['key' => 'market_gain_loss_percent', 'label' => __('Market Gain/Loss')],
-            ['key' => 'realized_gain_loss_dollars', 'label' => __('Realized Gain/Loss')],
+            ['key' => 'market_gain_dollars', 'label' => __('Market Gain/Loss')],
+            ['key' => 'market_gain_percent', 'label' => __('Market Gain/Loss')],
+            ['key' => 'realized_gain_dollars', 'label' => __('Realized Gain/Loss')],
             ['key' => 'dividends_earned', 'label' => __('Dividends Earned')],
             ['key' => 'market_data_fifty_two_week_low', 'label' => __('52 week low')],
             ['key' => 'market_data_fifty_two_week_high', 'label' => __('52 week high')],
@@ -40,9 +40,6 @@ new class extends Component {
     {
         return $this->portfolio
                     ->holdings()
-                    ->with(['transactions' => function ($query) {
-                        $query->portfolio($this->portfolio->id);
-                    }])
                     ->withCount(['transactions as num_transactions' => function ($query) {
                         $query->portfolio($this->portfolio->id);
                     }])
@@ -52,8 +49,8 @@ new class extends Component {
                     ->withAggregate('market_data', 'fifty_two_week_high')
                     ->withAggregate('market_data', 'updated_at')
                     ->selectRaw('(market_data.market_value * holdings.quantity) AS total_market_value')
-                    ->selectRaw('((market_data.market_value - holdings.average_cost_basis) * holdings.quantity) AS market_gain_loss_dollars')
-                    ->selectRaw('(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100) AS market_gain_loss_percent')
+                    ->selectRaw('((market_data.market_value - holdings.average_cost_basis) * holdings.quantity) AS market_gain_dollars')
+                    ->selectRaw('(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100) AS market_gain_percent')
                     ->join('market_data', 'holdings.symbol', 'market_data.symbol')
                     ->orderBy(...array_values($this->sortBy))
                     ->where('quantity', '>', 0)
