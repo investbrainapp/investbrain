@@ -20,4 +20,4 @@ new class extends Component {
     
 }; ?>
 
-<x-file wire:model="file" label="Select a file" hint="" accept="application/pdf" required />
+<x-file wire:model="file" label="{{ __('Select a file') }}" hint="" accept="application/pdf" required />

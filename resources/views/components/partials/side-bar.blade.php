@@ -42,7 +42,7 @@
 
             <x-menu-separator />
 
-            <x-menu-item title="{{ __('Logout') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
+            <x-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
             <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
                 {{ csrf_field() }}
             </form>
