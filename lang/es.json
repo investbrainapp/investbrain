@@ -13,9 +13,8 @@
     "Create": "Crear",
     "Cancel": "Cancelar",
     "Save": "Guardar",
-    "Documentation": "Documentación",
-    "We're open source!": "¡Somos de código abierto!",
-    "Toggle Theme": "Cambiar Tema",
+    "Close": "Cerrar",
+    
     "Delete Account": "Eliminar Cuenta",
     "Permanently delete your account.": "Elimina tu cuenta de forma permanente.",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.": "Una vez que tu cuenta sea eliminada, todos sus recursos y datos serán eliminados de forma permanente. Antes de eliminar tu cuenta, descarga cualquier dato o información que desees conservar.",
@@ -58,7 +57,6 @@
     "Delete": "Eliminar",
     "API Token": "Token API",
     "Please copy your new API token. For your security, it won't be shown again.": "Por favor, copia tu nuevo token API. Por seguridad, no se mostrará nuevamente.",
-    "Close": "Cerrar",
     "API Token Permissions": "Permisos del Token API",
     "API tokens allow third-party services to authenticate with our application on your behalf.": "Los tokens API permiten que servicios de terceros se autentiquen con nuestra aplicación en tu nombre.",
     "Delete API Token": "Eliminar Token API",
@@ -97,6 +95,11 @@
     "Click here to re-send the verification email.": "Haz clic aquí para reenviar el correo de verificación.",
     "A new verification link has been sent to your email address.": "Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.",
     "The provided password does not match your current password.": "La contraseña proporcionada no coincide con tu contraseña actual.",
+    
+    "Documentation": "Documentación",
+    "We're open source!": "¡Somos de código abierto!",
+    "Toggle Theme": "Cambiar Tema",
+    
     "Dashboard": "Tablero",
     "Market Gain/Loss": "Ganancia/Pérdida del Mercado",
     "Total Cost Basis": "Costo Total",

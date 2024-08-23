@@ -13,9 +13,8 @@
     "Create": "Create",
     "Cancel": "Cancel",
     "Save": "Save",
-    "Documentation": "Documentation",
-    "We\\'re open source!": "We\\'re open source!",
-    "Toggle Theme": "Toggle Theme",
+    "Close": "Close",
+
     "Delete Account": "Delete Account",
     "Permanently delete your account.": "Permanently delete your account.",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
@@ -58,7 +57,6 @@
     "Delete": "Delete",
     "API Token": "API Token",
     "Please copy your new API token. For your security, it won\\'t be shown again.": "Please copy your new API token. For your security, it won\\'t be shown again.",
-    "Close": "Close",
     "API Token Permissions": "API Token Permissions",
     "API tokens allow third-party services to authenticate with our application on your behalf.": "API tokens allow third-party services to authenticate with our application on your behalf.",
     "Delete API Token": "Delete API Token",
@@ -97,6 +95,11 @@
     "Click here to re-send the verification email.": "Click here to re-send the verification email.",
     "A new verification link has been sent to your email address.": "A new verification link has been sent to your email address.",
     "The provided password does not match your current password.": "The provided password does not match your current password.",
+    
+    "Documentation": "Documentation",
+    "We\\'re open source!": "We\\'re open source!",
+    "Toggle Theme": "Toggle Theme",
+    
     "Dashboard": "Dashboard",
     "Market Gain/Loss": "Market Gain/Loss",
     "Total Cost Basis": "Total Cost Basis",
