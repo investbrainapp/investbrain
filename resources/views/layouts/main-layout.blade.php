@@ -15,9 +15,9 @@
         @livewireStyles
     </head>
 
-    <body {{ $attributes->merge(['class']) }}>
+    <body {{ $attributes?->merge(['class']) }}>
 
-        {{ $body }}
+        @yield('body', $body ?? '')
 
         @livewireScripts
     </body>
