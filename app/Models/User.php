@@ -3,11 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Jetstream\HasProfilePhoto;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -19,6 +22,7 @@ class User extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasUuids;
+    use HasRelationships;
 
     /**
      * The attributes that are mass assignable.
@@ -70,8 +74,18 @@ class User extends Authenticatable
         return $this->belongsToMany(Portfolio::class)->withPivot('owner');
     }
 
-    // public function daily_changes()
-    // {
-    //     return $this->hasMany(DailyChange::class);
-    // }
+    public function holdings(): HasManyDeep
+    {
+        return $this->hasManyDeep(Holding::class, ['portfolio_user', Portfolio::class]);    
+    }
+
+    public function transactions(): HasManyDeep
+    {
+        return $this->hasManyDeep(Transaction::class, ['portfolio_user', Portfolio::class]);    
+    }
+
+    public function daily_change(): HasManyDeep
+    {
+        return $this->hasManyDeep(DailyChange::class, ['portfolio_user', Portfolio::class]);    
+    }
 }

@@ -43,10 +43,11 @@ new class extends Component {
             $dailyChangeQuery->selectRaw('date, 
                 SUM(total_market_value) as total_market_value, 
                 SUM(total_cost_basis) as total_cost_basis, 
-                SUM(total_gain) as total_gain, 
-                SUM(total_dividends_earned) as total_dividends_earned, 
-                SUM(realized_gains) as realized_gains'
+                SUM(total_gain) as total_gain'
             )->groupBy('date');
+
+            // SUM(total_dividends_earned) as total_dividends_earned, 
+            // SUM(realized_gains) as realized_gains
         }
 
         if ($filterMethod['method']) {
@@ -70,14 +71,14 @@ new class extends Component {
                     'name' => __('Market Gain'),
                     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_gain])->toArray()
                 ],
-                [
-                    'name' => __('Dividends Earned'),
-                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
-                ],
-                [
-                    'name' => __('Realized Gains'),
-                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->realized_gains])->toArray()
-                ],
+                // [
+                //     'name' => __('Dividends Earned'),
+                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
+                // ],
+                // [
+                //     'name' => __('Realized Gains'),
+                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->realized_gains])->toArray()
+                // ],
             ]
         ];
     }

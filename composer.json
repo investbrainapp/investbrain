@@ -14,7 +14,8 @@
         "livewire/volt": "^1.6",
         "maatwebsite/excel": "^3.1",
         "predis/predis": "^2.2",
-        "robsontenorio/mary": "^1.35"
+        "robsontenorio/mary": "^1.35",
+        "staudenmeir/eloquent-has-many-deep": "^1.20"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
