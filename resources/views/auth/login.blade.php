@@ -1,7 +1,9 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-auth-logo />
+            <div class="w-24 mb-10">
+                <x-small-logo />
+            </div>
         </x-slot>
 
         <x-errors class="mb-4" />
@@ -39,7 +41,7 @@
                     </a>
                 @endif
 
-                <x-button type="submit" class="ms-4" >
+                <x-button type="submit" class="btn-primary ms-4" >
                     {{ __('Log in') }}
                 </x-button>
 

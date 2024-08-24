@@ -56,31 +56,21 @@
         </x-ib-card>
 
         @if (!$user->portfolios->isEmpty())
+        <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
+                
+            @livewire('transactions-list', [
+                'transactions' => $user->transactions
+            ])
+
+        </x-ib-card>
+        @endif
+
+        @if (!$user->portfolios->isEmpty())
         <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
-         
-            @foreach($user->holdings->sortBy('market_gain_percent')->where('quantity', '>', 0)->take(5) as $holding)
-                <x-list-item no-separator :item="$holding" link="{{ route('portfolio.show', ['portfolio' => $holding->portfolio_id]) }}">
 
-                    @php
-                        $gainPercent = (($holding->market_data?->market_value - $holding->average_cost_basis) / $holding->average_cost_basis) * 100;
-                    @endphp
-
-                    <x-slot:value class="flex items-center">
-
-                        {{ $holding->symbol }}
-                        
-                        <x-badge class="{{ $gainPercent > 0 ? 'badge-success' : 'badge-error' }} ml-2 badge-sm" >
-                            <x-slot:value>
-                                {{ Number::percentage($gainPercent) }} 
-                            </x-slot:value>
-                        </x-badge>
-                        
-                    </x-slot:value>
-                    <x-slot:sub-value>
-                        {{ $holding->market_data?->name }}
-                    </x-slot:sub-value>
-                </x-list-item>
-            @endforeach
+            @livewire('top-performers-list', [
+                'holdings' => $user->holdings
+            ])
 
         </x-ib-card>
         @endif

@@ -45,14 +45,14 @@ class Transaction extends Model
 
             $transaction->syncHolding();
 
-            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
+            cache()->tags(['metrics', auth()->user()->id])->flush();
         });
 
         static::deleted(function ($transaction) {
 
             $transaction->syncHolding();
 
-            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
+            cache()->tags(['metrics', auth()->user()->id])->flush();
         });
     }
 
@@ -108,15 +108,15 @@ class Transaction extends Model
         return MarketData::getMarketData($this->attributes['symbol']);
     }
     
-    public function syncDividendsToHolding() 
-    {
-        return Dividend::syncHoldings(['symbol' => $this->attributes['symbol']]);
-    }
+    // public function syncDividendsToHolding() 
+    // {
+    //     return Dividend::syncHoldings(['symbol' => $this->attributes['symbol']]);
+    // }
 
-    public function refreshDividends() 
-    {
-        return Dividend::getDividendData($this->attributes['symbol']);
-    }
+    // public function refreshDividends() 
+    // {
+    //     return Dividend::getDividendData($this->attributes['symbol']);
+    // }
 
     /**
      * Writes average cost basis to a sale transaction
@@ -181,9 +181,9 @@ class Transaction extends Model
         $holding->save();
 
         // load market data while we're here
-        // $this->refreshMarketData();
+        $this->refreshMarketData();
 
-        // sync dividends to holding
+        // // sync dividends to holding
         // $this->syncDividendsToHolding();
     }
 }

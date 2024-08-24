@@ -44,20 +44,24 @@ class MarketData extends Model
 
     public static function getMarketData($symbol) 
     {
-        $market_data = self::firstOrNew(['symbol' => $symbol]);
+        $market_data = self::firstOrNew([
+            'symbol' => $symbol
+        ]);
 
         // check if new or stale
         if (!$market_data->exists || now()->diffInMinutes($market_data->updated_at) >= config('market_data.refresh')) {
             
             // get quote
-            $quote = app(MarketDataInterface::class)->quote($symbol);
+            // $quote = app(MarketDataInterface::class)->quote($symbol);
 
             // fill data
-            $market_data->fill($quote->toArray());
+            // $market_data->fill($quote->toArray());
 
-            // save with timestamps updated
-            $market_data->touch();
+            
         }
+
+        // save with timestamps updated
+        $market_data->touch();
 
         return $market_data;
     }

@@ -1,7 +1,9 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-auth-logo />
+            <div class="w-24 mb-10">
+                <x-small-logo />
+            </div>
         </x-slot>
 
         <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
@@ -18,7 +20,7 @@
             </div>
 
             <div class="flex justify-end mt-4">
-                <x-button type="submit" class="ms-4">
+                <x-button type="submit" class="btn-primary ms-4">
                     {{ __('Confirm') }}
                 </x-button>
             </div>

@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $user = $request->user()->load('portfolios');
 
         // get portfolio metrics
-        $metrics = cache()->remember(
+        $metrics = cache()->tags(['metrics', 'dashboard', $user->id])->remember(
             'dashboard-metrics-' . $user->id, 
             10, 
             function () {

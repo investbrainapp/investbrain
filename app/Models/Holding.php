@@ -125,10 +125,10 @@ class Holding extends Model
         return $query->where('symbol', $symbol);
     }
 
-    public function refreshDividends() 
-    {
-        return Dividend::getDividendData($this->attributes['symbol']);
-    }
+    // public function refreshDividends() 
+    // {
+    //     return Dividend::getDividendData($this->attributes['symbol']);
+    // }
 }
 
     

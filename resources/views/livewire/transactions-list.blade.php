@@ -8,7 +8,8 @@ use Livewire\Volt\Component;
 new class extends Component {
 
     // props
-    public Portfolio $portfolio;
+    public Collection $transactions;
+    public ?Portfolio $portfolio;
     public ?Transaction $editingTransaction;
 
     // methods
@@ -22,7 +23,7 @@ new class extends Component {
 
 <div class="">
 
-    @foreach($portfolio->transactions->take(10) as $transaction)
+    @foreach($transactions->take(10) as $transaction)
 
         <x-list-item 
             no-separator 

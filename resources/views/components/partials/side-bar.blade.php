@@ -24,13 +24,13 @@
 </div>
 <div class="p-4">
 
-<x-menu-separator />
+<x-section-border />
 
 @php
     $user = auth()->user();
 @endphp
 
-<x-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="-mx-2 !-my-2 rounded">
+<x-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="-mx-2 !-mt-5 rounded">
     <x-slot:actions>
         <x-dropdown>
             <x-slot:trigger>
@@ -40,7 +40,7 @@
             <x-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
             <x-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 
-            <x-menu-separator />
+            <x-section-border />
 
             <x-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
             <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">

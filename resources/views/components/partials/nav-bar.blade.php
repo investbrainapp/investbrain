@@ -1,13 +1,13 @@
 
 <div class="bg-base-100 border-base-300 border-b sticky top-0 z-10">
-    <div class="flex justify-between items-center px-6 py-5 mx-auto">
+    <div class="flex justify-between items-center px-7 py-3 mx-auto">
         <div class="flex-1 flex items-center">
             
             <label for="main-drawer" class="lg:hidden mr-3">
                 <x-icon name="o-bars-3" class="cursor-pointer" />
             </label>
 
-            <x-application-logo style="height:1.3em" />
+            <x-application-logo style="height:3.1em" />
 
         </div>
         <div class="flex flex-grow gap-4 w-50">
