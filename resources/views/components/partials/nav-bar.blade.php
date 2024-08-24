@@ -19,9 +19,10 @@
                 search-text="{{ __('Search holdings, portfolios, or anything else...') }}"
                 no-results-text="{{ __('Darn! Nothing found for that search.') }}"
             />
+            
             <x-button 
                 icon="o-magnifying-glass" 
-                @click.stop="$dispatch('mary-search-open')" 
+                @click="$dispatch('mary-search-open')" 
                 class="btn-sm"
             >
                 <x-slot:label>
