@@ -30,7 +30,7 @@
     $user = auth()->user();
 @endphp
 
-<x-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="-mx-2 !-mt-5 rounded">
+<x-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="-mx-2 !-mt-3 rounded">
     <x-slot:actions>
         <x-dropdown>
             <x-slot:trigger>
