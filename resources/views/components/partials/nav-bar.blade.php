@@ -7,7 +7,9 @@
                 <x-icon name="o-bars-3" class="cursor-pointer" />
             </label>
 
-            <x-application-logo style="height:3.1em" />
+            <div class="hidden md:block" style="height:3.1em">
+                <x-application-logo  />
+            </div>
 
         </div>
         <div class="flex flex-grow gap-4 w-50">
