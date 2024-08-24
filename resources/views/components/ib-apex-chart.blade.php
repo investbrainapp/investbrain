@@ -109,12 +109,11 @@
 
             chart.render();
 
-            // reset custom zoom button
+            {{-- // reset custom zoom button
             var resetZoomButton = document.querySelector('#chart-reset-zoom-{{ $name }}');
             resetZoomButton.addEventListener('click', function () {
               chart.resetSeries()
-                        
-            });
+            }); --}}
 
             // generate custom legend view
             function renderLegend(chartContext) {

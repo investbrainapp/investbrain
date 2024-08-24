@@ -101,21 +101,20 @@ new class extends Component {
                 wire:model.number="sale_price" 
                 required 
                 prefix="USD" 
-                money
                 type="number"
                 step="any"
-                
             />
+            {{-- money --}}
         @else
             <x-input 
                 label="Cost Basis" 
                 wire:model.number="cost_basis" 
                 required 
                 prefix="USD" 
-                money
                 type="number"
                 step="any"
             />
+            {{-- money --}}
         @endif
 
         <x-slot:actions>
