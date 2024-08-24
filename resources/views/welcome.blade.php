@@ -2,7 +2,7 @@
 
 <div class="flex flex-col min-h-[100dvh] bg-gradient-to-br from-[#03255B] to-[#011638] text-white">
     <header class="px-4 lg:px-6 h-14 flex items-center w-20">
-        <x-small-logo class="text-white" />
+        <x-glyph-only-logo class="text-white" />
     </header>
     <main class="flex-1 flex flex-col items-center justify-center px-4 md:px-6 gap-8">
         <div class="text-center space-y-4">

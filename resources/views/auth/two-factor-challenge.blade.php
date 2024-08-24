@@ -2,7 +2,7 @@
     <x-authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-small-logo />
+                <x-glyph-only-logo />
             </div>
         </x-slot>
 
