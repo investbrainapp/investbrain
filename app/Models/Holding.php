@@ -14,11 +14,6 @@ class Holding extends Model
 
     protected $with = ['market_data'];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'portfolio_id',
         'symbol',
@@ -31,15 +26,28 @@ class Holding extends Model
         'dividends_synced_at'
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'splits_synced_at' => 'datetime',
         'dividends_synced_at' => 'datetime',
     ];
+
+    protected $appends = [
+        'market_gain_percent'
+    ];
+
+    /**
+     * Append the market gain / loss percent attribute
+     * 
+     * @return int
+     * 
+     */
+    public function getMarketGainPercentAttribute()
+    {
+        
+        return (int) !empty($this->market_data?->market_value) && !empty($this->average_cost_basis)
+            ? (($this->market_data->market_value - $this->average_cost_basis) / $this->average_cost_basis) * 100
+            : 0;
+    }
 
     /**
      * Market data for holding

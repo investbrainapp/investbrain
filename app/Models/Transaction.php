@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\MarketData;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -143,6 +144,17 @@ class Transaction extends Model
      * @return void
      */
     public function syncHolding() {
+
+        // sync previous symbol too
+        if (Arr::has($this->changes, 'symbol')) {
+
+            $temp = new Transaction;
+            $temp->symbol = $this->original['symbol'];
+            $temp->portfolio_id = $this->portfolio_id;
+
+            $temp->syncHolding();
+        }
+
         // get the holding for a symbol and portfolio (or create one)
         $holding = Holding::firstOrNew([
             'portfolio_id' => $this->portfolio_id,

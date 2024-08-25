@@ -25,6 +25,9 @@ class MarketData extends Model
         'market_value',
         'fifty_two_week_high',
         'fifty_two_week_low',
+        'forward_pe',
+        'trailing_pe',
+        'market_cap'
     ];
 
     public static function setSplitsHoldingSynced($symbol) 
@@ -49,15 +52,17 @@ class MarketData extends Model
         ]);
 
         // check if new or stale
-        if (!$market_data->exists || now()->diffInMinutes($market_data->updated_at) >= config('market_data.refresh')) {
+        if (
+            !$market_data->exists 
+            || is_null($market_data->updated_at)
+            || $market_data->updated_at->diffInMinutes(now()) >= config('market_data.refresh')
+        ) {
             
             // get quote
-            // $quote = app(MarketDataInterface::class)->quote($symbol);
+            $quote = app(MarketDataInterface::class)->quote($symbol);
 
             // fill data
-            // $market_data->fill($quote->toArray());
-
-            
+            $market_data->fill($quote->toArray());
         }
 
         // save with timestamps updated

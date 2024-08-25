@@ -11,7 +11,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        
+        $market_data = config(
+            "market_data." . 
+            config('market_data.default', 'yahoo')
+        );
+
+        $this->app->bind(
+            \App\Interfaces\MarketData\MarketDataInterface::class,
+            $market_data
+        );
     }
 
     /**

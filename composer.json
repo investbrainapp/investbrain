@@ -15,6 +15,7 @@
         "maatwebsite/excel": "^3.1",
         "predis/predis": "^2.2",
         "robsontenorio/mary": "^1.35",
+        "scheb/yahoo-finance-api": "^4.10",
         "staudenmeir/eloquent-has-many-deep": "^1.20"
     },
     "require-dev": {

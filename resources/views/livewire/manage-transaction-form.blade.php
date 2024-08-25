@@ -2,11 +2,11 @@
 
 use App\Models\Transaction;
 use App\Models\Portfolio;
+use App\Rules\SymbolValidationRule;
 use Illuminate\Support\Collection;
-use Livewire\Attributes\Rule;
+use Livewire\Attributes\{Computed};
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
-use Livewire\Attributes\Computed;
 
 new class extends Component {
     use Toast;
@@ -15,27 +15,29 @@ new class extends Component {
     public ?Portfolio $portfolio;
     public ?Transaction $transaction;
 
-    #[Rule('required|string|max:15')]
     public String $symbol;
-
-    #[Rule('required|string|in:BUY,SELL')]
     public String $transaction_type;
-
-    #[Rule('required|date_format:Y-m-d')]
     public String $date;
-
-    #[Rule('required|min:0|numeric')]
     public Float $quantity;
-
-    #[Rule('exclude_if:transaction_type,SELL|min:0|numeric')]
     public ?Float $cost_basis;
-
-    #[Rule('exclude_if:transaction_type,BUY|min:0|numeric')]
     public ?Float $sale_price;
 
     public Bool $confirmingTransactionDeletion = false;
 
     // methods
+    public function rules()
+    {
+
+        return [
+            'symbol' => ['required', 'string', new SymbolValidationRule],
+            'transaction_type' => 'required|string|in:BUY,SELL',
+            'date' => 'required|date_format:Y-m-d',
+            'quantity' => 'required|min:0|numeric',
+            'cost_basis' => 'exclude_if:transaction_type,SELL|min:0|numeric',
+            'sale_price' => 'exclude_if:transaction_type,BUY|min:0|numeric',
+        ];
+    }
+
     public function mount() 
     {
         if (isset($this->transaction)) {
@@ -128,7 +130,13 @@ new class extends Component {
             />
             @endif
 
-            <x-button label="{{ $transaction ? 'Update' : 'Create' }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
+            <x-button 
+                label="{{ $transaction ? 'Update' : 'Create' }}" 
+                type="submit" 
+                icon="o-paper-airplane" 
+                class="btn-primary" 
+                spinner="{{ $transaction ? 'update' : 'save' }}"
+            />
         </x-slot:actions>
     </x-form>
 

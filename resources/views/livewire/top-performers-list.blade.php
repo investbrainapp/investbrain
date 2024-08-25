@@ -17,7 +17,7 @@ new class extends Component {
 <div class="">
 
     @foreach(
-        $holdings->sortBy('market_gain_percent')
+        $holdings->sortByDesc('market_gain_percent')
                     ->where('quantity', '>', 0)
                     ->where('market_data.market_value', '>', 0)
                     ->take(5) 
@@ -29,17 +29,13 @@ new class extends Component {
             link="{{ route('portfolio.show', ['portfolio' => $holding->portfolio_id]) }}"
         >
 
-            @php
-                $gainPercent = (($holding->market_data->market_value - $holding->average_cost_basis) / $holding->average_cost_basis) * 100;
-            @endphp
-
             <x-slot:value class="flex items-center">
 
                 {{ $holding->market_data?->name }} ({{ $holding->symbol }})
                 
-                <x-badge class="{{ $gainPercent > 0 ? 'badge-success' : 'badge-error' }} ml-2 badge-sm" >
+                <x-badge class="{{ $holding->market_gain_percent > 0 ? 'badge-success' : 'badge-error' }} ml-2 badge-sm" >
                     <x-slot:value>
-                        {{ Number::percentage($gainPercent) }} 
+                        {{ Number::percentage($holding->market_gain_percent) }} 
                     </x-slot:value>
                 </x-badge>
                 

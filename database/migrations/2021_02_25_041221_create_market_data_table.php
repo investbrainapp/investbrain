@@ -21,6 +21,11 @@ class CreateMarketDataTable extends Migration
             $table->float('fifty_two_week_high', 12, 4)->nullable();
             $table->timestamp('last_dividend_date')->nullable();
             $table->float('last_dividend_amount', 12, 4)->nullable();
+            $table->unsignedBigInteger('market_cap')->nullable();
+            $table->float('trailing_pe', 12, 4)->nullable();
+            $table->float('forward_pe', 12, 4)->nullable();
+            $table->float('pe_growth', 12, 4)->nullable();
+            $table->json('meta_data')->nullable();
             $table->timestamps();
         });
     }
