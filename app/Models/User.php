@@ -24,22 +24,12 @@ class User extends Authenticatable
     use HasUuids;
     use HasRelationships;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -47,20 +37,10 @@ class User extends Authenticatable
         'two_factor_secret',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
     protected $appends = [
         'profile_photo_url',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -76,7 +56,16 @@ class User extends Authenticatable
 
     public function holdings(): HasManyDeep
     {
-        return $this->hasManyDeep(Holding::class, ['portfolio_user', Portfolio::class]);    
+        return $this->hasManyDeep(Holding::class, ['portfolio_user', Portfolio::class])
+            ->withAggregate('market_data', 'name')
+            ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'fifty_two_week_low')
+            ->withAggregate('market_data', 'fifty_two_week_high')
+            ->withAggregate('market_data', 'updated_at')
+            ->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
+            ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100, 0) AS market_gain_percent')
+            ->join('market_data', 'holdings.symbol', 'market_data.symbol');    
     }
 
     public function transactions(): HasManyDeep

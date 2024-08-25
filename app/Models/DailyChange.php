@@ -12,25 +12,10 @@ class DailyChange extends Model
 
     public $timestamps = false;
 
-    /**
-     * The primary key of the table.
-     * 
-     * @var string
-     */
     protected $primaryKey = ['date', 'portfolio_id'];
 
-    /**
-     * Table name for the model
-     *
-     * @var string
-     */
     protected $table = 'daily_change';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'portfolio_id',
         'date',
@@ -42,18 +27,8 @@ class DailyChange extends Model
         'notes',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'date' => 'datetime',
     ];

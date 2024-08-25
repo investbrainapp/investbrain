@@ -40,18 +40,6 @@ new class extends Component {
     {
         return $this->portfolio
                     ->holdings()
-                    ->withCount(['transactions as num_transactions' => function ($query) {
-                        $query->portfolio($this->portfolio->id);
-                    }])
-                    ->withAggregate('market_data', 'name')
-                    ->withAggregate('market_data', 'market_value')
-                    ->withAggregate('market_data', 'fifty_two_week_low')
-                    ->withAggregate('market_data', 'fifty_two_week_high')
-                    ->withAggregate('market_data', 'updated_at')
-                    ->selectRaw('(market_data.market_value * holdings.quantity) AS total_market_value')
-                    ->selectRaw('((market_data.market_value - holdings.average_cost_basis) * holdings.quantity) AS market_gain_dollars')
-                    ->selectRaw('(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100) AS market_gain_percent')
-                    ->join('market_data', 'holdings.symbol', 'market_data.symbol')
                     ->orderBy(...array_values($this->sortBy))
                     ->where('quantity', '>', 0)
                     ->get();

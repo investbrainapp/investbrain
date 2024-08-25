@@ -44,7 +44,19 @@ class Portfolio extends Model
 
     public function holdings()
     {
-        return $this->hasMany(Holding::class, 'portfolio_id', 'id');
+        return $this->hasMany(Holding::class, 'portfolio_id', 'id')
+            ->withCount(['transactions as num_transactions' => function ($query) {
+                $query->portfolio($this->id);
+            }])
+            ->withAggregate('market_data', 'name')
+            ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'fifty_two_week_low')
+            ->withAggregate('market_data', 'fifty_two_week_high')
+            ->withAggregate('market_data', 'updated_at')
+            ->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
+            ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100, 0) AS market_gain_percent')
+            ->join('market_data', 'holdings.symbol', 'market_data.symbol');
     }
 
     public function transactions()
