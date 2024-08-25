@@ -43,7 +43,7 @@
                 </form>
             </div>
             <div class="flex flex-col items-center gap-2 pt-7">
-                <a target="_blank" href="https://github.com/hackeresq/investbrain" title="We're open source!" class="">
+                <a target="_blank" href="https://github.com/investbrainapp/investbrain" title="We're open source!" class="">
                     <x-github-icon />
                 </a>
             </div>

@@ -38,7 +38,7 @@
                 title="{{ __('Documentation') }}"
                 icon="o-book-open"
                 class="btn-circle btn-ghost btn-sm"
-                link="https://github.com/hackeresq/investbrain"
+                link="https://github.com/investbrainapp/investbrain"
                 external
             >
             </x-button>
@@ -46,7 +46,7 @@
             <x-button 
                 title="{{ __('We\'re open source!') }}"
                 class="btn-circle btn-ghost btn-sm"
-                link="https://github.com/hackeresq/investbrain"
+                link="https://github.com/investbrainapp/investbrain"
                 external
             >
                 <x-github-icon />
