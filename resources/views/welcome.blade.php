@@ -1,5 +1,6 @@
 @extends('layouts.main-layout', ['attributes' => null])
 
+@section('body')
 <div class="flex flex-col min-h-[100dvh] bg-gradient-to-br from-[#03255B] to-[#011638] text-white">
     <header class="px-4 lg:px-6 h-14 flex items-center w-20">
         <x-glyph-only-logo class="text-white" />
@@ -95,3 +96,4 @@
         };
     }
 </script>
+@endsection
