@@ -1,7 +1,7 @@
 {
     "name": "investbrainapp/investbrain",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A smart open-source tool that consolidates and tracks portfolios from your different brokerages",
     "keywords": ["stocks", "dividends", "investments", "tracking"],
     "license": "CC-BY-NC 4.0",
     "require": {
