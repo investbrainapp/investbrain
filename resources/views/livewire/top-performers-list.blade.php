@@ -26,7 +26,10 @@ new class extends Component {
         <x-list-item 
             no-separator 
             :item="$holding" 
-            link="{{ route('portfolio.show', ['portfolio' => $holding->portfolio_id]) }}"
+            link="{{ route('holding.show', [
+                'portfolio' => $holding->portfolio_id,
+                'symbol' => $holding->symbol,
+            ]) }}"
         >
 
             <x-slot:value class="flex items-center">
