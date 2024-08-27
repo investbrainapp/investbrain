@@ -4,6 +4,8 @@
 
 Investbrain helps you manage and track the performance of your investments.
 
+<p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/screenshot.png" width="800" alt="Investbrain Screenshot"></a></p>
+
 ## Contributing
 
 We appreciate any contributions to Investbrain! Please open a pull request on our [Github repository](https://github.com/investbrainapp/investbrain). Here are some ideas for first time contributors:
