@@ -62,20 +62,22 @@ new class extends Component {
     <x-table 
         :headers="$headers" 
         :rows="$this->transactions()" 
-        x-data="{ loading: false, timeout: null }"
+        x-data="{ loadingId: null, timeout: null }"
         @row-click="
-            timeout = setTimeout(() => { loading = true }, 200);
+            timeout = setTimeout(() => { loadingId = $event.detail.id }, 200);
             $wire.showTransactionDialog($event.detail.id).then(() => {
                 clearTimeout(timeout);
-                loading = false;
+                loadingId = null;
             })
         "
         :sort-by="$sortBy" 
         with-pagination
     >
         @scope('cell_symbol', $row)
-            {{ $row->symbol }}
-            <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+            <span class="flex">
+                {{ $row->symbol }}
+                <x-loading x-show="loadingId === '{{ $row->id }}'" x-cloak class="text-gray-400 ml-2" />
+            </span>
         @endscope
         @scope('cell_date', $row)
             {{ $row->date->format('M d, Y') }}
