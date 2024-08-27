@@ -153,7 +153,7 @@
     "Create Transaction": "Create Transaction",
     "Holdings": "Holdings",
     "Recent activity": "Recent activity",
-    "All Transactions": "All Transaction",
+    "All Transactions": "All Transactions",
     
     "validation.accepted": "This field must be accepted.",
     "validation.accepted_if": "This field must be accepted when :other is :value.",
