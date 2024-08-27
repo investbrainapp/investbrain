@@ -23,6 +23,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/portfolio/create', [PortfolioController::class, 'create'])->name('portfolio.create');
     Route::get('/portfolio/{portfolio}', [PortfolioController::class, 'show'])->name('portfolio.show');
 
+    Route::get('/portfolio/{portfolio}/{symbol}', [HoldingController::class, 'show'])->name('holding.show');
+
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
 });
 

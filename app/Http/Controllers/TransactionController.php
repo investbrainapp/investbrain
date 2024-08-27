@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Portfolio;
-use App\Models\Transaction;
-
 class TransactionController extends Controller
 {
 
@@ -13,8 +10,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $user = request()->user();
 
-        return view('transaction.index', compact('user'));
+        return view('transaction.index');
     }
 }
