@@ -3,6 +3,7 @@
 
         <x-ib-toolbar title="{{ __('All Transactions') }}" />
 
-        {{-- @livewire('manage-transaction-form', ['portfolio' => $portfolio]) --}}
+        @livewire('transactions-table')
+
     </div>
 </x-app-layout>

@@ -16,7 +16,7 @@
 
         <x-menu-item title="{{ __('Create Portfolio') }}" icon="o-document-plus" link="{{ route('portfolio.create') }}" />
     </x-menu-sub>
-    {{-- <x-menu-item title="{{ __('Transactions') }}" icon="o-banknotes" link="{{ route('transaction.index') }}" /> --}}
+    <x-menu-item title="{{ __('Transactions') }}" icon="o-banknotes" link="{{ route('transaction.index') }}" />
     {{-- <x-menu-item title="{{ __('Reporting') }}" icon="o-chart-bar-square" link="####" /> --}}
 
 </x-menu>

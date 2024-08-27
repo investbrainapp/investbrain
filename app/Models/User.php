@@ -70,7 +70,18 @@ class User extends Authenticatable
 
     public function transactions(): HasManyDeep
     {
-        return $this->hasManyDeep(Transaction::class, ['portfolio_user', Portfolio::class]);    
+        return $this->hasManyDeep(Transaction::class, ['portfolio_user', Portfolio::class])
+            ->withAggregate('market_data', 'name')
+            ->withAggregate('portfolio', 'title')
+            ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'fifty_two_week_low')
+            ->withAggregate('market_data', 'fifty_two_week_high')
+            ->withAggregate('market_data', 'updated_at')
+            ->selectRaw('COALESCE(transactions.cost_basis * transactions.quantity, 0) AS total_cost_basis')
+            ->selectRaw('COALESCE(market_data.market_value * transactions.quantity, 0) AS total_market_value')
+            ->selectRaw('COALESCE((market_data.market_value - transactions.cost_basis) * transactions.quantity, 0) AS market_gain_dollars')
+            ->selectRaw('COALESCE(((market_data.market_value - transactions.cost_basis) / transactions.cost_basis) * 100, 0) AS market_gain_percent')
+            ->join('market_data', 'transactions.symbol', 'market_data.symbol');;   
     }
 
     public function daily_change(): HasManyDeep

@@ -80,9 +80,6 @@ new class extends Component {
         @scope('cell_dividends_earned', $row)
             {{ Number::currency($row->dividends_earned ?? 0) }}
         @endscope
-        @scope('cell_dividends_earned', $row)
-            {{ Number::currency($row->dividends_earned ?? 0) }}
-        @endscope
         @scope('cell_market_data_updated_at', $row)
             {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}
         @endscope

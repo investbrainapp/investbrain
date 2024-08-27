@@ -62,7 +62,7 @@ new class extends Component {
         // $this->transaction->owner_id = auth()->user()->id;
         $this->transaction->save();
 
-        $this->success(__('Transaction updated'), redirectTo: route('portfolio.show', ['portfolio' => $this->portfolio->id]));
+        $this->success(__('Transaction updated'), redirectTo: route('portfolio.show', ['portfolio' => $this->transaction->portfolio_id]));
     }
 
     public function save()

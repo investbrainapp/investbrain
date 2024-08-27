@@ -13,7 +13,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
+        $user = request()->user();
 
-        return view('transaction.index');
+        return view('transaction.index', compact('user'));
     }
 }
