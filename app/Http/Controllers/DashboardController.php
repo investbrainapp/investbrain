@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use stdClass;
 use App\Models\Holding;
 use Illuminate\Http\Request;
 
