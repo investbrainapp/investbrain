@@ -3,7 +3,7 @@
 namespace App\Interfaces\MarketData;
 
 use Illuminate\Support\Collection;
-use Scheb\YahooFinanceApi\ApiClientFactory;
+use Scheb\YahooFinanceApi\ApiClientFactory as YahooFinance;
 
 class YahooMarketData implements MarketDataInterface
 {
@@ -12,7 +12,7 @@ class YahooMarketData implements MarketDataInterface
     public function __construct() {
 
         // create yahoo finance client factory
-        $this->client = ApiClientFactory::createApiClient();
+        $this->client = YahooFinance::createApiClient();
     }
 
     public function exists(String $symbol): Bool
