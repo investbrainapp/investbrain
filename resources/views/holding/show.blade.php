@@ -18,26 +18,14 @@
                     <span class="text-sm"> {{ $market_data->name }} </span>
                 </x-slot:title>
 
-                <p class="font-bold	text-2xl pb-2">
-                    {{ Number::currency($market_data->market_value) }} 
+                <div class="font-bold text-2xl py-1 flex items-center">
+                    {{ Number::currency($market_data->market_value ?? 0) }} 
                     
-                    @if ($holding->average_cost_basis)
-                    
-                        @php
-                            $isUp = $holding->average_cost_basis <= $market_data->market_value;
-                            $percent = ($market_data->market_value - $holding->average_cost_basis) / $holding->average_cost_basis
-                        @endphp
-
-                        <span class="text-base font-normal" style="color: {{ $isUp ? 'rgb(0, 200, 0)' : 'rgb(255, 20, 0)' }};">
-                            {!! $isUp ?  '&#9650;' :'&#9660;' !!}
-                            {{ Number::percentage(
-                                $percent,
-                                $percent < 1 ? 2 : 1
-                            ) }}
-                        </span>
-                    @endif
-                   
-                </p>
+                    <x-gain-loss-arrow-badge 
+                        :cost-basis="$holding->average_cost_basis"
+                        :market-value="$market_data->market_value"
+                    />
+                </div>
 
                 <p>
                     <span class="font-bold">{{ __('Quantity Owned') }}: </span>
@@ -46,22 +34,22 @@
 
                 <p>
                     <span class="font-bold">{{ __('Average Cost Basis') }}: </span>
-                    {{ Number::currency($holding->average_cost_basis) }} 
+                    {{ Number::currency($holding->average_cost_basis ?? 0) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Total Cost Basis') }}: </span>
-                    {{ Number::currency($holding->total_cost_basis) }} 
+                    {{ Number::currency($holding->total_cost_basis ?? 0) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Realized Gain/Loss') }}: </span>
-                    {{ Number::currency($holding->realized_gain_dollars) }} 
+                    {{ Number::currency($holding->realized_gain_dollars ?? 0) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Dividends Earned') }}: </span>
-                    {{ Number::currency($holding->dividends_earned) }} 
+                    {{ Number::currency($holding->dividends_earned ?? 0) }} 
                 </p>
 
                 <p>
@@ -84,25 +72,75 @@
 
             <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
 
-                
+                <p>
+                    <span class="font-bold">{{ __('Forward PE') }}: </span>
+                    {{ $market_data->forward_pe }} 
+                </p>
+
+                <p>
+                    <span class="font-bold">{{ __('Trailing PE') }}: </span>
+                    {{ $market_data->trailing_pe }} 
+                </p>
+
+                <p>
+                    <span class="font-bold">{{ __('Market Cap') }}: </span>
+                    ${{ Number::forHumans($market_data->market_cap ?? 0) }} 
+                </p>
 
             </x-ib-card>
 
             <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
-                
-                
+
+                @livewire('transactions-list', [
+                    'portfolio' => $holding->portfolio,
+                    'transactions' => $holding->transactions
+                ])
 
             </x-ib-card>
 
             <x-ib-card title="{{ __('Dividends') }}" class="md:col-span-3">
 
+                @foreach ($holding->dividends->take(5) as $dividend)
+
+                    <x-list-item :item="$dividend">
+                        <x-slot:value>
+        
+                        Purchased {{$dividend->purchased}}<br>
+                        Sold {{$dividend->sold}}<br>
+                            @php
+                                $owned = ($dividend->purchased - $dividend->sold);
+                            @endphp 
+
+                            {{ Number::currency($dividend->dividend_amount) }}
+                            x {{ $owned }}
+                            = {{ Number::currency($owned * $dividend->dividend_amount) }}
+
+                        </x-slot:value>
+                        <x-slot:sub-value>
+                            {{ $dividend->date->format('F d, Y') }}
+                        </x-slot:sub-value>
+                    </x-list-item>
                 
+                @endforeach
 
             </x-ib-card>
 
             <x-ib-card title="{{ __('Splits') }}" class="md:col-span-3">
 
+                @foreach ($holding->splits->take(5) as $split)
+
+                    <x-list-item :item="$split">
+                        <x-slot:value>
+        
+                           1:{{ $split->split_amount }}
+
+                        </x-slot:value>
+                        <x-slot:sub-value>
+                            {{ $split->date->format('F d, Y') }}
+                        </x-slot:sub-value>
+                    </x-list-item>
                 
+                @endforeach
 
             </x-ib-card>
 

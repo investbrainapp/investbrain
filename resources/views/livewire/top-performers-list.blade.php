@@ -35,12 +35,8 @@ new class extends Component {
             <x-slot:value class="flex items-center">
 
                 {{ $holding->market_data?->name }} ({{ $holding->symbol }})
-                
-                <x-badge class="{{ $holding->market_gain_percent > 0 ? 'badge-success' : 'badge-error' }} ml-2 badge-sm" >
-                    <x-slot:value>
-                        {{ Number::percentage($holding->market_gain_percent) }} 
-                    </x-slot:value>
-                </x-badge>
+
+                <x-gain-loss-arrow-badge :percent="$holding->market_gain_percent" />
                 
             </x-slot:value>
             <x-slot:sub-value>

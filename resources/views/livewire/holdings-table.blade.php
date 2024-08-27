@@ -45,11 +45,21 @@ new class extends Component {
                     ->get();
     }
 
+    public function goToHolding($holding)
+    {
+        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
+    }
+
 }; ?>
 
 <div class="">
 
-    <x-table wire:loading.remove :headers="$headers" :rows="$this->holdings()" :sort-by="$sortBy">
+    <x-table 
+        :headers="$headers" 
+        :rows="$this->holdings()" 
+        :sort-by="$sortBy"
+        @row-click="$wire.goToHolding($event.detail)"
+    >
         @scope('cell_average_cost_basis', $row)
             {{ Number::currency($row->average_cost_basis ?? 0) }}
         @endscope
@@ -63,7 +73,7 @@ new class extends Component {
             {{ Number::currency($row->market_gain_dollars ?? 0) }}
         @endscope
         @scope('cell_market_gain_percent', $row)
-            {{ Number::percentage($row->market_gain_percent ?? 0) }}
+            <x-gain-loss-arrow-badge :percent="$row->market_gain_percent" />
         @endscope
         @scope('cell_market_data_market_value', $row)
             {{ Number::currency($row->market_data_market_value ?? 0) }}

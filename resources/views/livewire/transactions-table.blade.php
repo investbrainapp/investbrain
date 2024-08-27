@@ -14,6 +14,11 @@ new class extends Component {
     public User $user;
     public ?Transaction $editingTransaction;
 
+    protected $listeners = [
+        'transaction-updated' => '$refresh',
+        'transaction-saved' => '$refresh'
+    ];
+
     public array $sortBy = ['column' => 'date', 'direction' => 'desc'];
 
     public array $headers;
@@ -33,16 +38,10 @@ new class extends Component {
             ['key' => 'symbol', 'label' => __('Symbol'), 'class' => ''],
             ['key' => 'market_data_name', 'label' => __('Name')],
             ['key' => 'transaction_type', 'label' => __('Type')],
+            ['key' => 'split', 'label' => __('Split')],
             ['key' => 'quantity', 'label' => __('Quantity')],
             ['key' => 'cost_basis', 'label' => __('Cost Basis')],
-            ['key' => 'total_cost_basis', 'label' => __('Total Cost Basis')],
-            ['key' => 'market_data_market_value', 'label' => __('Market Value')],
-            ['key' => 'total_market_value', 'label' => __('Total Market Value')],
-            // ['key' => 'market_gain_dollars', 'label' => __('Market Gain/Loss')],
-            // ['key' => 'market_gain_percent', 'label' => __('Market Gain/Loss')],
-            // ['key' => 'realized_gain_dollars', 'label' => __('Realized Gain/Loss')],
-            // ['key' => 'dividends_earned', 'label' => __('Dividends Earned')],
-            // ['key' => 'market_data_updated_at', 'label' => __('Market Data Age')],
+            ['key' => 'gain_dollars', 'label' => __('Gain/Loss')],
         ];
     }
 
@@ -82,6 +81,9 @@ new class extends Component {
         @scope('cell_date', $row)
             {{ $row->date->format('M d, Y') }}
         @endscope
+        @scope('cell_split', $row)
+            {{ $row->split ? 'Yes' : '' }}
+        @endscope
         @scope('cell_transaction_type', $row)
             <x-badge 
                 :value="$row->transaction_type" 
@@ -96,26 +98,14 @@ new class extends Component {
         @scope('cell_total_cost_basis', $row)
             {{ Number::currency($row->total_cost_basis ?? 0) }}
         @endscope
-        @scope('cell_realized_gain_dollars', $row)
-            {{ Number::currency($row->realized_gain_dollars ?? 0) }}
-        @endscope
-        @scope('cell_market_gain_dollars', $row)
-            {{ Number::currency($row->market_gain_dollars ?? 0) }}
-        @endscope
-        @scope('cell_market_gain_percent', $row)
-            {{ Number::percentage($row->market_gain_percent ?? 0) }}
+        @scope('cell_gain_dollars', $row)
+            {{ Number::currency($row->gain_dollars ?? 0) }}
         @endscope
         @scope('cell_market_data_market_value', $row)
             {{ Number::currency($row->market_data_market_value ?? 0) }}
         @endscope
         @scope('cell_total_market_value', $row)
             {{ Number::currency($row->total_market_value ?? 0) }}
-        @endscope
-        @scope('cell_dividends_earned', $row)
-            {{ Number::currency($row->dividends_earned ?? 0) }}
-        @endscope
-        @scope('cell_market_data_updated_at', $row)
-            {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}
         @endscope
     </x-table>
 

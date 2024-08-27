@@ -12,6 +12,11 @@ new class extends Component {
     public ?Portfolio $portfolio;
     public ?Transaction $editingTransaction;
 
+    protected $listeners = [
+        'transaction-updated' => '$refresh',
+        'transaction-saved' => '$refresh'
+    ];
+
     // methods
     public function showTransactionDialog($transactionId)
     {
@@ -45,7 +50,6 @@ new class extends Component {
                         ? 'badge-success' 
                         : 'badge-error' }} badge-sm mr-3" 
                 />
-                {{ $transaction->date->format('M j, Y') }} 
                 {{ $transaction->symbol }} 
                 ({{ $transaction->quantity }} 
                 @ {{ $transaction->transaction_type == 'BUY' 
@@ -54,6 +58,9 @@ new class extends Component {
 
                 <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>
+            <x-slot:sub-value>
+                {{ $transaction->date->format('F j, Y') }} 
+            </x-slot:sub-value>
         </x-list-item>
 
     @endforeach

@@ -12,7 +12,7 @@
             </div>
 
         </div>
-        <div class="flex flex-grow gap-4 w-50">
+        <div class="flex flex-grow gap-4 w-50" x-data>
 
             <x-spotlight
                 shortcut="slash"
@@ -22,11 +22,11 @@
             
             <x-button 
                 icon="o-magnifying-glass" 
-                @click="$dispatch('mary-search-open')" 
+                @click.stop="$dispatch('mary-search-open')"
                 class="btn-sm"
             >
                 <x-slot:label>
-                    @lang('Press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
+                    @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
 
                 </x-slot:label>
             </x-button>
