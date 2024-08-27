@@ -6,14 +6,15 @@ Investbrain helps you manage and track the performance of your investments.
 
 ## Contributing
 
-Thank you for considering a contribution to Investbrain! Please open a pull request on our [Github repository](https://github.com/investbrainapp/investbrain). Here are some ideas for first time contributors:
+We appreciate any contributions to Investbrain! Please open a pull request on our [Github repository](https://github.com/investbrainapp/investbrain). Here are some ideas for first time contributors:
 
 - Improve our documentation
 - Create new market data providers
 - Enhance the user interface
+- Additional translations
 - Fix bugs
 
-Don't forget to include passing tests with any pull requests.
+When you submit a contribution, don't forget to include passing tests with your PR!
 
 ## Code of Conduct
 
