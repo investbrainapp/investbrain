@@ -15,10 +15,12 @@ class HoldingController extends Controller
     public function show(Request $request, Portfolio $portfolio, String $symbol)
     {
 
-        $holding = Holding::where([
-            'portfolio_id' => $portfolio->id,
-            'symbol' => $symbol
-        ])->firstOrFail();
+        $holding = $request->user()
+            ->holdings()
+            ->where([
+                'holdings.portfolio_id' => $portfolio->id,
+                'holdings.symbol' => $symbol
+            ])->firstOrFail();
 
         $market_data = $holding->market_data;
 

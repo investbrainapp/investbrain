@@ -31,6 +31,11 @@ class Holding extends Model
         'dividends_synced_at' => 'datetime',
     ];
 
+    protected $attributes = [
+        'realized_gain_dollars' => 0,
+        'dividends_earned' => 0,
+    ];
+
     /**
      * Market data for holding
      *
@@ -106,7 +111,7 @@ class Holding extends Model
             ->selectRaw('@total_market_value:=COALESCE(SUM(holdings.quantity * market_data.market_value),0) AS total_market_value')
             ->selectRaw('@sum_total_cost_basis:=COALESCE(SUM(holdings.total_cost_basis),0) AS total_cost_basis')
             ->selectRaw('@total_gain_dollars:=COALESCE((@total_market_value - @sum_total_cost_basis),0) AS total_gain_dollars')
-            ->selectRaw('COALESCE((@total_gain_dollars / @sum_total_cost_basis) * 100,0) AS total_gain_percent')
+            // ->selectRaw('COALESCE((@total_gain_dollars / @sum_total_cost_basis) * 100,0) AS total_gain_percent')
             ->join('market_data', 'market_data.symbol', 'holdings.symbol');
     }
 

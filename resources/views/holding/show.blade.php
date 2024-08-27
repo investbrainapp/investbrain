@@ -20,7 +20,23 @@
 
                 <p class="font-bold	text-2xl pb-2">
                     {{ Number::currency($market_data->market_value) }} 
-                    <span class="text-base font-normal">▲ 9%</span>
+                    
+                    @if ($holding->average_cost_basis)
+                    
+                        @php
+                            $isUp = $holding->average_cost_basis <= $market_data->market_value;
+                            $percent = ($market_data->market_value - $holding->average_cost_basis) / $holding->average_cost_basis
+                        @endphp
+
+                        <span class="text-base font-normal" style="color: {{ $isUp ? 'rgb(0, 200, 0)' : 'rgb(255, 20, 0)' }};">
+                            {!! $isUp ?  '&#9650;' :'&#9660;' !!}
+                            {{ Number::percentage(
+                                $percent,
+                                $percent < 1 ? 2 : 1
+                            ) }}
+                        </span>
+                    @endif
+                   
                 </p>
 
                 <p>
@@ -30,27 +46,33 @@
 
                 <p>
                     <span class="font-bold">{{ __('Average Cost Basis') }}: </span>
-                    {{ $holding->average_cost_basis }} 
+                    {{ Number::currency($holding->average_cost_basis) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Total Cost Basis') }}: </span>
-                    {{ $holding->total_cost_basis }} 
+                    {{ Number::currency($holding->total_cost_basis) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Realized Gain/Loss') }}: </span>
-                    {{ $holding->realized_gain_dollars }} 
+                    {{ Number::currency($holding->realized_gain_dollars) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Dividends Earned') }}: </span>
-                    {{ $holding->dividends_earned }} 
+                    {{ Number::currency($holding->dividends_earned) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('52 week') }}: </span>
-                    ● ● ● ● ● ● ● ● ● ●
+
+                    <x-fifty-two-week-range 
+                        :low="$market_data->fifty_two_week_low" 
+                        :high="$market_data->fifty_two_week_high" 
+                        :current="$market_data->market_value"
+                    />
+                    
                 </p>
 
                 <p class="pt-2 text-sm">

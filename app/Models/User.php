@@ -64,7 +64,7 @@ class User extends Authenticatable
             ->withAggregate('market_data', 'updated_at')
             ->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
             ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100, 0) AS market_gain_percent')
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis), 0) AS market_gain_percent')
             ->join('market_data', 'holdings.symbol', 'market_data.symbol');    
     }
 
@@ -80,7 +80,7 @@ class User extends Authenticatable
             ->selectRaw('COALESCE(transactions.cost_basis * transactions.quantity, 0) AS total_cost_basis')
             ->selectRaw('COALESCE(market_data.market_value * transactions.quantity, 0) AS total_market_value')
             ->selectRaw('COALESCE((market_data.market_value - transactions.cost_basis) * transactions.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - transactions.cost_basis) / transactions.cost_basis) * 100, 0) AS market_gain_percent')
+            ->selectRaw('COALESCE(((market_data.market_value - transactions.cost_basis) / transactions.cost_basis), 0) AS market_gain_percent')
             ->join('market_data', 'transactions.symbol', 'market_data.symbol');;   
     }
 
