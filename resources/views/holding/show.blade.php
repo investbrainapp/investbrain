@@ -83,17 +83,6 @@
             <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
 
                 <p>
-                    <span class="font-bold">{{ __('52 week') }}: </span>
-
-                    <x-fifty-two-week-range 
-                        :low="$market_data->fifty_two_week_low" 
-                        :high="$market_data->fifty_two_week_high" 
-                        :current="$market_data->market_value"
-                    />
-                    
-                </p>
-                
-                <p>
                     <span class="font-bold">{{ __('Forward PE') }}: </span>
                     {{ $market_data->forward_pe }} 
                 </p>
@@ -108,6 +97,17 @@
                     ${{ Number::forHumans($market_data->market_cap ?? 0) }} 
                 </p>
 
+                <p>
+                    <span class="font-bold">{{ __('52 week') }}: </span>
+
+                    <x-fifty-two-week-range 
+                        :low="$market_data->fifty_two_week_low" 
+                        :high="$market_data->fifty_two_week_high" 
+                        :current="$market_data->market_value"
+                    />
+                    
+                </p>
+                
             </x-ib-card>
 
             <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">

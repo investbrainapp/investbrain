@@ -4,17 +4,21 @@ use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 use App\Imports\BackupImport;
+use Livewire\Attributes\Rule;
 
 new class extends Component {
     use Toast;
     use WithFileUploads;
 
     // props
+    #[Rule('required|file|mimes:xlsx|max:2048')]
     public $file;
 
     // methods
     public function import() 
     {
+
+        $this->validate();
 
         $import = (new BackupImport)->import($this->file);
 
