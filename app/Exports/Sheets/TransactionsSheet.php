@@ -12,10 +12,10 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'ID',
+            'Transaction ID',
             'Symbol',
-            'Portfolio',
-            'Transaction',
+            'Portfolio ID',
+            'Transaction Type',
             'Quantity',
             'Cost Basis',
             'Sale Price',
@@ -23,6 +23,14 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
             'Date',
             'Created',
             'Updated',
+            'Company Name',
+            'Portfolio Title',
+            'Market Value',
+            '52 Week Low',
+            '52 Week High',
+            'Market Data Refresh Date',
+            'Gain/Loss Dollars',
+            'Owner ID'
         ];
     }
 
@@ -31,7 +39,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return Transaction::myTransactions()->get();
+        return auth()->user()->transactions;
     }
 
      /**

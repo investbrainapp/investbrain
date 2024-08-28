@@ -35,8 +35,6 @@ class Portfolio extends Model
 
     protected $with = ['users', 'transactions'];
 
-    protected $appends = ['owner_id'];
-
     public function users()
     {
         return $this->belongsToMany(User::class)->withPivot('owner');
@@ -67,11 +65,6 @@ class Portfolio extends Model
     public function daily_change()
     {
         return $this->hasMany(DailyChange::class);
-    }
-
-    public function scopeMyPortfolios()
-    {
-        return $this->whereRelation('users', 'id', auth()->user()->id);
     }
 
     public function scopeWithoutWishlists() 

@@ -18,7 +18,7 @@ class Spotlight
             return $results;
         }
 
-        $portfolios = Portfolio::myPortfolios()->where('title', 'LIKE', '%'.$request->input('search').'%')->limit(5)->get();
+        $portfolios = $request->user()->portfolios()->where('title', 'LIKE', '%'.$request->input('search').'%')->limit(5)->get();
         $portfolios->each(function($portfolio) use ($results) {
 
             $results->push([
@@ -29,7 +29,7 @@ class Spotlight
             ]);
         });
 
-        $holdings = Holding::myHoldings()->where('symbol', 'LIKE', '%'.$request->input('search').'%')->limit(5)->get();
+        $holdings = $request->user()->holdings()->where('holdings.symbol', 'LIKE', '%'.$request->input('search').'%')->limit(5)->get();
         $holdings->each(function($holding) use ($results) {
 
             $results->push([

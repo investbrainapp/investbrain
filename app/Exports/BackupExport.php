@@ -3,9 +3,6 @@
 namespace App\Exports;
 
 use App\Exports\Sheets\DailyChangesSheet;
-use App\Exports\Sheets\SplitsSheet;
-use App\Exports\Sheets\DividendsSheet;
-use App\Exports\Sheets\MarketDataSheet;
 use App\Exports\Sheets\PortfoliosSheet;
 use App\Exports\Sheets\TransactionsSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -23,9 +20,6 @@ class BackupExport implements WithMultipleSheets
             return [
                 new PortfoliosSheet,
                 new TransactionsSheet,
-                new MarketDataSheet,
-                new DividendsSheet,
-                new SplitsSheet,
                 new DailyChangesSheet
             ];
     }

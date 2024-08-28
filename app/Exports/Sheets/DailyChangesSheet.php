@@ -13,13 +13,13 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
     {
         return [
             'Date',
-            'User',
+            'Portfolio',
             'Total Market Value',
             'Total Cost Basis',
             'Total Gain Loss',
             'Total Dividends',
             'Realized Gains',
-            'Notes'
+            'Annotation'
         ];
     }
 
@@ -28,7 +28,7 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return DailyChange::myDailyChanges()->get();
+        return auth()->user()->daily_changes;
     }
 
      /**

@@ -17,7 +17,7 @@ class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
             'Notes',
             'Wishlist',
             'Created',
-            'Updated',
+            'Updated'
         ];
     }
 
@@ -26,7 +26,7 @@ class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return Portfolio::myPortfolios()->get();
+        return auth()->user()->portfolios;
     }
 
      /**

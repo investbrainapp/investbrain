@@ -97,13 +97,6 @@ class Transaction extends Model
         return $query->where('symbol', $symbol);
     }
 
-    public function scopeMyTransactions()
-    {
-        return $this->whereHas('portfolio', function ($query) {
-            return $query->whereRelation('users', 'id', auth()->user()->id);
-        });
-    }
-
     public function refreshMarketData() 
     {
         return MarketData::getMarketData($this->attributes['symbol']);

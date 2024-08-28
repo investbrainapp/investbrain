@@ -54,6 +54,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Portfolio::class)->withPivot('owner');
     }
 
+    public function daily_changes()
+    {
+        return $this->hasManyDeep(DailyChange::class, ['portfolio_user', Portfolio::class]);
+    }
+
     public function holdings(): HasManyDeep
     {
         return $this->hasManyDeep(Holding::class, ['portfolio_user', Portfolio::class])

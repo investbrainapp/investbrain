@@ -32,19 +32,14 @@ class DailyChange extends Model
     protected $casts = [
         'date' => 'datetime',
     ];
-
-    public function scopeMyDailyChanges($query)
-    {
-        return $query->where('user_id', auth()->user()->id);
-    }
     
     public function scopePortfolio($query, $portfolio)
     {
         return $query->where('portfolio_id', $portfolio);
     }
+    
     public function portfolio()
     {
         return $this->belongsTo(Portfolio::class);
     }
-
 }

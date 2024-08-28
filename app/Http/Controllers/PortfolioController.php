@@ -22,7 +22,6 @@ class PortfolioController extends Controller
      */
     public function show(Portfolio $portfolio)
     {
-
         // get portfolio metrics
         $metrics = cache()->tags(['metrics', 'portfolio', auth()->user()->id, $portfolio->id])->remember(
             'portfolio-metrics-' . $portfolio->id, 
