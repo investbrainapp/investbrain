@@ -16,8 +16,6 @@ class Holding extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $with = ['market_data'];
-
     protected $fillable = [
         'portfolio_id',
         'symbol',
@@ -68,9 +66,6 @@ class Holding extends Model
      */
     public function dividends() 
     {
-
-      
-
         return $this->hasMany(Dividend::class, 'symbol', 'symbol')
                 ->select([
                     'dividends.symbol',
@@ -127,6 +122,16 @@ class Holding extends Model
     {
         return $this->hasMany(Split::class, 'symbol', 'symbol')
             ->orderBy('date', 'DESC');
+    }
+
+    public function scopeWithMarketData($query)
+    {
+        $query->withAggregate('market_data', 'name')
+                ->withAggregate('market_data', 'market_value')
+                ->withAggregate('market_data', 'fifty_two_week_low')
+                ->withAggregate('market_data', 'fifty_two_week_high')
+                ->withAggregate('market_data', 'updated_at')
+                ->join('market_data', 'holdings.symbol', 'market_data.symbol');
     }
 
     public function scopePortfolio($query, $portfolio)

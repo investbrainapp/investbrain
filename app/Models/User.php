@@ -62,32 +62,21 @@ class User extends Authenticatable
     public function holdings(): HasManyDeep
     {
         return $this->hasManyDeep(Holding::class, ['portfolio_user', Portfolio::class])
-            ->withAggregate('market_data', 'name')
-            ->withAggregate('market_data', 'market_value')
-            ->withAggregate('market_data', 'fifty_two_week_low')
-            ->withAggregate('market_data', 'fifty_two_week_high')
-            ->withAggregate('market_data', 'updated_at')
+            ->withMarketData()
             ->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
             ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis), 0) AS market_gain_percent')
-            ->join('market_data', 'holdings.symbol', 'market_data.symbol');    
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis), 0) AS market_gain_percent');    
     }
 
     public function transactions(): HasManyDeep
     {
         return $this->hasManyDeep(Transaction::class, ['portfolio_user', Portfolio::class])
-            ->withAggregate('market_data', 'name')
-            ->withAggregate('portfolio', 'title')
-            ->withAggregate('market_data', 'market_value')
-            ->withAggregate('market_data', 'fifty_two_week_low')
-            ->withAggregate('market_data', 'fifty_two_week_high')
-            ->withAggregate('market_data', 'updated_at')
+            ->withMarketData()
             ->selectRaw('
                 CASE
                     WHEN transaction_type = \'SELL\' 
                     THEN COALESCE(transactions.sale_price - transactions.cost_basis, 0)
                     ELSE COALESCE(market_data.market_value - transactions.cost_basis, 0)
-                END AS gain_dollars')
-            ->join('market_data', 'transactions.symbol', 'market_data.symbol');;   
+                END AS gain_dollars');   
     }
 }

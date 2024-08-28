@@ -86,6 +86,17 @@ class Transaction extends Model
     {
         return $this->belongsTo(Portfolio::class);
     }
+
+    public function scopeWithMarketData($query)
+    {
+        $query->withAggregate('market_data', 'name')
+                    ->withAggregate('portfolio', 'title')
+                    ->withAggregate('market_data', 'market_value')
+                    ->withAggregate('market_data', 'fifty_two_week_low')
+                    ->withAggregate('market_data', 'fifty_two_week_high')
+                    ->withAggregate('market_data', 'updated_at')
+                    ->join('market_data', 'transactions.symbol', 'market_data.symbol');
+    }
     
     public function scopePortfolio($query, $portfolio)
     {
