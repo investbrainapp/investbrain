@@ -40,7 +40,7 @@
             <x-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
             <x-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 
-            <x-section-border />
+            <x-section-border class="py-3" />
 
             <x-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
             <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">

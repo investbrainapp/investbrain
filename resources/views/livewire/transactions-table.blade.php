@@ -24,11 +24,16 @@ new class extends Component {
     public array $headers;
 
     // methods
-    public function showTransactionDialog($transactionId)
+    public function goToHolding($holding)
     {
-        $this->editingTransaction = Transaction::findOrFail($transactionId);
-        $this->dispatch('toggle-manage-transaction');
+        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
     }
+
+    // public function showTransactionDialog($transactionId)
+    // {
+    //     $this->editingTransaction = Transaction::findOrFail($transactionId);
+    //     $this->dispatch('toggle-manage-transaction');
+    // }
 
     public function mount()
     {
@@ -64,7 +69,8 @@ new class extends Component {
         x-data="{ loadingId: null, timeout: null }"
         @row-click="
             timeout = setTimeout(() => { loadingId = $event.detail.id }, 200);
-            $wire.showTransactionDialog($event.detail.id).then(() => {
+            {{-- $wire.showTransactionDialog($event.detail.id).then(() => { --}}
+            $wire.goToHolding($event.detail).then(() => {
                 clearTimeout(timeout);
                 loadingId = null;
             })

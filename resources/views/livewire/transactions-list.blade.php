@@ -11,6 +11,7 @@ new class extends Component {
     public Collection $transactions;
     public ?Portfolio $portfolio;
     public ?Transaction $editingTransaction;
+    public Bool $shouldGoToHolding = true;
 
     protected $listeners = [
         'transaction-updated' => '$refresh',
@@ -22,6 +23,11 @@ new class extends Component {
     {
         $this->editingTransaction = Transaction::findOrFail($transactionId);
         $this->dispatch('toggle-manage-transaction');
+    }
+
+    public function goToHolding($holding)
+    {
+        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
     }
 
 }; ?>
@@ -36,6 +42,12 @@ new class extends Component {
             class="cursor-pointer"
             x-data="{ loading: false, timeout: null }"
             @click="
+                if ($wire.shouldGoToHolding) {
+
+                    $wire.goToHolding({{ $transaction }})
+                    
+                    return;
+                }
                 timeout = setTimeout(() => { loading = true }, 200);
                 $wire.showTransactionDialog('{{ $transaction->id }}').then(() => {
                     clearTimeout(timeout);

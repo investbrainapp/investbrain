@@ -77,15 +77,12 @@ class User extends Authenticatable
             ->withAggregate('market_data', 'fifty_two_week_low')
             ->withAggregate('market_data', 'fifty_two_week_high')
             ->withAggregate('market_data', 'updated_at')
-            ->selectRaw('COALESCE(transactions.cost_basis * transactions.quantity, 0) AS total_cost_basis')
-            ->selectRaw('COALESCE(market_data.market_value * transactions.quantity, 0) AS total_market_value')
-            ->selectRaw('COALESCE((market_data.market_value - transactions.cost_basis) * transactions.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - transactions.cost_basis) / transactions.cost_basis), 0) AS market_gain_percent')
+            ->selectRaw('
+                CASE
+                    WHEN transaction_type = \'SELL\' 
+                    THEN COALESCE(transactions.sale_price - transactions.cost_basis, 0)
+                    ELSE COALESCE(market_data.market_value - transactions.cost_basis, 0)
+                END AS gain_dollars')
             ->join('market_data', 'transactions.symbol', 'market_data.symbol');;   
-    }
-
-    public function daily_change(): HasManyDeep
-    {
-        return $this->hasManyDeep(DailyChange::class, ['portfolio_user', Portfolio::class]);    
     }
 }

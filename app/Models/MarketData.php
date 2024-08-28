@@ -25,6 +25,15 @@ class MarketData extends Model
         'market_cap'
     ];
 
+    protected $attributes = [
+        'market_value' => 0,
+        'fifty_two_week_high' => 0,
+        'fifty_two_week_low' => 0,
+        'forward_pe' => 0,
+        'trailing_pe' => 0,
+        'market_cap' => 0
+    ];
+
     public static function setSplitsHoldingSynced($symbol) 
     {
         $market_data = self::where('symbol', $symbol)->get()->first();

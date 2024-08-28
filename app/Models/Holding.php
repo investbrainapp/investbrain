@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Split;
 use App\Models\Dividend;
+use App\Models\Portfolio;
+use App\Models\MarketData;
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -53,7 +57,8 @@ class Holding extends Model
      */
     public function transactions() 
     {
-        return $this->hasMany(Transaction::class, 'symbol', 'symbol');
+        return $this->hasMany(Transaction::class, 'symbol', 'symbol')
+                    ->where('transactions.portfolio_id', $this->portfolio_id);
     }
 
     /**
@@ -63,7 +68,44 @@ class Holding extends Model
      */
     public function dividends() 
     {
-        return $this->hasMany(Dividend::class, 'symbol', 'symbol');
+
+      
+
+        return $this->hasMany(Dividend::class, 'symbol', 'symbol')
+                ->select([
+                    'dividends.symbol',
+                    'dividends.date',
+                    'dividends.dividend_amount',
+                ])
+                ->selectRaw("SUM(
+                    CASE WHEN transaction_type = 'BUY' 
+                        AND transactions.symbol = dividends.symbol 
+                        AND transactions.portfolio_id = '$this->portfolio_id'
+                        AND dividends.date >= transactions.date 
+                    THEN transactions.quantity
+                    ELSE 0 END
+                ) AS purchased")
+                ->selectRaw("SUM(
+                    CASE WHEN transaction_type = 'SELL'
+                        AND transactions.symbol = dividends.symbol 
+                        AND transactions.portfolio_id = '$this->portfolio_id' 
+                        AND dividends.date >= transactions.date 
+                    THEN transactions.quantity
+                    ELSE 0 END
+                ) AS sold")
+                ->join('transactions', 'transactions.symbol', 'dividends.symbol')
+                ->groupBy([
+                    'dividends.symbol',
+                    'dividends.date',
+                    'dividends.dividend_amount',
+                ])
+                ->orderBy('dividends.date', 'DESC')
+                ->where('dividends.date', '>=', function ($query) {
+                    $query->selectRaw('min(transactions.date)')
+                        ->from('transactions')
+                        ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
+                        ->whereRaw("transactions.symbol = '$this->symbol'");
+                });
     }
 
     /**
@@ -83,12 +125,18 @@ class Holding extends Model
      */
     public function splits() 
     {
-        return $this->hasMany(Split::class, 'symbol', 'symbol');
+        return $this->hasMany(Split::class, 'symbol', 'symbol')
+            ->orderBy('date', 'DESC');
     }
 
     public function scopePortfolio($query, $portfolio)
     {
         return $query->where('portfolio_id', $portfolio);
+    }
+
+    public function scopeSymbol($query, $symbol)
+    {
+        return $query->where('symbol', $symbol);
     }
 
     public function scopeWithoutWishlists($query) {
@@ -113,11 +161,6 @@ class Holding extends Model
             ->selectRaw('@total_gain_dollars:=COALESCE((@total_market_value - @sum_total_cost_basis),0) AS total_gain_dollars')
             // ->selectRaw('COALESCE((@total_gain_dollars / @sum_total_cost_basis) * 100,0) AS total_gain_percent')
             ->join('market_data', 'market_data.symbol', 'holdings.symbol');
-    }
-
-    public function scopeSymbol($query, $symbol)
-    {
-        return $query->where('symbol', $symbol);
     }
 
     // public function refreshDividends() 

@@ -126,14 +126,14 @@ class Transaction extends Model
      */
     public function ensureCostBasisIsAddedToSale()
     {
-        $holding = Holding::firstOrNew([
+        $average_cost_basis = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
-            'symbol' => $this->symbol
-        ],[
-            'average_cost_basis' => null
-        ]);
+            'symbol' => $this->symbol,
+            'transaction_type' => 'BUY',
+        ])->whereDate('date', '<=', $this->date)
+        ->average('cost_basis');
 
-        $this->cost_basis = $holding->average_cost_basis ?? 0;
+        $this->cost_basis = $average_cost_basis ?? 0;
 
         return $this;
     }

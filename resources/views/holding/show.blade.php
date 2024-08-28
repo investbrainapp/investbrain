@@ -1,5 +1,16 @@
 <x-app-layout>
-    <div>  
+    <div x-data>  
+
+        <x-ib-modal 
+            key="new-transaction"
+            title="New Transaction"
+        >
+            @livewire('manage-transaction-form', [
+                'portfolio' => $portfolio, 
+                'symbol' => $market_data->symbol, 
+            ])
+
+        </x-ib-modal>
 
         <x-ib-toolbar>
             <x-slot:title>
@@ -7,6 +18,16 @@
                     {{ $portfolio->title }}
                 </a> » <span title="{{ __('Holding') }}">{{ $market_data->symbol }}</span>
             </x-slot:title>
+
+            <x-ib-flex-spacer />
+            
+            <div>
+                <x-button 
+                    label="{{ __('Create Transaction') }}" 
+                    class="btn-sm btn-primary" 
+                    @click="$dispatch('toggle-new-transaction')"
+                />
+            </div>
         </x-ib-toolbar>
 
         <div class="mt-6 grid md:grid-cols-9 gap-5">
@@ -93,7 +114,8 @@
 
                 @livewire('transactions-list', [
                     'portfolio' => $holding->portfolio,
-                    'transactions' => $holding->transactions
+                    'transactions' => $holding->transactions,
+                    'shouldGoToHolding' => false
                 ])
 
             </x-ib-card>
@@ -104,9 +126,7 @@
 
                     <x-list-item :item="$dividend">
                         <x-slot:value>
-        
-                        Purchased {{$dividend->purchased}}<br>
-                        Sold {{$dividend->sold}}<br>
+                        
                             @php
                                 $owned = ($dividend->purchased - $dividend->sold);
                             @endphp 
