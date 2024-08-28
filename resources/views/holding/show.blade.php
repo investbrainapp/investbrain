@@ -73,6 +73,15 @@
                     {{ Number::currency($holding->dividends_earned ?? 0) }} 
                 </p>
 
+                <p class="pt-2 text-sm">
+                    {{ __('Market Data Age') }}: 
+                    {{ \Carbon\Carbon::parse($market_data->updated_at)->diffForHumans() }}
+                </p>
+
+            </x-ib-card>
+
+            <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
+
                 <p>
                     <span class="font-bold">{{ __('52 week') }}: </span>
 
@@ -83,16 +92,7 @@
                     />
                     
                 </p>
-
-                <p class="pt-2 text-sm">
-                    {{ __('Market Data Age') }}: 
-                    {{ \Carbon\Carbon::parse($market_data->updated_at)->diffForHumans() }}
-                </p>
-
-            </x-ib-card>
-
-            <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
-
+                
                 <p>
                     <span class="font-bold">{{ __('Forward PE') }}: </span>
                     {{ $market_data->forward_pe }} 

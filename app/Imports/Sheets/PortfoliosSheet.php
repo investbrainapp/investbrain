@@ -14,18 +14,18 @@ class PortfoliosSheet implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
     public function collection(Collection $portfolios)
     {
-        foreach ($portfolios->sortBy('date') as $row) {
+        foreach ($portfolios->sortBy('date') as $portfolio) {
 
-            Portfolio::myPortfolios()
-                        ->where(['id' => $row['id']])
-                        ->orWhere(['title' => $row['title']])
-                        ->firstOr(function () use ($row) {
+            auth()->user()->portfolios()
+                        ->where(['id' => $portfolio['id']])
+                        ->orWhere(['title' => $portfolio['title']])
+                        ->firstOr(function () use ($portfolio) {
 
                             return Portfolio::make()->forceFill([
-                                'id' => $row['id'] ?? null,
-                                'title' => $row['title'],
-                                'wishlist' => $row['wishlist'] ?? false,
-                                'notes' => $row['notes'],
+                                'id' => $portfolio['id'] ?? null,
+                                'title' => $portfolio['title'],
+                                'wishlist' => $portfolio['wishlist'] ?? false,
+                                'notes' => $portfolio['notes'],
                             ])->save();
                         });
         }

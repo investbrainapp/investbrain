@@ -3,6 +3,7 @@
 use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
+use App\Imports\BackupImport;
 
 new class extends Component {
     use Toast;
@@ -12,12 +13,41 @@ new class extends Component {
     public $file;
 
     // methods
-    public function mount() 
+    public function import() 
     {
 
-        //
+        $import = (new BackupImport)->import($this->file);
+
+        $this->success(__('Successfully imported!'));
+
+        // Artisan::queue(RefreshHoldingData::class);
     }
     
 }; ?>
 
-<x-file wire:model="file" label="{{ __('Select a file') }}" hint="" accept="application/pdf" required />
+<x-forms.form-section submit="import">
+    <x-slot name="title">
+        {{ __('Import') }}
+    </x-slot>
+
+    <x-slot name="description">
+        {{ __('Upload or recover your Investbrain portfolio and holdings.') }}
+    </x-slot>
+
+    <x-slot name="form">
+        
+        <div class="col-span-6 sm:col-span-4">
+            <x-file wire:model="file" label="{{ __('Select a file') }}" hint="" accept=".xlsx" required />
+        </div>
+
+    </x-slot>
+
+    <x-slot name="actions">
+  
+        <x-button type="submit">
+            {{ __('Import') }}
+        </x-button>
+    </x-slot>
+</x-forms.form-section>
+
+

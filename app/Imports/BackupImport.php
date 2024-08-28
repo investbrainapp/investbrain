@@ -20,11 +20,8 @@ class BackupImport implements WithMultipleSheets
     {
         return [
             'Portfolios' => new PortfoliosSheet,
-            'Transactions' => new TransactionsSheet,
-            'Market Data' => new MarketDataSheet,
-            'Dividends' => new DividendsSheet,
-            'Splits' => new SplitsSheet,
-            'Daily Changes' => new DailyChangesSheet,
+            // 'Transactions' => new TransactionsSheet,
+            // 'Daily Changes' => new DailyChangesSheet,
         ];
     }
 }

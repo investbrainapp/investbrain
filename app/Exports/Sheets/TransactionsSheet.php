@@ -29,8 +29,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
             '52 Week Low',
             '52 Week High',
             'Market Data Refresh Date',
-            'Gain/Loss Dollars',
-            'Owner ID'
+            'Gain/Loss Dollars'
         ];
     }
 
