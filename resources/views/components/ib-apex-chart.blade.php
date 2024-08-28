@@ -88,9 +88,9 @@
                 mounted: function (chartContext, config) {
                     renderLegend(chartContext);
                 },
-                updated: function (chartContext, config) {
+                {{-- updated: function (chartContext, config) {
                     renderLegend(chartContext);
-                }
+                } --}}
             }
 
             this.data.tooltip = {
@@ -117,6 +117,7 @@
 
             // generate custom legend view
             function renderLegend(chartContext) {
+            console.log(chartContext)
                 var legendContainer = document.querySelector('#chart-legend-{{ $name }}');
 
                 if (!legendContainer) return;

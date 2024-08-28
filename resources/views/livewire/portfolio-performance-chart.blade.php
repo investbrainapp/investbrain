@@ -36,6 +36,7 @@ new class extends Component {
         $dailyChangeQuery = DailyChange::query();
 
         if (isset($this->portfolio)) {
+            
             $dailyChangeQuery->portfolio($this->portfolio->id);
 
         } else {
