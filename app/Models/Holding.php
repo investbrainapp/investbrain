@@ -55,9 +55,9 @@ class Holding extends Model
      */
     public function transactions() 
     {
-        return $this->hasMany(Transaction::class, 'symbol', 'symbol')
-                    ->where('portfolio_id', $this->portfolio_id)
-                    ->withAggregate('portfolio', 'title');
+
+        return $this->hasManyThrough(Transaction::class, Portfolio::class, 'id', 'portfolio_id', 'portfolio_id', 'id')
+                        ->where('symbol', $this->symbol);
     }
 
     /**
@@ -127,12 +127,12 @@ class Holding extends Model
 
     public function scopeWithMarketData($query)
     {
-        $query->withAggregate('market_data', 'name')
-                ->withAggregate('market_data', 'market_value')
-                ->withAggregate('market_data', 'fifty_two_week_low')
-                ->withAggregate('market_data', 'fifty_two_week_high')
-                ->withAggregate('market_data', 'updated_at')
-                ->join('market_data', 'holdings.symbol', 'market_data.symbol');
+        return $query->withAggregate('market_data', 'name')
+                    ->withAggregate('market_data', 'market_value')
+                    ->withAggregate('market_data', 'fifty_two_week_low')
+                    ->withAggregate('market_data', 'fifty_two_week_high')
+                    ->withAggregate('market_data', 'updated_at')
+                    ->join('market_data', 'holdings.symbol', 'market_data.symbol');
     }
 
     public function scopePortfolio($query, $portfolio)

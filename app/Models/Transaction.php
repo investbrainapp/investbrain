@@ -89,7 +89,7 @@ class Transaction extends Model
 
     public function scopeWithMarketData($query)
     {
-        $query->withAggregate('market_data', 'name')
+        return $query->withAggregate('market_data', 'name')
                     ->withAggregate('market_data', 'market_value')
                     ->withAggregate('market_data', 'fifty_two_week_low')
                     ->withAggregate('market_data', 'fifty_two_week_high')

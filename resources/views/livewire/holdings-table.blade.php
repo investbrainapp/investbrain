@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Holding;
 use App\Models\Portfolio;
 use App\Models\Transaction;
 use Illuminate\Support\Collection;
@@ -40,6 +41,9 @@ new class extends Component {
     {
         return $this->portfolio
                     ->holdings()
+                    ->withCount(['transactions as num_transactions' => function ($query) {
+                        $query->where('portfolio_id', $this->portfolio->id);
+                    }])
                     ->orderBy(...array_values($this->sortBy))
                     ->where('quantity', '>', 0)
                     ->get();
