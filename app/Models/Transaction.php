@@ -90,7 +90,6 @@ class Transaction extends Model
     public function scopeWithMarketData($query)
     {
         $query->withAggregate('market_data', 'name')
-                    ->withAggregate('portfolio', 'title')
                     ->withAggregate('market_data', 'market_value')
                     ->withAggregate('market_data', 'fifty_two_week_low')
                     ->withAggregate('market_data', 'fifty_two_week_high')
@@ -106,6 +105,15 @@ class Transaction extends Model
     public function scopeSymbol($query, $symbol)
     {
         return $query->where('symbol', $symbol);
+    }
+
+    public function scopeMyTransactions() 
+    {
+        return $this->whereHas('portfolio', function ($query) {
+            $query->whereHas('users', function ($query) {
+                $query->where('id', auth()->id());
+            });
+        });
     }
 
     public function refreshMarketData() 

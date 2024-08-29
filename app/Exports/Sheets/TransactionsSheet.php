@@ -2,10 +2,11 @@
 
 namespace App\Exports\Sheets;
 
+use App\Models\Portfolio;
 use App\Models\Transaction;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
 {
@@ -22,14 +23,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
             'Split',
             'Date',
             'Created',
-            'Updated',
-            'Company Name',
-            'Portfolio Title',
-            'Market Value',
-            '52 Week Low',
-            '52 Week High',
-            'Market Data Refresh Date',
-            'Gain/Loss Dollars'
+            'Updated'
         ];
     }
 
@@ -38,7 +32,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return auth()->user()->transactions;
+        return Transaction::myTransactions()->get();
     }
 
      /**

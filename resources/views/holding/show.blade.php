@@ -7,7 +7,7 @@
         >
             @livewire('manage-transaction-form', [
                 'portfolio' => $portfolio, 
-                'symbol' => $market_data->symbol, 
+                'symbol' => $holding->market_data->symbol, 
             ])
 
         </x-ib-modal>
@@ -16,7 +16,7 @@
             <x-slot:title>
                 <a href="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}" title="{{ __('Portfolio') }}">
                     {{ $portfolio->title }}
-                </a> » <span title="{{ __('Holding') }}">{{ $market_data->symbol }}</span>
+                </a> » <span title="{{ __('Holding') }}">{{ $holding->market_data->symbol }}</span>
             </x-slot:title>
 
             <x-ib-flex-spacer />
@@ -35,16 +35,16 @@
             <x-ib-card class="md:col-span-5">
                 <x-slot:title class="pb-2">
 
-                    {{ $market_data->symbol }} 
-                    <span class="text-sm"> {{ $market_data->name }} </span>
+                    {{ $holding->market_data->symbol }} 
+                    <span class="text-sm"> {{ $holding->market_data->name }} </span>
                 </x-slot:title>
 
                 <div class="font-bold text-2xl py-1 flex items-center">
-                    {{ Number::currency($market_data->market_value ?? 0) }} 
+                    {{ Number::currency($holding->market_data->market_value ?? 0) }} 
                     
                     <x-gain-loss-arrow-badge 
                         :cost-basis="$holding->average_cost_basis"
-                        :market-value="$market_data->market_value"
+                        :market-value="$holding->market_data->market_value"
                     />
                 </div>
 
@@ -75,7 +75,7 @@
 
                 <p class="pt-2 text-sm">
                     {{ __('Market Data Age') }}: 
-                    {{ \Carbon\Carbon::parse($market_data->updated_at)->diffForHumans() }}
+                    {{ \Carbon\Carbon::parse($holding->market_data->updated_at)->diffForHumans() }}
                 </p>
 
             </x-ib-card>
@@ -84,26 +84,26 @@
 
                 <p>
                     <span class="font-bold">{{ __('Forward PE') }}: </span>
-                    {{ $market_data->forward_pe }} 
+                    {{ $holding->market_data->forward_pe }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Trailing PE') }}: </span>
-                    {{ $market_data->trailing_pe }} 
+                    {{ $holding->market_data->trailing_pe }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    ${{ Number::forHumans($market_data->market_cap ?? 0) }} 
+                    ${{ Number::forHumans($holding->market_data->market_cap ?? 0) }} 
                 </p>
 
                 <p>
                     <span class="font-bold">{{ __('52 week') }}: </span>
 
                     <x-fifty-two-week-range 
-                        :low="$market_data->fifty_two_week_low" 
-                        :high="$market_data->fifty_two_week_high" 
-                        :current="$market_data->market_value"
+                        :low="$holding->market_data->fifty_two_week_low" 
+                        :high="$holding->market_data->fifty_two_week_high" 
+                        :current="$holding->market_data->market_value"
                     />
                     
                 </p>

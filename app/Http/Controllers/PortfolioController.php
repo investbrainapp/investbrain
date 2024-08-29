@@ -22,16 +22,17 @@ class PortfolioController extends Controller
      */
     public function show(Portfolio $portfolio)
     {
+        $portfolio->load(['transactions', 'holdings']);
+        
         // get portfolio metrics
         $metrics = cache()->tags(['metrics', 'portfolio', auth()->user()->id, $portfolio->id])->remember(
             'portfolio-metrics-' . $portfolio->id, 
             60, 
             function () use ($portfolio) {
-                return
-                 Holding::query()
-                    ->portfolio($portfolio->id)
-                    ->getPortfolioMetrics()
-                    ->first();
+                return Holding::query()
+                        ->portfolio($portfolio->id)
+                        ->getPortfolioMetrics()
+                        ->first();
             }
         );
         

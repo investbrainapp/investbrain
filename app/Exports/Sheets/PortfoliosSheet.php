@@ -26,7 +26,7 @@ class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return auth()->user()->portfolios;
+        return Portfolio::myPortfolios()->get();
     }
 
      /**

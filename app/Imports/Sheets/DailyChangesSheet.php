@@ -15,23 +15,25 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
     public function collection(Collection $dailyChanges)
     {
-        foreach ($dailyChanges->sortBy('date') as $row) {
-            if ($row['user'] != auth()->user()->id) {
+        foreach ($dailyChanges as $dailyChange) {
+
+            if ($dailyChange['user'] != auth()->user()->id) {
+
                 throw new Exception('Can\'t do that.');
             }
 
             DailyChange::updateOrCreate([
-                'date' => $row['date'],
-                'user_id' => $row['user'],
+                'date' => $dailyChange['date'],
+                'portfolio_id' => $dailyChange['portfolio_id'],
             ],[
-                'user_id' => $row['user'],
-                'date' => $row['date'],
-                'total_market_value' => $row['total_market_value'],
-                'total_cost_basis' => $row['total_cost_basis'],
-                'total_gain' => $row['total_gain'],
-                'total_dividends_earned' => $row['total_dividends_earned'],
-                'realized_gains' => $row['realized_gains'],
-                'notes' => $row['notes'],
+                'portfolio_id' => $dailyChange['portfolio_id'],
+                'date' => $dailyChange['date'],
+                'total_market_value' => $dailyChange['total_market_value'],
+                'total_cost_basis' => $dailyChange['total_cost_basis'],
+                'total_gain' => $dailyChange['total_gain'],
+                'total_dividends' => $dailyChange['total_dividends'],
+                'realized_gains' => $dailyChange['realized_gains'],
+                'annotation' => $dailyChange['annotation'],
             ]);
         }
     }

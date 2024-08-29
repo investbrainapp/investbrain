@@ -72,6 +72,7 @@ class User extends Authenticatable
     {
         return $this->hasManyDeep(Transaction::class, ['portfolio_user', Portfolio::class])
             ->withMarketData()
+            ->withAggregate('portfolio', 'title')
             ->selectRaw('
                 CASE
                     WHEN transaction_type = \'SELL\' 

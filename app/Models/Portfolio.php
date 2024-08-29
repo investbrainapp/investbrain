@@ -62,6 +62,13 @@ class Portfolio extends Model
         return $this->hasMany(DailyChange::class);
     }
 
+    public function scopeMyPortfolios() 
+    {
+        return $this->whereHas('users', function ($query) {
+            $query->where('user_id', auth()->user()->id);
+        });
+    }
+
     public function scopeWithoutWishlists() 
     {
         return $this->where(['wishlist' => false]);

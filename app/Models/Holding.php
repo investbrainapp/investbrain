@@ -56,7 +56,8 @@ class Holding extends Model
     public function transactions() 
     {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol')
-                    ->where('transactions.portfolio_id', $this->portfolio_id);
+                    ->where('portfolio_id', $this->portfolio_id)
+                    ->withAggregate('portfolio', 'title');
     }
 
     /**
@@ -141,7 +142,7 @@ class Holding extends Model
 
     public function scopeSymbol($query, $symbol)
     {
-        return $query->where('symbol', $symbol);
+        return $query->where('holdings.symbol', $symbol);
     }
 
     public function scopeWithoutWishlists($query) {

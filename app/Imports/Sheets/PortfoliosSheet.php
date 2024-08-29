@@ -14,7 +14,7 @@ class PortfoliosSheet implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
     public function collection(Collection $portfolios)
     {
-        foreach ($portfolios->sortBy('date') as $portfolio) {
+        foreach ($portfolios as $portfolio) {
 
             auth()->user()->portfolios()
                         ->where(['id' => $portfolio['id']])
