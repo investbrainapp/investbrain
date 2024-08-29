@@ -31,7 +31,7 @@ class PortfolioController extends Controller
             function () use ($portfolio) {
                 return Holding::query()
                         ->portfolio($portfolio->id)
-                        ->getPortfolioMetrics()
+                        ->withPortfolioMetrics()
                         ->first();
             }
         );

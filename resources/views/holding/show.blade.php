@@ -114,7 +114,7 @@
 
                 @livewire('transactions-list', [
                     'portfolio' => $holding->portfolio,
-                    'transactions' => $transactions,
+                    'transactions' => $holding->transactions,
                     'shouldGoToHolding' => false
                 ])
 

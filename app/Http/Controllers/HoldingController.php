@@ -15,13 +15,13 @@ class HoldingController extends Controller
     public function show(Request $request, Portfolio $portfolio, String $symbol)
     {
 
-        $holding = Holding::with(['market_data'])
+        $holding = Holding::with(['market_data', 'transactions'])
                             ->symbol($symbol)
                             ->portfolio($portfolio->id)
                             ->firstOrFail();
 
-        $transactions = $holding->transactions;
+        // $transactions = dd($holding->transactions()->toSql());
                         
-        return view('holding.show', compact(['portfolio', 'holding', 'transactions']));
+        return view('holding.show', compact(['portfolio', 'holding']));
     }
 }

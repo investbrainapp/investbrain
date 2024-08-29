@@ -22,7 +22,7 @@ class DashboardController extends Controller
                 return
                  Holding::query()
                     ->myHoldings()
-                    ->getPortfolioMetrics()
+                    ->withPortfolioMetrics()
                     ->first();
             }
         );

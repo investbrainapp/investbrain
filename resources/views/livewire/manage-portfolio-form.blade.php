@@ -52,7 +52,7 @@ new class extends Component {
         // $key = 'portfolio-metrics-' . $portfolio->id;
         // $metrics = cache()->remember($key, 60, function () use ($portfolio) {
         //     return Holding::where(['portfolio_id' => $portfolio->id])
-        //         ->getPortfolioMetrics()
+        //         ->withPortfolioMetrics()
         //         ->first();
         // });
 

@@ -39,14 +39,16 @@ new class extends Component {
 
     public function holdings(): Collection
     {
-        return $this->portfolio
-                    ->holdings()
-                    ->withCount(['transactions as num_transactions' => function ($query) {
-                        $query->where('portfolio_id', $this->portfolio->id);
-                    }])
-                    ->orderBy(...array_values($this->sortBy))
-                    ->where('quantity', '>', 0)
-                    ->get();
+        $holdings = $this->portfolio
+                        ->holdings()
+                        ->withCount(['transactions as num_transactions' => function($query) {
+                            return $query->whereRaw('transactions.symbol = holdings.symbol');
+                        }])
+                        ->orderBy(...array_values($this->sortBy))
+                        ->where('holdings.quantity', '>', 0)
+                        ->get();
+
+        return $holdings;
     }
 
     public function goToHolding($holding)

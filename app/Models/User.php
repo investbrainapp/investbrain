@@ -63,9 +63,7 @@ class User extends Authenticatable
     {
         return $this->hasManyDeep(Holding::class, ['portfolio_user', Portfolio::class])
             ->withMarketData()
-            ->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
-            ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis), 0) AS market_gain_percent');    
+            ->withPerformance();    
     }
 
     public function transactions(): HasManyDeep

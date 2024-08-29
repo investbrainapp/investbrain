@@ -55,9 +55,7 @@ class Holding extends Model
      */
     public function transactions() 
     {
-
-        return $this->hasManyThrough(Transaction::class, Portfolio::class, 'id', 'portfolio_id', 'portfolio_id', 'id')
-                        ->where('symbol', $this->symbol);
+        return $this->hasManyThrough(Transaction::class, Portfolio::class, 'id', 'portfolio_id', 'portfolio_id', 'id');
     }
 
     /**
@@ -135,6 +133,13 @@ class Holding extends Model
                     ->join('market_data', 'holdings.symbol', 'market_data.symbol');
     }
 
+    public function scopeWithPerformance($query)
+    {
+        return $query->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
+            ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis), 0) AS market_gain_percent');
+    }
+
     public function scopePortfolio($query, $portfolio)
     {
         return $query->where('portfolio_id', $portfolio);
@@ -157,10 +162,9 @@ class Holding extends Model
         });
     }
 
-    public function scopeGetPortfolioMetrics($query) 
+    public function scopeWithPortfolioMetrics($query) 
     {
-
-        $query->selectRaw('COALESCE(SUM(holdings.dividends_earned),0) AS total_dividends_earned')
+        return $query->selectRaw('COALESCE(SUM(holdings.dividends_earned),0) AS total_dividends_earned')
             ->selectRaw('COALESCE(SUM(holdings.realized_gain_dollars),0) AS realized_gain_dollars')
             ->selectRaw('@total_market_value:=COALESCE(SUM(holdings.quantity * market_data.market_value),0) AS total_market_value')
             ->selectRaw('@sum_total_cost_basis:=COALESCE(SUM(holdings.total_cost_basis),0) AS total_cost_basis')
