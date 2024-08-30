@@ -4,6 +4,7 @@ use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 use App\Imports\BackupImport;
+use App\Exports\BackupExport;
 use Livewire\Attributes\Rule;
 
 new class extends Component {
@@ -17,7 +18,6 @@ new class extends Component {
     // methods
     public function import() 
     {
-
         $this->validate();
 
         try {
@@ -25,13 +25,16 @@ new class extends Component {
             $import = (new BackupImport)->import($this->file);
 
         } catch (\Throwable $e) {
-     dd($e);
+     
             return $this->error($e->getMessage());
         }
 
         $this->success(__('Successfully imported!'));
+    }
 
-        // Artisan::queue(RefreshHoldingData::class);
+    public function downloadTemplate()
+    {
+        return Excel::download(new BackupExport(empty: true), now()->format('Y_m_d') . '_investbrain_template.xlsx');
     }
     
 }; ?>
@@ -42,7 +45,8 @@ new class extends Component {
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Upload or recover your Investbrain portfolio and holdings.') }}
+        {{ __('Upload or recover your Investbrain portfolio and holdings.') }} 
+        <a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a>
     </x-slot>
 
     <x-slot name="form">

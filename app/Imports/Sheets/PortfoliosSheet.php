@@ -12,25 +12,26 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, SkipsEmptyRows
 {
-    // use Importable;
-
     public function collection(Collection $portfolios)
     {
-        foreach ($portfolios as $portfolio) {
+        Portfolio::withoutEvents(function () use ($portfolios) {
+                
+            foreach ($portfolios as $portfolio) {
 
-            auth()->user()->portfolios()
-                        ->where(['id' => $portfolio['portfolio_id']])
-                        ->orWhere(['title' => $portfolio['title']])
-                        ->firstOr(function () use ($portfolio) {
+                auth()->user()->portfolios()
+                            ->where(['id' => $portfolio['portfolio_id']])
+                            ->orWhere(['title' => $portfolio['title']])
+                            ->firstOr(function () use ($portfolio) {
 
-                            return Portfolio::make()->forceFill([
-                                'id' => $portfolio['portfolio_id'] ?? null,
-                                'title' => $portfolio['title'],
-                                'wishlist' => $portfolio['wishlist'] ?? false,
-                                'notes' => $portfolio['notes'],
-                            ])->save();
-                        });
-        }
+                                return Portfolio::make()->forceFill([
+                                    'id' => $portfolio['portfolio_id'] ?? null,
+                                    'title' => $portfolio['title'],
+                                    'wishlist' => $portfolio['wishlist'] ?? false,
+                                    'notes' => $portfolio['notes'],
+                                ])->save();
+                            });
+            }
+        });
     }
 
     public function rules(): array

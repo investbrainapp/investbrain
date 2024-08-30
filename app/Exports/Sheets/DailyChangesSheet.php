@@ -9,6 +9,10 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
 {
+    public function __construct(
+        public bool $empty = false
+    ) { }
+
     public function headings(): array
     {
         return [
@@ -28,7 +32,7 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return DailyChange::myDailyChanges()->get();
+        return $this->empty ? collect() : DailyChange::myDailyChanges()->get();
     }
 
      /**

@@ -9,6 +9,10 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
 {
+    public function __construct(
+        public bool $empty = false
+    ) { }
+    
     public function headings(): array
     {
         return [
@@ -26,7 +30,7 @@ class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return Portfolio::myPortfolios()->get();
+        return $this->empty ? collect() : Portfolio::myPortfolios()->get();
     }
 
      /**

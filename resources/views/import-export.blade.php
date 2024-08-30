@@ -2,7 +2,7 @@
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-        @livewire('import-portfolios-field')
+            @livewire('import-portfolios-field')
 
             <x-section-border />
         </div>

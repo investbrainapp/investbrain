@@ -12,15 +12,20 @@ class BackupExport implements WithMultipleSheets
 {
     use Exportable;
 
+    public function __construct(
+        public bool $empty = false
+    )
+    { }
+
     /**
      * @return array
      */
     public function sheets(): array
     {
             return [
-                new PortfoliosSheet,
-                new TransactionsSheet,
-                new DailyChangesSheet
+                new PortfoliosSheet($this->empty),
+                new TransactionsSheet($this->empty),
+                new DailyChangesSheet($this->empty)
             ];
     }
 }

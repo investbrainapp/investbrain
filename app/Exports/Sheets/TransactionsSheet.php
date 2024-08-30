@@ -10,6 +10,10 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 
 class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
 {
+    public function __construct(
+        public bool $empty = false
+    ) { }
+    
     public function headings(): array
     {
         return [
@@ -32,7 +36,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
     */
     public function collection()
     {
-        return Transaction::myTransactions()->get();
+        return $this->empty ? collect() : Transaction::myTransactions()->get();
     }
 
      /**
