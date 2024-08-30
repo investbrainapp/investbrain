@@ -39,6 +39,8 @@ new class extends Component {
 
     public function holdings(): Collection
     {
+
+        // dd(Holding::toSql());
         $holdings = $this->portfolio
                         ->holdings()
                         ->withCount(['transactions as num_transactions' => function($query) {
