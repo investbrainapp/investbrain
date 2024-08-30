@@ -20,7 +20,14 @@ new class extends Component {
 
         $this->validate();
 
-        $import = (new BackupImport)->import($this->file);
+        try {
+
+            $import = (new BackupImport)->import($this->file);
+
+        } catch (\Throwable $e) {
+     dd($e);
+            return $this->error($e->getMessage());
+        }
 
         $this->success(__('Successfully imported!'));
 

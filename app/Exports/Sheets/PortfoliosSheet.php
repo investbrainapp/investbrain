@@ -12,7 +12,7 @@ class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'ID',
+            'Portfolio ID',
             'Title',
             'Notes',
             'Wishlist',

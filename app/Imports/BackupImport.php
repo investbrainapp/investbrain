@@ -21,7 +21,7 @@ class BackupImport implements WithMultipleSheets
         return [
             'Portfolios' => new PortfoliosSheet,
             'Transactions' => new TransactionsSheet,
-            // 'Daily Changes' => new DailyChangesSheet,
+            'Daily Changes' => new DailyChangesSheet,
         ];
 
         // Can listen for AfterSheet to run clean up afterwards

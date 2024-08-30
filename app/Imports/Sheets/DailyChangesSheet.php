@@ -8,19 +8,26 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
 
-class DailyChangesSheet implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows
 {
     // use Importable;
 
     public function collection(Collection $dailyChanges)
     {
-        foreach ($dailyChanges as $dailyChange) {
 
-            if ($dailyChange['user'] != auth()->user()->id) {
+        $portfolios = auth()->user()->portfolios->pluck('id');
+        
+        $dailyChanges->pluck('portfolio_id')->unique()->each(function($portfolio) use ($portfolios) {
 
-                throw new Exception('Can\'t do that.');
+            if (!$portfolios->contains($portfolio)) {
+    
+                throw new Exception('You do not have permission to access that portfolio.');
             }
+        });
+
+        foreach ($dailyChanges as $dailyChange) {
 
             DailyChange::updateOrCreate([
                 'date' => $dailyChange['date'],
@@ -36,5 +43,19 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 'annotation' => $dailyChange['annotation'],
             ]);
         }
+    }
+
+    public function rules(): array
+    {
+        return [
+            'portfolio_id' => ['required'],
+            'date' => ['required', 'date'],
+            'total_market_value' => ['sometimes', 'nullable', 'numeric'],
+            'total_cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],
+            'total_gain' => ['sometimes', 'nullable', 'numeric'],
+            'total_dividends' => ['sometimes', 'nullable', 'min:0', 'numeric'],
+            'realized_gains' => ['sometimes', 'nullable', 'numeric'],
+            'annotation' => ['sometimes', 'nullable', 'string'],
+        ];
     }
 }
