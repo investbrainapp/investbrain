@@ -66,11 +66,7 @@ class Holding extends Model
     public function dividends() 
     {
         return $this->hasMany(Dividend::class, 'symbol', 'symbol')
-                ->select([
-                    'dividends.symbol',
-                    'dividends.date',
-                    'dividends.dividend_amount',
-                ])
+                ->select(['dividends.symbol','dividends.date','dividends.dividend_amount'])
                 ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'BUY' 
                         AND transactions.symbol = dividends.symbol 
@@ -88,11 +84,7 @@ class Holding extends Model
                     ELSE 0 END
                 ) AS sold")
                 ->join('transactions', 'transactions.symbol', 'dividends.symbol')
-                ->groupBy([
-                    'dividends.symbol',
-                    'dividends.date',
-                    'dividends.dividend_amount',
-                ])
+                ->groupBy(['dividends.symbol','dividends.date','dividends.dividend_amount'])
                 ->orderBy('dividends.date', 'DESC')
                 ->where('dividends.date', '>=', function ($query) {
                     $query->selectRaw('min(transactions.date)')
@@ -172,11 +164,6 @@ class Holding extends Model
             // ->selectRaw('COALESCE((@total_gain_dollars / @sum_total_cost_basis) * 100,0) AS total_gain_percent')
             ->join('market_data', 'market_data.symbol', 'holdings.symbol');
     }
-
-    // public function refreshDividends() 
-    // {
-    //     return Dividend::getDividendData($this->attributes['symbol']);
-    // }
 }
 
     
