@@ -17,7 +17,6 @@ new class extends Component {
 
     public function mount()
     {
-    
         $this->headers = [
             ['key' => 'symbol', 'label' => __('Symbol'), 'class' => ''],
             ['key' => 'market_data_name', 'label' => __('Name'), 'sortable' => true],

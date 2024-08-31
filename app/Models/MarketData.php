@@ -57,7 +57,7 @@ class MarketData extends Model
 
         // check if new or stale
         if (
-            !$market_data->exists 
+            !$market_data->exists
             || is_null($market_data->updated_at)
             || $market_data->updated_at->diffInMinutes(now()) >= config('market_data.refresh')
         ) {
@@ -67,10 +67,10 @@ class MarketData extends Model
 
             // fill data
             $market_data->fill($quote->toArray());
-        }
 
-        // save with timestamps updated
-        $market_data->touch();
+            // save with timestamps updated
+            $market_data->touch();
+        }
 
         return $market_data;
     }

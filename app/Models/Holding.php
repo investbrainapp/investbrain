@@ -55,7 +55,7 @@ class Holding extends Model
      */
     public function transactions() 
     {
-        return $this->hasManyThrough(Transaction::class, Portfolio::class, 'id', 'portfolio_id', 'portfolio_id', 'id');
+        return $this->hasManyThrough(Transaction::class, Portfolio::class, 'id', 'portfolio_id', 'portfolio_id', 'id')->orderBy('date', 'DESC');
     }
 
     /**

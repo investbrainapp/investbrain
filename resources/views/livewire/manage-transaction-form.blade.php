@@ -85,7 +85,7 @@ new class extends Component {
 
         $this->dispatch('transaction-saved');
 
-        $this->success(__('Transaction created'), redirectTo: route('portfolio.show', ['portfolio' => $this->portfolio->id]));
+        $this->success(__('Transaction created'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $this->symbol]));
     }
 
     public function delete()
@@ -93,7 +93,7 @@ new class extends Component {
 
         $this->transaction->delete();
 
-        $this->success(__('Transaction deleted'), redirectTo: route('portfolio.show', ['portfolio' => $this->portfolio->id]));
+        $this->success(__('Transaction deleted'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $this->symbol]));
     }
 }; ?>
 

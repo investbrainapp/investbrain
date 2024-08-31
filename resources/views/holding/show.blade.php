@@ -39,44 +39,7 @@
                     <span class="text-sm"> {{ $holding->market_data->name }} </span>
                 </x-slot:title>
 
-                <div class="font-bold text-2xl py-1 flex items-center">
-                    {{ Number::currency($holding->market_data->market_value ?? 0) }} 
-                    
-                    <x-gain-loss-arrow-badge 
-                        :cost-basis="$holding->average_cost_basis"
-                        :market-value="$holding->market_data->market_value"
-                    />
-                </div>
-
-                <p>
-                    <span class="font-bold">{{ __('Quantity Owned') }}: </span>
-                    {{ $holding->quantity }} 
-                </p>
-
-                <p>
-                    <span class="font-bold">{{ __('Average Cost Basis') }}: </span>
-                    {{ Number::currency($holding->average_cost_basis ?? 0) }} 
-                </p>
-
-                <p>
-                    <span class="font-bold">{{ __('Total Cost Basis') }}: </span>
-                    {{ Number::currency($holding->total_cost_basis ?? 0) }} 
-                </p>
-
-                <p>
-                    <span class="font-bold">{{ __('Realized Gain/Loss') }}: </span>
-                    {{ Number::currency($holding->realized_gain_dollars ?? 0) }} 
-                </p>
-
-                <p>
-                    <span class="font-bold">{{ __('Dividends Earned') }}: </span>
-                    {{ Number::currency($holding->dividends_earned ?? 0) }} 
-                </p>
-
-                <p class="pt-2 text-sm">
-                    {{ __('Market Data Age') }}: 
-                    {{ \Carbon\Carbon::parse($holding->market_data->updated_at)->diffForHumans() }}
-                </p>
+                @livewire('holding-market-data', ['holding' => $holding])
 
             </x-ib-card>
 
@@ -122,26 +85,7 @@
 
             <x-ib-card title="{{ __('Dividends') }}" class="md:col-span-3">
 
-                @foreach ($holding->dividends->take(5) as $dividend)
-
-                    <x-list-item :item="$dividend">
-                        <x-slot:value>
-                        
-                            @php
-                                $owned = ($dividend->purchased - $dividend->sold);
-                            @endphp 
-
-                            {{ Number::currency($dividend->dividend_amount) }}
-                            x {{ $owned }}
-                            = {{ Number::currency($owned * $dividend->dividend_amount) }}
-
-                        </x-slot:value>
-                        <x-slot:sub-value>
-                            {{ $dividend->date->format('F d, Y') }}
-                        </x-slot:sub-value>
-                    </x-list-item>
-                
-                @endforeach
+                @livewire('holding-dividends-list', ['holding' => $holding])
 
             </x-ib-card>
 
