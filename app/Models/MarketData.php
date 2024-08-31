@@ -34,19 +34,19 @@ class MarketData extends Model
         'market_cap' => 0
     ];
 
-    public static function setSplitsHoldingSynced($symbol) 
+    public function holdings() 
     {
-        $market_data = self::where('symbol', $symbol)->get()->first();
+        return $this->hasMany(Holding::class, 'symbol', 'symbol');
+    }
 
-        $market_data->splits_synced_to_holdings_at = now();
-
-        $market_data->save();
+    public function scopeSymbol($query, $symbol)
+    {
+        return $query->where('symbol', $symbol);
     }
 
     public function refreshMarketData() 
     {
         return static::getMarketData($this->attributes['symbol']);
-
     }
 
     public static function getMarketData($symbol) 
@@ -73,15 +73,5 @@ class MarketData extends Model
         }
 
         return $market_data;
-    }
-
-    public function holdings() 
-    {
-        return $this->hasMany(Holding::class, 'symbol', 'symbol');
-    }
-
-    public function scopeSymbol($query, $symbol)
-    {
-        return $query->where('symbol', $symbol);
     }
 }

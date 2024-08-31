@@ -3,11 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Holding;
-use App\Models\Dividend;
-use App\Models\Transaction;
 use Illuminate\Console\Command;
 
-class RefreshHoldingData extends Command
+class SyncHoldingData extends Command
 {
     /**
      * The name and signature of the console command.
@@ -46,7 +44,7 @@ class RefreshHoldingData extends Command
         foreach ($holdings as $holding) {
             $this->line('Refreshing ' . $holding->symbol);
 
-            $holding->sync();
+            $holding->syncTransactionsAndDividends();
         }
     }
 }

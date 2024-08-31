@@ -7,7 +7,7 @@
         } else {
 
             $isUp = $costBasis <= $marketValue;
-            $percent = ($marketValue - $costBasis) / $costBasis;
+            $percent = $costBasis ? (($marketValue - $costBasis) / $costBasis) : 0;
         }
         
     @endphp

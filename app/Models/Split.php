@@ -28,6 +28,58 @@ class Split extends Model
         'last_date' => 'datetime',
     ];
 
+    public function holdings() {
+        return $this->hasMany(Holding::class, 'symbol', 'symbol');
+    }
+
+    public function transactions() {
+        return $this->hasMany(Transaction::class, 'symbol', 'symbol');
+    }
+
+    /**
+     * Grab new split data
+     *
+     * @param string $symbol
+     * @param \DateTimeInterface|null $start_date
+     * @return void
+     */
+    public static function refreshSplitData(string $symbol) 
+    {
+        // dates for split data
+        $splits_meta = self::where(['symbol' => $symbol])
+            ->selectRaw('COUNT(symbol) as total_splits')
+            ->selectRaw('MIN(date) as first_date')
+            ->selectRaw('MAX(date) as last_date')
+            ->get()
+            ->first();
+
+        // assume need to populate all split data because it didnt exist before
+        $start_date = new \DateTime('@0');
+        $end_date = now();
+
+        // nope, need to populate newer split data
+        if ($splits_meta->total_splits) {
+            
+            $start_date = $splits_meta->last_date->addHours(48);
+            $end_date =  now();
+        }
+
+        // get some data
+        if ($split_data = collect() && $start_date && $end_date) {
+            $split_data = app(MarketDataInterface::class)->splits($symbol, $start_date, $end_date);
+        }
+
+        if ($split_data->isNotEmpty()) {
+            // insert records
+            (new self)->insert($split_data->toArray());   
+        }
+
+        // sync to transactions
+        self::syncToTransactions($symbol);
+
+        return $split_data;
+    }
+
     /**
      * Syncs all transactions of symbol with split data
      *
@@ -77,60 +129,9 @@ class Split extends Model
             }
         }
 
-        // update market data with latest date
-        MarketData::setSplitsHoldingSynced($symbol);
+        // // update market data with latest date
+        // MarketData::setSplitsHoldingSynced($symbol);
     }
 
-    /**
-     * Grab new split data
-     *
-     * @param string $symbol
-     * @param \DateTimeInterface|null $start_date
-     * @return void
-     */
-    public static function getSplitData(string $symbol) 
-    {
-        // dates for split data
-        $splits_meta = self::where(['symbol' => $symbol])
-            ->selectRaw('COUNT(symbol) as total_splits')
-            ->selectRaw('MIN(date) as first_date')
-            ->selectRaw('MAX(date) as last_date')
-            ->get()
-            ->first();
-
-        // assume need to populate all split data because it didnt exist before
-        $start_date = new \DateTime('@0');
-        $end_date = now();
-
-        // nope, need to populate newer split data
-        if ($splits_meta->total_splits) {
-            
-            $start_date = $splits_meta->last_date->addHours(48);
-            $end_date =  now();
-        }
-
-        // get some data
-        if ($split_data = collect() && $start_date && $end_date) {
-            $split_data = app(MarketDataInterface::class)->splits($symbol, $start_date, $end_date);
-        }
-
-        if ($split_data->isNotEmpty()) {
-            // insert records
-            (new self)->insert($split_data->toArray());   
-            
-        }
-
-        // sync to transactions
-        self::syncToTransactions($symbol);
-
-        return $split_data;
-    }
-
-    public function holdings() {
-        return $this->hasMany(Holding::class, 'symbol', 'symbol');
-    }
-
-    public function transactions() {
-        return $this->hasMany(Transaction::class, 'symbol', 'symbol');
-    }
+    
 }

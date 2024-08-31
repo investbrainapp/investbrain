@@ -165,7 +165,7 @@ class Holding extends Model
             ->join('market_data', 'market_data.symbol', 'holdings.symbol');
     }
 
-    public function sync()
+    public function syncTransactionsAndDividends()
     {
         // pull existing transaction data
         $query = Transaction::where([

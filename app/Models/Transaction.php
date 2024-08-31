@@ -44,18 +44,16 @@ class Transaction extends Model
 
         static::saved(function ($transaction) {
 
-            $transaction->syncHolding();
+            $transaction->syncToHolding();
 
             $transaction->refreshMarketData();
-
-            $transaction->syncDividendsToHolding();
 
             cache()->tags(['metrics', auth()->user()->id])->flush();
         });
 
         static::deleted(function ($transaction) {
 
-            $transaction->syncHolding();
+            $transaction->syncToHolding();
 
             cache()->tags(['metrics', auth()->user()->id])->flush();
         });
@@ -124,11 +122,6 @@ class Transaction extends Model
     {
         return MarketData::getMarketData($this->attributes['symbol']);
     }
-    
-    public function syncDividendsToHolding() 
-    {
-        return Dividend::syncHoldings(['symbol' => $this->attributes['symbol']]);
-    }
 
     /**
      * Writes average cost basis to a sale transaction
@@ -154,7 +147,7 @@ class Transaction extends Model
      *
      * @return void
      */
-    public function syncHolding() {
+    public function syncToHolding() {
 
         // if symbol name changed, sync previous symbol too
         if (Arr::has($this->changes, 'symbol')) {
@@ -163,7 +156,7 @@ class Transaction extends Model
             $temp->symbol = $this->original['symbol'];
             $temp->portfolio_id = $this->portfolio_id;
 
-            $temp->syncHolding();
+            $temp->syncToHolding();
         }
 
         // get the holding for a symbol and portfolio (or create one)
@@ -178,6 +171,6 @@ class Transaction extends Model
             'total_cost_basis' => $this->quantity * $this->cost_basis,
         ]);
 
-        $holding->sync();
+        $holding->syncTransactionsAndDividends();
     }
 }

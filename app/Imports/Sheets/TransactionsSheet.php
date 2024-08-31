@@ -42,7 +42,7 @@ class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation,
 
                             return $transaction;
                         })
-                        ->syncHolding();
+                        ->syncToHolding();
             }
         });
         
