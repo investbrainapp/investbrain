@@ -2,7 +2,6 @@
 
 namespace App\Exports\Sheets;
 
-use App\Models\Portfolio;
 use App\Models\Transaction;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -13,7 +12,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
     public function __construct(
         public bool $empty = false
     ) { }
-    
+
     public function headings(): array
     {
         return [

@@ -29,7 +29,7 @@ new class extends Component {
             return $this->error($e->getMessage());
         }
 
-        $this->success(__('Successfully imported!'));
+        $this->success(__('Successfully imported!'), redirectTo: route('dashboard'));
     }
 
     public function downloadTemplate()
@@ -58,8 +58,12 @@ new class extends Component {
     </x-slot>
 
     <x-slot name="actions">
+
+        <x-forms.action-message class="me-3" on="saved">
+            {{ __('Saved.') }}
+        </x-forms.action-message>
   
-        <x-button type="submit">
+        <x-button type="submit" spinner="import">
             {{ __('Import') }}
         </x-button>
     </x-slot>

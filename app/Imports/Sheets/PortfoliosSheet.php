@@ -3,7 +3,6 @@
 namespace App\Imports\Sheets;
 
 use App\Models\Portfolio;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -14,24 +13,19 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
 {
     public function collection(Collection $portfolios)
     {
-        Portfolio::withoutEvents(function () use ($portfolios) {
-                
-            foreach ($portfolios as $portfolio) {
+        foreach ($portfolios as $portfolio) {
+            
+            Portfolio::unguard();
 
-                auth()->user()->portfolios()
-                            ->where(['id' => $portfolio['portfolio_id']])
-                            ->orWhere(['title' => $portfolio['title']])
-                            ->firstOr(function () use ($portfolio) {
-
-                                return Portfolio::make()->forceFill([
-                                    'id' => $portfolio['portfolio_id'] ?? null,
-                                    'title' => $portfolio['title'],
-                                    'wishlist' => $portfolio['wishlist'] ?? false,
-                                    'notes' => $portfolio['notes'],
-                                ])->save();
-                            });
-            }
-        });
+            Portfolio::updateOrCreate([
+                'id' => $portfolio['portfolio_id']
+            ], [
+                'id' => $portfolio['portfolio_id'] ?? null,
+                'title' => $portfolio['title'],
+                'wishlist' => $portfolio['wishlist'] ?? false,
+                'notes' => $portfolio['notes'],
+            ]);
+        }
     }
 
     public function rules(): array

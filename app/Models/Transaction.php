@@ -46,6 +46,10 @@ class Transaction extends Model
 
             $transaction->syncHolding();
 
+            $transaction->refreshMarketData();
+
+            $transaction->syncDividendsToHolding();
+
             cache()->tags(['metrics', auth()->user()->id])->flush();
         });
 
@@ -174,33 +178,6 @@ class Transaction extends Model
             'total_cost_basis' => $this->quantity * $this->cost_basis,
         ]);
 
-        // pull existing transaction data
-        $query = self::where([
-            'portfolio_id' => $this->portfolio_id,
-            'symbol' => $this->symbol,
-        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
-        ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
-        ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `cost_basis`')
-        ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN ((sale_price - cost_basis) * quantity) ELSE 0 END) AS `realized_gains`')
-        ->first();
-
-        $total_quantity = $query->qty_purchases - $query->qty_sales;
-        $average_cost_basis = $query->qty_purchases > 0 
-                                ? $query->cost_basis / $query->qty_purchases 
-                                : 0;
-
-        // update holding
-        $holding->fill([
-            'quantity' => $total_quantity,
-            'average_cost_basis' => $average_cost_basis,
-            'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->realized_gains,
-        ]);
-
-        $holding->save();
-
-        $this->refreshMarketData();
-
-        $this->syncDividendsToHolding();
+        $holding->sync();
     }
 }

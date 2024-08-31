@@ -38,7 +38,11 @@
 
             @if ($user->portfolios->isEmpty())
                 <div class="flex justify-center items-center h-[100px] mb-8">
-                    <x-button label="{{ __('Create your first portfolio!') }}" class="btn-primary" link="{{ route('portfolio.create') }}" />
+                    
+                    <x-button label="{{ __('Import / Export Data') }}" class="btn-primary btn-outline mr-6" link="{{ route('import-export') }}" />
+                    <span>{{ __('or') }}</span>
+                    <x-button label="{{ __('Create your first portfolio!') }}" class="btn-primary ml-6" link="{{ route('portfolio.create') }}" />
+                    
                 </div>
             @endif
             
