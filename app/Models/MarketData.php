@@ -28,6 +28,18 @@ class MarketData extends Model
         'dividend_yield'
     ];
 
+    protected $casts = [
+        'last_dividend_date' => 'datetime',
+        'market_value' => 'float',
+        'fifty_two_week_high' => 'float',
+        'fifty_two_week_low' => 'float',
+        'forward_pe' => 'float',
+        'trailing_pe' => 'float',
+        'market_cap' => 'float',
+        'book_value' => 'float',
+        'dividend_yield' => 'float'
+    ];
+
     public function holdings() 
     {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');

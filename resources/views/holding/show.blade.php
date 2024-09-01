@@ -46,6 +46,11 @@
             <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
 
                 <p>
+                    <span class="font-bold">{{ __('Market Cap') }}: </span>
+                    ${{ Number::forHumans($holding->market_data->market_cap ?? 0) }} 
+                </p>
+
+                <p>
                     <span class="font-bold">{{ __('Forward PE') }}: </span>
                     {{ $holding->market_data->forward_pe }} 
                 </p>
@@ -56,8 +61,8 @@
                 </p>
 
                 <p>
-                    <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    ${{ Number::forHumans($holding->market_data->market_cap ?? 0) }} 
+                    <span class="font-bold">{{ __('Book Value') }}: </span>
+                    {{ $holding->market_data->book_value }} 
                 </p>
 
                 <p>
@@ -68,7 +73,16 @@
                         :high="$holding->market_data->fifty_two_week_high" 
                         :current="$holding->market_data->market_value"
                     />
-                    
+                </p>
+
+                <p>
+                    <span class="font-bold">{{ __('Dividend Yield') }}: </span>
+                    {{ $holding->market_data->dividend_yield }} 
+                </p>
+
+                <p>
+                    <span class="font-bold">{{ __('Last Dividend Date') }}: </span>
+                    {{ $holding->market_data?->last_dividend_date?->format('F d, Y') ?? 'Never' }} 
                 </p>
                 
             </x-ib-card>

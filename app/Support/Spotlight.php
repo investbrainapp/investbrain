@@ -18,7 +18,10 @@ class Spotlight
             return $results;
         }
 
-        $portfolios = $request->user()->portfolios()->where('title', 'LIKE', '%'.$request->input('search').'%')->limit(5)->get();
+        $portfolios = $request->user()->portfolios()
+            ->where('title', 'LIKE', '%'.$request->input('search').'%')
+            ->limit(5)
+            ->get();
         $portfolios->each(function($portfolio) use ($results) {
 
             $results->push([
@@ -29,13 +32,20 @@ class Spotlight
             ]);
         });
 
-        $holdings = $request->user()->holdings()->where('holdings.symbol', 'LIKE', '%'.$request->input('search').'%')->limit(5)->get();
+        $holdings = $request->user()->holdings()
+            ->where('holdings.quantity', '>', 0)
+            ->where(function ($query) use ($request) {
+                return $query->where('holdings.symbol', 'LIKE', '%'.$request->input('search').'%')
+                        ->orWhere('market_data.name', 'LIKE', '%'.$request->input('search').'%');
+            })
+            ->limit(5)
+            ->get();
         $holdings->each(function($holding) use ($results) {
 
             $results->push([
-                'name' => 'Holding: '. $holding->symbol,
+                'name' => 'Holding: '.$holding->market_data->name.' ('.$holding->symbol.')',
                 'description' => $holding->portfolio->title,
-                'link' => route('portfolio.show', ['portfolio' => $holding->portfolio->id]),
+                'link' => route('holding.show', ['portfolio' => $holding->portfolio->id, 'symbol' => $holding->symbol]),
                 'avatar' => null
             ]);
         });

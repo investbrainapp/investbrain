@@ -18,33 +18,6 @@ Route::get('/', function () {
 
 Route::get('/test', function () {
     //
-
-
-    return Alphavantage::fundamentals()->overview('TSLA');
-
-    $quote = Alphavantage::core()->quoteEndpoint('FFRHX');
-
-    $quote = Arr::get($quote, 'Global Quote', []);
-
-
-    return $quote;
-
-    $client = ApiClientFactory::createApiClient();
-
-    return $client->getQuote("IBM");
-
-    return $client->getHistoricalQuoteData(
-        "AAPL",
-        ApiClient::INTERVAL_1_DAY,
-        new \DateTime("-14 days"),
-        new \DateTime("today")
-    );
-
-    return $client->getHistoricalDividendData(
-        "AAPL",
-        new \DateTime("-5 years"),
-        new \DateTime("today")
-    );
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {

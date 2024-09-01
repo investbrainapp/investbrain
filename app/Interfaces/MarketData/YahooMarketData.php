@@ -3,13 +3,14 @@
 namespace App\Interfaces\MarketData;
 
 use Illuminate\Support\Collection;
+use Scheb\YahooFinanceApi\ApiClient;
 use Scheb\YahooFinanceApi\ApiClientFactory as YahooFinance;
 
 class YahooMarketData implements MarketDataInterface
 {
-    public function __construct(
-        public $client
-    ) {
+    public ApiClient $client;
+
+    public function __construct() {
 
         // create yahoo finance client factory
         $this->client = YahooFinance::createApiClient();
