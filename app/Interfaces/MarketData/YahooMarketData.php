@@ -7,9 +7,9 @@ use Scheb\YahooFinanceApi\ApiClientFactory as YahooFinance;
 
 class YahooMarketData implements MarketDataInterface
 {
-    public $client;
-
-    public function __construct() {
+    public function __construct(
+        public $client
+    ) {
 
         // create yahoo finance client factory
         $this->client = YahooFinance::createApiClient();
