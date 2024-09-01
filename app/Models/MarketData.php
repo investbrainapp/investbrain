@@ -22,16 +22,10 @@ class MarketData extends Model
         'fifty_two_week_low',
         'forward_pe',
         'trailing_pe',
-        'market_cap'
-    ];
-
-    protected $attributes = [
-        'market_value' => 0,
-        'fifty_two_week_high' => 0,
-        'fifty_two_week_low' => 0,
-        'forward_pe' => 0,
-        'trailing_pe' => 0,
-        'market_cap' => 0
+        'market_cap',
+        'book_value',
+        'last_dividend_date',
+        'dividend_yield'
     ];
 
     public function holdings() 

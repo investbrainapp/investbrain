@@ -17,26 +17,40 @@ class AlphaVantageMarketData implements MarketDataInterface
 
     public function quote($symbol): Collection
     {
-        $fundamental = Alphavantage::fundamentals()->overview($symbol);
         $quote = Alphavantage::core()->quoteEndpoint($symbol);
+        $quote = Arr::get($quote, 'Global Quote', []);
+
+        $fundamental = cache()->tags(['quote', 'alpha-vantage', $symbol])->remember(
+            'symbol-'.$symbol, 
+            1440, 
+            function () use ($symbol) {
+                return Alphavantage::fundamentals()->overview($symbol);
+            }
+        );
 
         if (empty($fundamental)) return collect();
 
         return collect([
             'name' => Arr::get($fundamental, 'Name'),
             'symbol' => Arr::get($fundamental, 'Symbol'),
-            'market_value' => Arr::get($quote, 'Global Quote')['05. price'],
+            'market_value' => Arr::get($quote, '05. price'),
             'fifty_two_week_high' => Arr::get($fundamental, '52WeekHigh'),
             'fifty_two_week_low' => Arr::get($fundamental, '52WeekLow'),
             'forward_pe' => Arr::get($fundamental, 'ForwardPE'),
             'trailing_pe' => Arr::get($fundamental, 'TrailingPE'),
-            'market_cap' => Arr::get($fundamental, 'MarketCapitalization') 
+            'market_cap' => Arr::get($fundamental, 'MarketCapitalization'),
+            'book_value' => Arr::get($fundamental, 'BookValue'),
+            'last_dividend_date' => Arr::get($fundamental, 'DividendDate') != 'None'
+                        ? Arr::get($fundamental, 'DividendDate')
+                        : null,
+            'dividend_yield' => Arr::get($fundamental, 'DividendYield') != 'None'
+                        ? Arr::get($fundamental, 'DividendYield')
+                        : null
         ]);        
     }
 
     public function dividends($symbol, $startDate, $endDate): Collection
     {
-
         $dividends = Alphavantage::fundamentals()->dividends($symbol);
 
         return collect($dividends)

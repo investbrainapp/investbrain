@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "47988869f65dbf94a6228627c7806e1f",
+    "content-hash": "40816463478b2d00c6a7c18e71aa7e7c",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -7369,16 +7369,16 @@
         },
         {
             "name": "tschucki/alphavantage-laravel",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Tschucki/alphavantage-laravel.git",
-                "reference": "409c78c123ed40a150d8ea6ac095ab36dc077f82"
+                "reference": "1317dab3b0b3b3866c974816ef31e745a888e596"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Tschucki/alphavantage-laravel/zipball/409c78c123ed40a150d8ea6ac095ab36dc077f82",
-                "reference": "409c78c123ed40a150d8ea6ac095ab36dc077f82",
+                "url": "https://api.github.com/repos/Tschucki/alphavantage-laravel/zipball/1317dab3b0b3b3866c974816ef31e745a888e596",
+                "reference": "1317dab3b0b3b3866c974816ef31e745a888e596",
                 "shasum": ""
             },
             "require": {
@@ -7436,7 +7436,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Tschucki/alphavantage-laravel/issues",
-                "source": "https://github.com/Tschucki/alphavantage-laravel/tree/0.0.1"
+                "source": "https://github.com/Tschucki/alphavantage-laravel/tree/0.0.2"
             },
             "funding": [
                 {
@@ -7444,7 +7444,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-14T17:31:03+00:00"
+            "time": "2024-09-01T11:41:46+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

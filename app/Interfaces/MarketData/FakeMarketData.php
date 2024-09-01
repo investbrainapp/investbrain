@@ -23,7 +23,10 @@ class FakeMarketData implements MarketDataInterface
             'fifty_two_week_low' => 341.20,
             'forward_pe' => 20.1,
             'trailing_pe' => 30.34,
-            'market_cap' => 9800700600
+            'market_cap' => 9800700600,
+            'book_value' => 4.7,
+            'last_dividend_date' => now()->subDays(45),
+            'dividend_yield' => .033
         ]);
     }
 

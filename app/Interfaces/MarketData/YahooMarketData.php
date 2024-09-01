@@ -36,7 +36,10 @@ class YahooMarketData implements MarketDataInterface
             'fifty_two_week_low' => $quote->getFiftyTwoWeekLow(),
             'forward_pe' => $quote->getForwardPE(),
             'trailing_pe' => $quote->getTrailingPE(),
-            'market_cap' => $quote->getMarketCap()         
+            'market_cap' => $quote->getMarketCap(),
+            'book_value' => $quote->getBookValue(),
+            'last_dividend_date' => $quote->getDividendDate(),
+            'dividend_yield' => $quote->getTrailingAnnualDividendYield()
         ]);
     }
 

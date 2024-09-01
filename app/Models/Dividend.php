@@ -26,6 +26,18 @@ class Dividend extends Model
         'last_date' => 'datetime',
     ];
 
+    public function marketData() {
+        return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
+    }
+
+    public function holdings() {
+        return $this->hasMany(Holding::class, 'symbol', 'symbol');
+    }
+
+    public function transactions() {
+        return $this->hasMany(Transaction::class, 'symbol', 'symbol');
+    }
+
     /**
      * Grab new dividend data
      *
@@ -48,7 +60,6 @@ class Dividend extends Model
         if ( $dividends_meta->total_dividends ) {
 
             $start_date = $dividends_meta->last_date->addHours(48);
-            $end_date =  now();
         }
 
         // get some data
@@ -67,48 +78,43 @@ class Dividend extends Model
             (new self)->insert($dividend_data->toArray());
 
             // sync to holdings
-            $dividends = self::where([
-                                'dividends.symbol' => $dividend_data->last()->symbol,
-                            ])->select(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
-                            ->selectRaw('@purchased:=(SELECT coalesce(SUM(quantity),0) FROM transactions WHERE transactions.transaction_type = "BUY" AND transactions.symbol = dividends.symbol AND date(transactions.date) <= date(dividends.date) AND holdings.portfolio_id = transactions.portfolio_id ) AS `purchased`')
-                            ->selectRaw('@sold:=(SELECT coalesce(SUM(quantity),0) FROM transactions WHERE transactions.transaction_type = "SELL" AND transactions.symbol = dividends.symbol AND date(transactions.date) <= date(dividends.date)  AND holdings.portfolio_id = transactions.portfolio_id ) AS `sold`')
-                            ->selectRaw('@owned:=(@purchased - @sold) AS `owned`')
-                            ->selectRaw('@dividends_received:=(@owned * dividends.dividend_amount) AS `dividends_received`')
-                            ->join('transactions', 'transactions.symbol', 'dividends.symbol')
-                            ->join('holdings', 'transactions.portfolio_id', 'holdings.portfolio_id')
-                            ->groupBy(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
-                            ->get();
+            self::syncHoldings($dividend_data);
 
-            // iterate through holdings and update 
-            Holding::where(['symbol' => $symbol])
-                ->get()
-                ->each(function ($holding) use ($dividends) {
-                    $holding->update([
-                        'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)->sum('dividends_received')
-                    ]);
-                });
-
-            // sync most last dividend date in market data
+            // sync last dividend amount to market data table
             $market_data = MarketData::symbol($symbol)->first();
-            $dividend_data_latest_date = $dividend_data->sortByDesc('date')->first()['date'];
-            
-            if ($market_data->dividend_date < $dividend_data_latest_date) {
-                $market_data->update(['dividend_date' => $dividend_data_latest_date]); // why is this set to latest date?
-            }
+            $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['amount'];
+            $market_data->save();
         }
 
         return $dividend_data;
     }
 
-    public function marketData() {
-        return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
-    }
+    public static function syncHoldings($dividend_data): void
+    {
+        $symbol = $dividend_data->last()->symbol;
 
-    public function holdings() {
-        return $this->hasMany(Holding::class, 'symbol', 'symbol');
-    }
+        // group by holdings
+        $dividends = self::where([
+                        'dividends.symbol' => $dividend_data->last()->symbol,
+                    ])
+                    ->select(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
+                    ->selectRaw('@purchased:=(SELECT coalesce(SUM(quantity),0) FROM transactions WHERE transactions.transaction_type = "BUY" AND transactions.symbol = dividends.symbol AND date(transactions.date) <= date(dividends.date) AND holdings.portfolio_id = transactions.portfolio_id ) AS `purchased`')
+                    ->selectRaw('@sold:=(SELECT coalesce(SUM(quantity),0) FROM transactions WHERE transactions.transaction_type = "SELL" AND transactions.symbol = dividends.symbol AND date(transactions.date) <= date(dividends.date)  AND holdings.portfolio_id = transactions.portfolio_id ) AS `sold`')
+                    ->selectRaw('@owned:=(@purchased - @sold) AS `owned`')
+                    ->selectRaw('@dividends_received:=(@owned * dividends.dividend_amount) AS `dividends_received`')
+                    ->join('transactions', 'transactions.symbol', 'dividends.symbol')
+                    ->join('holdings', 'transactions.portfolio_id', 'holdings.portfolio_id')
+                    ->groupBy(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
+                    ->get();
 
-    public function transactions() {
-        return $this->hasMany(Transaction::class, 'symbol', 'symbol');
+        // iterate through holdings and update 
+        Holding::where(['symbol' => $symbol])
+                ->get()
+                ->each(function ($holding) use ($dividends) {
+                    $holding->update([
+                        'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
+                                                        ->sum('dividends_received')
+                    ]);
+                });
     }
 }
