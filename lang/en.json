@@ -134,6 +134,7 @@
     "Symbol": "Symbol",
     "Quantity": "Quantity",
     "Quantity Owned": "Quantity Owned",
+    "The quantity must not be greater than the available quantity.": "The quantity must not be greater than the available quantity.",
     "Average Cost Basis": "Average Cost Basis",
     "Market Value": "Market Value",
     "52 week": "52 week",

@@ -3,10 +3,12 @@
 use App\Models\Transaction;
 use App\Models\Portfolio;
 use App\Rules\SymbolValidationRule;
+use App\Rules\QuantityValidationRule;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\{Computed};
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
+use Illuminate\Validation\Rule;
 
 new class extends Component {
     use Toast;
@@ -34,7 +36,12 @@ new class extends Component {
             'transaction_type' => 'required|string|in:BUY,SELL',
             'portfolio_id' => 'required|exists:portfolios,id',
             'date' => 'required|date_format:Y-m-d',
-            'quantity' => 'required|min:0|numeric',
+            'quantity' => [
+                'required', 
+                'numeric', 
+                'min:0', 
+                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type)
+            ],
             'cost_basis' => 'exclude_if:transaction_type,SELL|min:0|numeric',
             'sale_price' => 'exclude_if:transaction_type,BUY|min:0|numeric',
         ];

@@ -134,6 +134,7 @@
     "Symbol": "Símbolo",
     "Quantity": "Cantidad",
     "Quantity Owned": "Cantidad de propiedad",
+    "The quantity must not be greater than the available quantity.": "La cantidad no debe ser mayor que la cantidad disponible.",
     "Average Cost Basis": "Costo Promedio",
     "Market Value": "Valor de Mercado",
     "52 week": "52 semanas",
