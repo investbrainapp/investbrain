@@ -3,6 +3,7 @@
 namespace App\Interfaces\MarketData;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Tschucki\Alphavantage\Facades\Alphavantage;
 
@@ -36,13 +37,18 @@ class AlphaVantageMarketData implements MarketDataInterface
     public function dividends($symbol, $startDate, $endDate): Collection
     {
 
-        return collect($this->client->getHistoricalDividendData($symbol, $startDate, $endDate))
+        $dividends = Alphavantage::fundamentals()->dividends($symbol);
+
+        return collect($dividends)
+                        ->where('ex_dividend_date', '>=', $startDate)
+                        ->where('ex_dividend_date', '<', $endDate)
                         ->map(function($dividend) use ($symbol) {
                             
                             return [
                                 'symbol' => $symbol,
-                                'date' => $dividend->getDate()->format('Y-m-d H:i:s'),
-                                'dividend_amount' => $dividend->getDividends(),
+                                'date' => Carbon::parse(Arr::get($dividend, 'ex_dividend_date'))
+                                                    ->format('Y-m-d H:i:s'),
+                                'dividend_amount' => Arr::get($dividend, 'amount'),
                             ];
                         });
     }
@@ -50,14 +56,18 @@ class AlphaVantageMarketData implements MarketDataInterface
     public function splits($symbol, $startDate, $endDate): Collection
     {   
 
-        return collect($this->client->getHistoricalSplitData($symbol, $startDate, $endDate))
-                        ->map(function($split) use ($symbol) {
-                            $split_amount = explode(':', $split->getStockSplits());
+        $splits = Alphavantage::fundamentals()->splits($symbol);
 
+        return collect($splits)
+                        ->where('effective_date', '>=', $startDate)
+                        ->where('effective_date', '<', $endDate)
+                        ->map(function($split) use ($symbol) {
+                            
                             return [
                                 'symbol' => $symbol,
-                                'date' => $split->getDate()->format('Y-m-d H:i:s'),
-                                'split_amount' => $split_amount[0] / $split_amount[1],
+                                'date' => Carbon::parse(Arr::get($split, 'effective_date'))
+                                                    ->format('Y-m-d H:i:s'),
+                                'split_amount' => Arr::get($split, 'split_factor'),
                             ];
                         });
     }
