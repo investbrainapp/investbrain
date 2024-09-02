@@ -15,10 +15,12 @@
     @endif
 >
     <template x-teleport="body">
-        <div x-transition.opacity x-show="open" class="fixed top-0 left-0 z-[99] flex items-center justify-center w-full h-full" x-cloak>
+        <div x-transition.opacity x-show="open" class="fixed top-0 left-0 z-[99] flex items-center justify-center w-full h-full">
             <div 
                 @click="open=false" 
                 class="absolute inset-0 w-full h-full bg-black bg-opacity-40"
+                x-show="open"
+                x-cloak
             ></div>
 
             <x-card     
@@ -26,6 +28,8 @@
                 :title="$title"
                 :subtitle="$subtitle"
                 {{ $attributes->merge(['class' => 'relative transform overflow-hidden rounded-md ext-left shadow-xl w-full sm:w-2/3 lg:w-1/3 m-2 sm:m-0']) }} 
+                x-show="open"
+                x-cloak
             >
                 @if ($showClose)
                     <x-button 
