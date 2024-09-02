@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+use App\Console\Commands\{
+    RefreshMarketData,
+    CaptureDailyChange,
+    RefreshDividendData,
+    RefreshSplitData
+};
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote')->hourly();
+Schedule::call(RefreshMarketData::class)->weekdays()->everyMinute(); // configurable in 'config.market_data'
+Schedule::call(CaptureDailyChange::class)->weekdays();
+Schedule::call(RefreshDividendData::class)->weekly();
+Schedule::call(RefreshSplitData::class)->monthly();
