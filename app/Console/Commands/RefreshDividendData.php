@@ -44,6 +44,7 @@ class RefreshDividendData extends Command
 
         foreach ($holdings as $holding) {
             $this->line('Refreshing ' . $holding->symbol);
+            
             Dividend::refreshDividendData($holding->symbol);
         }
     }

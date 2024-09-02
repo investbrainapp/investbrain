@@ -50,11 +50,6 @@ class MarketData extends Model
         return $query->where('symbol', $symbol);
     }
 
-    public function refreshMarketData() 
-    {
-        return static::getMarketData($this->attributes['symbol']);
-    }
-
     public static function getMarketData($symbol) 
     {
         $market_data = self::firstOrNew([

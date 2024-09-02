@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Holding;
 use App\Models\MarketData;
 use Illuminate\Console\Command;
 
@@ -40,11 +41,16 @@ class RefreshMarketData extends Command
     public function handle()
     {
         // get all symbols from market data
-        $symbols = MarketData::get(['symbol']);
+        $symbols = Holding::where('quantity', '>', 0)
+                    ->select(['symbol'])
+                    ->distinct()
+                    ->get()
+                    ->pluck('symbol');
 
         foreach ($symbols as $symbol) {
-            $this->line('Refreshing ' . $symbol->symbol);
-            $symbol->refreshMarketData();
+            $this->line('Refreshing ' . $symbol);
+
+            MarketData::getMarketData($symbol);
         }
     }
 }

@@ -44,6 +44,7 @@ class RefreshSplitData extends Command
 
         foreach ($holdings as $holding) {
             $this->line('Refreshing ' . $holding->symbol);
+            
             Split::refreshSplitData($holding->symbol);
         }   
     }

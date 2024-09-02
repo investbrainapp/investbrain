@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Portfolio;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -38,37 +39,27 @@ class CaptureDailyChange extends Command
      */
     public function handle()
     {
-        User::all()->each(function($user){
+        Portfolio::with('holdings.market_data')->get()->each(function($portfolio){
 
-            $this->line('Capturing daily change for ' . $user->name);
+            $this->line('Capturing daily change for ' . $portfolio->title);
 
-            $portfolios = $user->portfolios()->withoutWishlists()->with(['holdings.market_data'])->get();
+            $total_cost_basis = $portfolio->holdings->sum('total_cost_basis');
 
-            $total_cost_basis = $portfolios->reduce(function ($carry, $portfolio) {
-                return $carry + $portfolio->holdings->sum('total_cost_basis');
+            $total_dividends = $portfolio->holdings->sum('dividends_earned');
+
+            $realized_gains = $portfolio->holdings->sum('realized_gain_dollars');
+
+            $total_market_value = $portfolio->holdings->sum(function($holding) {
+                return $holding->market_data->market_value * $holding->quantity;
             });
 
-            $total_dividends = $portfolios->reduce(function ($carry, $portfolio) {
-                return $carry + $portfolio->holdings->sum('dividends_earned');
-            });
-
-            $realized_gains = $portfolios->reduce(function ($carry, $portfolio) {
-                return $carry + $portfolio->holdings->sum('realized_gain_loss_dollars');
-            });
-
-            $total_market_value = $portfolios->reduce(function ($carry, $portfolio) {
-                return $carry + $portfolio->holdings->sum(function($holding) {
-                    return $holding->market_data->market_value * $holding->quantity;
-                }) ;
-            });
-
-            $user->daily_changes()->create([
+            $portfolio->daily_changes()->create([
                 'date' => now(),
-                'total_cost_basis' => $total_cost_basis,
                 'total_market_value' => $total_market_value,
-                'total_dividends' => $total_dividends,
-                'realized_gains' => $realized_gains,
-                'total_gain_loss' => $total_market_value - $total_cost_basis
+                'total_cost_basis' => $total_cost_basis,
+                'total_gain' => $total_market_value - $total_cost_basis,
+                'total_dividends_earned' => $total_dividends,
+                'realized_gains' => $realized_gains
             ]);
         });
     }
