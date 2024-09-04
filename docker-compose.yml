@@ -1,0 +1,48 @@
+networks:
+  investbrain_network:
+    driver: bridge
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: investbrain-app
+    restart: unless-stopped
+    tty: true
+    expose:
+      - "9000"
+    volumes:
+      - .:/var/www/app:delegated
+    depends_on:
+      - mysql
+    networks:
+      - investbrain_network
+  nginx:
+    image: nginx:alpine
+    container_name: investbrain-nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8000:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/app:delegated
+    depends_on:
+      - app
+    networks:
+      - investbrain_network
+  mysql:
+    image: mysql:8.4
+    container_name: investbrain-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: investbrain
+      MYSQL_DATABASE: investbrain
+      MYSQL_USER: investbrain
+      MYSQL_PASSWORD: investbrain
+    volumes:
+      - investbrain-mysql:/var/lib/mysql
+    networks:
+      - investbrain_network
+volumes:
+  investbrain-mysql:
