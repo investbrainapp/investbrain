@@ -44,11 +44,5 @@ RUN chown -R www-data:www-data . \
 # install composer
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/local/bin/composer
 
-# copy composer.json to workdir & install dependencies
-RUN composer install
-
-# Run NPM build
-RUN npm install && npm run build
-
 # Run everything else
 CMD ["./docker/entrypoint.sh"]

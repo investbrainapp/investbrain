@@ -8,8 +8,12 @@ if [ ! -f /var/www/app/.env ]; then
     cp /var/www/app/.env.example /var/www/app/.env
 fi
 
-echo "Waiting a second for the database to become available..."
-sleep 2
+echo "Installing Composer dependencies..."
+/usr/local/bin/composer install
+
+echo "Install NPM dependencies and build frontend..."
+/usr/bin/npm install 
+/usr/bin/npm run build 
 
 echo "Running migrations..."
 /usr/local/bin/php /var/www/app/artisan migrate
