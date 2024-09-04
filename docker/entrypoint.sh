@@ -22,7 +22,7 @@ echo "===============   Install NPM dependencies and build frontend...    ======
 /usr/bin/npm run build 
 
 echo "===============   Running migrations...    =============== "
-/usr/local/bin/php /var/www/app/artisan migrate
+/usr/local/bin/php /var/www/app/artisan migrate --force
 
 echo "===============   Spinning up Supervisor daemon...    =============== "
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

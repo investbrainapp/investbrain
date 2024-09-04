@@ -36,10 +36,9 @@ services:
     container_name: investbrain-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: investbrain
-      MYSQL_DATABASE: investbrain
-      MYSQL_USER: investbrain
-      MYSQL_PASSWORD: investbrain
+      MYSQL_DATABASE: ${DB_DATABASE:-investbrain}
+      MYSQL_USER: ${DB_USERNAME:-investbrain}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-investbrain}
     volumes:
       - investbrain-mysql:/var/lib/mysql
     networks:
