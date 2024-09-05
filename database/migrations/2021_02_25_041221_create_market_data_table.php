@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Database\Seeders\MarketDataSeeder;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMarketDataTable extends Migration
 {
@@ -29,6 +31,10 @@ class CreateMarketDataTable extends Migration
             $table->json('meta_data')->nullable();
             $table->timestamps();
         });
+
+        Artisan::call('db:seed', [
+            '--class' => MarketDataSeeder::class,
+        ]);
     }
 
     /**
