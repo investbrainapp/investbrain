@@ -8,7 +8,55 @@ Investbrain helps you manage and track the performance of your investments.
 
 ## Installation
 
-Coming soon.
+For ease of installation, we highly recommend installing Investbrain in a Docker container using the provided Docker Compose option, which downloads all the necessary dependencies and builds everything you need to get started quickly!
+
+To get started, you can clone this repository:
+
+```bash
+git clone https://github.com/investbrainapp/investbrain.git .
+```
+
+Once the repository is cloned, enter the directory:
+
+```bash
+cd investbrain
+```
+
+And bring up the container (this will take a few minutes):
+
+```bash
+docker composer up
+```
+
+If everything worked as expected, you should now be able to access Investbrain in the browser at:
+
+```bash
+http://localhost:8000/register
+```
+
+Congrats! You've just installed Investbrain!
+
+## Updating
+
+To update Investbrain using the recommended Docker installation method, you just need to stop the running containers:
+
+```bash
+docker compose stop
+```
+
+Then pull the latest updates from this repository using git:
+
+```bash
+git pull
+```
+
+Then bring the containers back up!
+
+```bash
+docker compose up
+```
+
+Easy as that!
 
 ## Under the hood
 
