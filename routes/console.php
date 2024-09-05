@@ -8,7 +8,7 @@ use App\Console\Commands\{
     RefreshSplitData
 };
 
-Schedule::call(RefreshMarketData::class)->weekdays()->everyMinute(); // configurable in 'config.market_data'
-Schedule::call(CaptureDailyChange::class)->weekdays();
-Schedule::call(RefreshDividendData::class)->weekly();
-Schedule::call(RefreshSplitData::class)->monthly();
+Schedule::command(RefreshMarketData::class)->weekdays()->everyMinute(); // configurable in 'config.market_data'
+Schedule::command(CaptureDailyChange::class)->weekdays();
+Schedule::command(RefreshDividendData::class)->weekly();
+Schedule::command(RefreshSplitData::class)->monthly();
