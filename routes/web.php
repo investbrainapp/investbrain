@@ -1,14 +1,10 @@
 <?php
 
-use Illuminate\Support\Arr;
-use Scheb\YahooFinanceApi\ApiClient;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HoldingController;
-use Scheb\YahooFinanceApi\ApiClientFactory;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\TransactionController;
-use Tschucki\Alphavantage\Facades\Alphavantage;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
