@@ -160,7 +160,7 @@ class Transaction extends Model
         }
 
         // get the holding for a symbol and portfolio (or create one)
-        $holding = Holding::firstOrCreate([
+        Holding::firstOrNew([
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol
         ], [
@@ -169,8 +169,6 @@ class Transaction extends Model
             'quantity' => $this->quantity,
             'average_cost_basis' => $this->cost_basis,
             'total_cost_basis' => $this->quantity * $this->cost_basis,
-        ]);
-
-        $holding->syncTransactionsAndDividends();
+        ])->syncTransactionsAndDividends();
     }
 }
