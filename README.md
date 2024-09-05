@@ -28,6 +28,8 @@ And bring up the container (this will take a few minutes):
 docker composer up
 ```
 
+In the previous setep, all of the default configurations are set. This includes creating a .env file and setting the required `APP_KEY`. 
+
 If everything worked as expected, you should now be able to access Investbrain in the browser at:
 
 ```bash
@@ -36,9 +38,15 @@ http://localhost:8000/register
 
 Congrats! You've just installed Investbrain!
 
+## Configuration
+
+There are several available configuration options when installing with the recommended [Docker method](#Installation). These options are configurable using an environment file, and you can see which options are configurable by reviewing the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file. Changes can be made in the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation.
+
+If you make any updates to the default configurations, make sure you restart the Docker containers in order for those changes to take effect.
+
 ## Updating
 
-To update Investbrain using the recommended Docker installation method, you just need to stop the running containers:
+To update Investbrain using the recommended [Docker installation](#Installation) method, you just need to stop the running containers:
 
 ```bash
 docker compose stop
