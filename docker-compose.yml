@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - "8000:80"
+      - "${APP_PORT:-8000}:80"
     volumes:
       - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
       - .:/var/www/app:delegated
