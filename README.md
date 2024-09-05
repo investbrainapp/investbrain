@@ -8,11 +8,11 @@ Investbrain helps you manage and track the performance of your investments.
 
 ## Under the hood
 
-Investbrain is a Laravel PHP web application that leverages the Livewire and Mary UI frameworks for its frontend. Out of the box, we feature two market data providers: Yahoo Finance and Alpha Vantage. But we also offer an extensible market data provider interface, for intrepid developers to create their own! We also have robust support for i18n, a11y, and dark mode. 
+Investbrain is a Laravel PHP web application that leverages the Livewire and Mary UI frameworks for its frontend. Out of the box, we feature two market data providers: Yahoo Finance and Alpha Vantage. But we also offer an extensible market data provider interface for intrepid developers to create their own! We also have robust support for i18n, a11y, and dark mode. 
 
 ## Installation
 
-For ease of installation, we _highly recommend_ installing Investbrain using the provided Docker Compose file, which downloads all the necessary dependencies and seamlessly builds everything you need to get started quickly!
+For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which downloads all the necessary dependencies and seamlessly builds everything you need to get started quickly!
 
 Before getting started, you should already have the following installed on your machine: [Docker Engine](https://docs.docker.com/engine/install/), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), and a wild sense of adventure.
 
