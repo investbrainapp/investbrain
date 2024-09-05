@@ -8,35 +8,29 @@ Investbrain helps you manage and track the performance of your investments.
 
 ## Under the hood
 
-Investbrain is a Laravel PHP web application that leverages the Livewire and Mary UI frameworks for its frontend. As far as persistent data storage, any relational database should work (but we generally recommend SQLite or MySQL). There are out of the box market data providers for Yahoo Finance, Alpha Vantage, and an extensible market data provider interface. We also have robust i18n, a11y, and dark mode support. 
+Investbrain is a Laravel PHP web application that leverages the Livewire and Mary UI frameworks for its frontend. Out of the box, we feature two market data providers: Yahoo Finance and Alpha Vantage. But we also offer an extensible market data provider interface, for intrepid developers to create their own! We also have robust support for i18n, a11y, and dark mode. 
 
 ## Installation
 
-For ease of installation, we highly recommend installing Investbrain in a Docker container using the provided Docker Compose option, which downloads all the necessary dependencies and builds everything you need to get started quickly!
+For ease of installation, we _highly recommend_ installing Investbrain using the provided Docker Compose file, which downloads all the necessary dependencies and seamlessly builds everything you need to get started quickly!
 
-Before getting started, you should already have the following installed on your machine: Docker Desktop or CLI, Git, and a wild sense of adventure.
+Before getting started, you should already have the following installed on your machine: [Docker Engine](https://docs.docker.com/engine/install/), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), and a wild sense of adventure.
 
 Ready? Let's get started! 
 
 First, you can clone this repository:
 
 ```bash
-git clone https://github.com/investbrainapp/investbrain.git .
+git clone https://github.com/investbrainapp/investbrain.git . && cd investbrain
 ```
 
-Once the repository is cloned, enter the directory:
-
-```bash
-cd investbrain
-```
-
-And bring up the container (this will take a few minutes):
+Then, build the Docker image and bring up the container (this will take a few minutes):
 
 ```bash
 docker composer up
 ```
 
-In the previous setep, all of the default configurations are set. This includes creating a .env file and setting the required `APP_KEY`. 
+In the previous setep, all of the default configurations are set automatically. This includes creating a .env file and setting the required Laravel `APP_KEY`. 
 
 If everything worked as expected, you should now be able to access Investbrain in the browser at:
 
@@ -46,11 +40,20 @@ http://localhost:8000/register
 
 Congrats! You've just installed Investbrain!
 
-## Configuration
+## Configuration (optional)
 
-There are several available configuration options when installing with the recommended [Docker method](#Installation). These options are configurable using an environment file, and you can see which options are configurable by reviewing the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file. Changes can be made in the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation.
+There are several configurations available when installing using the recommended [Docker method](#Installation). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
 
-If you make any updates to the default configurations, make sure you restart the Docker containers in order for those changes to take effect.
+| Option      | Description      | Default      |
+| ------------- | ------------- | ------------- |
+| APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
+| APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
+| DB_HOST | The location of your database host where Investbrain is installed  | investbrain-mysql |
+| DB_DATABASE | The name of the database where Investbrain is installed  | investbrain |
+| DB_USERNAME | Your database username | investbrain |
+| DB_PASSWORD | Your database password | investbrain |
+
+> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.
 
 ## Updating
 
