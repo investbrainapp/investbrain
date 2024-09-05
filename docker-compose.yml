@@ -1,5 +1,5 @@
 networks:
-  investbrain_network:
+  investbrain-network:
     driver: bridge
 services:
   app:
@@ -16,7 +16,7 @@ services:
     depends_on:
       - mysql
     networks:
-      - investbrain_network
+      - investbrain-network
   nginx:
     image: nginx:alpine
     container_name: investbrain-nginx
@@ -30,7 +30,7 @@ services:
     depends_on:
       - app
     networks:
-      - investbrain_network
+      - investbrain-network
   mysql:
     image: mysql:8.4
     container_name: investbrain-mysql
@@ -42,6 +42,6 @@ services:
     volumes:
       - investbrain-mysql:/var/lib/mysql
     networks:
-      - investbrain_network
+      - investbrain-network
 volumes:
   investbrain-mysql:
