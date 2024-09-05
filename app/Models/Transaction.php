@@ -160,7 +160,7 @@ class Transaction extends Model
         }
 
         // get the holding for a symbol and portfolio (or create one)
-        $holding = Holding::firstOrNew([
+        $holding = Holding::firstOrCreate([
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol
         ], [

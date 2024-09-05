@@ -31,7 +31,7 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
                 'total_market_value' => $dailyChange['total_market_value'],
                 'total_cost_basis' => $dailyChange['total_cost_basis'],
                 'total_gain' => $dailyChange['total_gain'],
-                'total_dividends' => $dailyChange['total_dividends'],
+                'total_dividends_earned' => $dailyChange['total_dividends'],
                 'realized_gains' => $dailyChange['realized_gains'],
                 'annotation' => $dailyChange['annotation'],
             ]);
