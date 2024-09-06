@@ -3,17 +3,10 @@
 cd /var/www/app
 
 echo "====================== Running entrypoint script...  ====================== "
-
 if [ ! -f ".env" ]; then
     echo " > Ope, gotta create an .env file!"
 
     cp .env.example .env
-fi
-
-if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
-    echo " > Ah, APP_KEY is missing in .env file. Generating a new key!"
-    
-    /usr/local/bin/php artisan key:generate
 fi
 
 echo "====================== Checking for updates...  ====================== "
@@ -22,7 +15,14 @@ echo "====================== Checking for updates...  ====================== "
 echo "====================== Installing Composer dependencies...  ====================== "
 /usr/local/bin/composer install
 
-echo "====================== Install NPM dependencies and build frontend...  ====================== "
+echo "====================== Validating environment...  ====================== "
+if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
+    echo " > Ah, APP_KEY is missing in .env file. Generating a new key!"
+    
+    /usr/local/bin/php artisan key:generate --force
+fi
+
+echo "====================== Installing NPM dependencies and building frontend...  ====================== "
 /usr/bin/npm install 
 /usr/bin/npm run build 
 
