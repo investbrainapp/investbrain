@@ -53,7 +53,7 @@ class CaptureDailyChange extends Command
                 return $holding->market_data->market_value * $holding->quantity;
             });
 
-            $portfolio->daily_changes()->create([
+            $portfolio->daily_change()->create([
                 'date' => now(),
                 'total_market_value' => $total_market_value,
                 'total_cost_basis' => $total_cost_basis,

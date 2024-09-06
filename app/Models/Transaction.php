@@ -17,6 +17,7 @@ class Transaction extends Model
     protected $fillable = [
         'symbol',
         'date',
+        'portfolio_id',
         'transaction_type',
         'quantity',
         'cost_basis',
@@ -48,14 +49,14 @@ class Transaction extends Model
 
             $transaction->refreshMarketData();
 
-            cache()->tags(['metrics', auth()->user()->id])->flush();
+            cache()->tags(['metrics', $transaction->portfolio_id])->flush();
         });
 
         static::deleted(function ($transaction) {
 
             $transaction->syncToHolding();
 
-            cache()->tags(['metrics', auth()->user()->id])->flush();
+            cache()->tags(['metrics', $transaction->portfolio_id])->flush();
         });
     }
 

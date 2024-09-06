@@ -25,12 +25,10 @@ class Holding extends Model
         'realized_gain_dollars',
         'dividends_earned',
         'splits_synced_at',
-        'dividends_synced_at'
     ];
 
     protected $casts = [
         'splits_synced_at' => 'datetime',
-        'dividends_synced_at' => 'datetime',
     ];
 
     protected $attributes = [

@@ -24,7 +24,6 @@ class Split extends Model
 
     protected $casts = [
         'date' => 'datetime',
-        'first_date' => 'datetime',
         'last_date' => 'datetime',
     ];
 
@@ -48,7 +47,6 @@ class Split extends Model
         // dates for split data
         $splits_meta = self::where(['symbol' => $symbol])
             ->selectRaw('COUNT(symbol) as total_splits')
-            ->selectRaw('MIN(date) as first_date')
             ->selectRaw('MAX(date) as last_date')
             ->get()
             ->first();
@@ -76,8 +74,6 @@ class Split extends Model
 
         // sync to transactions
         self::syncToTransactions($symbol);
-
-        return $split_data;
     }
 
     /**
@@ -92,7 +88,7 @@ class Split extends Model
         $splits = self::where([
                 'splits.symbol' => $symbol,
             ])
-            ->whereDate('transactions.date', '>', DB::raw('IFNULL(market_data.splits_synced_to_holdings_at, "0000-00-00")'))
+            ->whereDate('transactions.date', '>', DB::raw('IFNULL(holdings.splits_synced_at, "0000-00-00")'))
             ->select([
                 'splits.date', 
                 'splits.symbol', 
@@ -100,7 +96,7 @@ class Split extends Model
                 'transactions.portfolio_id'
             ])
             ->join('transactions', 'transactions.symbol', 'splits.symbol')
-            ->join('market_data', 'transactions.symbol', 'market_data.symbol')
+            ->join('holdings', 'transactions.symbol', 'holdings.symbol')
             ->orderBy('splits.date', 'ASC')
             ->get();
 
@@ -126,11 +122,15 @@ class Split extends Model
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
+
+                Holding::where([
+                    'symbol' => $split->symbol,
+                    'portfolio_id' => $split->portfolio_id
+                ])->update([
+                    'splits_synced_at' => now()
+                ]);
             }
         }
-
-        // // update market data with latest date
-        // MarketData::setSplitsHoldingSynced($symbol);
     }
 
     

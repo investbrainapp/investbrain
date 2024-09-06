@@ -41,16 +41,15 @@ class RefreshMarketData extends Command
     public function handle()
     {
         // get all symbols from market data
-        $symbols = Holding::where('quantity', '>', 0)
+        $holdings = Holding::where('quantity', '>', 0)
                     ->select(['symbol'])
                     ->distinct()
-                    ->get()
-                    ->pluck('symbol');
+                    ->get();
 
-        foreach ($symbols as $symbol) {
-            $this->line('Refreshing ' . $symbol);
+        foreach ($holdings as $holding) {
+            $this->line('Refreshing ' . $holding->symbol);
 
-            MarketData::getMarketData($symbol);
+            MarketData::getMarketData($holding->symbol);
         }
     }
 }

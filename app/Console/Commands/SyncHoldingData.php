@@ -12,14 +12,14 @@ class SyncHoldingData extends Command
      *
      * @var string
      */
-    protected $signature = 'holding-data:refresh';
+    protected $signature = 'holding-data:sync';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Refresh holdings';
+    protected $description = 'Syncs holdings with transactions and dividends';
 
     /**
      * Create a new command instance.

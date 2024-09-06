@@ -25,7 +25,6 @@ class CreateHoldingsTable extends Migration
             $table->float('realized_gain_dollars', 12, 4)->nullable();
             $table->float('dividends_earned', 12, 4)->nullable();
             $table->timestamp('splits_synced_at')->nullable();
-            $table->timestamp('dividends_synced_at')->nullable();
             $table->timestamps();
         });
     }

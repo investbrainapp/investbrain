@@ -22,7 +22,6 @@ class Dividend extends Model
 
     protected $casts = [
         'date' => 'datetime',
-        'first_date' => 'datetime',
         'last_date' => 'datetime',
     ];
 

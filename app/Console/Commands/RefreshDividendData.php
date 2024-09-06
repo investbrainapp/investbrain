@@ -39,8 +39,7 @@ class RefreshDividendData extends Command
      */
     public function handle()
     {
-        // $holdings = Holding::where('quantity', '>', 0)->distinct()->get(['symbol']);
-        $holdings = Holding::distinct()->get(['symbol']);
+        $holdings = Holding::where('quantity', '>', 0)->distinct()->get(['symbol']);
 
         foreach ($holdings as $holding) {
             $this->line('Refreshing ' . $holding->symbol);
