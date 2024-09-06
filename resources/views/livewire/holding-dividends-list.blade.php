@@ -33,7 +33,7 @@ new class extends Component {
 
         </x-slot:value>
         <x-slot:sub-value>
-            {{ $dividend->date->format('F d, Y') }}
+            <span title="{{ __('Ex Dividend Date') }}">{{ $dividend->date->format('F d, Y') }}</span>
         </x-slot:sub-value>
     </x-list-item>
 

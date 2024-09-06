@@ -32,7 +32,7 @@ new class extends Component {
             ['key' => 'market_data_fifty_two_week_low', 'label' => __('52 week low')],
             ['key' => 'market_data_fifty_two_week_high', 'label' => __('52 week high')],
             ['key' => 'num_transactions', 'label' => __('Number of Transactions')],
-            ['key' => 'market_data_updated_at', 'label' => __('Market Data Age')],
+            ['key' => 'market_data_updated_at', 'label' => __('Last Refreshed')],
         ];
     }
 

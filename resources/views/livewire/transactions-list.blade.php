@@ -71,7 +71,7 @@ new class extends Component {
                 <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>
             <x-slot:sub-value>
-                {{ $transaction->date->format('F j, Y') }} 
+                <span title="{{ __('Transaction Date') }}">{{ $transaction->date->format('F j, Y') }} </span>
             </x-slot:sub-value>
         </x-list-item>
 

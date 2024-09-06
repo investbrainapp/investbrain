@@ -84,8 +84,8 @@
                 </p>
 
                 <p>
-                    <span class="font-bold">{{ __('Last Dividend Date') }}: </span>
-                    {{ $holding->market_data?->last_dividend_date?->format('F d, Y') ?? 'Never' }} 
+                    <span class="font-bold">{{ __('Last Dividend Paid') }}: </span>
+                    {{ $holding->market_data?->last_dividend_date?->format('F d, Y') ?? '' }} 
                 </p>
                 
             </x-ib-card>
@@ -117,7 +117,7 @@
 
                         </x-slot:value>
                         <x-slot:sub-value>
-                            {{ $split->date->format('F d, Y') }}
+                            <span title="{{ __('Distribution Date') }}">{{ $split->date->format('F d, Y') }}</span>
                         </x-slot:sub-value>
                     </x-list-item>
                 

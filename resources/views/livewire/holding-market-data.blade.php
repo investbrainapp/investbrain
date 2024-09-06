@@ -52,8 +52,10 @@ new class extends Component {
         {{ Number::currency($holding->dividends_earned ?? 0) }} 
     </p>
 
-    <p class="pt-2 text-sm">
-        {{ __('Market Data Age') }}: 
-        {{ \Carbon\Carbon::parse($holding->market_data->updated_at)->diffForHumans() }}
+    <p class="pt-2 text-sm" title="{{ \Carbon\Carbon::parse($holding->market_data->updated_at)->toIso8601String() }}">
+        {{ __('Last Refreshed') }}: 
+        {{ !is_null($holding->market_data->updated_at) 
+            ? \Carbon\Carbon::parse($holding->market_data->updated_at)->diffForHumans()
+            : '' }}
     </p>
 </div>
