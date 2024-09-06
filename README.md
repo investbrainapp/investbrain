@@ -52,6 +52,9 @@ There are several configurations available when installing using the recommended
 | DB_DATABASE | The name of the database where Investbrain is installed  | investbrain |
 | DB_USERNAME | Your database username | investbrain |
 | DB_PASSWORD | Your database password | investbrain |
+| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo` or `alphavantage`) | yahoo |
+| MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
+| ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 
 > Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.
 
