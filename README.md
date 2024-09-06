@@ -27,7 +27,7 @@ git clone https://github.com/investbrainapp/investbrain.git && cd investbrain
 Then, build the Docker image and bring up the container (this will take a few minutes):
 
 ```bash
-docker composer up
+docker compose up
 ```
 
 In the previous setep, all of the default configurations are set automatically. This includes creating a .env file and setting the required Laravel `APP_KEY`. 
