@@ -40,7 +40,7 @@ class YahooMarketData implements MarketDataInterface
             'market_cap' => $quote->getMarketCap(),
             'book_value' => $quote->getBookValue(),
             'last_dividend_date' => $quote->getDividendDate(),
-            'dividend_yield' => $quote->getTrailingAnnualDividendYield()
+            'dividend_yield' => $quote->getTrailingAnnualDividendYield() * 100
         ]);
     }
 

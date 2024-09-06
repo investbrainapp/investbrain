@@ -77,7 +77,10 @@
 
                 <p>
                     <span class="font-bold">{{ __('Dividend Yield') }}: </span>
-                    {{ $holding->market_data->dividend_yield }} 
+                    {{ Number::percentage(
+                        $holding->market_data->dividend_yield ?? 0, 
+                        $holding->market_data->dividend_yield < 1 ? 2 : 0
+                    ) }} 
                 </p>
 
                 <p>
