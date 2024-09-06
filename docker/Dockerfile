@@ -1,4 +1,3 @@
-# use PHP 8.3
 FROM php:8.3-fpm
 
 ENV DEBIAN_FRONTEND noninteractive
