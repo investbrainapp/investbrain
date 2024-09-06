@@ -21,7 +21,7 @@ Ready? Let's get started!
 First, you can clone this repository:
 
 ```bash
-git clone https://github.com/investbrainapp/investbrain.git . && cd investbrain
+git clone https://github.com/investbrainapp/investbrain.git && cd investbrain
 ```
 
 Then, build the Docker image and bring up the container (this will take a few minutes):
