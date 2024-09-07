@@ -110,6 +110,21 @@ class Transaction extends Model
         return $query->where('symbol', $symbol);
     }
 
+    public function scopeBuy($query)
+    {
+        return $query->where('transaction_type', 'BUY');
+    }
+
+    public function scopeSell($query)
+    {
+        return $query->where('transaction_type', 'SELL');
+    }
+
+    public function scopeBeforeDate($query, $date)
+    {
+        return $query->whereDate('date', '<', $date);
+    }
+
     public function scopeMyTransactions() 
     {
         return $this->whereHas('portfolio', function ($query) {

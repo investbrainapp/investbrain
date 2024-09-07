@@ -102,18 +102,34 @@
 
             <x-ib-card title="{{ __('Dividends') }}" class="md:col-span-3">
 
+                @if($holding->dividends->isEmpty())
+                    <div class="flex justify-center items-center h-full pb-10 text-secondary">
+
+                        {{ __('No dividends for :symbol yet', ['symbol' => $holding->symbol]) }}
+                    </div>
+
+                @endif
+
                 @livewire('holding-dividends-list', ['holding' => $holding])
 
             </x-ib-card>
 
             <x-ib-card title="{{ __('Splits') }}" class="md:col-span-3">
 
+                @if($holding->splits->isEmpty())
+                    <div class="flex justify-center items-center h-full pb-10 text-secondary">
+
+                        {{ __('No splits for :symbol yet', ['symbol' => $holding->symbol]) }}
+                    </div>
+
+                @endif
+
                 @foreach ($holding->splits->take(5) as $split)
 
                     <x-list-item :item="$split">
                         <x-slot:value>
         
-                           1:{{ $split->split_amount }}
+                        1:{{ $split->split_amount }}
 
                         </x-slot:value>
                         <x-slot:sub-value>

@@ -16,6 +16,7 @@
     "Close": "Close",
     "or": "or",
     "and": "and",
+    "Nothing to show here yet": "Nothing to show here yet",
 
     "Hang on! You're doing that too much.": "Hang on! You're doing that too much.",
     "Delete Account": "Delete Account",
@@ -117,6 +118,7 @@
     "Dividends Earned": "Dividends Earned",
     "Split": "Split",
     "Splits": "Splits",
+    "No splits for :symbol yet": "No splits for :symbol yet",
     "Distribution Date": "Distribution Date",
     "My portfolios": "My portfolios",
     "Create your first portfolio!": "Create your first portfolio!",
@@ -148,6 +150,7 @@
     "Dividend Yield": "Dividend Yield",
     "Last Dividend Paid": "Last Dividend Paid",
     "Ex Dividend Date": "Ex Dividend Date",
+    "No dividends for :symbol yet": "No dividends for :symbol yet",
     "Number of Transactions": "Number of Transactions",
     "Last Refreshed": "Last Refreshed",
     "Portfolio updated": "Portfolio updated",

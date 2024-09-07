@@ -85,14 +85,31 @@
 
             <x-ib-card title="{{ __('Holdings') }}" class="md:col-span-4">
 
-                @livewire('holdings-table', [
-                    'portfolio' => $portfolio
-                ])
+                @if($portfolio->holdings->isEmpty())
+                    <div class="flex justify-center items-center h-full pb-10 text-secondary">
 
+                        {{ __('Nothing to show here yet') }}
+                    </div>
+
+                @else
+
+                    @livewire('holdings-table', [
+                        'portfolio' => $portfolio
+                    ])
+
+                @endif
             </x-ib-card>
 
             <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
+
+                @if($portfolio->transactions->isEmpty())
+                    <div class="flex justify-center items-center h-full pb-10 text-secondary">
+
+                        {{ __('Nothing to show here yet') }}
+                    </div>
                 
+                @endif
+
                 @livewire('transactions-list', [
                     'portfolio' => $portfolio,
                     'transactions' => $portfolio->transactions
@@ -101,6 +118,14 @@
             </x-ib-card>
 
             <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
+
+                @if($portfolio->holdings->isEmpty())
+                    <div class="flex justify-center items-center h-full pb-10 text-secondary">
+
+                        {{ __('Nothing to show here yet') }}
+                    </div>
+
+                @endif
 
                 @livewire('top-performers-list', [
                     'holdings' => $portfolio->holdings

@@ -177,9 +177,13 @@ class Holding extends Model
                         ->first();
 
         $total_quantity = $query->qty_purchases - $query->qty_sales;
-        $average_cost_basis = $query->qty_purchases > 0 
-                                ? $query->cost_basis / $query->qty_purchases 
-                                : 0;
+
+        $average_cost_basis = (
+                                $query->qty_purchases > 0 
+                                && $total_quantity > 0
+                              )
+                                    ? $query->cost_basis / $query->qty_purchases 
+                                    : 0;
 
         // pull dividend data joined with holdings/transactions
         $dividends = Dividend::select('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount')
