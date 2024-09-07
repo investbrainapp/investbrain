@@ -82,7 +82,15 @@ Easy as that!
 
 ## Command line utilities
 
-Investbrain comes bundled with several helpful command line utilities to make managing your portfolios and holdings more efficient. Keep in mind these commands are extremely powerful and can make irreversable changes to your holdings. We only recommend backing up your portfolios before using these commands:
+Investbrain comes bundled with several helpful command line utilities to make managing your portfolios and holdings more efficient. Keep in mind these commands are extremely powerful and can make irreversable changes to your holdings. 
+
+To run these commands, you can use `docker exec` like this:
+
+```bash
+docker exec -it investbrain-app php artisan <replace with command you want to run>
+```
+
+Just to be safe, we recommend backing up your portfolios before using these commands:
 
 | Command      | Description      |
 | ------------- | ------------- |
@@ -92,12 +100,6 @@ Investbrain comes bundled with several helpful command line utilities to make ma
 | capture:daily-change | Captures a snapshot of each portfolio's daily performance. |
 | sync:daily-change | Re-calculates daily snapshots of your portfolio's daily performance. |
 | sync:holdings | Re-calculates performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
-
-To run these commands, you can use `docker exec` like this:
-
-```bash
-docker exec -it investbrain-app php artisan <replace with command you want to run>
-```
 
 ## Testing
 
