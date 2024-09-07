@@ -40,7 +40,7 @@ new class extends Component {
                 'required', 
                 'numeric', 
                 'min:0', 
-                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type)
+                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date)
             ],
             'cost_basis' => 'exclude_if:transaction_type,SELL|min:0|numeric',
             'sale_price' => 'exclude_if:transaction_type,BUY|min:0|numeric',
