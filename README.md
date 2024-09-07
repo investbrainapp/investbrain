@@ -98,7 +98,7 @@ Just to be safe, we recommend backing up your portfolios before using these comm
 | refresh:dividend-data | Refreshes dividend data with your configured market data provider. Will also re-calculate your total dividends earned for each holding. |
 | refresh:split-data | Refreshes splits data with your configured market data provider. Will also create new transactions to account for any splits. |
 | capture:daily-change | Captures a snapshot of each portfolio's daily performance. |
-| sync:daily-change | Re-calculates daily snapshots of your portfolio's daily performance. |
+| sync:daily-change | Re-calculates daily snapshots of your portfolio's daily performance. Useful to fill in gaps in your portfolio charts. (Note: this is an extremely resource intensive query.) |
 | sync:holdings | Re-calculates performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
 
 ## Testing
