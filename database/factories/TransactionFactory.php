@@ -19,14 +19,18 @@ class TransactionFactory extends Factory
      */
     public function definition(): array
     {
+        $transaction_type = $this->faker->randomElement(['BUY', 'SELL']);
+
         return [
-            'symbol' => $this->faker->randomElement(['AAPL', 'GOOGL', 'AMZN']),
-            'transaction_type' => static::$transaction_type = $this->faker->randomElement(['BUY', 'SELL']),
-            'portfolio_id' => Portfolio::factory()->create(), 
+            'symbol' => $this->faker->randomElement(['AAPL', 'GOOG', 'AMZN']),
+            'transaction_type' => $transaction_type,
+            'portfolio_id' => Portfolio::factory()->create()->id, 
             'date' => $this->faker->date('Y-m-d'),
-            'quantity' => $this->faker->randomFloat(2, 1, 100),
-            'cost_basis' => $this->faker->randomFloat(2, 10, 500),
-            'sale_price' => static::$transaction_type == 'SELL' 
+            'quantity' => 1,
+            'cost_basis' => $transaction_type == 'BUY' 
+                ? $this->faker->randomFloat(2, 10, 500)
+                : null, 
+            'sale_price' => $transaction_type == 'SELL' 
                 ? $this->faker->randomFloat(2, 10, 500)
                 : null, 
         ];
@@ -39,7 +43,7 @@ class TransactionFactory extends Factory
         ]);
     }
 
-    public function portfolios($portfolio_id): static
+    public function portfolio($portfolio_id): static
     {
         return $this->state(fn (array $attributes) => [
             'portfolio_id' => $portfolio_id,
@@ -50,6 +54,8 @@ class TransactionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'transaction_type' => 'BUY',
+            'cost_basis' => $this->faker->randomFloat(2, 10, 500),
+            'sale_price' => null
         ]);
     }
 
@@ -57,6 +63,8 @@ class TransactionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'transaction_type' => 'SELL',
+            'sale_price' => $this->faker->randomFloat(2, 10, 500),
+            'cost_basis' => null,
         ]);
     }
 }
