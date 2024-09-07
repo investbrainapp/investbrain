@@ -13,7 +13,7 @@ class RefreshSplitData extends Command
      *
      * @var string
      */
-    protected $signature = 'split-data:refresh
+    protected $signature = 'refresh:split-data
                             {--force= : Don\'t ask to confirm.}';
 
     /**

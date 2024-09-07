@@ -80,6 +80,33 @@ docker compose up
 
 Easy as that!
 
+## Command line utilities
+
+Investbrain comes bundled with several helpful command line utilities to make managing your portfolios and holdings more efficient. Keep in mind these commands are extremely powerful and can make irreversable changes to your holdings. We only recommend backing up your portfolios before using these commands:
+
+| Command      | Description      |
+| ------------- | ------------- |
+| refresh:market-data | Refreshes market data with your configured market data provider. |
+| refresh:dividend-data | Refreshes dividend data with your configured market data provider. Will also re-calculate your total dividends earned for each holding. |
+| refresh:split-data | Refreshes splits data with your configured market data provider. Will also create new transactions to account for any splits. |
+| capture:daily-change | Captures a snapshot of each portfolio's daily performance. |
+| sync:daily-change | Re-calculates daily snapshots of your portfolio's daily performance. |
+| sync:holdings | Re-calculates performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
+
+To run these commands, you can use `docker exec` like this:
+
+```bash
+docker exec -it investbrain-app php artisan <replace with command you want to run>
+```
+
+## Testing
+
+Investbrain has a complete PHPUnit test suite that creates an in-memory SQLite database and runs any queued jobs synchronously using Laravel's array driver. You can run the entire Investbrain test suite from within the Docker container by running:
+
+```bash
+docker exec -it investbrain-app php artisan test
+```
+
 ## Contributing
 
 We appreciate any contributions to Investbrain! Please open a pull request on our [Github repository](https://github.com/investbrainapp/investbrain). Here are some ideas for first time contributors:

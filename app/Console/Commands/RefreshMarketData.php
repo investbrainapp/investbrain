@@ -13,7 +13,7 @@ class RefreshMarketData extends Command
      *
      * @var string
      */
-    protected $signature = 'market-data:refresh
+    protected $signature = 'refresh:market-data
                             {--force= : Ignore refresh delay}';
 
     /**

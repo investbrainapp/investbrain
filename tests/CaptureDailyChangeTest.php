@@ -30,7 +30,7 @@ class CaptureDailyChangeTest extends TestCase
     public function test_daily_change_for_portfolios()
     {
         // Run the command
-        Artisan::call('daily-change:capture');
+        Artisan::call('capture:daily-change');
 
         // Assert the daily change was captured for the portfolio
         $this->assertDatabaseHas('daily_change', [

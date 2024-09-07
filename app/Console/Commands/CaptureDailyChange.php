@@ -12,7 +12,7 @@ class CaptureDailyChange extends Command
      *
      * @var string
      */
-    protected $signature = 'daily-change:capture';
+    protected $signature = 'capture:daily-change';
 
     /**
      * The console command description.

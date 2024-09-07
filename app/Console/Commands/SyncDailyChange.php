@@ -3,24 +3,23 @@
 namespace App\Console\Commands;
 
 use App\Models\Holding;
-use App\Models\Dividend;
 use Illuminate\Console\Command;
 
-class RefreshDividendData extends Command
+class SyncDailyChange extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'refresh:dividend-data';
+    protected $signature = 'sync:daily-change';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Refresh dividend data from data provider';
+    protected $description = 'Re-calculates daily snapshots of your portfolio\'s daily performance. Use discretion as this is a resource intensive command.';
 
     /**
      * Create a new command instance.
@@ -39,12 +38,6 @@ class RefreshDividendData extends Command
      */
     public function handle()
     {
-        $holdings = Holding::where('quantity', '>', 0)->distinct()->get(['symbol']);
-
-        foreach ($holdings as $holding) {
-            $this->line('Refreshing ' . $holding->symbol);
-            
-            Dividend::refreshDividendData($holding->symbol);
-        }
+        //
     }
 }

@@ -12,7 +12,7 @@ class SyncHoldingData extends Command
      *
      * @var string
      */
-    protected $signature = 'holding-data:sync';
+    protected $signature = 'sync:holdings';
 
     /**
      * The console command description.
