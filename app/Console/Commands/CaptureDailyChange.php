@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Portfolio;
-use App\Models\User;
 use Illuminate\Console\Command;
 
 class CaptureDailyChange extends Command
