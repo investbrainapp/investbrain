@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,7 +20,7 @@ class ApiTokenPermissionsTest extends TestCase
     //         $this->markTestSkipped('API support is not enabled.');
     //     }
 
-    //     $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+    //     $this->actingAs($user = User::factory()->create());
 
     //     $token = $user->tokens()->create([
     //         'name' => 'Test Token',
@@ -41,7 +41,7 @@ class ApiTokenPermissionsTest extends TestCase
     //         $this->markTestSkipped('API support is not enabled.');
     //     }
 
-    //     $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+    //     $this->actingAs($user = User::factory()->create());
 
     //     Livewire::test(ApiTokenManager::class)
     //         ->set(['createApiTokenForm' => [
@@ -65,7 +65,7 @@ class ApiTokenPermissionsTest extends TestCase
     //         $this->markTestSkipped('API support is not enabled.');
     //     }
 
-    //     $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+    //     $this->actingAs($user = User::factory()->create());
 
     //     $token = $user->tokens()->create([
     //         'name' => 'Test Token',
