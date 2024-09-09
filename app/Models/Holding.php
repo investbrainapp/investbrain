@@ -176,7 +176,7 @@ class Holding extends Model
                         ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN ((sale_price - cost_basis) * quantity) ELSE 0 END) AS `realized_gains`')
                         ->first();
 
-        $total_quantity = $query->qty_purchases - $query->qty_sales;
+        $total_quantity = round($query->qty_purchases - $query->qty_sales, 5);
 
         $average_cost_basis = (
                                 $query->qty_purchases > 0 
