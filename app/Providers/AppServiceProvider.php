@@ -13,8 +13,8 @@ class AppServiceProvider extends ServiceProvider
     {
         
         $market_data = config(
-            "market_data." . 
-            config('market_data.default', 'yahoo')
+            "investbrain." . 
+            config('investbrain.default', 'yahoo')
         );
 
         $this->app->bind(

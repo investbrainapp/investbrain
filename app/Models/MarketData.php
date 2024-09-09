@@ -60,7 +60,7 @@ class MarketData extends Model
         if (
             !$market_data->exists
             || is_null($market_data->updated_at)
-            || $market_data->updated_at->diffInMinutes(now()) >= config('market_data.refresh')
+            || $market_data->updated_at->diffInMinutes(now()) >= config('investbrain.refresh')
         ) {
             
             // get quote
