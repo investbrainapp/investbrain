@@ -27,6 +27,12 @@ if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
     /usr/local/bin/php artisan key:generate --force
 fi
 
+if [ ! -L "public/storage" ]; then
+    echo " > Creating symbolic link for app public storage..."
+    
+    /usr/local/bin/php artisan storage:link
+fi
+
 echo "====================== Installing NPM dependencies and building frontend...  ====================== "
 /usr/bin/npm install 
 /usr/bin/npm run build 
