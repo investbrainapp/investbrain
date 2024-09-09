@@ -31,6 +31,10 @@ class CreateMarketDataTable extends Migration
             $table->json('meta_data')->nullable();
             $table->timestamps();
         });
+
+        Artisan::call('db:seed', [
+            '--class' => MarketDataSeeder::class,
+        ]);
     }
 
     /**
