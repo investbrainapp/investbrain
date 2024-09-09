@@ -42,5 +42,8 @@ echo "====================== Installing NPM dependencies and building frontend..
 echo "====================== Running migrations...  ====================== "
 /usr/local/bin/php artisan migrate --force
 
+echo "====================== Running seeders...  ====================== "
+/usr/local/bin/php artisan seed:market-data
+
 echo "====================== Spinning up Supervisor daemon...  ====================== "
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
