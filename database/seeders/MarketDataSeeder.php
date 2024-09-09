@@ -71,7 +71,7 @@ class MarketDataSeeder extends Seeder
             // Close the CSV file
             fclose($handle);
 
-            echo "Imported $rowCount items successfully!\n";
+            echo "Imported $rowCount market data items successfully!\n";
 
         } else {
 
