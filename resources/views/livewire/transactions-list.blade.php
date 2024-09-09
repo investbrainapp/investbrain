@@ -57,7 +57,9 @@ new class extends Component {
         >
             <x-slot:value class="flex items-center">
                 <x-badge 
-                    :value="$transaction->transaction_type" 
+                    :value="$transaction->split
+                        ? 'SPLIT'
+                        : $transaction->transaction_type" 
                     class="{{ $transaction->transaction_type == 'BUY' 
                         ? 'badge-success' 
                         : 'badge-error' }} badge-sm mr-3" 
