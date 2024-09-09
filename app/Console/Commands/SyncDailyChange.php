@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Holding;
 use Illuminate\Console\Command;
 
 class SyncDailyChange extends Command
@@ -38,6 +37,6 @@ class SyncDailyChange extends Command
      */
     public function handle()
     {
-        //
+        $this->line('test');
     }
 }
