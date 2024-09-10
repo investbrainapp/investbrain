@@ -72,4 +72,18 @@ class YahooMarketData implements MarketDataInterface
                             ];
                         });
     }
+
+    public function history($symbol, $startDate, $endDate): Collection
+    {
+
+        return collect($this->client->getHistoricalQuoteData($symbol, ApiClient::INTERVAL_1_DAY, $startDate, $endDate))
+            ->map(function($history) use ($symbol) {
+
+                return [
+                    'symbol' => $symbol,
+                    'date' => $history->getDate()->format('Y-m-d'),
+                    'close' => (float) $history->getClose(),
+                ];
+            });
+    }
 }

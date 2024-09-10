@@ -85,4 +85,26 @@ class AlphaVantageMarketData implements MarketDataInterface
                             ];
                         });
     }
+
+    public function history($symbol, $startDate, $endDate): Collection
+    {
+
+        $history = Alphavantage::timeSeries()->daily($symbol);
+
+        $history = Arr::get($history, 'Time Series (Daily)', []);
+        
+        return collect($history)
+                    ->filter(function ($history, $date) use ($startDate, $endDate) {
+
+                        return Carbon::parse($date)->between($startDate, $endDate);
+                    })
+                    ->map(function($history, $date) use ($symbol) {
+                        
+                        return [ 
+                            'symbol' => $symbol,
+                            'date' => Carbon::parse($date)->format('Y-m-d'),
+                            'close' => (float) Arr::get($history, '4. close')
+                        ];
+                    });
+    }
 }

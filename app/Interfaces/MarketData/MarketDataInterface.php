@@ -45,4 +45,15 @@ interface MarketDataInterface
      * @return Collection
      */
     public function splits(String $symbol, \DateTimeInterface $startDate, \DateTimeInterface $endDate): Collection;
+
+    /**
+     * Get historical close data
+     * 
+     * @param String $symbol
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * 
+     * @return Collection
+     */
+    public function history(String $symbol, \DateTimeInterface $startDate, \DateTimeInterface $endDate): Collection;
 }

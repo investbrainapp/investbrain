@@ -63,4 +63,19 @@ class FakeMarketData implements MarketDataInterface
             ],
         ]);
     }
+
+    public function history($symbol, $startDate, $endDate): Collection
+    {
+
+        for ($i = 0; $i < 14; $i++) { 
+
+            $series[] = [
+                'symbol' => $symbol,
+                'date' => now()->subDays($i)->format('Y-m-d'),
+                'close' => (float) rand(1, 100),
+            ];
+        }
+        
+        return collect($series);
+    }
 }
