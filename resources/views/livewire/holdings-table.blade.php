@@ -45,7 +45,7 @@ new class extends Component {
                             return $query->whereRaw('transactions.symbol = holdings.symbol');
                         }])
                         ->orderBy(...array_values($this->sortBy))
-                        ->where('holdings.quantity', '>', 0)
+                        // ->where('holdings.quantity', '>', 0)
                         ->get();
 
         return $holdings;
