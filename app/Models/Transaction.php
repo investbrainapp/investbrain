@@ -21,7 +21,8 @@ class Transaction extends Model
         'transaction_type',
         'quantity',
         'cost_basis',
-        'sale_price'
+        'sale_price',
+        'split',
     ];
 
     protected $hidden = [];
@@ -185,6 +186,7 @@ class Transaction extends Model
             'quantity' => $this->quantity,
             'average_cost_basis' => $this->cost_basis,
             'total_cost_basis' => $this->quantity * $this->cost_basis,
+            'splits_synced_at' => now(),
         ])->syncTransactionsAndDividends();
     }
 }

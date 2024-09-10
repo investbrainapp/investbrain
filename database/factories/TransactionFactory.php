@@ -36,6 +36,13 @@ class TransactionFactory extends Factory
         ];
     }
 
+    public function yearsAgo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => $this->faker->date('Y-m-d', '-3 years'),
+        ]);
+    }
+
     public function symbol($symbol): static
     {
         return $this->state(fn (array $attributes) => [

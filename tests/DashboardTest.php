@@ -17,8 +17,7 @@ class DashboardTest extends TestCase
      */
     public function test_user_has_portfolios(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user = User::factory()->create());
 
         Portfolio::factory(5)->create();
 
@@ -29,8 +28,7 @@ class DashboardTest extends TestCase
      */
     public function test_user_has_transactions(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user = User::factory()->create());
 
         Transaction::factory(10)->create();
 
@@ -41,8 +39,7 @@ class DashboardTest extends TestCase
      */
     public function test_user_has_holdings(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user = User::factory()->create());
 
         $portfolio = Portfolio::factory()->create();
 
@@ -55,8 +52,7 @@ class DashboardTest extends TestCase
      */
     public function test_user_has_dashboard_metrics(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user = User::factory()->create());
 
         $portfolio = Portfolio::factory()->create();
 
