@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Interfaces\MarketData\MarketDataInterface;
 
 class SyncDailyChange extends Command
 {
@@ -37,6 +38,7 @@ class SyncDailyChange extends Command
      */
     public function handle()
     {
-        $this->line('test');
+        // get history
+        // $history = app(MarketDataInterface::class)->history($symbol);
     }
 }
