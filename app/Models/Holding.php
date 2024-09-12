@@ -8,6 +8,7 @@ use App\Models\Portfolio;
 use App\Models\MarketData;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -231,13 +232,18 @@ class Holding extends Model
 
         $date_interval = "DATE_ADD(date, INTERVAL 1 DAY)";
 
+        try {
+
+            DB::statement('SET GLOBAL cte_max_recursion_depth = 25000;');
+
+        } catch (\Throwable $e) {
+
+            Log::info('Couldn\'t set the max CTE recursion depth config.');
+        }
+
         if (config('database.default') === 'sqlite') {
             
             $date_interval = "date(date, '+1 day')";
-
-        } else if (config('database.default') === 'mysql') {
-
-            DB::statement('SET GLOBAL cte_max_recursion_depth = 20000;');
         }
 
         return DB::table(DB::raw("(
