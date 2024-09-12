@@ -98,13 +98,15 @@ class AlphaVantageMarketData implements MarketDataInterface
 
                         return Carbon::parse($date)->between($startDate, $endDate);
                     })
-                    ->map(function($history, $date) use ($symbol) {
+                    ->mapWithKeys(function($history, $date) use ($symbol) {
+
+                        $date = Carbon::parse($date)->format('Y-m-d');
                         
-                        return [ 
-                            'symbol' => $symbol,
-                            'date' => Carbon::parse($date)->format('Y-m-d'),
-                            'close' => (float) Arr::get($history, '4. close')
-                        ];
+                        return [ $date => [
+                                'symbol' => $symbol,
+                                'date' => $date,
+                                'close' => (float) Arr::get($history, '4. close')
+                            ]];
                     });
     }
 }

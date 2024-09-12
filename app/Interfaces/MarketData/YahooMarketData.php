@@ -77,13 +77,15 @@ class YahooMarketData implements MarketDataInterface
     {
 
         return collect($this->client->getHistoricalQuoteData($symbol, ApiClient::INTERVAL_1_DAY, $startDate, $endDate))
-            ->map(function($history) use ($symbol) {
+            ->mapWithKeys(function($history) use ($symbol) {
 
-                return [
-                    'symbol' => $symbol,
-                    'date' => $history->getDate()->format('Y-m-d'),
-                    'close' => (float) $history->getClose(),
-                ];
+                $date = $history->getDate()->format('Y-m-d');
+
+                return [ $date => [
+                        'symbol' => $symbol,
+                        'date' => $date,
+                        'close' => (float) $history->getClose(),
+                    ]];
             });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\MarketData;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class FakeMarketData implements MarketDataInterface
@@ -66,13 +67,16 @@ class FakeMarketData implements MarketDataInterface
 
     public function history($symbol, $startDate, $endDate): Collection
     {
+        $numDays = Carbon::parse($startDate)->diffInDays($endDate, true);
 
-        for ($i = 0; $i < 14; $i++) { 
+        for ($i = 0; $i < $numDays; $i++) { 
 
-            $series[] = [
+            $date = now()->subDays($i)->format('Y-m-d');
+
+            $series[$date] = [
                 'symbol' => $symbol,
-                'date' => now()->subDays($i)->format('Y-m-d'),
-                'close' => (float) rand(1, 100),
+                'date' => $date,
+                'close' => (float) rand(150, 400),
             ];
         }
         
