@@ -30,6 +30,7 @@ class Holding extends Model
 
     protected $casts = [
         'splits_synced_at' => 'datetime',
+        'first_transaction_date' => 'datetime'
     ];
 
     protected $attributes = [
@@ -133,7 +134,7 @@ class Holding extends Model
 
     public function scopePortfolio($query, $portfolio)
     {
-        return $query->where('portfolio_id', $portfolio);
+        return $query->where('holdings.portfolio_id', $portfolio);
     }
 
     public function scopeSymbol($query, $symbol)
@@ -220,6 +221,49 @@ class Holding extends Model
 
         $this->save();
     }
-}
 
-    
+    public function dailyPerformance(
+        \Illuminate\Support\Carbon $start_date = null, 
+        \Illuminate\Support\Carbon $end_date = null, 
+    ) {
+        if ($start_date == null) $start_date = now();
+        if ($end_date == null) $end_date = now();
+
+        $date_interval = "DATE_ADD(date, INTERVAL 1 DAY)";
+
+        if (config('database.default') === 'sqlite') {
+            $date_interval = "date(date, '+1 day')";
+        }
+
+        return DB::table(DB::raw("(
+                WITH RECURSIVE date_series AS (
+                    SELECT '{$start_date->format('Y-m-d')}' AS date
+                    UNION ALL
+                    SELECT $date_interval
+                    FROM date_series
+                    WHERE date < '{$end_date->format('Y-m-d')}'
+                )
+                SELECT date_series.date
+                FROM date_series
+            ) as date_series")
+        )
+        ->select([
+            'date_series.date',
+            DB::raw("
+                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
+                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0) AS `owned`
+            "),
+            DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END), 0) AS `cost_basis`"),
+            DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS `realized_gains`")
+        ])
+        ->leftJoin('transactions', function ($join) {
+            $join->on(DB::raw('DATE(transactions.date)'), '<=', 'date_series.date')
+                ->where('transactions.symbol', '=', $this->symbol)
+                ->where('transactions.portfolio_id', '=', $this->portfolio_id);
+        })
+        ->groupBy('date_series.date')
+        ->orderBy('date_series.date')
+        ->get()
+        ->keyBy('date');
+    }
+}

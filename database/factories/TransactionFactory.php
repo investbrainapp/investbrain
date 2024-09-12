@@ -39,7 +39,14 @@ class TransactionFactory extends Factory
     public function yearsAgo(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => $this->faker->date('Y-m-d', '-3 years'),
+            'date' => $this->faker->dateTimeBetween('-5 years', '-3 years')->format('Y-m-d'),
+        ]);
+    }
+
+    public function lastMonth(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => now()->subMonth()->format('Y-m-d'),
         ]);
     }
 
