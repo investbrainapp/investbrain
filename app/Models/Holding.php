@@ -232,7 +232,12 @@ class Holding extends Model
         $date_interval = "DATE_ADD(date, INTERVAL 1 DAY)";
 
         if (config('database.default') === 'sqlite') {
+            
             $date_interval = "date(date, '+1 day')";
+
+        } else if (config('database.default') === 'mysql') {
+
+            DB::statement('SET GLOBAL cte_max_recursion_depth = 20000;');
         }
 
         return DB::table(DB::raw("(

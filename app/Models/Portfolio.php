@@ -98,15 +98,16 @@ class Portfolio extends Model
                     $join->on('transactions.symbol', '=', 'holdings.symbol')
                          ->where('transactions.portfolio_id', '=', $this->id); 
                 })
-                ->select('holdings.*', DB::raw('min(transactions.date) as first_transaction_date')) // get first transaction date
-                ->groupBy('holdings.symbol') 
+                ->select('holdings.symbol', 'holdings.portfolio_id', DB::raw('min(transactions.date) as first_transaction_date')) // get first transaction date
+                ->groupBy(['holdings.symbol', 'holdings.portfolio_id']) 
                 ->get();
         
         $total_performance = [];
 
         $holdings->each(function($holding) use (&$total_performance) {
 
-            $all_history = app(MarketDataInterface::class)->history('ACME', $holding->first_transaction_date, now());
+            $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
+
             $quantity = $holding->dailyPerformance($holding->first_transaction_date, now());
 
             $dividends = $holding->dividends->keyBy(function ($dividend, $key) {
@@ -150,8 +151,12 @@ class Portfolio extends Model
             }
         });
 
-        $this->daily_change()->delete();
+        if (!empty($total_performance)) {
+            DB::transaction(function () use ($total_performance) {
+                $this->daily_change()->delete();
 
-        DailyChange::insert($total_performance);
+                DailyChange::insert($total_performance);
+            });
+        }
     }
 }

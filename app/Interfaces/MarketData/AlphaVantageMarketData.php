@@ -89,7 +89,7 @@ class AlphaVantageMarketData implements MarketDataInterface
     public function history($symbol, $startDate, $endDate): Collection
     {
 
-        $history = Alphavantage::timeSeries()->daily($symbol);
+        $history = Alphavantage::timeSeries()->daily($symbol, 'full');
 
         $history = Arr::get($history, 'Time Series (Daily)', []);
         
