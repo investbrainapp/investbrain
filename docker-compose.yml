@@ -41,7 +41,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-investbrain}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-investbrain}
     volumes:
-      - ./docker/mysql.conf:/etc/mysql/my.cnf
+      - ./docker/mysql.conf:/etc/mysql/conf.d/my.cnf
       - investbrain-mysql:/var/lib/mysql
     networks:
       - investbrain-network
