@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Holding;
 use App\Models\MarketData;
 use App\Models\Transaction;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
@@ -41,6 +42,11 @@ class Dividend extends Model
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }
 
+    public function scopeSymbol($query, $symbol)
+    {
+        return $query->where('dividends.symbol', $symbol);
+    }
+
     /**
      * Grab new dividend data
      *
@@ -74,7 +80,7 @@ class Dividend extends Model
         if ($dividend_data->isNotEmpty()) {
             // create mass insert
             foreach ($dividend_data as $index => $dividend){
-                $dividend_data[$index] = [...$dividend, ...['updated_at' => now(), 'created_at' => now()]];
+                $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
             }
 
             // insert records
@@ -85,7 +91,7 @@ class Dividend extends Model
 
             // sync last dividend amount to market data table
             $market_data = MarketData::symbol($symbol)->first();
-            $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['amount'];
+            $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
             $market_data->save();
         }
 
@@ -94,7 +100,7 @@ class Dividend extends Model
 
     public static function syncHoldings($dividend_data): void
     {
-        $symbol = $dividend_data->last()->symbol;
+        $symbol = $dividend_data->last()['symbol'];
 
         // group by holdings
         $dividends = self::select('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount')
@@ -116,7 +122,7 @@ class Dividend extends Model
                                 })
                                 ->selectRaw('COALESCE(purchases.total_purchased, 0) - COALESCE(sales.total_sold, 0) AS owned')
                                 ->selectRaw('(COALESCE(purchases.total_purchased, 0) - COALESCE(sales.total_sold, 0)) * dividends.dividend_amount AS dividends_received')
-                                ->where('dividends.symbol', $dividend_data->last()->symbol)
+                                ->where('dividends.symbol', $dividend_data->last()['symbol'])
                                 ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount')
                                 ->get();
 
