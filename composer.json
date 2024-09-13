@@ -6,7 +6,7 @@
     "license": "CC-BY-NC 4.0",
     "require": {
         "php": "^8.2",
-        "finnhub/client": "dev-master",
+        "finnhub/client": "master@dev",
         "laravel/framework": "^11.9",
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
@@ -31,7 +31,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/hackerESQ/finnhub-php"
+            "url": "https://github.com/investbrainapp/finnhub-php"
         }
     ],
     "autoload": {
@@ -80,6 +80,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
