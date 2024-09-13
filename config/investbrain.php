@@ -6,9 +6,12 @@ return [
 
     'default' => env('MARKET_DATA_PROVIDER', 'yahoo'),
 
-    'yahoo' => App\Interfaces\MarketData\YahooMarketData::class,
-    'alphavantage' => App\Interfaces\MarketData\AlphaVantageMarketData::class,
-    'fake' => App\Interfaces\MarketData\FakeMarketData::class,
+    'interfaces' => [
+        'yahoo' => App\Interfaces\MarketData\YahooMarketData::class,
+        'alphavantage' => App\Interfaces\MarketData\AlphaVantageMarketData::class,
+        'finnhub' => App\Interfaces\MarketData\FinnhubMarketData::class,
+        'fake' => App\Interfaces\MarketData\FakeMarketData::class,
+    ],
 
     'self_hosted' => env('SELF_HOSTED', true)
 ];

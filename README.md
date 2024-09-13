@@ -8,7 +8,7 @@ Investbrain helps you manage and track the performance of your investments.
 
 ## Under the hood
 
-Investbrain is a Laravel PHP web application that leverages Livewire, Mary UI, and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature two market data providers: Yahoo Finance and Alpha Vantage. But we also offer an extensible market data provider interface for intrepid developers to create their own! Finally, of course we have robust support for i18n, a11y, and dark mode. 
+Investbrain is a Laravel PHP web application that leverages Livewire, Mary UI, and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature two market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! Finally, of course we have robust support for i18n, a11y, and dark mode. 
 
 ## Installation
 

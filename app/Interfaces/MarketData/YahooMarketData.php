@@ -22,7 +22,7 @@ class YahooMarketData implements MarketDataInterface
         return $this->quote($symbol)->isNotEmpty();
     }
 
-    public function quote($symbol): Collection
+    public function quote(String $symbol): Collection
     {
 
         $quote = $this->client->getQuote($symbol);
@@ -44,7 +44,7 @@ class YahooMarketData implements MarketDataInterface
         ]);
     }
 
-    public function dividends($symbol, $startDate, $endDate): Collection
+    public function dividends(String $symbol, $startDate, $endDate): Collection
     {
 
         return collect($this->client->getHistoricalDividendData($symbol, $startDate, $endDate))
@@ -58,7 +58,7 @@ class YahooMarketData implements MarketDataInterface
                         });
     }
 
-    public function splits($symbol, $startDate, $endDate): Collection
+    public function splits(String $symbol, $startDate, $endDate): Collection
     {   
 
         return collect($this->client->getHistoricalSplitData($symbol, $startDate, $endDate))
@@ -73,7 +73,7 @@ class YahooMarketData implements MarketDataInterface
                         });
     }
 
-    public function history($symbol, $startDate, $endDate): Collection
+    public function history(String $symbol, $startDate, $endDate): Collection
     {
 
         return collect($this->client->getHistoricalQuoteData($symbol, ApiClient::INTERVAL_1_DAY, $startDate, $endDate))

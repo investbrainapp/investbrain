@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "40816463478b2d00c6a7c18e71aa7e7c",
+    "content-hash": "94cd2d270d276ef1634b6b44dc12145e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -901,6 +901,68 @@
                 "source": "https://github.com/ezyang/htmlpurifier/tree/v4.17.0"
             },
             "time": "2023-11-17T15:01:25+00:00"
+        },
+        {
+            "name": "finnhub/client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hackerESQ/finnhub-php.git",
+                "reference": "1f1b35a0c0a6a68f9a791e3ac5cdb6f44ff69d80"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hackerESQ/finnhub-php/zipball/1f1b35a0c0a6a68f9a791e3ac5cdb6f44ff69d80",
+                "reference": "1f1b35a0c0a6a68f9a791e3ac5cdb6f44ff69d80",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "guzzlehttp/guzzle": "^7.2",
+                "php": "^7.3 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.12",
+                "phpunit/phpunit": "^8.0 || ^9.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Finnhub\\": "lib/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Finnhub\\Test\\": "test/"
+                }
+            },
+            "license": [
+                "unlicense"
+            ],
+            "authors": [
+                {
+                    "name": "OpenAPI-Generator contributors",
+                    "homepage": "https://openapi-generator.tech"
+                }
+            ],
+            "description": "Official Finnhub stock API PHP library. https://finnhub.io/",
+            "homepage": "https://openapi-generator.tech",
+            "keywords": [
+                "api",
+                "openapi",
+                "openapi-generator",
+                "openapitools",
+                "php",
+                "rest",
+                "sdk"
+            ],
+            "support": {
+                "source": "https://github.com/hackerESQ/finnhub-php/tree/master"
+            },
+            "time": "2024-09-13T01:29:18+00:00"
         },
         {
             "name": "fruitcake/php-cors",
@@ -9805,8 +9867,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "finnhub/client": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

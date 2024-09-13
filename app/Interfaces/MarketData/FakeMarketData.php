@@ -13,7 +13,7 @@ class FakeMarketData implements MarketDataInterface
         return true;
     }
 
-    public function quote($symbol): Collection
+    public function quote(String $symbol): Collection
     {
 
         return collect([
@@ -31,7 +31,7 @@ class FakeMarketData implements MarketDataInterface
         ]);
     }
 
-    public function dividends($symbol, $startDate, $endDate): Collection
+    public function dividends(String $symbol, $startDate, $endDate): Collection
     {
 
         return collect([
@@ -53,7 +53,7 @@ class FakeMarketData implements MarketDataInterface
         ]);
     }
 
-    public function splits($symbol, $startDate, $endDate): Collection
+    public function splits(String $symbol, $startDate, $endDate): Collection
     {   
 
         return collect([
@@ -65,7 +65,7 @@ class FakeMarketData implements MarketDataInterface
         ]);
     }
 
-    public function history($symbol, $startDate, $endDate): Collection
+    public function history(String $symbol, $startDate, $endDate): Collection
     {
         $numDays = Carbon::parse($startDate)->diffInDays($endDate, true);
 

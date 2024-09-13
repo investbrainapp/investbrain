@@ -15,7 +15,7 @@ class AlphaVantageMarketData implements MarketDataInterface
         return $this->quote($symbol)->isNotEmpty();
     }
 
-    public function quote($symbol): Collection
+    public function quote(String $symbol): Collection
     {
         $quote = Alphavantage::core()->quoteEndpoint($symbol);
         $quote = Arr::get($quote, 'Global Quote', []);
@@ -49,7 +49,7 @@ class AlphaVantageMarketData implements MarketDataInterface
         ]);        
     }
 
-    public function dividends($symbol, $startDate, $endDate): Collection
+    public function dividends(String $symbol, $startDate, $endDate): Collection
     {
         $dividends = Alphavantage::fundamentals()->dividends($symbol);
 
@@ -67,7 +67,7 @@ class AlphaVantageMarketData implements MarketDataInterface
                         });
     }
 
-    public function splits($symbol, $startDate, $endDate): Collection
+    public function splits(String $symbol, $startDate, $endDate): Collection
     {   
 
         $splits = Alphavantage::fundamentals()->splits($symbol);
@@ -86,7 +86,7 @@ class AlphaVantageMarketData implements MarketDataInterface
                         });
     }
 
-    public function history($symbol, $startDate, $endDate): Collection
+    public function history(String $symbol, $startDate, $endDate): Collection
     {
 
         $history = Alphavantage::timeSeries()->daily($symbol, 'full');

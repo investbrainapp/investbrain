@@ -11,15 +11,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        if (!in_array(
+            $interface = config('investbrain.default', 'yahoo'), 
+            array_keys(config('investbrain.interfaces', []))
+        )) {
+            throw new \Exception("Error: '$interface' is not a valid market data interface.");
+        }
         
-        $market_data = config(
-            "investbrain." . 
-            config('investbrain.default', 'yahoo')
-        );
-
         $this->app->bind(
             \App\Interfaces\MarketData\MarketDataInterface::class,
-            $market_data
+            config("investbrain.interfaces.$interface")
         );
     }
 
