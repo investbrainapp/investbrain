@@ -14,7 +14,7 @@ Schedule::command(RefreshMarketData::class)->weekdays()->everyMinute();
  * 
  * This scheduled job records daily changes to your portfolios every weekday
  */
-Schedule::command(CaptureDailyChange::class)->weekdays();
+Schedule::command(CaptureDailyChange::class)->weekdays()->daily();
 
 /**
  * 
