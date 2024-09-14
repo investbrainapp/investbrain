@@ -9,6 +9,11 @@ use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
 Route::get('/', function () {
+    if (config('investbrain.self_hosted', true)) {
+        
+        return redirect(route('dashboard'));
+    }
+
     return view('welcome');
 });
 
