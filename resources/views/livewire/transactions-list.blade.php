@@ -34,7 +34,7 @@ new class extends Component {
 
 <div class="">
 
-    @foreach($transactions->take(10) as $transaction)
+    @foreach($transactions->sortByDesc('date')->take(10) as $transaction)
 
         <x-list-item 
             no-separator 
