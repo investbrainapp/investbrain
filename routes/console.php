@@ -8,13 +8,13 @@ use App\Console\Commands\{RefreshMarketData, CaptureDailyChange, RefreshDividend
  * This scheduled job refreshes market data from your selected data provider
  * Update the cadence with the MARKET_DATA_REFRESH key in your env file
  */
-Schedule::command(RefreshMarketData::class)->weekdays()->everyMinute();
+Schedule::command(RefreshMarketData::class)->everyMinute()->weekdays();
 
 /**
  * 
  * This scheduled job records daily changes to your portfolios every weekday
  */
-Schedule::command(CaptureDailyChange::class)->weekdays()->daily();
+Schedule::command(CaptureDailyChange::class)->daily()->weekdays();
 
 /**
  * 
