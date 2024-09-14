@@ -4,7 +4,7 @@ return [
 
     'refresh' => env('MARKET_DATA_REFRESH', 30), // minutes
 
-    'default' => env('MARKET_DATA_PROVIDER', 'yahoo'),
+    'provider' => env('MARKET_DATA_PROVIDER', 'yahoo'),
 
     'interfaces' => [
         'yahoo' => App\Interfaces\MarketData\YahooMarketData::class,

@@ -32,7 +32,7 @@ docker compose up
 
 In the previous step, all of the default configurations are set automatically. This includes creating a .env file and setting the required Laravel `APP_KEY`. 
 
-If everything worked as expected, you should now be able to access Investbrain in the browser at:
+If everything worked as expected, you should now be able to access Investbrain in the browser at. You should create an account by visiting:
 
 ```bash
 http://localhost:8000/register
@@ -40,21 +40,63 @@ http://localhost:8000/register
 
 Congrats! You've just installed Investbrain!
 
-## Configuration (optional)
+## Market data providers
 
-There are several configurations available when installing using the recommended [Docker method](#Installation). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
+Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as Yahoo Finance, Alpha Vantage, or Finnhub. The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
+
+### Configuration
+
+You can specify the provider you want to use in your .env file:
+
+```bash
+MARKET_DATA_PROVIDER=yahoo
+```
+
+You can also use Investbrain's built-in fallback mechanism to ensure reliable data access, even if a provider fails. If any provider fails, Investbrain will automatically attempt to retrieve data from the next available provider, continuing through your configured providers until one returns successfully.
+
+Your selected providers should be listed in your .env file. Each should be separated by a comma:
+
+```bash
+MARKET_DATA_PROVIDER=yahoo,alphavantage
+```
+
+In the above example, Yahoo Finance will be attempted first and the Alpha Vantage provider will be used as the fallback. If Yahoo Finance fails to retrieve market data, the application will automatically try Alpha Vantage.
+
+### Custom providers
+
+If you wish to create your own market data provider, you can create your own implementation of the [MarketDataInterface](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/MarketDataInterface.php). You can refer to any existing market data implementation as an examples.
+
+Once you've created your market data implementation, be sure add your custom provider to the Investbrain configuration file, under the interfaces section:
+
+```php
+
+'interfaces' => [
+    //                       *  *  *
+    'custom_provider' => \App\Services\CustomProviderMarketData::class,
+    //                       *  *  *
+],
+```
+
+And add your custom provider to your .env file:
+
+```bash
+MARKET_DATA_PROVIDER=yahoo,alphavantage,custom_provider
+```
+
+Feel free to submit a PR with any custom providers you create.
+
+## Configuration
+
+There are several optional configurations available when installing using the recommended [Docker method](#Installation). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
 
 | Option      | Description      | Default      |
 | ------------- | ------------- | ------------- |
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
-| DB_HOST | The location of your database host where Investbrain is installed  | investbrain-mysql |
-| DB_DATABASE | The name of the database where Investbrain is installed  | investbrain |
-| DB_USERNAME | Your database username | investbrain |
-| DB_PASSWORD | Your database password | investbrain |
-| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo` or `alphavantage`) | yahoo |
+| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, or `finnhub`) | yahoo |
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
+| FINNHUB_API_KEY | If using the Finnhub provider | `null` |
 
 > Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.
 
