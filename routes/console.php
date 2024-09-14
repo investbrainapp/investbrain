@@ -20,7 +20,7 @@ Schedule::command(CaptureDailyChange::class)->daily()->weekdays();
  * 
  * Refreshes dividend data for your holdings (and syncs new dividends to holdings)
  */
-Schedule::command(RefreshDividendData::class)->daily();
+Schedule::command(RefreshDividendData::class)->daily()->weekdays();
 
 /**
  * 
