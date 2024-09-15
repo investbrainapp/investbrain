@@ -64,9 +64,11 @@ class SyncDailyChange extends Command implements PromptsForMissingInput
             
             $portfolio = Portfolio::findOrFail($this->argument('portfolio_id'));
 
+            $this->output->write('Syncing daily change history... This may take a moment.', false);
+
             $portfolio->syncDailyChanges();
 
-            $this->line('Awesome! Daily change history for '. $portfolio->title .' has been completed.');
+            $this->output->write('Awesome! Daily change history for '. $portfolio->title .' has been completed.', false);
 
         } catch (\Throwable $e) {
 

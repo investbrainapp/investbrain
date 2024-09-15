@@ -43,10 +43,24 @@ class TransactionFactory extends Factory
         ]);
     }
 
+    public function lastYear(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => now()->subYear()->format('Y-m-d'),
+        ]);
+    }
+
     public function lastMonth(): static
     {
         return $this->state(fn (array $attributes) => [
             'date' => now()->subMonth()->format('Y-m-d'),
+        ]);
+    }
+
+    public function recent(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => $this->faker->dateTimeBetween('-2 weeks', 'now')->format('Y-m-d'),
         ]);
     }
 

@@ -101,41 +101,44 @@ class Portfolio extends Model
                 ->select('holdings.symbol', 'holdings.portfolio_id', DB::raw('min(transactions.date) as first_transaction_date')) // get first transaction date
                 ->groupBy(['holdings.symbol', 'holdings.portfolio_id']) 
                 ->get();
+
+        $dividends = Dividend::whereIn('symbol', $holdings->pluck('symbol'))->get();
         
         $total_performance = [];
 
-        $holdings->each(function($holding) use (&$total_performance) {
+        $holdings->each(function($holding) use (&$total_performance, $dividends) {
+
+            $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));
 
             $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
 
-            $quantity = $holding->dailyPerformance($holding->first_transaction_date, now());
+            $daily_performance = $holding->dailyPerformance($holding->first_transaction_date, now());
 
             $dividends = $holding->dividends->keyBy(function ($dividend, $key) {
                                         return $dividend['date']->format('Y-m-d');
-                                    })->toArray();
+                                    });
 
             $dividends_earned = 0;
-            $daily_performance = [];
+            $daily = [];
 
-            $all_history->sortBy('date')->each(function ($history, $date) use ($quantity, $dividends, &$daily_performance, &$dividends_earned) {
+            $all_history->sortBy('date')->each(function ($history, $date) use ($daily_performance, $dividends, &$daily, &$dividends_earned) {
 
                 $close = Arr::get($history, 'close', 0);
-                $total_market_value = $quantity->get($date)->owned * $close;
-                $dividend = Arr::get($dividends, $date, []);
-                $dividends_earned += $quantity->get($date)->owned * Arr::get($dividend, 'dividend_amount', 0);
+                $total_market_value = $daily_performance->get($date)->owned * $close;
+                $dividends_earned += $daily_performance->get($date)->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
-                $daily_performance[$date] = [
+                $daily[$date] = [
                     'date' => $date,
                     'portfolio_id' => $this->id,
                     'total_market_value' => $total_market_value, 
-                    'total_cost_basis' => $quantity->get($date)->cost_basis,
-                    'total_gain' => $total_market_value - $quantity->get($date)->cost_basis,
-                    'realized_gains' => $quantity->get($date)->realized_gains,
+                    'total_cost_basis' => $daily_performance->get($date)->cost_basis,
+                    'total_gain' => $total_market_value - $daily_performance->get($date)->cost_basis,
+                    'realized_gains' => $daily_performance->get($date)->realized_gains,
                     'total_dividends_earned' => $dividends_earned
                 ];
             });
 
-            foreach ($daily_performance as $date => $performance) {
+            foreach ($daily as $date => $performance) {
                 if (!isset($total_performance[$date])) {
                     
                     $total_performance[$date] = $performance;

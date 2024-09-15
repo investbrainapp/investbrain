@@ -40,6 +40,34 @@ class SyncDailyChangeTest extends TestCase
 
     /**
      */
+    public function test_cost_basis_is_synced(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        $first_transaction = Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+        Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
+        $holding = Holding::symbol('ACME')->portfolio($portfolio->id)->first();
+        $daily_change = DailyChange::whereDate('date', $first_transaction->date)->first();
+
+        $this->assertEquals($holding->average_cost_basis, $daily_change->total_cost_basis);
+
+        $second_transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+        Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
+        $daily_change = DailyChange::whereDate('date', $second_transaction->date)->first();
+        
+        $this->assertEqualsWithDelta($first_transaction->cost_basis + $second_transaction->cost_basis, $daily_change->total_cost_basis, 0.01);        
+
+        $third_transaction = Transaction::factory(2)->sell()->lastMonth()->portfolio($portfolio->id)->symbol('ACME')->create()->first();
+        Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
+        $daily_change = DailyChange::whereDate('date', $third_transaction->date)->first();
+
+        $this->assertEquals(0, $daily_change->total_cost_basis);        
+    }
+
+    /**
+     */
     public function test_sales_are_captured_as_realized_gains(): void
     {
         $this->actingAs($user = User::factory()->create());
