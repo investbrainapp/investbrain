@@ -52,10 +52,13 @@ class AlphaVantageMarketData implements MarketDataInterface
     public function dividends(String $symbol, $startDate, $endDate): Collection
     {
         $dividends = Alphavantage::fundamentals()->dividends($symbol);
+        $dividends = Arr::get($dividends, 'data', []);
 
         return collect($dividends)
-                        ->where('ex_dividend_date', '>=', $startDate)
-                        ->where('ex_dividend_date', '<', $endDate)
+                        ->filter(function($dividend) use ($startDate, $endDate) {
+                            
+                            return Carbon::parse(Arr::get($dividend, 'ex_dividend_date'))->between($startDate, $endDate);
+                        })
                         ->map(function($dividend) use ($symbol) {
                             
                             return [
@@ -69,12 +72,14 @@ class AlphaVantageMarketData implements MarketDataInterface
 
     public function splits(String $symbol, $startDate, $endDate): Collection
     {   
-
         $splits = Alphavantage::fundamentals()->splits($symbol);
+        $splits = Arr::get($splits, 'data', []);
 
         return collect($splits)
-                        ->where('effective_date', '>=', $startDate)
-                        ->where('effective_date', '<', $endDate)
+                        ->filter(function($split) use ($startDate, $endDate) {
+                                            
+                            return Carbon::parse(Arr::get($split, 'effective_date'))->between($startDate, $endDate);
+                        })
                         ->map(function($split) use ($symbol) {
                             
                             return [

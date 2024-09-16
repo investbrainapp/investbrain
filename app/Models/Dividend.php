@@ -90,7 +90,7 @@ class Dividend extends Model
             self::syncHoldings($dividend_data);
 
             // sync last dividend amount to market data table
-            $market_data = MarketData::symbol($symbol)->first();
+            $market_data = MarketData::firstOrNew(['symbol' => $symbol]);
             $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
             $market_data->save();
         }
