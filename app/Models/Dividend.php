@@ -129,9 +129,6 @@ class Dividend extends Model
                         ->havingRaw('dividends_received > 0')
                         ->get();
 
-
-        dump($dividends->toArray());
-
         // iterate through holdings and update 
         Holding::where(['symbol' => $symbol])
                 ->get()
