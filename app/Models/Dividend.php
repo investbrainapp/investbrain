@@ -111,13 +111,13 @@ class Dividend extends Model
                                 AND date(transactions.date) <= date(dividends.date) 
                                 THEN transactions.quantity ELSE 0 END, 0))
                             * dividends.dividend_amount
-                                AS dividends_received
+                                AS total_received
                         ')
                         ->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
                         ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
                         ->where('dividends.symbol', $dividend_data->last()['symbol'])
-                        ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'dividends_received')
-                        ->havingRaw('dividends_received > 0')
+                        ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
+                        ->havingRaw('total_received > 0')
                         ->get();
 
         // iterate through holdings and update 
@@ -126,7 +126,7 @@ class Dividend extends Model
                 ->each(function ($holding) use ($dividends) {
                     $holding->update([
                         'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
-                                                        ->sum('dividends_received')
+                                                        ->sum('total_received')
                     ]);
                 });
     }
