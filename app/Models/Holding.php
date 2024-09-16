@@ -188,26 +188,21 @@ class Holding extends Model
 
         // pull dividend data joined with holdings/transactions
         $dividends = Dividend::select('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount')
+                            ->selectRaw('
+                                (COALESCE(CASE WHEN transactions.transaction_type = "BUY" 
+                                    AND date(transactions.date) <= date(dividends.date) 
+                                    THEN transactions.quantity ELSE 0 END, 0)
+                                - COALESCE(CASE WHEN transactions.transaction_type = "SELL" 
+                                    AND date(transactions.date) <= date(dividends.date) 
+                                    THEN transactions.quantity ELSE 0 END, 0))
+                                * dividends.dividend_amount
+                                    AS total_received
+                            ')
                             ->join('transactions', 'transactions.symbol', 'dividends.symbol')
                             ->join('holdings', 'transactions.portfolio_id', 'holdings.portfolio_id')
-                            ->leftJoin(DB::raw('(SELECT symbol, portfolio_id, COALESCE(SUM(quantity), 0) AS total_purchased
-                                                FROM transactions
-                                                WHERE transaction_type = "BUY"
-                                                GROUP BY symbol, portfolio_id) AS purchases'), function($join) {
-                                $join->on('purchases.symbol', 'dividends.symbol')
-                                    ->on('purchases.portfolio_id', 'holdings.portfolio_id');
-                            })
-                            ->leftJoin(DB::raw('(SELECT symbol, portfolio_id, COALESCE(SUM(quantity), 0) AS total_sold
-                                                FROM transactions
-                                                WHERE transaction_type = "SELL"
-                                                GROUP BY symbol, portfolio_id) AS sales'), function($join) {
-                                $join->on('sales.symbol', 'dividends.symbol')
-                                    ->on('sales.portfolio_id', 'holdings.portfolio_id');
-                            })
-                            ->selectRaw('COALESCE(purchases.total_purchased, 0) - COALESCE(sales.total_sold, 0) AS owned')
-                            ->selectRaw('(COALESCE(purchases.total_purchased, 0) - COALESCE(sales.total_sold, 0)) * dividends.dividend_amount AS dividends_received')
                             ->where('dividends.symbol', $this->symbol)
-                            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount')
+                            ->where('transactions.portfolio_id', $this->portfolio_id)
+                            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
                             ->get();
 
         // update holding
@@ -216,7 +211,7 @@ class Holding extends Model
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
             'realized_gain_dollars' => $query->realized_gains,
-            'dividends_earned' => $dividends->where('portfolio_id', $this->portfolio_id)->sum('dividends_received')
+            'dividends_earned' => $dividends->sum('total_received')
         ]);
 
         $this->save();
