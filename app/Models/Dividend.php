@@ -104,21 +104,33 @@ class Dividend extends Model
         // group by holdings
         $dividends = self::select(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
                         ->selectRaw('
-                            (COALESCE(SUM(CASE WHEN transactions.transaction_type = "BUY" 
+                            COALESCE(CASE WHEN transactions.transaction_type = "BUY" 
                                 AND date(transactions.date) <= date(dividends.date) 
-                                THEN transactions.quantity ELSE 0 END), 0)
-                            - COALESCE(SUM(CASE WHEN transactions.transaction_type = "SELL" 
+                                THEN transactions.quantity ELSE 0 END, 0)
+                            - COALESCE(CASE WHEN transactions.transaction_type = "SELL" 
                                 AND date(transactions.date) <= date(dividends.date) 
-                                THEN transactions.quantity ELSE 0 END), 0)) 
-                            * dividends.dividend_amount 
+                                THEN transactions.quantity ELSE 0 END, 0)
+                                AS owned
+                        ')
+                        ->selectRaw('
+                            (COALESCE(CASE WHEN transactions.transaction_type = "BUY" 
+                                AND date(transactions.date) <= date(dividends.date) 
+                                THEN transactions.quantity ELSE 0 END, 0)
+                            - COALESCE(CASE WHEN transactions.transaction_type = "SELL" 
+                                AND date(transactions.date) <= date(dividends.date) 
+                                THEN transactions.quantity ELSE 0 END, 0))
+                            * dividends.dividend_amount
                                 AS dividends_received
                         ')
                         ->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
                         ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
                         ->where('dividends.symbol', $dividend_data->last()['symbol'])
-                        ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount')
+                        ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'owned', 'dividends_received')
                         ->havingRaw('dividends_received > 0')
                         ->get();
+
+
+        dump($dividends->toArray());
 
         // iterate through holdings and update 
         Holding::where(['symbol' => $symbol])
