@@ -2,8 +2,10 @@
 
 namespace App\Imports\Sheets;
 
+use App\Console\Commands\SyncDailyChange;
 use App\Models\Portfolio;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -17,7 +19,7 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
             
             Portfolio::unguard();
 
-            Portfolio::updateOrCreate([
+            $portfolio = Portfolio::updateOrCreate([
                 'id' => $portfolio['portfolio_id']
             ], [
                 'id' => $portfolio['portfolio_id'] ?? null,
@@ -25,6 +27,8 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
                 'wishlist' => $portfolio['wishlist'] ?? false,
                 'notes' => $portfolio['notes'],
             ]);
+
+            Artisan::queue(SyncDailyChange::class, ['portfolio_id' => $portfolio->id])->delay(10);
         }
     }
 

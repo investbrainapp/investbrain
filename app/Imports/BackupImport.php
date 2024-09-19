@@ -2,9 +2,12 @@
 
 namespace App\Imports;
 
+use App\Console\Commands\RefreshMarketData;
 use App\Imports\Sheets\PortfoliosSheet;
+use Illuminate\Support\Facades\Artisan;
 use App\Imports\Sheets\DailyChangesSheet;
 use App\Imports\Sheets\TransactionsSheet;
+use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -20,9 +23,7 @@ class BackupImport implements WithMultipleSheets, WithEvents
     public function registerEvents(): array
     {
         return [
-            // BeforeSheet::class => DB::commit(),
-            // AfterSheet::class => Artisan::queue(RefreshHoldingData::class),
-            // AfterSheet::class => Artisan::call(RefreshHoldingData::class)
+            AfterImport::class => fn() => Artisan::queue(RefreshMarketData::class)
         ];
     }
 
