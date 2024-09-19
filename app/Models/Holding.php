@@ -173,7 +173,7 @@ class Holding extends Model
                             'symbol' => $this->symbol,
                         ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
                         ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
-                        ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `cost_basis`')
+                        ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `total_cost_basis`')
                         ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN ((sale_price - cost_basis) * quantity) ELSE 0 END) AS `realized_gains`')
                         ->first();
 
@@ -183,7 +183,7 @@ class Holding extends Model
                                 $query->qty_purchases > 0 
                                 && $total_quantity > 0
                               )
-                                    ? $query->cost_basis / $query->qty_purchases 
+                                    ? $query->total_cost_basis / $query->qty_purchases 
                                     : 0;
 
         // pull dividend data joined with holdings/transactions
