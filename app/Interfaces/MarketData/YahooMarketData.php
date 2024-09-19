@@ -32,15 +32,15 @@ class YahooMarketData implements MarketDataInterface
         return collect([
             'name' => $quote->getLongName() ?? $quote->getShortName(),
             'symbol' => $quote->getSymbol(),
-            'market_value' => $quote->getRegularMarketPrice(),
-            'fifty_two_week_high' => $quote->getFiftyTwoWeekHigh(),
-            'fifty_two_week_low' => $quote->getFiftyTwoWeekLow(),
-            'forward_pe' => $quote->getForwardPE(),
-            'trailing_pe' => $quote->getTrailingPE(),
-            'market_cap' => $quote->getMarketCap(),
-            'book_value' => $quote->getBookValue(),
+            'market_value' => (float) $quote->getRegularMarketPrice(),
+            'fifty_two_week_high' => (float) $quote->getFiftyTwoWeekHigh(),
+            'fifty_two_week_low' => (float) $quote->getFiftyTwoWeekLow(),
+            'forward_pe' => (float) $quote->getForwardPE(),
+            'trailing_pe' => (float) $quote->getTrailingPE(),
+            'market_cap' => (int) $quote->getMarketCap(),
+            'book_value' => (float) $quote->getBookValue(),
             'last_dividend_date' => $quote->getDividendDate(),
-            'dividend_yield' => $quote->getTrailingAnnualDividendYield() * 100
+            'dividend_yield' => (float) $quote->getTrailingAnnualDividendYield() * 100
         ]);
     }
 

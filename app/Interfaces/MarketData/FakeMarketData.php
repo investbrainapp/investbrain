@@ -19,15 +19,15 @@ class FakeMarketData implements MarketDataInterface
         return collect([
             'name' => 'ACME Company Ltd',
             'symbol' => $symbol,
-            'market_value' => 230.19,
-            'fifty_two_week_high' => 512.90,
-            'fifty_two_week_low' => 341.20,
-            'forward_pe' => 20.1,
-            'trailing_pe' => 30.34,
-            'market_cap' => 9800700600,
-            'book_value' => 4.7,
+            'market_value' => (float) 230.19,
+            'fifty_two_week_high' => (float) 512.90,
+            'fifty_two_week_low' => (float) 341.20,
+            'forward_pe' => (float) 20.1,
+            'trailing_pe' => (float) 30.34,
+            'market_cap' => (int) 9800700600,
+            'book_value' => (float) 4.7,
             'last_dividend_date' => now()->subDays(45),
-            'dividend_yield' => .033
+            'dividend_yield' => (float) 0.033
         ]);
     }
 

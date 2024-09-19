@@ -43,15 +43,15 @@ class FinnhubMarketData implements MarketDataInterface
         return collect([
             'name' => Arr::get($fundamental, 'metric.name'),
             'symbol' => $symbol,
-            'market_value' => Arr::get($quote, 'c'), 
-            'fifty_two_week_high' => Arr::get($fundamental, 'metric.52WeekHigh'),
-            'fifty_two_week_low' => Arr::get($fundamental, 'metric.52WeekLow'),
-            'forward_pe' => Arr::get($fundamental, 'metric.forwardPE'), // confirm
-            'trailing_pe' => Arr::get($fundamental, 'metric.trailingPE'), // confirm
-            'market_cap' => Arr::get($fundamental, 'metric.marketCapitalization'), // confirm
-            'book_value' => Arr::get($fundamental, 'metric.bookValuePerShare'), // confirm
+            'market_value' => (float) Arr::get($quote, 'c'), 
+            'fifty_two_week_high' => (float) Arr::get($fundamental, 'metric.52WeekHigh'),
+            'fifty_two_week_low' => (float) Arr::get($fundamental, 'metric.52WeekLow'),
+            'forward_pe' => (float) Arr::get($fundamental, 'metric.forwardPE'), // confirm
+            'trailing_pe' => (float) Arr::get($fundamental, 'metric.trailingPE'), // confirm
+            'market_cap' => (int) Arr::get($fundamental, 'metric.marketCapitalization'), // confirm
+            'book_value' => (float) Arr::get($fundamental, 'metric.bookValuePerShare'), // confirm
             'last_dividend_date' => Arr::get($fundamental, 'metric.lastDivDate'), // confirm
-            'dividend_yield' => Arr::get($fundamental, 'metric.dividendYield'), // confirm
+            'dividend_yield' => (float) Arr::get($fundamental, 'metric.dividendYield'), // confirm
         ]);      
     }
 

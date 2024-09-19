@@ -33,18 +33,18 @@ class AlphaVantageMarketData implements MarketDataInterface
         return collect([
             'name' => Arr::get($fundamental, 'Name'),
             'symbol' => Arr::get($fundamental, 'Symbol'),
-            'market_value' => Arr::get($quote, '05. price'),
-            'fifty_two_week_high' => Arr::get($fundamental, '52WeekHigh'),
-            'fifty_two_week_low' => Arr::get($fundamental, '52WeekLow'),
-            'forward_pe' => Arr::get($fundamental, 'ForwardPE'),
-            'trailing_pe' => Arr::get($fundamental, 'TrailingPE'),
-            'market_cap' => Arr::get($fundamental, 'MarketCapitalization'),
-            'book_value' => Arr::get($fundamental, 'BookValue'),
+            'market_value' => (float) Arr::get($quote, '05. price'),
+            'fifty_two_week_high' => (float) Arr::get($fundamental, '52WeekHigh'),
+            'fifty_two_week_low' => (float) Arr::get($fundamental, '52WeekLow'),
+            'forward_pe' => (float) Arr::get($fundamental, 'ForwardPE'),
+            'trailing_pe' => (float) Arr::get($fundamental, 'TrailingPE'),
+            'market_cap' => (int) Arr::get($fundamental, 'MarketCapitalization'),
+            'book_value' => (float) Arr::get($fundamental, 'BookValue'),
             'last_dividend_date' => Arr::get($fundamental, 'DividendDate') != 'None'
                         ? Arr::get($fundamental, 'DividendDate')
                         : null,
             'dividend_yield' => Arr::get($fundamental, 'DividendYield') != 'None'
-                        ? Arr::get($fundamental, 'DividendYield')
+                        ? (float) Arr::get($fundamental, 'DividendYield')
                         : null
         ]);        
     }
