@@ -15,7 +15,7 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
 {
     public function collection(Collection $portfolios)
     {
-        foreach ($portfolios as $portfolio) {
+        foreach ($portfolios as $index => $portfolio) {
             
             Portfolio::unguard();
 
@@ -28,7 +28,7 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
                 'notes' => $portfolio['notes'],
             ]);
 
-            Artisan::queue(SyncDailyChange::class, ['portfolio_id' => $portfolio->id])->delay(10);
+            Artisan::queue(SyncDailyChange::class, ['portfolio_id' => $portfolio->id])->delay(30 + ($index * 10));
         }
     }
 
