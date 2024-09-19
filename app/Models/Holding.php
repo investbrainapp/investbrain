@@ -174,7 +174,7 @@ class Holding extends Model
                         ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
                         ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
                         ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `total_cost_basis`')
-                        ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN ((sale_price - cost_basis) * quantity) ELSE 0 END) AS `realized_gains`')
+                        ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS `total_sale_price`')
                         ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
@@ -210,7 +210,7 @@ class Holding extends Model
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->realized_gains,
+            'realized_gain_dollars' => $query->total_sale_price > 0 ? $query->total_sale_price - $query->total_cost_basis : 0,
             'dividends_earned' => $dividends->sum('total_received')
         ]);
 
