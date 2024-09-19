@@ -177,7 +177,7 @@ class Holding extends Model
                         ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN ((sale_price - cost_basis) * quantity) ELSE 0 END) AS `realized_gains`')
                         ->first();
 
-        $total_quantity = round($query->qty_purchases - $query->qty_sales, 5);
+        $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
 
         $average_cost_basis = (
                                 $query->qty_purchases > 0 
@@ -246,14 +246,16 @@ class Holding extends Model
         ->select([
             'date_series.date',
             DB::raw("
+                ROUND(
                 COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0) AS `owned`
+                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS `owned`
             "),
             DB::raw("
                COALESCE(CASE 
                     WHEN (
+                        ROUND(
                         COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) - 
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0)
+                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3)
                     ) = 0 THEN 0
                     ELSE SUM(CASE 
                         WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis 
