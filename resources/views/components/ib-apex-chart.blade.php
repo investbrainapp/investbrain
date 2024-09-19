@@ -53,7 +53,7 @@
       ],
       'yaxis' => [
         'labels' => [
-          'offsetX' => 0,
+          'offsetX' => -10,
           'offsetY' => -10
         ],
         'tooltip' => [
@@ -93,6 +93,10 @@
                 } --}}
             }
 
+            this.data.yaxis.labels.formatter = function (value) {
+              return `$${value}`
+            }
+
             this.data.tooltip = {
                 enabled: true,
                 y: {
@@ -100,7 +104,7 @@
                     
                         const firstDataPoint = this.data.series[seriesIndex].data[0][1]
                         const percentageChange = ((value - firstDataPoint) / firstDataPoint) * 100;
-                        return `${value} (${percentageChange.toFixed(2)}%)`;
+                        return `$${parseFloat(value.toFixed(2))} (${percentageChange.toFixed(2)}%)`;
                     }
                 },
             }
