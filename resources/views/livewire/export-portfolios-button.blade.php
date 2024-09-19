@@ -26,7 +26,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <x-button type="submit" @click="$wire.export">
+    <x-button type="submit" @click="$wire.export" spinner="export">
         {{ __('Download Export') }}
     </x-button>
 </div>
