@@ -50,7 +50,7 @@ class MarketData extends Model
         return $query->where('symbol', $symbol);
     }
 
-    public static function getMarketData($symbol) 
+    public static function getMarketData($symbol, $force = false) 
     {
         $market_data = self::firstOrNew([
             'symbol' => $symbol
@@ -58,7 +58,8 @@ class MarketData extends Model
 
         // check if new or stale
         if (
-            !$market_data->exists
+            $force
+            || !$market_data->exists
             || is_null($market_data->updated_at)
             || $market_data->updated_at->diffInMinutes(now()) >= config('investbrain.refresh')
         ) {

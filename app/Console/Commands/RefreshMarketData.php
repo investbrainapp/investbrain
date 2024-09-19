@@ -14,7 +14,7 @@ class RefreshMarketData extends Command
      * @var string
      */
     protected $signature = 'refresh:market-data
-                            {--force= : Ignore refresh delay}';
+                            {--force : Ignore refresh delay}';
 
     /**
      * The console command description.
@@ -40,6 +40,8 @@ class RefreshMarketData extends Command
      */
     public function handle()
     {
+        $force = $this->option('force') ?? false;
+    
         // get all symbols from market data
         $holdings = Holding::where('quantity', '>', 0)
                     ->select(['symbol'])
@@ -49,7 +51,7 @@ class RefreshMarketData extends Command
         foreach ($holdings as $holding) {
             $this->line('Refreshing ' . $holding->symbol);
 
-            MarketData::getMarketData($holding->symbol);
+            MarketData::getMarketData($holding->symbol, $force);
         }
     }
 }
