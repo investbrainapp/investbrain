@@ -25,7 +25,7 @@ class BackupImport implements WithMultipleSheets, WithEvents
     {
         return [
             AfterImport::class => 
-                fn() => Artisan::queue(RefreshMarketData::class, ['force' => true])->chain([
+                fn() => Artisan::queue(RefreshMarketData::class, ['--force' => true])->chain([
                     fn() => Artisan::call(RefreshDividendData::class)
                 ])
         ];
