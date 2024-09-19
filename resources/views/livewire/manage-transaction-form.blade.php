@@ -105,7 +105,7 @@ new class extends Component {
 }; ?>
 
 <div class="" x-data="{ transaction_type: @entangle('transaction_type') }">
-    <x-form wire:submit="{{ $transaction ? 'update' : 'save' }}" class="">
+    <x-ib-form wire:submit="{{ $transaction ? 'update' : 'save' }}" class="">
 
         @if(empty($portfolio))
 
@@ -155,13 +155,13 @@ new class extends Component {
 
         <x-slot:actions>
             @if ($transaction)
-            <x-button 
-                class="ms-3 btn btn-ghost text-error" 
-                wire:click="$toggle('confirmingTransactionDeletion')" 
-                wire:loading.attr="disabled"
-                label="{{ __('Delete') }}"
-                title="{{ __('Delete Transaction') }}"
-            />
+                <x-button 
+                    wire:click="$toggle('confirmingTransactionDeletion')" 
+                    wire:loading.attr="disabled"
+                    icon="o-trash"
+                    class="btn btn-ghost btn-circle text-error" 
+                    title="{{ __('Delete Transaction') }}"
+                />
             @endif
 
             <x-button 
@@ -172,7 +172,7 @@ new class extends Component {
                 spinner="{{ $transaction ? 'update' : 'save' }}"
             />
         </x-slot:actions>
-    </x-form>
+    </x-ib-form>
 
     <x-confirmation-modal wire:model.live="confirmingTransactionDeletion">
         <x-slot name="title">

@@ -23,10 +23,20 @@
     <div @click="open = false" class="fixed inset-0 bg-black opacity-50"></div>
 
     <x-card 
-        :title="$title"
-        :subtitle="$subtitle"
+        
         {{ $attributes->merge(['class' => 'min-h-screen w-11/12 lg:w-1/3 rounded-none px-8 transition']) }} 
     >
+        @if($title)
+            <x-slot:title>
+                {!! strip_tags($title) !!}
+            </x-slot:title>
+        @endif
+
+        @if($subtitle)
+            <x-slot:subtitle>
+                {!! strip_tags($subtitle) !!}
+            </x-slot:subtitle>
+        @endif
 
         @if ($showClose)
             <x-button icon="o-x-mark" class="btn-ghost btn-circle btn-sm absolute top-4 right-4 " @click="open = false" />

@@ -47,20 +47,6 @@ new class extends Component {
 
     public function save()
     {
-
-        // // get stats
-        // $key = 'portfolio-metrics-' . $portfolio->id;
-        // $metrics = cache()->remember($key, 60, function () use ($portfolio) {
-        //     return Holding::where(['portfolio_id' => $portfolio->id])
-        //         ->withPortfolioMetrics()
-        //         ->first();
-        // });
-
-        // return view('pages.portfolios.show', [
-        //     'portfolio' => $portfolio,
-        //     'metrics' => $metrics
-        // ]);
-
         $portfolio = (new Portfolio())->fill($this->validate());
         // $portfolio->owner_id = auth()->user()->id;
         $portfolio->save();
@@ -78,7 +64,7 @@ new class extends Component {
 }; ?>
 
 <div class="grid lg:grid-cols-4 gap-10">
-    <x-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" class="col-span-3">
+    <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" class="col-span-3">
         <x-input label="{{ __('Title') }}" wire:model="title" required />
 
         <x-textarea label="{{ __('Notes') }}" wire:model="notes" rows="5" />
@@ -91,21 +77,21 @@ new class extends Component {
 
         <x-slot:actions>
             @if ($portfolio)
-            <x-button 
-                class="ms-3 btn btn-ghost text-error" 
-                wire:click="$toggle('confirmingPortfolioDeletion')" 
-                wire:loading.attr="disabled"
-                label="{{ __('Delete') }}"
-                title="{{ __('Delete Portfolio') }}"
-            />
+                <x-button 
+                    wire:click="$toggle('confirmingPortfolioDeletion')" 
+                    wire:loading.attr="disabled"
+                    icon="o-trash"
+                    class="btn btn-ghost btn-circle text-error" 
+                    title="{{ __('Delete Portfolio') }}"
+                />
             @endif
 
             @if (!$hideCancel)
-            <x-button label="{{ __('Cancel') }}" link="/dashboard" />
+                <x-button label="{{ __('Cancel') }}" link="/dashboard" />
             @endif
             <x-button label="{{ $portfolio ? 'Update' : 'Create' }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
         </x-slot:actions>
-    </x-form>
+    </x-ib-form>
 
     <x-confirmation-modal wire:model.live="confirmingPortfolioDeletion">
         <x-slot name="title">
