@@ -24,10 +24,10 @@ class BackupImport implements WithMultipleSheets, WithEvents
     public function registerEvents(): array
     {
         return [
-            AfterImport::class => function() {
-                Artisan::call(RefreshMarketData::class);
-                Artisan::queue(RefreshDividendData::class);
-            }
+            AfterImport::class => 
+                fn() => Artisan::queue(RefreshMarketData::class)->chain([
+                    fn() => Artisan::call(RefreshDividendData::class)
+                ])
         ];
     }
 
