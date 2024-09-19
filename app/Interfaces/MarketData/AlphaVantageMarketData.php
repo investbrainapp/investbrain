@@ -28,8 +28,6 @@ class AlphaVantageMarketData implements MarketDataInterface
             }
         );
 
-        if (empty($fundamental)) return collect();
-
         return collect([
             'name' => Arr::get($fundamental, 'Name'),
             'symbol' => Arr::get($fundamental, 'Symbol'),
