@@ -210,7 +210,7 @@ class Holding extends Model
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->total_sale_price > 0 ? $query->total_sale_price - $query->total_cost_basis : 0,
+            'realized_gain_dollars' => $query->total_sale_price > 0 ? $query->total_sale_price - ($query->qty_sales * ($query->total_cost_basis / $query->qty_purchases)) : 0,
             'dividends_earned' => $dividends->sum('total_received')
         ]);
 
