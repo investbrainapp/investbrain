@@ -72,10 +72,10 @@ new class extends Component {
                     'name' => __('Market Gain'),
                     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_gain])->toArray()
                 ],
-                // [
-                //     'name' => __('Dividends Earned'),
-                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
-                // ],
+                [
+                    'name' => __('Dividends Earned'),
+                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
+                ],
                 // [
                 //     'name' => __('Realized Gains'),
                 //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->realized_gains])->toArray()
@@ -108,16 +108,24 @@ new class extends Component {
             
         </div>
         
-        <div class="flex items-center">
+        <div class="flex items-center" x-data="{ loading: false }">
             {{-- <x-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
 
-            <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-ghost btn-sm">
+            <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+
+            <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-ghost btn-sm" x-bind:disabled="loading">
                     
                 @foreach($options as $option)
 
                     <x-menu-item 
                         title="{{ $option['name'] }}" 
-                        x-on:click="$wire.changeScope('{{ $option['id'] }}')"
+                        @click="
+                            timeout = setTimeout(() => { loading = true }, 200);
+                            $wire.changeScope('{{ $option['id'] }}').then(() => {
+                                clearTimeout(timeout);
+                                loading = false;
+                            })
+                        "
                     />
             
                 @endforeach
