@@ -20,6 +20,12 @@ new class extends Component {
     {
         $this->validate();
 
+        if (!RateLimiter::attempt('import:'.auth()->user()->id, $perMinute = 3, fn()=>null)) {
+
+            $this->error(__('Hang on! You\'re doing that too much.'));
+            return;
+        }
+
         try {
 
             $import = (new BackupImport)->import($this->file);
