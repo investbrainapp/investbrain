@@ -127,15 +127,17 @@ class Portfolio extends Model
                 $total_market_value = $performance->owned * $close;
                 $dividends_earned += $performance->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
-                $daily[$date] = [
-                    'date' => $date,
-                    'portfolio_id' => $this->id,
-                    'total_market_value' => $total_market_value, 
-                    'total_cost_basis' => $performance->cost_basis,
-                    'total_gain' => $total_market_value - $performance->cost_basis,
-                    'realized_gains' => $performance->realized_gains,
-                    'total_dividends_earned' => $dividends_earned
-                ];
+                if (Carbon::parse($date)->isWeekday()) {
+                    $daily[$date] = [
+                        'date' => $date,
+                        'portfolio_id' => $this->id,
+                        'total_market_value' => $total_market_value, 
+                        'total_cost_basis' => $performance->cost_basis,
+                        'total_gain' => $total_market_value - $performance->cost_basis,
+                        'realized_gains' => $performance->realized_gains,
+                        'total_dividends_earned' => $dividends_earned
+                    ];
+                }
             });
 
             foreach ($daily as $date => $performance) {

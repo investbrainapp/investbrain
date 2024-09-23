@@ -5,6 +5,7 @@ namespace Tests;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Holding;
+use Carbon\CarbonPeriod;
 use App\Models\Portfolio;
 use App\Models\DailyChange;
 use App\Models\Transaction;
@@ -33,7 +34,7 @@ class SyncDailyChangeTest extends TestCase
         $portfolio->syncDailyChanges();
 
         $count_of_daily_changes = $portfolio->daily_change()->count('date');
-        $days_between_now_and_first_trans = (int) now()->diffInDays($portfolio->transactions()->min('date'), true) + 1;
+        $days_between_now_and_first_trans = (int) CarbonPeriod::create($portfolio->transactions()->min('date'), now())->filter('isWeekday')->count();
 
         $this->assertEquals($count_of_daily_changes, $days_between_now_and_first_trans);
     }
@@ -49,19 +50,28 @@ class SyncDailyChangeTest extends TestCase
         $first_transaction = Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
         Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
         $holding = Holding::symbol('ACME')->portfolio($portfolio->id)->first();
-        $daily_change = DailyChange::whereDate('date', $first_transaction->date)->first();
+        $daily_change = DailyChange::whereDate('date', '<=', $first_transaction->date->addDays(2))
+                                ->whereDate('date', '>=', $first_transaction->date->subDays(2))
+                                ->orderByDesc('date')
+                                ->first();
 
         $this->assertEquals($holding->average_cost_basis, $daily_change->total_cost_basis);
 
         $second_transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
         Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
-        $daily_change = DailyChange::whereDate('date', $second_transaction->date)->first();
+        $daily_change = DailyChange::whereDate('date', '<=', $second_transaction->date->addDays(2))
+                                ->whereDate('date', '>=', $second_transaction->date->subDays(2))
+                                ->orderByDesc('date')
+                                ->first();
         
         $this->assertEqualsWithDelta($first_transaction->cost_basis + $second_transaction->cost_basis, $daily_change->total_cost_basis, 0.01);        
 
         $third_transaction = Transaction::factory(2)->sell()->lastMonth()->portfolio($portfolio->id)->symbol('ACME')->create()->first();
         Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
-        $daily_change = DailyChange::whereDate('date', $third_transaction->date)->first();
+        $daily_change = DailyChange::whereDate('date', '<=', $third_transaction->date->addDays(2))
+                                ->whereDate('date', '>=', $third_transaction->date->subDays(2))
+                                ->orderByDesc('date')
+                                ->first();
 
         $this->assertEquals(0, $daily_change->total_cost_basis);        
     }
@@ -99,12 +109,14 @@ class SyncDailyChangeTest extends TestCase
 
         $this->assertEquals($day_before->realized_gains, 0);
 
-        $day_after = DailyChange::query()
+        $after = DailyChange::query()
             ->portfolio($portfolio->id)
-            ->whereDate('date', $sale_transaction->date->addDays(1))
+            ->whereDate('date', '<=', $sale_transaction->date->addDays(2))
+            ->whereDate('date', '>=', $sale_transaction->date->subDays(2))
+            ->orderByDesc('date')
             ->first();
 
-        $this->assertEqualsWithDelta($day_after->realized_gains, $realized_gain, 0.01);
+        $this->assertEqualsWithDelta($after->realized_gains, $realized_gain, 0.01);
     }
 
     public function test_dividends_captured_in_daily_change_sync(): void
@@ -124,7 +136,9 @@ class SyncDailyChangeTest extends TestCase
 
         $first_dividend_change = DailyChange::query()
             ->portfolio($portfolio->id)
-            ->whereDate('date', $dividends->first()->date)
+            ->whereDate('date', '<=', $dividends->first()->date->addDays(2))
+            ->whereDate('date', '>=', $dividends->first()->date->subDays(2))
+            ->orderByDesc('date')
             ->first();
 
         $owned = $dividends->first()->purchased - $dividends->first()->sold;
@@ -133,7 +147,9 @@ class SyncDailyChangeTest extends TestCase
 
         $last_dividend_change = DailyChange::query()
             ->portfolio($portfolio->id)
-            ->whereDate('date', $dividends->last()->date)
+            ->whereDate('date', '<=', $dividends->last()->date->addDays(2))
+            ->whereDate('date', '>=', $dividends->last()->date->subDays(2))
+            ->orderByDesc('date')
             ->first();
 
         $total_dividends = $dividends->reduce(function (?float $carry, $dividend) {

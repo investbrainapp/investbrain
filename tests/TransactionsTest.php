@@ -30,9 +30,9 @@ class TransactionsTest extends TestCase
     {
         $this->actingAs($user = User::factory()->create());
 
-        Transaction::factory(5)->buy()->symbol('AAPL')->create();
+        Transaction::factory(5)->buy()->lastYear()->symbol('AAPL')->create();
 
-        $transaction = Transaction::factory()->sell()->symbol('AAPL')->create();
+        $transaction = Transaction::factory()->sell()->lastMonth()->symbol('AAPL')->create();
 
         $this->assertNotNull($transaction->cost_basis);
     }
@@ -56,8 +56,8 @@ class TransactionsTest extends TestCase
 
         $portfolio = Portfolio::factory()->create();
 
-        Transaction::factory(5)->buy()->portfolio($portfolio->id)->symbol('AAPL')->create();
-        $transaction = Transaction::factory()->sell()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory(5)->buy()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $transaction = Transaction::factory()->sell()->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
 
         $this->assertDatabaseHas('holdings', [
             'portfolio_id' => $portfolio->id,

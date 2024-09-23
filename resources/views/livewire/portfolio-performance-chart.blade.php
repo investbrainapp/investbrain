@@ -11,7 +11,7 @@ new class extends Component {
     public ?Portfolio $portfolio;
     public String $name = 'portfolio';
     public String $scope = 'YTD';
-    public Array $options = [
+    public Array $scopeOptions = [
         ['id' => '1M', 'name' => '1 month', 'method' => 'subMonths', 'args' => [1]],
         ['id' => '3M', 'name' => '3 months', 'method' => 'subMonths', 'args' => [3]],
         ['id' => 'YTD', 'name' => 'Year to date', 'method' => 'startOfYear', 'args' => []],
@@ -31,7 +31,7 @@ new class extends Component {
 
     public function generatePerformanceData()
     {
-        $filterMethod = collect($this->options)->where('id', $this->scope)->first();
+        $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
         $dailyChangeQuery = DailyChange::query();
 
@@ -41,14 +41,15 @@ new class extends Component {
 
         } else {
             
-            $dailyChangeQuery->selectRaw('date, 
+            $dailyChangeQuery->selectRaw('
+                date, 
                 SUM(total_market_value) as total_market_value, 
                 SUM(total_cost_basis) as total_cost_basis, 
-                SUM(total_gain) as total_gain'
-            )->groupBy('date');
+                SUM(total_gain) as total_gain,
+                --SUM(realized_gains) as realized_gains,
+                --SUM(total_dividends_earned) as total_dividends_earned
+            ')->groupBy('date');
 
-            // SUM(total_dividends_earned) as total_dividends_earned, 
-            // SUM(realized_gains) as realized_gains
         }
 
         if ($filterMethod['method']) {
@@ -72,10 +73,11 @@ new class extends Component {
                     'name' => __('Market Gain'),
                     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_gain])->toArray()
                 ],
-                [
-                    'name' => __('Dividends Earned'),
-                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
-                ],
+                
+                // [
+                //     'name' => __('Dividends Earned'),
+                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
+                // ],
                 // [
                 //     'name' => __('Realized Gains'),
                 //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->realized_gains])->toArray()
@@ -93,7 +95,7 @@ new class extends Component {
 
     public function getScopeName($scope)
     {
-        return collect($this->options)->where('id', $scope)->first()['name'];
+        return collect($this->scopeOptions)->where('id', $scope)->first()['name'];
     }
 
 }; ?>
@@ -115,7 +117,7 @@ new class extends Component {
 
             <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-ghost btn-sm" x-bind:disabled="loading">
                     
-                @foreach($options as $option)
+                @foreach($scopeOptions as $option)
 
                     <x-menu-item 
                         title="{{ $option['name'] }}" 

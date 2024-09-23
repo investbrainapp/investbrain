@@ -71,7 +71,7 @@ class Holding extends Model
                     CASE WHEN transaction_type = 'BUY' 
                         AND transactions.symbol = dividends.symbol 
                         AND transactions.portfolio_id = '$this->portfolio_id'
-                        AND dividends.date >= transactions.date 
+                        AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
                     ELSE 0 END
                 ) AS purchased")
@@ -79,10 +79,19 @@ class Holding extends Model
                     CASE WHEN transaction_type = 'SELL'
                         AND transactions.symbol = dividends.symbol 
                         AND transactions.portfolio_id = '$this->portfolio_id' 
-                        AND dividends.date >= transactions.date 
+                        AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
                     ELSE 0 END
                 ) AS sold")
+                ->selectRaw('SUM(
+                    (CASE WHEN transaction_type = "BUY" 
+                        AND date(transactions.date) <= date(dividends.date) 
+                        THEN transactions.quantity ELSE 0 END
+                    - CASE WHEN transaction_type = "SELL" 
+                        AND date(transactions.date) <= date(dividends.date) 
+                        THEN transactions.quantity ELSE 0 END)
+                    * dividends.dividend_amount
+                ) AS total_received')
                 ->join('transactions', 'transactions.symbol', 'dividends.symbol')
                 ->groupBy(['dividends.symbol','dividends.date','dividends.dividend_amount'])
                 ->orderBy('dividends.date', 'DESC')
@@ -186,32 +195,15 @@ class Holding extends Model
                                     ? $query->total_cost_basis / $query->qty_purchases 
                                     : 0;
 
-        // pull dividend data joined with holdings/transactions
-        $dividends = Dividend::select('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount')
-                            ->selectRaw('
-                                (COALESCE(CASE WHEN transactions.transaction_type = "BUY" 
-                                    AND date(transactions.date) <= date(dividends.date) 
-                                    THEN transactions.quantity ELSE 0 END, 0)
-                                - COALESCE(CASE WHEN transactions.transaction_type = "SELL" 
-                                    AND date(transactions.date) <= date(dividends.date) 
-                                    THEN transactions.quantity ELSE 0 END, 0))
-                                * dividends.dividend_amount
-                                    AS total_received
-                            ')
-                            ->join('transactions', 'transactions.symbol', 'dividends.symbol')
-                            ->join('holdings', 'transactions.portfolio_id', 'holdings.portfolio_id')
-                            ->where('dividends.symbol', $this->symbol)
-                            ->where('transactions.portfolio_id', $this->portfolio_id)
-                            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
-                            ->get();
-
         // update holding
         $this->fill([
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->total_sale_price > 0 ? $query->total_sale_price - ($query->qty_sales * ($query->total_cost_basis / $query->qty_purchases)) : 0,
-            'dividends_earned' => $dividends->sum('total_received')
+            'realized_gain_dollars' => $query->qty_purchases > 0 && $query->total_sale_price > 0 
+                    ? $query->total_sale_price - ($query->qty_sales * ($query->total_cost_basis / $query->qty_purchases)) 
+                    : 0,
+            'dividends_earned' => $this->dividends->sum('total_received')
         ]);
 
         $this->save();

@@ -21,8 +21,8 @@ class CaptureDailyChangeTest extends TestCase
         $this->actingAs($user = User::factory()->create());
 
         $this->portfolio = Portfolio::factory()->create();
-        Transaction::factory(5)->buy()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
-        $this->transaction = Transaction::factory()->sell()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory(5)->buy()->lastYear()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
+        $this->transaction = Transaction::factory()->sell()->lastMonth()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
     }
 
     /**

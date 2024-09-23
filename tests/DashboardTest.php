@@ -55,9 +55,9 @@ class DashboardTest extends TestCase
         $this->actingAs($user = User::factory()->create());
 
         $portfolio = Portfolio::factory()->create();
-
-        Transaction::factory(5)->buy()->portfolio($portfolio->id)->symbol('AAPL')->create();
-        $transaction = Transaction::factory()->sell()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        
+        Transaction::factory(5)->buy()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $transaction = Transaction::factory()->sell()->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
 
         $metrics = Holding::query()
                     ->myHoldings()
@@ -65,7 +65,7 @@ class DashboardTest extends TestCase
                     ->first();
     
         $this->assertEqualsWithDelta(
-            $transaction->sale_price - $transaction->cost_basis, 
+            $transaction->sale_price - $transaction->cost_basis,
             $metrics->realized_gain_dollars,
             0.01
         );

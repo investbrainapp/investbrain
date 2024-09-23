@@ -17,7 +17,7 @@
           'enabled' => false
         ]
       ],
-      'colors' => ['#3185FC', '#48435C', '#9792E3', '#00E396', '#B74F6F', ],
+      'colors' => ['#3185FC', '#48435C', '#9792E3', '#00E396', '#B74F6F'],
       'stroke' => [
         'curve' => "smooth",
         'width' => 3
