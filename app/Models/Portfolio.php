@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
@@ -110,41 +111,40 @@ class Portfolio extends Model
 
             $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));
 
-            $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
-
             $daily_performance = $holding->dailyPerformance($holding->first_transaction_date, now());
-
             $dividends = $holding->dividends->keyBy(function ($dividend, $key) {
-                                        return $dividend['date']->format('Y-m-d');
-                                    });
+                return $dividend['date']->format('Y-m-d');
+            });
+            $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
 
             $dividends_earned = 0;
             $daily = [];
 
-            $all_history->sortBy('date')->each(function ($history, $date) use ($daily_performance, $dividends, &$daily, &$dividends_earned) {
+            $daily_performance->each(function ($performance, $date) use ($all_history, $dividends, &$daily, &$dividends_earned) {
 
-                $close = Arr::get($history, 'close', 0);
-                $total_market_value = $daily_performance->get($date)->owned * $close;
-                $dividends_earned += $daily_performance->get($date)->owned * ($dividends->get($date)?->dividend_amount ?? 0);
+                $close = $this->getMostRecentCloseData($all_history, $date);
+                
+                $total_market_value = $performance->owned * $close;
+                $dividends_earned += $performance->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
                 $daily[$date] = [
                     'date' => $date,
                     'portfolio_id' => $this->id,
                     'total_market_value' => $total_market_value, 
-                    'total_cost_basis' => $daily_performance->get($date)->cost_basis,
-                    'total_gain' => $total_market_value - $daily_performance->get($date)->cost_basis,
-                    'realized_gains' => $daily_performance->get($date)->realized_gains,
+                    'total_cost_basis' => $performance->cost_basis,
+                    'total_gain' => $total_market_value - $performance->cost_basis,
+                    'realized_gains' => $performance->realized_gains,
                     'total_dividends_earned' => $dividends_earned
                 ];
             });
 
             foreach ($daily as $date => $performance) {
-                if (!isset($total_performance[$date])) {
+                if (Arr::get($total_performance, $date) == null) {
                     
                     $total_performance[$date] = $performance;
 
                 } else {
-                    
+
                     $total_performance[$date]['total_market_value'] += $performance['total_market_value'];
                     $total_performance[$date]['total_cost_basis'] += $performance['total_cost_basis'];
                     $total_performance[$date]['total_gain'] += $performance['total_gain'];
@@ -162,4 +162,21 @@ class Portfolio extends Model
             });
         }
     }
+
+    protected function getMostRecentCloseData($history, $date, $i = 0, $max_attempts = 5)
+    {
+        $close = Arr::get($history, "$date.close", 0);
+
+        if (!$close && $i < $max_attempts) {
+
+            $i++;
+    
+            $date = Carbon::parse($date)->subDay()->format('Y-m-d');
+
+            return $this->getMostRecentCloseData($history, $date, $i);
+        }
+
+        return $close;
+    }
+
 }
