@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -109,6 +110,8 @@ class Portfolio extends Model
 
         $holdings->each(function($holding) use (&$total_performance, $dividends) {
 
+            $period = CarbonPeriod::create($holding->first_transaction_date, now())->filter('isWeekday');
+
             $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));
 
             $daily_performance = $holding->dailyPerformance($holding->first_transaction_date, now());
@@ -118,29 +121,30 @@ class Portfolio extends Model
             $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
 
             $dividends_earned = 0;
-            $daily = [];
+            $holding_performance = [];
 
-            $daily_performance->each(function ($performance, $date) use ($all_history, $dividends, &$daily, &$dividends_earned) {
+            foreach($period as $date) {
+                $date = $date->format('Y-m-d');
 
                 $close = $this->getMostRecentCloseData($all_history, $date);
                 
-                $total_market_value = $performance->owned * $close;
-                $dividends_earned += $performance->owned * ($dividends->get($date)?->dividend_amount ?? 0);
+                $total_market_value = $daily_performance->get($date)->owned * $close;
+                $dividends_earned += $daily_performance->get($date)->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
                 if (Carbon::parse($date)->isWeekday()) {
-                    $daily[$date] = [
+                    $holding_performance[$date] = [
                         'date' => $date,
                         'portfolio_id' => $this->id,
                         'total_market_value' => $total_market_value, 
-                        'total_cost_basis' => $performance->cost_basis,
-                        'total_gain' => $total_market_value - $performance->cost_basis,
-                        'realized_gains' => $performance->realized_gains,
+                        'total_cost_basis' => $daily_performance->get($date)->cost_basis,
+                        'total_gain' => $total_market_value - $daily_performance->get($date)->cost_basis,
+                        'realized_gains' => $daily_performance->get($date)->realized_gains,
                         'total_dividends_earned' => $dividends_earned
                     ];
                 }
-            });
+            }
 
-            foreach ($daily as $date => $performance) {
+            foreach ($holding_performance as $date => $performance) {
                 if (Arr::get($total_performance, $date) == null) {
                     
                     $total_performance[$date] = $performance;
