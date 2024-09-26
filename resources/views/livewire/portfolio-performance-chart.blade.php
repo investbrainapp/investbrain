@@ -45,10 +45,14 @@ new class extends Component {
                 date, 
                 SUM(total_market_value) as total_market_value, 
                 SUM(total_cost_basis) as total_cost_basis, 
-                SUM(total_gain) as total_gain,
-                --SUM(realized_gains) as realized_gains,
-                --SUM(total_dividends_earned) as total_dividends_earned
-            ')->groupBy('date');
+                SUM(total_gain) as total_gain 
+                /*  ,
+                    SUM(realized_gains) as realized_gains,
+                    SUM(total_dividends_earned) as total_dividends_earned 
+                */
+            ')
+            ->groupBy('date')
+            ->orderByDesc('date');
 
         }
 
