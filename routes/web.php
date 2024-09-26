@@ -5,7 +5,6 @@ use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\TransactionController;
-use App\Models\DailyChange;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
@@ -20,14 +19,6 @@ Route::get('/', function () {
 
 Route::get('/test', function () {
     //
-    return DailyChange::myDailyChanges()->selectRaw('
-        date, 
-        SUM(total_market_value) as total_market_value, 
-        SUM(total_cost_basis) as total_cost_basis, 
-        SUM(total_gain) as total_gain
-    ')
-    ->groupBy('date')
-    ->orderByDesc('date')->get()->toArray();
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
