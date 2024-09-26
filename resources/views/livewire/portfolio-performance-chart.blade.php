@@ -33,7 +33,7 @@ new class extends Component {
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $dailyChangeQuery = DailyChange::query();
+        $dailyChangeQuery = DailyChange::myDailyChanges();
 
         if (isset($this->portfolio)) {
             
