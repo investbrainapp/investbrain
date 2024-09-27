@@ -51,8 +51,7 @@ new class extends Component {
                     SUM(total_dividends_earned) as total_dividends_earned 
                 */
             ')
-            ->groupBy('date')
-            ->orderByDesc('date');
+            ->groupBy('date');
 
         }
 
