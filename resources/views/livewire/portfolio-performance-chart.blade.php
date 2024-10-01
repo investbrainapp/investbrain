@@ -110,7 +110,8 @@ new class extends Component {
         <div class="flex items-center">
             
             <h2 class="text-xl mr-4">{{ __('Performance') }}</h2>
-            <div id="chart-legend-{{ $name }}" class="flex space-between"></div>
+
+            <div id="chart-legend-{{ $name }}" class="hidden md:flex space-between"></div>
             
         </div>
         
