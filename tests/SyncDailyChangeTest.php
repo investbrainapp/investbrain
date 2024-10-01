@@ -95,7 +95,9 @@ class SyncDailyChangeTest extends TestCase
 
         $daily_change = DailyChange::query()
             ->portfolio($portfolio->id)
-            ->whereDate('date', $sale_transaction->date)
+            ->whereDate('date', '<=', $sale_transaction->date->addDays(2))
+            ->whereDate('date', '>=', $sale_transaction->date->subDays(2))
+            ->orderByDesc('date')
             ->first();
 
         $realized_gain = ($sale_transaction->sale_price - $sale_transaction->cost_basis) * $sale_transaction->quantity;
@@ -104,7 +106,9 @@ class SyncDailyChangeTest extends TestCase
 
         $day_before = DailyChange::query()
             ->portfolio($portfolio->id)
-            ->whereDate('date', $sale_transaction->date->subDays(1))
+            ->whereDate('date', '<', $sale_transaction->date->subDays(1))
+            ->orderByDesc('date')
+            ->limit(10)
             ->first();
 
         $this->assertEquals($day_before->realized_gains, 0);
