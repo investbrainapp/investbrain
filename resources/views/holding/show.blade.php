@@ -2,8 +2,8 @@
     <div x-data>  
 
         <x-ib-modal 
-            key="new-transaction"
-            title="New Transaction"
+            key="create-transaction"
+            title="{{ __('Create Transaction') }}"
         >
             @livewire('manage-transaction-form', [
                 'portfolio' => $portfolio, 
@@ -25,7 +25,7 @@
                 <x-button 
                     label="{{ __('Create Transaction') }}" 
                     class="btn-sm btn-primary" 
-                    @click="$dispatch('toggle-new-transaction')"
+                    @click="$dispatch('toggle-create-transaction')"
                 />
             </div>
         </x-ib-toolbar>
@@ -101,6 +101,17 @@
             </x-ib-card>
 
             <x-ib-card title="{{ __('Dividends') }}" class="md:col-span-3">
+
+                <x-ib-modal 
+                    key="dividend-options"
+                    title="{{ __('Dividend options') }}"
+                >
+                    @livewire('manage-transaction-form', [
+                        'portfolio' => $portfolio, 
+                        'symbol' => $holding->market_data->symbol, 
+                    ])
+
+                </x-ib-modal>
 
                 @if($holding->dividends->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
