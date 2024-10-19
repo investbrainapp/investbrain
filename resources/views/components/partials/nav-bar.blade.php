@@ -1,7 +1,7 @@
 
 <div class="bg-base-100 border-base-300 border-b sticky top-0 z-10">
-    <div class="flex justify-between items-center px-7 py-3 mx-auto">
-        <div class="flex-1 flex items-center">
+    <div class="flex justify-between items-center px-7 py-3 gap-4 mx-auto">
+        <div class="flex flex-0 items-center">
             
             <label for="main-drawer" class="lg:hidden mr-3">
                 <x-icon name="o-bars-3" class="cursor-pointer" />
@@ -12,7 +12,7 @@
             </div>
 
         </div>
-        <div class="flex flex-grow gap-4 w-50" x-data>
+        <div class="flex flex-1 justify-center" x-data>
 
             <x-spotlight
                 shortcut="slash"
@@ -22,7 +22,7 @@
             
             <x-button 
                 @click.stop="$dispatch('mary-search-open')"
-                class="btn-sm w-32 justify-start md:w-auto"
+                class="btn-sm flex-1 justify-start md:flex-none"
             >
                 <x-slot:label>
                     <span class="flex">
@@ -35,7 +35,7 @@
             </x-button>
 
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-0 items-center gap-4">
 
             <x-button 
                 title="{{ __('Documentation') }}"
