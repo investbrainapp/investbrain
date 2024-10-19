@@ -2,12 +2,13 @@
 
 namespace Tests;
 
-use App\Models\Dividend;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Split;
 use App\Models\Holding;
+use App\Models\Dividend;
 use App\Models\Portfolio;
+use App\Models\MarketData;
 use App\Models\Transaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -54,11 +55,10 @@ class DividendsTest extends TestCase
 
         $transactions = Transaction::where(['reinvested_dividend' => true])->symbol('ACME')->portfolio($portfolio->id)->get();
 
-        $dividendsReinvested = $transactions->reduce(function ($carry, $transaction) {
-            return $carry + ($transaction->cost_basis * $transaction->quantity);
-        }, 0); 
+        $market_data = MarketData::symbol('ACME')->first();
+        $dividendsReinvested = $transactions->sum('quantity'); 
 
         $this->assertCount(3, $transactions);
-        $this->assertEqualsWithDelta(4.95, $dividendsReinvested, 0.01);
+        $this->assertEqualsWithDelta(4.95, $dividendsReinvested * $market_data->market_value, 0.01);
     }
 }
