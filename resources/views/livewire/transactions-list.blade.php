@@ -59,7 +59,9 @@ new class extends Component {
                 <x-badge 
                     :value="$transaction->split
                         ? 'SPLIT'
-                        : $transaction->transaction_type" 
+                        : ($transaction->reinvested_dividend
+                            ? 'REINVEST' 
+                            : $transaction->transaction_type)" 
                     class="{{ $transaction->transaction_type == 'BUY' 
                         ? 'badge-success' 
                         : 'badge-error' }} badge-sm mr-3" 

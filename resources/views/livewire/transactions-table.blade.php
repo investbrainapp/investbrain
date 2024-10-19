@@ -93,8 +93,10 @@ new class extends Component {
         @scope('cell_transaction_type', $row)
             <x-badge 
                 :value="$row->split
-                    ? 'SPLIT'
-                    : $row->transaction_type" 
+                        ? 'SPLIT'
+                        : ($row->reinvested_dividend
+                            ? 'REINVEST' 
+                            : $row->transaction_type)" 
                 class="{{ $row->transaction_type == 'BUY' 
                     ? 'badge-success' 
                     : 'badge-error' }} badge-sm mr-3" 
