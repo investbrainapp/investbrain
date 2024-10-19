@@ -52,7 +52,7 @@ new class extends Component {
 
     <x-slot name="description">
         {{ __('Upload or recover your Investbrain portfolio and holdings.') }} 
-        <a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a>
+        <strong><a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></strong>
     </x-slot>
 
     <x-slot name="form">
