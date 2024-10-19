@@ -3,6 +3,7 @@
 namespace App\Imports\Sheets;
 
 use App\Models\DailyChange;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Imports\ValidatesPortfolioPermissions;
@@ -19,10 +20,18 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
     {
         $this->validatePortfolioPermissions($dailyChanges);
 
-        $chunkSize = 180; 
+        $chunkSize = 500;
 
         $dailyChanges->chunk($chunkSize)->each(function ($chunk) {
-            
+
+            // have to manually format dates since we're doing a raw upsert
+            $chunk = $chunk->map(function ($daily) {
+
+                $daily['date'] = Carbon::parse($daily['date'])->format('Y-m-d');
+
+                return $daily;
+            });
+
             DailyChange::upsert(
                 $chunk->toArray(),
                 [
@@ -49,7 +58,7 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
             'total_market_value' => ['sometimes', 'nullable', 'numeric'],
             'total_cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],
             'total_gain' => ['sometimes', 'nullable', 'numeric'],
-            'total_dividends' => ['sometimes', 'nullable', 'min:0', 'numeric'],
+            'total_dividends_earned' => ['sometimes', 'nullable', 'min:0', 'numeric'],
             'realized_gains' => ['sometimes', 'nullable', 'numeric'],
             'annotation' => ['sometimes', 'nullable', 'string'],
         ];
