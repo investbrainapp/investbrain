@@ -153,7 +153,7 @@ class Dividend extends Model
                     'symbol' => $holding->symbol,
                     'transaction_type' => "BUY",
                     'reinvested_dividend' => true,
-                    'cost_basis' => $market_data->market_value,
+                    'cost_basis' => 0,
                     'quantity' => ($dividend['dividend_amount'] * $holding->qtyOwned(Carbon::parse($dividend['date']))) / $market_data->market_value,
                 ]);
             }
