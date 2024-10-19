@@ -2,7 +2,6 @@
 
 namespace App\Imports\Sheets;
 
-use Exception;
 use App\Models\DailyChange;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -20,22 +19,26 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
     {
         $this->validatePortfolioPermissions($dailyChanges);
 
-        foreach ($dailyChanges as $dailyChange) {
+        $chunkSize = 180; 
 
-            DailyChange::updateOrCreate([
-                'date' => $dailyChange['date'],
-                'portfolio_id' => $dailyChange['portfolio_id'],
-            ],[
-                'portfolio_id' => $dailyChange['portfolio_id'],
-                'date' => $dailyChange['date'],
-                'total_market_value' => $dailyChange['total_market_value'],
-                'total_cost_basis' => $dailyChange['total_cost_basis'],
-                'total_gain' => $dailyChange['total_gain'],
-                'total_dividends_earned' => $dailyChange['total_dividends'],
-                'realized_gains' => $dailyChange['realized_gains'],
-                'annotation' => $dailyChange['annotation'],
-            ]);
-        }
+        $dailyChanges->chunk($chunkSize)->each(function ($chunk) {
+            
+            DailyChange::upsert(
+                $chunk->toArray(),
+                [
+                    'portfolio_id',
+                    'date'
+                ],
+                [
+                    'total_market_value',
+                    'total_cost_basis',
+                    'total_gain',
+                    'total_dividends_earned',
+                    'realized_gains',
+                    'annotation'
+                ]
+            );
+        });
     }
 
     public function rules(): array
