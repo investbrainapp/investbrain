@@ -131,7 +131,7 @@
 
                     var seriesColor = chartContext.w.config.colors[i];
                     var legendItem = document.createElement('div');
-                    legendItem.classList.add('flex', 'items-center', 'm-2', 'cursor-pointer');
+                    legendItem.classList.add('flex', 'items-center', 'my-2', 'mr-4', 'cursor-pointer');
                     legendItem.setAttribute('data-series-index', i);
 
                     var colorBox = document.createElement('span');

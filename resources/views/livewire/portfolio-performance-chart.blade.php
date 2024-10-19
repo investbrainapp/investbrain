@@ -105,13 +105,13 @@ new class extends Component {
 }; ?>
 
 <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">
-    <div class="flex justify-between items-center mb-2">
+    <div class="flex flex-col md:flex-row md:justify-between mb-2">
                     
-        <div class="flex items-center">
+        <div class="flex flex-col md:flex-row items-start md:items-center">
             
-            <h2 class="text-xl mr-4">{{ __('Performance') }}</h2>
+            <h2 class="text-xl mb-2 md:mb-0 md:mr-4">{{ __('Performance') }}</h2>
 
-            <div id="chart-legend-{{ $name }}" class="hidden md:flex space-between"></div>
+            <div id="chart-legend-{{ $name }}" class="flex space-between whitespace-nowrap mb-2 md:mb-0"></div>
             
         </div>
         
@@ -120,7 +120,7 @@ new class extends Component {
 
             <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
 
-            <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-ghost btn-sm" x-bind:disabled="loading">
+            <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
                     
                 @foreach($scopeOptions as $option)
 
