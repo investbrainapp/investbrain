@@ -24,6 +24,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
             'Cost Basis',
             'Sale Price',
             'Split',
+            'Reinvested Dividend',
             'Date',
             'Created',
             'Updated'

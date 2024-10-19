@@ -89,7 +89,7 @@ new class extends Component {
             @if (!$hideCancel)
                 <x-button label="{{ __('Cancel') }}" link="/dashboard" />
             @endif
-            <x-button label="{{ $portfolio ? 'Update' : 'Create' }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
+            <x-button label="{{ $portfolio ? __('Update') : __('Create') }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
         </x-slot:actions>
     </x-ib-form>
 

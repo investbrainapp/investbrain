@@ -6,6 +6,7 @@ use App\Models\Holding;
 use App\Models\MarketData;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -86,10 +87,15 @@ class Dividend extends Model
             (new self)->insert($dividend_data->toArray());
 
             // sync to holdings
-            self::syncHoldings($dividend_data);
+            self::syncHoldings($symbol);
+
+            // get market data
+            $market_data = MarketData::firstOrNew(['symbol' => $symbol]);
+
+            // re-invest dividends
+            self::reinvestDividends($dividend_data, $market_data);
 
             // sync last dividend amount to market data table
-            $market_data = MarketData::firstOrNew(['symbol' => $symbol]);
             $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
             $market_data->save();
         }
@@ -97,10 +103,8 @@ class Dividend extends Model
         return $dividend_data;
     }
 
-    public static function syncHoldings($dividend_data): void
+    public static function syncHoldings(string $symbol): void
     {
-        $symbol = $dividend_data->last()['symbol'];
-
         // group by holdings
         $dividends = self::select(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
                         ->selectRaw('
@@ -115,7 +119,7 @@ class Dividend extends Model
                         ')
                         ->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
                         ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
-                        ->where('dividends.symbol', $dividend_data->last()['symbol'])
+                        ->where('dividends.symbol', $symbol)
                         ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
                         ->havingRaw('total_received > 0')
                         ->get();
@@ -129,5 +133,30 @@ class Dividend extends Model
                                                         ->sum('total_received')
                     ]);
                 });
+    }
+
+    public static function reinvestDividends(iterable $dividend_data, MarketData $market_data): void
+    {
+        // re-invest dividends
+        Holding::where([
+            'symbol' => $market_data->symbol,
+            'reinvest_dividends' => true,
+        ])
+        ->get()
+        ->each(function($holding) use ($dividend_data, $market_data) {
+
+            foreach($dividend_data as $dividend) {
+
+                Transaction::create([
+                    'date' => $dividend['date'],
+                    'portfolio_id' => $holding->portfolio_id,
+                    'symbol' => $holding->symbol,
+                    'transaction_type' => "BUY",
+                    'reinvested_dividend' => true,
+                    'cost_basis' => $market_data->market_value,
+                    'quantity' => ($dividend['dividend_amount'] * $holding->qtyOwned(Carbon::parse($dividend['date']))) / $market_data->market_value,
+                ]);
+            }
+        });
     }
 }

@@ -23,6 +23,7 @@ class Transaction extends Model
         'cost_basis',
         'sale_price',
         'split',
+        'reinvested_dividend'
     ];
 
     protected $hidden = [];
@@ -30,6 +31,7 @@ class Transaction extends Model
     protected $casts = [
         'date' => 'datetime',
         'split' => 'boolean',
+        'reinvested_dividend' => 'boolean'
     ];
 
     protected static function boot()

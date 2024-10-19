@@ -33,10 +33,10 @@
         <div class="mt-6 grid md:grid-cols-9 gap-5">
 
             <x-ib-card class="md:col-span-5">
-                <x-slot:title class="pb-2">
+                <x-slot:title>
 
                     {{ $holding->market_data->symbol }} 
-                    <span class="text-sm"> {{ $holding->market_data->name }} </span>
+                    <span class="text-sm ml-2"> {{ $holding->market_data->name }} </span>
                 </x-slot:title>
 
                 @livewire('holding-market-data', ['holding' => $holding])
@@ -100,15 +100,27 @@
 
             </x-ib-card>
 
-            <x-ib-card title="{{ __('Dividends') }}" class="md:col-span-3">
+            <x-ib-card class="md:col-span-3">
+
+                <x-slot:title>
+                    {{ __('Dividends') }}
+
+                    <x-ib-flex-spacer/>
+
+                    <x-button 
+                        title="{{ __('Dividend options') }}" 
+                        icon="o-ellipsis-vertical" 
+                        class="btn-circle btn-ghost btn-sm text-secondary" 
+                        @click="$dispatch('toggle-dividend-options')"
+                    />
+                </x-slot:title>
 
                 <x-ib-modal 
                     key="dividend-options"
                     title="{{ __('Dividend options') }}"
                 >
-                    @livewire('manage-transaction-form', [
-                        'portfolio' => $portfolio, 
-                        'symbol' => $holding->market_data->symbol, 
+                    @livewire('holding-dividend-options-form', [
+                        'holding' => $holding
                     ])
 
                 </x-ib-modal>

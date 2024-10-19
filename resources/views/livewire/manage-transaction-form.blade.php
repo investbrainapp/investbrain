@@ -165,7 +165,7 @@ new class extends Component {
             @endif
 
             <x-button 
-                label="{{ $transaction ? 'Update' : 'Create' }}" 
+                label="{{ $transaction ? __('Update') : __('Create') }}" 
                 type="submit" 
                 icon="o-paper-airplane" 
                 class="btn-primary" 

@@ -26,11 +26,13 @@ class Holding extends Model
         'realized_gain_dollars',
         'dividends_earned',
         'splits_synced_at',
+        'reinvest_dividends'
     ];
 
     protected $casts = [
         'splits_synced_at' => 'datetime',
-        'first_transaction_date' => 'datetime'
+        'first_transaction_date' => 'datetime',
+        'reinvest_dividends' => 'boolean'
     ];
 
     protected $attributes = [
@@ -207,6 +209,19 @@ class Holding extends Model
         ]);
 
         $this->save();
+    }
+
+    public function qtyOwned(\Illuminate\Support\Carbon $date = null)
+    {
+        if ($date == null) $date = now();
+
+        $transactions = $this->transactions->where('date', '<=', $date);
+
+        $purchases = $transactions->where('transaction_type', 'BUY')->sum('quantity');
+
+        $sales = $transactions->where('transaction_type', 'SELL')->sum('quantity');
+
+        return $purchases - $sales;
     }
 
     public function dailyPerformance(

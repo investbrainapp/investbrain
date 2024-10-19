@@ -88,7 +88,7 @@ new class extends Component {
             {{ $row->date->format('M d, Y') }}
         @endscope
         @scope('cell_split', $row)
-            {{ $row->split ? 'Yes' : '' }}
+            {{ $row->split ? __('Yes') : '' }}
         @endscope
         @scope('cell_transaction_type', $row)
             <x-badge 
