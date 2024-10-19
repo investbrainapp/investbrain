@@ -21,13 +21,16 @@
             />
             
             <x-button 
-                icon="o-magnifying-glass" 
                 @click.stop="$dispatch('mary-search-open')"
-                class="btn-sm"
+                class="btn-sm w-32 justify-start md:w-auto"
             >
                 <x-slot:label>
-                    @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
-
+                    <span class="flex">
+                        <x-icon name="o-magnifying-glass" class="mr-2" />
+                        <span class="hidden md:block">
+                            @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
+                        </span>
+                    </span>
                 </x-slot:label>
             </x-button>
 
