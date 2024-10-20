@@ -48,7 +48,7 @@ class ConnectedAccountController extends Controller
 
         // already linked, let's go login
         if ($connected_account->exists) {
-            Auth::login($connected_account->user);
+            Auth::login($connected_account->user, true);
 
             return redirect(route('dashboard'));
         }
@@ -65,7 +65,7 @@ class ConnectedAccountController extends Controller
             $connected_account->user_id = $user->id;
             $connected_account->save();
     
-            Auth::login($user);
+            Auth::login($user, true);
     
             return redirect(route('dashboard'));
         }
@@ -119,7 +119,7 @@ class ConnectedAccountController extends Controller
                 ]
             ]);
 
-            Auth::login($user);
+            Auth::login($user, true);
         }
 
         return redirect(route('dashboard'));
