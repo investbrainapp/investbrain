@@ -11,7 +11,7 @@
         </div>
 
         @if (session('status') == 'verification-link-sent')
-            <x-alert icon="o-envelope" class="alert-success">
+            <x-alert icon="o-envelope" class="alert-success mb-4">
                 {{ __('A new verification link has been sent to the email address you provided in your profile settings.') }}
             </x-alert>
         @endif

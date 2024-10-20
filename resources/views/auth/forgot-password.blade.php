@@ -11,7 +11,7 @@
         </div>
 
         @session('status')
-            <x-alert icon="o-envelope" class="alert-success">
+            <x-alert icon="o-envelope" class="alert-success mb-4">
                 {{ $value }}
             </x-alert>
         @endsession

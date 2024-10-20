@@ -41,7 +41,7 @@ class ConnectedAccountController extends Controller
         } catch (Exception $e) {
 
             return redirect(route('login'))
-                ->with('errors', new MessageBag([__('Could not login using that provider. Try again later.')]));
+                ->with('errors', new MessageBag([__('Could not login using :provider. Try again later.', ['provider' => config("services.$provider.name")])]));
         }
 
         // check if this account is already linked
@@ -92,7 +92,10 @@ class ConnectedAccountController extends Controller
         $user->notify(new VerifyConnectedAccountNotification($verification->id));
 
         return redirect(route('login'))
-                ->with('status', __('Account already exists. Check your email to connect your accounts.'));
+                ->with('status', __(
+                    'Account already exists. Check your email to connect your :provider account.', 
+                    ['provider' => config("services.$provider.name")]
+                ));
     }
 
     protected function validateProvider($provider): void
