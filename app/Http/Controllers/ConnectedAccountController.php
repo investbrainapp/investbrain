@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\User;
-use App\Http\Controllers\Controller;
 use App\Models\ConnectedAccount;
-use App\Models\ConnectedAccountVerification;
-use App\Notifications\VerifyConnectedAccountNotification;
-use Illuminate\Contracts\Support\MessageBag;
+use Illuminate\Support\MessageBag;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use App\Models\ConnectedAccountVerification;
+use App\Notifications\VerifyConnectedAccountNotification;
 
 class ConnectedAccountController extends Controller
 {
@@ -35,7 +35,7 @@ class ConnectedAccountController extends Controller
         $this->validateProvider($provider);
 
         try {
-            
+
             $providerUser = Socialite::driver($provider)->user();
 
         } catch (Exception $e) {
