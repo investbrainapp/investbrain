@@ -102,7 +102,8 @@ class Holding extends Model
                         ->from('transactions')
                         ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
                         ->whereRaw("transactions.symbol = '$this->symbol'");
-                });
+                })
+                ->having('total_received', '>', 0);
     }
 
     /**
