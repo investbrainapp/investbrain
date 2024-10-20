@@ -144,7 +144,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        env('REGISTRATION_ENABLED', true) ? Features::registration() : null,
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::updateProfileInformation(),

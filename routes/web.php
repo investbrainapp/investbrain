@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\VerifyConnectedAccountController;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
@@ -21,10 +23,10 @@ Route::get('/test', function () {
     //
 });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
-    Route::view('/import-export', 'import-export')->name('import-export');
+    Route::view('/import-export', 'import-export')->name('import-export')->middleware('verified');
 
     Route::get('/portfolio/create', [PortfolioController::class, 'create'])->name('portfolio.create');
     Route::get('/portfolio/{portfolio}', [PortfolioController::class, 'show'])->name('portfolio.show');
@@ -37,3 +39,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 // overwrites jetstream routes
 Route::get('/terms', [TermsOfServiceController::class, 'show'])->name('terms.show');
 Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('policy.show');
+
+// social login routes
+Route::get('auth/verify/{verification_id}', VerifyConnectedAccountController::class)->name('verify_connected_account');
+
+Route::get('auth/{provider}', [SocialLoginController::class, 'redirectToProvider'])->name('oauth.redirect');
+Route::get('auth/{provider}/callback', [SocialLoginController::class, 'handleProviderCallback']);
