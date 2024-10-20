@@ -11,7 +11,7 @@ use App\Notifications\VerifyConnectedAccountNotification;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
-class SocialLoginController extends Controller
+class ConnectedAccountController extends Controller
 {
 
     /**

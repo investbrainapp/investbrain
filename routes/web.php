@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
-use App\Http\Controllers\SocialLoginController;
+use App\Http\Controllers\ConnectedAccountController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\VerifyConnectedAccountController;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
@@ -43,5 +43,5 @@ Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('policy.s
 // social login routes
 Route::get('auth/verify/{verification_id}', VerifyConnectedAccountController::class)->name('verify_connected_account');
 
-Route::get('auth/{provider}', [SocialLoginController::class, 'redirectToProvider'])->name('oauth.redirect');
-Route::get('auth/{provider}/callback', [SocialLoginController::class, 'handleProviderCallback']);
+Route::get('auth/{provider}', [ConnectedAccountController::class, 'redirectToProvider'])->name('oauth.redirect');
+Route::get('auth/{provider}/callback', [ConnectedAccountController::class, 'handleProviderCallback']);
