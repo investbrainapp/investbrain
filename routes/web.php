@@ -41,7 +41,7 @@ Route::get('/terms', [TermsOfServiceController::class, 'show'])->name('terms.sho
 Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('policy.show');
 
 // social login routes
-Route::get('auth/verify/{verification_id}', VerifyConnectedAccountController::class)->name('verify_connected_account');
+Route::get('auth/verify/{verification_id}', [ConnectedAccountController::class, 'verify'])->name('oauth.verify_connected_account');
 
 Route::get('auth/{provider}', [ConnectedAccountController::class, 'redirectToProvider'])->name('oauth.redirect');
 Route::get('auth/{provider}/callback', [ConnectedAccountController::class, 'handleProviderCallback']);
