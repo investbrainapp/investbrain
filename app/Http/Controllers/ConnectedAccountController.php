@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ConnectedAccount;
 use App\Models\ConnectedAccountVerification;
 use App\Notifications\VerifyConnectedAccountNotification;
+use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -33,7 +34,15 @@ class ConnectedAccountController extends Controller
     {
         $this->validateProvider($provider);
 
-        $providerUser = Socialite::driver($provider)->user();
+        try {
+            
+            $providerUser = Socialite::driver($provider)->user();
+
+        } catch (Exception $e) {
+
+            return redirect(route('login'))
+                ->with('error',new MessageBag([__('Could not login using that provider. Try again later.')]));
+        }
 
         // check if this account is already linked
         $connected_account = ConnectedAccount::firstOrNew([ 
@@ -83,7 +92,7 @@ class ConnectedAccountController extends Controller
         $user->notify(new VerifyConnectedAccountNotification($verification->id));
 
         return redirect(route('login'))
-                ->with('status', __('Account already exists. Check your email for a link to login.'));
+                ->with('status', __('Account already exists. Check your email to connect your accounts.'));
     }
 
     protected function validateProvider($provider): void
