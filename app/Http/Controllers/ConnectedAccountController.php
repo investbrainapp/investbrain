@@ -41,7 +41,7 @@ class ConnectedAccountController extends Controller
         } catch (Exception $e) {
 
             return redirect(route('login'))
-                ->with('error',new MessageBag([__('Could not login using that provider. Try again later.')]));
+                ->with('errors', new MessageBag([__('Could not login using that provider. Try again later.')]));
         }
 
         // check if this account is already linked
