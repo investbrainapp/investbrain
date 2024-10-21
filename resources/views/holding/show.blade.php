@@ -12,19 +12,37 @@
 
         </x-ib-modal>
 
+        <x-ib-modal 
+            key="holding-options"
+            title="{{ __('Holding options') }}"
+        >
+            @livewire('holding-options-form', [
+                'holding' => $holding
+            ])
+
+        </x-ib-modal>
+
         <x-ib-toolbar>
             <x-slot:title>
                 <a href="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}" title="{{ __('Portfolio') }}">
                     {{ $portfolio->title }}
                 </a> » <span title="{{ __('Holding') }}">{{ $holding->market_data->symbol }}</span>
+
             </x-slot:title>
+
+            <x-button 
+                title="{{ __('Holding options') }}" 
+                icon="o-pencil" 
+                class="btn-circle btn-ghost btn-sm text-secondary" 
+                @click="$dispatch('toggle-holding-options')"
+            />
 
             <x-ib-flex-spacer />
             
             <div>
                 <x-button 
                     label="{{ __('Create Transaction') }}" 
-                    class="btn-sm btn-primary" 
+                    class="btn-sm btn-primary whitespace-nowrap" 
                     @click="$dispatch('toggle-create-transaction')"
                 />
             </div>
@@ -100,30 +118,7 @@
 
             </x-ib-card>
 
-            <x-ib-card class="md:col-span-3">
-
-                <x-slot:title>
-                    {{ __('Dividends') }}
-
-                    <x-ib-flex-spacer/>
-
-                    <x-button 
-                        title="{{ __('Dividend options') }}" 
-                        icon="o-ellipsis-vertical" 
-                        class="btn-circle btn-ghost btn-sm text-secondary" 
-                        @click="$dispatch('toggle-dividend-options')"
-                    />
-                </x-slot:title>
-
-                <x-ib-modal 
-                    key="dividend-options"
-                    title="{{ __('Dividend options') }}"
-                >
-                    @livewire('holding-dividend-options-form', [
-                        'holding' => $holding
-                    ])
-
-                </x-ib-modal>
+            <x-ib-card title="{{ __('Dividends') }}" class="md:col-span-3">
 
                 @if($holding->dividends->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">

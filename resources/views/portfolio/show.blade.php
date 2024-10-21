@@ -13,7 +13,7 @@
 
         <x-ib-drawer 
             key="manage-portfolio"
-            title="{{ $portfolio->title }}"
+            title="{{ __('Manage Portfolio') }}"
         >
             @livewire('manage-portfolio-form', [
                 'portfolio' => $portfolio, 
@@ -29,7 +29,7 @@
             @endif
 
             <x-button 
-                title="{{ __('Edit Portfolio') }}" 
+                title="{{ __('Manage Portfolio') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-manage-portfolio')"
@@ -40,7 +40,7 @@
             <div>
                 <x-button 
                     label="{{ __('Create Transaction') }}" 
-                    class="btn-sm btn-primary" 
+                    class="btn-sm btn-primary whitespace-nowrap" 
                     @click="$dispatch('toggle-create-transaction')"
                 />
             </div>

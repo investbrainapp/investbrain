@@ -34,14 +34,14 @@ new class extends Component {
     {
         $this->holding->update($this->validate());
 
-        $this->success(__('Dividend options saved'));
+        $this->success(__('Holding options saved'));
 
-        $this->dispatch('toggle-dividend-options');
+        $this->dispatch('toggle-holding-options');
     }
 }; ?>
 
-<div class="" x-data="{ }">
-    <x-ib-form wire:submit="save" class="">
+<div class="" x-data="{ }"> {{-- grid lg:grid-cols-4 gap-10 --}}
+    <x-ib-form wire:submit="save" class=""> {{-- col-span-3 --}}
 
         <x-toggle 
             label="{{ __('Reinvest dividends') }}" 
