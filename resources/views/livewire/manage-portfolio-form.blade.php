@@ -38,7 +38,7 @@ new class extends Component {
     public function update()
     {
         $this->authorize('fullAccess', $this->portfolio);
-        
+
         $this->portfolio->update($this->validate());
         $this->portfolio->save();
 
@@ -70,7 +70,7 @@ new class extends Component {
     <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" class="col-span-3">
         <x-input label="{{ __('Title') }}" wire:model="title" required />
 
-        <x-textarea label="{{ __('Notes') }}" wire:model="notes" rows="4" />
+        <x-ib-textarea label="{{ __('Notes') }}" wire:model="notes" rows="4" />
 
         @livewire('share-portfolio-form', ['portfolio' => $portfolio])
 
