@@ -162,7 +162,7 @@ new class extends Component {
 
         <x-ib-modal 
             key="add-user-modal"
-            title="{{ __('Share Portfolio') }}"
+            title="{{ __('Share portfolio') }}"
         >
             <div class="" x-data="{  }">
                 <x-ib-form wire:submit="addUser" class="">
@@ -186,7 +186,7 @@ new class extends Component {
                     
                         <x-button 
                             label="{{ __('Share') }}" 
-                            title="{{ __('Share Portfolio') }}"
+                            title="{{ __('Share portfolio') }}"
                             type="submit" 
                             icon="o-paper-airplane" 
                             class="btn-primary" 

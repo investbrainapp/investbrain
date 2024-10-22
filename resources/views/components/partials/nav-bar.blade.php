@@ -25,10 +25,13 @@
                 class="btn-sm flex-1 justify-start md:flex-none"
             >
                 <x-slot:label>
-                    <span class="flex">
+                    <span class="flex items-center text-gray-400">
                         <x-icon name="o-magnifying-glass" class="mr-2" />
-                        <span class="hidden md:block">
+                        <span class=" truncate hidden sm:block">
                             @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
+                        </span>
+                        <span class=" truncate block sm:hidden">
+                            @lang('Click to search')
                         </span>
                     </span>
                 </x-slot:label>
