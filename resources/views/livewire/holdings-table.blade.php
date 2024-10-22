@@ -18,19 +18,19 @@ new class extends Component {
     public function mount()
     {
         $this->headers = [
-            ['key' => 'symbol', 'label' => __('Symbol'), 'class' => ''],
-            ['key' => 'market_data_name', 'label' => __('Name'), 'sortable' => true],
+            ['key' => 'symbol', 'label' => __('Symbol')],
+            ['key' => 'market_data_name', 'label' => __('Name'), 'sortable' => true, 'class' => 'hidden md:block'],
             ['key' => 'quantity', 'label' => __('Quantity')],
             ['key' => 'average_cost_basis', 'label' => __('Average Cost Basis')],
-            ['key' => 'total_cost_basis', 'label' => __('Total Cost Basis')],
+            ['key' => 'total_cost_basis', 'label' => __('Total Cost Basis'), 'class' => 'hidden md:block'],
             ['key' => 'market_data_market_value', 'label' => __('Market Value')],
-            ['key' => 'total_market_value', 'label' => __('Total Market Value')],
+            ['key' => 'total_market_value', 'label' => __('Total Market Value'), 'class' => 'hidden md:block'],
             ['key' => 'market_gain_dollars', 'label' => __('Market Gain/Loss')],
-            ['key' => 'market_gain_percent', 'label' => __('Market Gain/Loss')],
+            ['key' => 'market_gain_percent', 'label' => __('Market Gain/Loss'), 'class' => 'hidden md:block'],
             ['key' => 'realized_gain_dollars', 'label' => __('Realized Gain/Loss')],
             ['key' => 'dividends_earned', 'label' => __('Dividends Earned')],
-            ['key' => 'market_data_fifty_two_week_low', 'label' => __('52 week low')],
-            ['key' => 'market_data_fifty_two_week_high', 'label' => __('52 week high')],
+            ['key' => 'market_data_fifty_two_week_low', 'label' => __('52 week low'), 'class' => 'hidden md:block'],
+            ['key' => 'market_data_fifty_two_week_high', 'label' => __('52 week high'), 'class' => 'hidden md:block'],
             ['key' => 'num_transactions', 'label' => __('Number of Transactions')],
             ['key' => 'market_data_updated_at', 'label' => __('Last Refreshed')],
         ];
@@ -58,46 +58,44 @@ new class extends Component {
 
 }; ?>
 
-<div class="">
 
-    <x-table 
-        :headers="$headers" 
-        :rows="$this->holdings()" 
-        :sort-by="$sortBy"
-        @row-click="$wire.goToHolding($event.detail)"
-    >
-        @scope('cell_average_cost_basis', $row)
-            {{ Number::currency($row->average_cost_basis ?? 0) }}
-        @endscope
-        @scope('cell_total_cost_basis', $row)
-            {{ Number::currency($row->total_cost_basis ?? 0) }}
-        @endscope
-        @scope('cell_realized_gain_dollars', $row)
-            {{ Number::currency($row->realized_gain_dollars ?? 0) }}
-        @endscope
-        @scope('cell_market_gain_dollars', $row)
-            {{ Number::currency($row->market_gain_dollars ?? 0) }}
-        @endscope
-        @scope('cell_market_gain_percent', $row)
-            <x-gain-loss-arrow-badge :percent="$row->market_gain_percent" />
-        @endscope
-        @scope('cell_market_data_market_value', $row)
-            {{ Number::currency($row->market_data_market_value ?? 0) }}
-        @endscope
-        @scope('cell_market_data_fifty_two_week_low', $row)
-            {{ Number::currency($row->market_data_fifty_two_week_low ?? 0) }}
-        @endscope
-        @scope('cell_market_data_fifty_two_week_high', $row)
-            {{ Number::currency($row->market_data_fifty_two_week_high ?? 0) }}
-        @endscope
-        @scope('cell_total_market_value', $row)
-            {{ Number::currency($row->total_market_value ?? 0) }}
-        @endscope
-        @scope('cell_dividends_earned', $row)
-            {{ Number::currency($row->dividends_earned ?? 0) }}
-        @endscope
-        @scope('cell_market_data_updated_at', $row)
-            {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}
-        @endscope
-    </x-table>
-</div>
+<x-table 
+    :headers="$headers" 
+    :rows="$this->holdings()" 
+    :sort-by="$sortBy"
+    @row-click="$wire.goToHolding($event.detail)"
+>
+    @scope('cell_average_cost_basis', $row)
+        {{ Number::currency($row->average_cost_basis ?? 0) }}
+    @endscope
+    @scope('cell_total_cost_basis', $row)
+        {{ Number::currency($row->total_cost_basis ?? 0) }}
+    @endscope
+    @scope('cell_realized_gain_dollars', $row)
+        {{ Number::currency($row->realized_gain_dollars ?? 0) }}
+    @endscope
+    @scope('cell_market_gain_dollars', $row)
+        {{ Number::currency($row->market_gain_dollars ?? 0) }}
+    @endscope
+    @scope('cell_market_gain_percent', $row)
+        <x-gain-loss-arrow-badge :percent="$row->market_gain_percent" />
+    @endscope
+    @scope('cell_market_data_market_value', $row)
+        {{ Number::currency($row->market_data_market_value ?? 0) }}
+    @endscope
+    @scope('cell_market_data_fifty_two_week_low', $row)
+        {{ Number::currency($row->market_data_fifty_two_week_low ?? 0) }}
+    @endscope
+    @scope('cell_market_data_fifty_two_week_high', $row)
+        {{ Number::currency($row->market_data_fifty_two_week_high ?? 0) }}
+    @endscope
+    @scope('cell_total_market_value', $row)
+        {{ Number::currency($row->total_market_value ?? 0) }}
+    @endscope
+    @scope('cell_dividends_earned', $row)
+        {{ Number::currency($row->dividends_earned ?? 0) }}
+    @endscope
+    @scope('cell_market_data_updated_at', $row)
+        {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}
+    @endscope
+</x-table>
