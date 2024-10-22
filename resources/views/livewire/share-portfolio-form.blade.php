@@ -18,7 +18,7 @@ new class extends Component {
     public string $emailAddress;
 
     #[Rule('sometimes|boolean')]
-    public bool $fullAccess = false;
+    public int $fullAccess = 0;
 
     public array $permissions;
 
