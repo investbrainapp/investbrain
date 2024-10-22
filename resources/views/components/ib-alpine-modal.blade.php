@@ -3,10 +3,11 @@
     'showClose' => true,
     'closeOnEscape' => true,
     'title' => null,
-    'subtitle' => null
+    'subtitle' => null,
+    'persistent' => false
 ])
 
-<div 
+<dialog 
     x-data="{ open: false }"
     x-on:toggle-{{ $key }}.window="open = !open"
     class="relative z-50 w-auto h-auto"
@@ -17,7 +18,9 @@
     <template x-teleport="body">
         <div x-transition.opacity x-show="open" class="fixed top-0 left-0 z-[99] flex items-center justify-center w-full h-full">
             <div 
-                @click="open=false" 
+                @if(!$persistent)
+                    @click="open=false" 
+                @endif
                 class="absolute inset-0 w-full h-full bg-black bg-opacity-40"
                 x-show="open"
                 x-cloak
@@ -44,4 +47,4 @@
             </x-card>
         </div>
     </template>
-</div>
+</dialog>

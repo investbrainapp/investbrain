@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Holding;
 use App\Models\Portfolio;
-use App\Models\DailyChange;
+use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
 {
@@ -20,8 +20,12 @@ class PortfolioController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Portfolio $portfolio)
+    public function show(Request $request, Portfolio $portfolio)
     {
+        if ($request->user()->cannot('readOnly', $portfolio)) {
+            abort(403);
+        }
+
         $portfolio->load(['transactions', 'holdings']);
         
         // get portfolio metrics

@@ -47,8 +47,6 @@ new class extends Component {
 
     public function save()
     {
-        $this->authorize('fullAccess', $this->portfolio);
-
         $portfolio = (new Portfolio())->fill($this->validate());
 
         $portfolio->save();
@@ -66,15 +64,18 @@ new class extends Component {
     }
 }; ?>
 
-<div class="grid lg:grid-cols-4 gap-10">
-    <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" class="col-span-3">
+<div class="w-full md:w-3/4">
+
+    <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" >
         <x-input label="{{ __('Title') }}" wire:model="title" required />
 
         <x-ib-textarea label="{{ __('Notes') }}" wire:model="notes" rows="4" />
 
+        @if (isset($this->portfolio))
         @livewire('share-portfolio-form', ['portfolio' => $portfolio])
+        @endif
 
-        <x-toggle class="mt-1" label="{{ __('Wishlist') }}" wire:model="wishlist" >
+        <x-toggle label="{{ __('Wishlist') }}" wire:model="wishlist" >
             <x-slot:hint>
                 {{ __('Treat this portfolio as a "wishlist" (holdings will be excluded from realized gains, unrealized gains, and dividends)') }}
             </x-slot:hint>

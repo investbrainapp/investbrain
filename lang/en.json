@@ -125,7 +125,7 @@
     "Dividends": "Dividends",
     "Holding Options": "Holding Options",
     "Holding options saved": "Holding options saved",
-    "Reinvest dividends": "Reinvest dividends",
+    "Reinvest Dividends": "Reinvest Dividends",
     "Automatically generate buy transactions for any dividends earned": "Automatically generate buy transactions for any dividends earned",
     "Split": "Split",
     "Splits": "Splits",
@@ -348,9 +348,11 @@
     "Updated user's access permission to portfolio": "Updated user's access permission to portfolio", 
     "Removed user's access to portfolio": "Removed user's access to portfolio",
     "Shared portfolio with user": "Shared portfolio with user",
-    "Share Portfolio": "Share portfolio",
+    "Share Portfolio": "Share Portfolio",
     "Type an email address to share portfolio": "Type an email address to share portfolio",
     "Grant full access": "Grant full access",
     "Allow this user to manage portfolio details and create or update transactions": "Allow this user to manage portfolio details and create or update transactions",
-    "Share": "Share"
+    "Share": "Share",
+    "Remove Access": "Remove Access",
+    "By removing this person's access, they will no longer be able to view this portfolio. They will lose access immediately.": "By removing this person's access, they will no longer be able to view this portfolio. They will lose access immediately."
 }

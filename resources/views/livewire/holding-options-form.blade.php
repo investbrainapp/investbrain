@@ -44,7 +44,7 @@ new class extends Component {
     <x-ib-form wire:submit="save" class=""> {{-- col-span-3 --}}
 
         <x-toggle 
-            label="{{ __('Reinvest dividends') }}" 
+            label="{{ __('Reinvest Dividends') }}" 
             wire:model="reinvest_dividends" 
             right 
             hint="{{ __('Automatically generate buy transactions for any dividends earned.') }}"

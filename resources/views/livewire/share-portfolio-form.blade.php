@@ -21,6 +21,8 @@ new class extends Component {
     public int $fullAccess = 0;
 
     public array $permissions;
+    public bool $confirmingAccessDeletion = false;
+    public ?string $deletingAccessFor = null;
 
     // methods
     public function mount()
@@ -57,10 +59,17 @@ new class extends Component {
         $this->success(__('Updated user\'s access permission to portfolio'));
     }
 
-    public function deleteUser(string $userId)
+    public function deleteUser(string $userId, bool $confirmed = false)
     {
         $this->authorize('fullAccess', $this->portfolio);
 
+        if (!$confirmed) {
+            $this->deletingAccessFor = $userId;
+            $this->confirmingAccessDeletion = true;
+
+            return;
+        }
+        
         unset($this->permissions[$userId]);
 
         $this->portfolio->users()->sync($this->permissions);
@@ -68,6 +77,10 @@ new class extends Component {
         $this->portfolio->refresh();
 
         $this->success(__('Removed user\'s access to portfolio'));
+
+        // reset
+        $this->confirmingAccessDeletion = false;
+        $this->deletingAccessFor = null;
     }
 
     public function addUser()
@@ -100,18 +113,13 @@ new class extends Component {
 }; ?>
 
 <div class="">
-    @if ($this->portfolio)
-    
     <label class="pt-0 label label-text font-semibold">
         <span>{{ __('People with access') }}</span>
     </label>
 
     <div class="border-primary border rounded-sm px-2 py-5 mb-2">
-        @php
-            $owner = collect($this->portfolio?->users)->where('pivot.owner', 1)->first() ?? auth()->user();
-        @endphp
         <x-list-item 
-            :item="$owner" 
+            :item="$portfolio->owner" 
             avatar="profile_photo_url" 
             no-separator
             no-hover 
@@ -119,9 +127,9 @@ new class extends Component {
         >
             <x-slot:value>
             
-                {{ $owner->name }}
+                {{ $portfolio->owner->name }}
 
-                @if (auth()->user()->id == $owner->id) 
+                @if (auth()->user()->id == $portfolio->owner->id) 
                     ({{ __('you') }})
                 @endif
             </x-slot:value>
@@ -148,6 +156,7 @@ new class extends Component {
                         :options="[['id' => 0, 'name' => __('Read only')], ['id' => 1, 'name' => __('Full access')]]"
                         wire:model.live.number="permissions.{{ $user->id }}.full_access"
                     />
+                    @if($user->id != auth()->user()->id)
                     <x-button 
                         class="btn-sm btn-ghost btn-circle" 
                         wire:click="deleteUser('{{ $user->id }}')"
@@ -155,14 +164,35 @@ new class extends Component {
                     >
                         <x-icon name="o-x-mark" class="w-4" />
                     </x-button>
+                    @endif
    
                 </x-slot:actions>
             </x-list-item>
         @endforeach
 
-        <x-ib-modal 
+        <x-confirmation-modal wire:model.live="confirmingAccessDeletion">
+            <x-slot:title>
+                {{ __('Remove Access') }}
+            </x-slot:title>
+    
+            <x-slot name="content">
+                {{ __('By removing this person\'s access, they will no longer be able to view this portfolio. They will lose access immediately.') }}
+            </x-slot>
+    
+            <x-slot name="footer">
+                <x-button class="btn-outline" wire:click="$toggle('confirmingAccessDeletion')" wire:loading.attr="disabled">
+                    {{ __('Cancel') }}
+                </x-secondary-button>
+    
+                <x-button class="ms-3 btn-error text-white" wire:click="deleteUser('{{ $this->deletingAccessFor }}', true)" spinner="deleteUser" wire:loading.attr="disabled">
+                    {{ __('Remove Access') }}
+                </x-button>
+            </x-slot>
+        </x-confirmation-modal>
+
+        <x-ib-alpine-modal 
             key="add-user-modal"
-            title="{{ __('Share portfolio') }}"
+            title="{{ __('Share Portfolio') }}"
         >
             <div class="" x-data="{  }">
                 <x-ib-form wire:submit="addUser" class="">
@@ -172,6 +202,7 @@ new class extends Component {
                         icon="o-envelope" 
                         placeholder="{{ __('Type an email address to share portfolio') }}"
                         wire:model="emailAddress" 
+                        required
                     />
                 
                     <x-toggle 
@@ -186,7 +217,7 @@ new class extends Component {
                     
                         <x-button 
                             label="{{ __('Share') }}" 
-                            title="{{ __('Share portfolio') }}"
+                            title="{{ __('Share Portfolio') }}"
                             type="submit" 
                             icon="o-paper-airplane" 
                             class="btn-primary" 
@@ -197,12 +228,11 @@ new class extends Component {
         
             </div>
             
-        </x-ib-modal>
+        </x-ib-alpine-modal>
 
         <x-button class="btn-sm block mt-4" @click="$dispatch('toggle-add-user-modal')">
-            {{ __('Add people') }}
+            {{ __('Add People') }}
         </x-button>
         
     </div>
-    @endif
 </div>

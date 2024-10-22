@@ -69,6 +69,17 @@ class Portfolio extends Model
         });
     }
 
+    public function scopeFullAccess() 
+    {
+        return $this->whereHas('users', function ($query) {
+            $query->where('user_id', auth()->user()->id)
+                  ->where(function ($query) {
+                      $query->where('full_access', true)
+                            ->orWhere('owner', true);
+                  });
+        });
+    }
+
     public function scopeWithoutWishlists() 
     {
         return $this->where(['wishlist' => false]);

@@ -116,11 +116,10 @@ new class extends Component {
                 label="{{ __('Portfolio') }}" 
                 wire:model="portfolio_id" 
                 required 
-                :options="auth()->user()->portfolios"
+                :options="auth()->user()->portfolios()->fullAccess()->get()"
                 option-label="title" 
                 placeholder="Select a portfolio"
             />
-
         @endif
 
         <x-input label="{{ __('Symbol') }}" wire:model="symbol" required />

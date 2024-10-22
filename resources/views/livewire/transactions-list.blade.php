@@ -89,7 +89,7 @@ new class extends Component {
 
     @endforeach
 
-    <x-ib-modal 
+    <x-ib-alpine-modal 
         key="manage-transaction"
         title="{{ __('Manage Transaction') }}"
     >
@@ -98,5 +98,5 @@ new class extends Component {
             'transaction' => $editingTransaction, 
         ], key($editingTransaction->id ?? 'new'))
 
-    </x-ib-modal>
+    </x-ib-alpine-modal>
 </div>

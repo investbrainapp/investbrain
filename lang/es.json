@@ -125,7 +125,7 @@
     "Dividends": "Dividendos",
     "Holding Options": "Opciones de Participaciones",
     "Holding options saved": "Opciones de participaciones guardadas",
-    "Reinvest dividends": "Reinvertir dividendos",
+    "Reinvest Dividends": "Reinvertir Dividendos",
     "Automatically generate buy transactions for any dividends earned": "Genere automáticamente transacciones de compra para cualquier dividendo obtenido",
     "Split": "Division",
     "Splits": "Divisiones",
@@ -352,5 +352,7 @@
     "Type an email address to share portfolio": "Escribe una dirección de correo electrónico para compartir portafolio",
     "Grant full access": "Otorgar acceso completo",
     "Allow this user to manage portfolio details and create or update transactions": "Permitir a este usuario administrar detalles de portafolio y crear o actualizar transacciones",
-    "Share": "Compartir"
+    "Share": "Compartir",
+    "Remove Access": "Eliminar acceso",
+    "By removing this person's access, they will no longer be able to view this portfolio. They will lose access immediately.": "Al eliminar el acceso de esta persona, ya no podrá ver este portafolio. Perderán el acceso inmediatamente."
 }

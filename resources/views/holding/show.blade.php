@@ -1,7 +1,7 @@
 <x-app-layout>
     <div x-data>  
 
-        <x-ib-modal 
+        <x-ib-alpine-modal 
             key="create-transaction"
             title="{{ __('Create Transaction') }}"
         >
@@ -10,9 +10,9 @@
                 'symbol' => $holding->market_data->symbol, 
             ])
 
-        </x-ib-modal>
+        </x-ib-alpine-modal>
 
-        <x-ib-modal 
+        <x-ib-alpine-modal 
             key="holding-options"
             title="{{ __('Holding Options') }}"
         >
@@ -20,7 +20,7 @@
                 'holding' => $holding
             ])
 
-        </x-ib-modal>
+        </x-ib-alpine-modal>
 
         <x-ib-toolbar>
             <x-slot:title>
