@@ -3,7 +3,7 @@
 
         <x-ib-modal 
             key="create-transaction"
-            title="{{ __('Create transaction') }}"
+            title="{{ __('Create Transaction') }}"
         >
             @livewire('manage-transaction-form', [
                 'portfolio' => $portfolio, 
@@ -13,7 +13,7 @@
 
         <x-ib-drawer 
             key="manage-portfolio"
-            title="{{ __('Manage portfolio') }}"
+            title="{{ __('Manage Portfolio') }}"
         >
             @livewire('manage-portfolio-form', [
                 'portfolio' => $portfolio, 
@@ -30,7 +30,7 @@
 
             @can('fullAccess', $portfolio)
             <x-button 
-                title="{{ __('Manage portfolio') }}" 
+                title="{{ __('Manage Portfolio') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-manage-portfolio')"
@@ -42,7 +42,7 @@
             @can('fullAccess', $portfolio)
             <div>
                 <x-button 
-                    label="{{ __('Create transaction') }}" 
+                    label="{{ __('Create Transaction') }}" 
                     class="btn-sm btn-primary whitespace-nowrap" 
                     @click="$dispatch('toggle-create-transaction')"
                 />

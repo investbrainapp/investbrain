@@ -91,7 +91,7 @@ new class extends Component {
 
     <x-ib-modal 
         key="manage-transaction"
-        title="{{ __('Manage transaction') }}"
+        title="{{ __('Manage Transaction') }}"
     >
         @livewire('manage-transaction-form', [
             'portfolio' => $portfolio, 

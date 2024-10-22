@@ -3,7 +3,7 @@
 
         <x-ib-modal 
             key="create-transaction"
-            title="{{ __('Create transaction') }}"
+            title="{{ __('Create Transaction') }}"
         >
             @livewire('manage-transaction-form', [
                 'portfolio' => $portfolio, 
@@ -14,7 +14,7 @@
 
         <x-ib-modal 
             key="holding-options"
-            title="{{ __('Holding options') }}"
+            title="{{ __('Holding Options') }}"
         >
             @livewire('holding-options-form', [
                 'holding' => $holding

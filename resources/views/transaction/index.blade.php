@@ -3,7 +3,7 @@
 
         <x-ib-modal 
             key="create-transaction"
-            title="{{ __('Create transaction') }}"
+            title="{{ __('Create Transaction') }}"
         >
             @livewire('manage-transaction-form')
 
@@ -15,7 +15,7 @@
             
             <div>
                 <x-button 
-                    label="{{ __('Create transaction') }}" 
+                    label="{{ __('Create Transaction') }}" 
                     class="btn-sm btn-primary whitespace-nowrap " 
                     @click="$dispatch('toggle-create-transaction')"
                 />
