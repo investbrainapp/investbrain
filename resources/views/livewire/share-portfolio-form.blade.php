@@ -6,6 +6,7 @@ use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Illuminate\Support\Collection;
 use Mary\Traits\Toast;
+use App\Notifications\InvitedToPortfolioNotification;
 
 new class extends Component {
 
@@ -99,7 +100,14 @@ new class extends Component {
             'full_access' => $this->fullAccess
         ];
 
-        $this->portfolio->users()->sync($this->permissions);
+        $sync = $this->portfolio->users()->sync($this->permissions);
+
+        if (!empty($sync['attached'])) {
+
+            foreach($sync['attached'] as $newUserId) {
+                User::find($newUserId)->notify(new InvitedToPortfolioNotification($this->portfolio, auth()->user()));
+            };
+        }
 
         $this->success(__('Shared portfolio with user'));
         $this->portfolio->refresh();
@@ -233,6 +241,5 @@ new class extends Component {
         <x-button class="btn-sm block mt-4" @click="$dispatch('toggle-add-user-modal')">
             {{ __('Add People') }}
         </x-button>
-        
     </div>
 </div>
