@@ -27,7 +27,6 @@ new class extends Component {
     // methods
     public function mount() 
     {
-
         if (isset($this->portfolio)) {
 
             $this->title = $this->portfolio->title;
@@ -38,8 +37,9 @@ new class extends Component {
 
     public function update()
     {
+        $this->authorize('fullAccess', $this->portfolio);
+        
         $this->portfolio->update($this->validate());
-        // $this->portfolio->owner_id = auth()->user()->id;
         $this->portfolio->save();
 
         $this->success(__('Portfolio updated'), redirectTo: "/portfolio/{$this->portfolio->id}");
@@ -47,8 +47,10 @@ new class extends Component {
 
     public function save()
     {
+        $this->authorize('fullAccess', $this->portfolio);
+
         $portfolio = (new Portfolio())->fill($this->validate());
-        // $portfolio->owner_id = auth()->user()->id;
+
         $portfolio->save();
 
         $this->success(__('Portfolio created'), redirectTo: "/portfolio/{$portfolio->id}");
@@ -56,6 +58,7 @@ new class extends Component {
 
     public function delete()
     {
+        $this->authorize('fullAccess', $this->portfolio);
 
         $this->portfolio->delete();
 
@@ -67,9 +70,11 @@ new class extends Component {
     <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" class="col-span-3">
         <x-input label="{{ __('Title') }}" wire:model="title" required />
 
-        <x-textarea label="{{ __('Notes') }}" wire:model="notes" rows="5" />
+        <x-textarea label="{{ __('Notes') }}" wire:model="notes" rows="4" />
 
-        <x-toggle label="{{ __('Wishlist') }}" wire:model="wishlist">
+        @livewire('share-portfolio-form', ['portfolio' => $portfolio])
+
+        <x-toggle class="mt-1" label="{{ __('Wishlist') }}" wire:model="wishlist" >
             <x-slot:hint>
                 {{ __('Treat this portfolio as a "wishlist" (holdings will be excluded from realized gains, unrealized gains, and dividends)') }}
             </x-slot:hint>

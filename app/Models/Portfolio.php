@@ -26,9 +26,9 @@ class Portfolio extends Model
     {
         parent::boot();
         
-        static::saved(function ($model) {
+        static::saved(function ($portfolio) {
 
-            self::syncUsers($model);
+            self::ensurePortfolioHasOwner($portfolio);
         });
     }
 
@@ -42,7 +42,7 @@ class Portfolio extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot('owner');
+        return $this->belongsToMany(User::class)->withPivot(['owner', 'full_access', 'invite_accepted_at']);
     }
 
     public function holdings()
@@ -76,21 +76,23 @@ class Portfolio extends Model
 
     public function getOwnerIdAttribute()
     {
-        return $this->users()->firstWhere('owner', 1)?->id;
+        return $this->owner?->id;
     }
 
-    public static function syncUsers(self $model) 
+    public function getOwnerAttribute()
+    {
+        return $this->users()->firstWhere('owner', 1);
+    }
+
+    public static function ensurePortfolioHasOwner(self $portfolio) 
     {
         // make sure we don't remove owner access
-        $user_id[$model->owner_id ?? auth()->user()->id] = ['owner' => true];
+        if (!$portfolio->owner_id) {
+            $users[auth()->user()->id] = ['owner' => true];
 
-        // // add other users
-        // foreach(request()->users ?? [] as $id) {
-        //     $user_id[$id] = ['owner' => false];
-        // };
-
-        // save
-        $model->users()->sync($user_id);
+            // save
+            $portfolio->users()->sync($users);
+        }
     }
 
     public function syncDailyChanges(): void

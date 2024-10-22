@@ -4,8 +4,11 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
+use Mary\Traits\Toast;
 
 new class extends Component {
+
+    use Toast; 
 
     // props
     public Collection $transactions;
@@ -21,6 +24,11 @@ new class extends Component {
     // methods
     public function showTransactionDialog($transactionId)
     {
+        if (!auth()->user()->can('fullAccess', $this->portfolio)) {
+            $this->error(__('You do not have permission to manage transactions for this portfolio'));
+            return;
+        }
+
         $this->editingTransaction = Transaction::findOrFail($transactionId);
         $this->dispatch('toggle-manage-transaction');
     }

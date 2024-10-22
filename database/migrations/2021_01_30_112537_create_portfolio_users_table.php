@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
             $table->foreignIdFor(User::class, 'user_id')->constrained()->onDelete('cascade');
             $table->boolean('owner')->default(false);
-            $table->boolean('write')->default(false);
+            $table->boolean('full_access')->default(false);
+            $table->datetime('invite_accepted_at')->nullable();
             $table->primary(['portfolio_id', 'user_id']);
         });
     }

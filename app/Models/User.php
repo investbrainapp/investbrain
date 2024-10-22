@@ -52,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function portfolios()
     {
-        return $this->belongsToMany(Portfolio::class)->withPivot('owner');
+        return $this->belongsToMany(Portfolio::class)->withPivot(['owner', 'full_access', 'invite_accepted_at']);
     }
 
     public function daily_changes()

@@ -28,15 +28,18 @@
             <x-badge value="{{ __('Wishlist') }}" class="badge-secondary mr-3" />
             @endif
 
+            @can('fullAccess', $portfolio)
             <x-button 
                 title="{{ __('Manage Portfolio') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-manage-portfolio')"
             />
+            @endcan
 
             <x-ib-flex-spacer />
             
+            @can('fullAccess', $portfolio)
             <div>
                 <x-button 
                     label="{{ __('Create Transaction') }}" 
@@ -44,6 +47,7 @@
                     @click="$dispatch('toggle-create-transaction')"
                 />
             </div>
+            @endcan
         </x-ib-toolbar>
 
         @livewire('portfolio-performance-chart', [

@@ -24,7 +24,7 @@
 
     <x-card 
         
-        {{ $attributes->merge(['class' => 'min-h-screen w-11/12 lg:w-1/3 rounded-none px-8 transition']) }} 
+        {{ $attributes->merge(['class' => 'min-h-screen w-5/6 xl:w-3/5 rounded-none px-8 transition']) }} 
     >
         @if($title)
             <x-slot:title>

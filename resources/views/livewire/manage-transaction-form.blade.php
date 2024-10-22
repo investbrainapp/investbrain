@@ -30,7 +30,6 @@ new class extends Component {
     // methods
     public function rules()
     {
-
         return [
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => 'required|string|in:BUY,SELL',
@@ -68,6 +67,7 @@ new class extends Component {
 
     public function update()
     {
+        $this->authorize('fullAccess', $this->portfolio);
         
         $this->transaction->update($this->validate());
         // $this->transaction->owner_id = auth()->user()->id;
@@ -81,6 +81,8 @@ new class extends Component {
 
     public function save()
     {
+        $this->authorize('fullAccess', $this->portfolio);
+
         $validated = $this->validate();
 
         if (!isset($this->portfolio)) {
@@ -97,6 +99,7 @@ new class extends Component {
 
     public function delete()
     {
+        $this->authorize('fullAccess', $this->portfolio);
 
         $this->transaction->delete();
 

@@ -30,22 +30,24 @@
 
             </x-slot:title>
 
+            @can('fullAccess', $portfolio)
             <x-button 
                 title="{{ __('Holding options') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-holding-options')"
             />
+            @endcan
 
             <x-ib-flex-spacer />
             
-            <div>
-                <x-button 
-                    label="{{ __('Create Transaction') }}" 
-                    class="btn-sm btn-primary whitespace-nowrap" 
-                    @click="$dispatch('toggle-create-transaction')"
-                />
-            </div>
+            @can('fullAccess', $portfolio)
+            <x-button 
+                label="{{ __('Create Transaction') }}" 
+                class="btn-sm btn-primary whitespace-nowrap" 
+                @click="$dispatch('toggle-create-transaction')"
+            />
+            @endcan
         </x-ib-toolbar>
 
         <div class="mt-6 grid md:grid-cols-9 gap-5">

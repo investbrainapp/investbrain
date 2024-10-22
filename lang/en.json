@@ -18,6 +18,7 @@
     "or": "or",
     "and": "and",
     "Yes": "Yes",
+    "you": "you",
     "Nothing to show here yet": "Nothing to show here yet",
 
     "Hang on! You're doing that too much.": "Hang on! You're doing that too much.",
@@ -334,5 +335,20 @@
 
     "auth.failed": "These credentials do not match our records.",
     "auth.password": "The provided password is incorrect.",
-    "auth.throttle": "Too many login attempts. Please try again in :seconds seconds."
+    "auth.throttle": "Too many login attempts. Please try again in :seconds seconds.",
+
+    "Add people": "Add people",
+    "People with access": "People with access",
+    "Owner": "Owner",
+    "Read only": "Read only",
+    "Full access": "Full access",
+    "You do not have permission to manage transactions for this portfolio": "You do not have permission to manage transactions for this portfolio",
+    "Updated user's access permission to portfolio": "Updated user's access permission to portfolio", 
+    "Removed user's access to portfolio": "Removed user's access to portfolio",
+    "Shared portfolio with user": "Shared portfolio with user",
+    "Share Portfolio": "Share Portfolio",
+    "Type an email address to share portfolio": "Type an email address to share portfolio",
+    "Grant full access": "Grant full access",
+    "Allow this user to manage portfolio details and create or update transactions": "Allow this user to manage portfolio details and create or update transactions",
+    "Share": "Share"
 }

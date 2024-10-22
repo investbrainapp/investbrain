@@ -18,6 +18,7 @@
     "or": "o",
     "and": "y",
     "Yes": "Sí",
+    "you": "tú",
     "Nothing to show here yet": "No hay nada que mostrar aquí todavía",
     
     "Hang on! You're doing that too much.": "¡Por favor espere un momento!",
@@ -334,5 +335,20 @@
 
     "auth.failed": "Estas credenciales no coinciden con nuestros registros.",
     "auth.password": "La contraseña es incorrecta.",
-    "auth.throttle": "Demasiados intentos de acceso. Por favor intente nuevamente en :seconds segundos."
+    "auth.throttle": "Demasiados intentos de acceso. Por favor intente nuevamente en :seconds segundos.",
+
+    "Add people": "Agregar personas",
+    "People with access": "Personas con acceso",
+    "Read only": "Sólo lectura",
+    "Full access": "Acceso completo",
+    "Owner": "Dueño",
+    "You do not have permission to manage transactions for this portfolio": "No tienes permisos para administrar transacciones",
+    "Updated user's access permission to portfolio": "Se actualizó el permiso de acceso del usuario al portafolio", 
+    "Removed user's access to portfolio": "Se eliminó el acceso del usuario al portafolio",
+    "Shared portfolio with user": "Portafolio compartido con usuario",
+    "Share Portfolio": "Compartir portafolio",
+    "Type an email address to share portfolio": "Escribe una dirección de correo electrónico para compartir portafolio",
+    "Grant full access": "Otorgar acceso completo",
+    "Allow this user to manage portfolio details and create or update transactions": "Permitir a este usuario administrar detalles de portafolio y crear o actualizar transacciones",
+    "Share": "Compartir"
 }

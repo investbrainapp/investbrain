@@ -29,12 +29,6 @@ new class extends Component {
         return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
     }
 
-    // public function showTransactionDialog($transactionId)
-    // {
-    //     $this->editingTransaction = Transaction::findOrFail($transactionId);
-    //     $this->dispatch('toggle-manage-transaction');
-    // }
-
     public function mount()
     {
         $this->headers = [
@@ -69,7 +63,6 @@ new class extends Component {
         x-data="{ loadingId: null, timeout: null }"
         @row-click="
             timeout = setTimeout(() => { loadingId = $event.detail.id }, 200);
-            {{-- $wire.showTransactionDialog($event.detail.id).then(() => { --}}
             $wire.goToHolding($event.detail).then(() => {
                 clearTimeout(timeout);
                 loadingId = null;
