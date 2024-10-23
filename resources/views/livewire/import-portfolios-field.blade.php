@@ -6,13 +6,14 @@ use Mary\Traits\Toast;
 use App\Imports\BackupImport;
 use App\Exports\BackupExport;
 use Livewire\Attributes\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 new class extends Component {
     use Toast;
     use WithFileUploads;
 
     // props
-    #[Rule('required|file|mimes:xlsx|max:2048')]
+    #[Rule('required|extensions:xlsx|mimes:xlsx|max:2048')]
     public $file;
 
     // methods
@@ -28,7 +29,11 @@ new class extends Component {
 
         try {
 
-            $import = (new BackupImport)->import($this->file);
+            $import = Excel::import(
+                new BackupImport, 
+                $this->file->getPathname(), 
+                config('livewire.temporary_file_upload.disk', null)
+            );
 
         } catch (\Throwable $e) {
      
@@ -69,7 +74,7 @@ new class extends Component {
             {{ __('Saved.') }}
         </x-forms.action-message>
   
-        <x-button type="submit" spinner="import">
+        <x-button type="submit" wire:loading.attr="disabled" spinner="import">
             {{ __('Import') }}
         </x-button>
     </x-slot>
