@@ -354,5 +354,10 @@
     "Allow this user to manage portfolio details and create or update transactions": "Permitir a este usuario administrar detalles de portafolio y crear o actualizar transacciones",
     "Share": "Compartir",
     "Remove Access": "Eliminar acceso",
-    "By removing this person's access, they will no longer be able to view this portfolio. They will lose access immediately.": "Al eliminar el acceso de esta persona, ya no podrá ver este portafolio. Perderán el acceso inmediatamente."
+    "By removing this person's access, they will no longer be able to view this portfolio. They will lose access immediately.": "Al eliminar el acceso de esta persona, ya no podrá ver este portafolio. Perderán el acceso inmediatamente.",
+
+    "Hey again!": "¡Oye de nuevo!",
+    "Before you can get started with Investbrain, you'll want to create a password:": "Antes de poder comenzar a utilizar Investbrain, deberá crear una cuenta:",
+    "Or login with SSO:": "O iniciar sesión mediante SSO:",
+    "Create Password": "Crear Contraseña"
 }

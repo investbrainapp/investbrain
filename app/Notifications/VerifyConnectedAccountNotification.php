@@ -37,12 +37,14 @@ class VerifyConnectedAccountNotification extends Notification implements ShouldQ
         $verification = ConnectedAccountVerification::find($this->verification_id);
         $provider = config("services.$verification->provider.name");
 
+        $url = url()->signedRoute('oauth.verify_connected_account', ['verification_id' => $this->verification_id], now()->days($days = 7));
+
         return (new MailMessage)
                     ->greeting('Welcome back!')
                     ->subject("Connect your $provider account with Investbrain")
                     ->line("You recently attempted to log into an existing Investbrain account using $provider. To safeguard your Investbrain account, please confirm this was you by pressing the 'Connect $provider' button below:")
-                    ->action("Connect $provider", route('oauth.verify_connected_account', ['verification_id' => $this->verification_id]))
-                    ->line('If you do not recognize this activity, we recommend [changing your password]('.route('profile.show').') as soon as possible. Otherwise, you can disregard this message.');
+                    ->action("Connect $provider", $url)
+                    ->line("If you do not recognize this activity, we recommend [changing your password](".route('profile.show').") as soon as possible. Otherwise, you can disregard this message. This link will expire in {$days} days.");
     }
 
     /**

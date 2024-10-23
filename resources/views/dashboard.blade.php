@@ -59,7 +59,7 @@
 
         </x-ib-card>
 
-        @if (!$user->portfolios->isEmpty())
+        @if (!$user->transactions->isEmpty())
         <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
                 
             @livewire('transactions-list', [

@@ -51,29 +51,15 @@
 
                 <x-section-border />
 
-                <div class="">
+                <x-connected-accounts-login />
+                
+                <x-button 
+                    link="{{ route('register') }}" 
+                    class="btn-sm btn-block btn-outline btn-secondary my-1" 
+                >
+                    {{ __('Sign up with email') }}
+                </x-button>
 
-                    @foreach(explode(',', config('services.enabled_login_providers')) as $provider)
-                        <x-button 
-                            link="{{ route('oauth.redirect', ['provider' => $provider]) }}" 
-                            class="btn-sm btn-block my-1" 
-                            style='background-color: {{ config("services.$provider.color") }}'
-                            no-wire-navigate
-                        >
-                            @include("components.$provider-icon")
-                    
-                            {{ __('Login with') }} {{ config("services.$provider.name") }} 
-                        </x-button>
-                    @endforeach
-                    
-                    <x-button 
-                        link="{{ route('register') }}" 
-                        class="btn-sm btn-block btn-outline btn-secondary my-1" 
-                    >
-                        {{ __('Sign up with email') }}
-                    </x-button>
-
-                </div>
             @endif
         </form>
     </x-authentication-card>

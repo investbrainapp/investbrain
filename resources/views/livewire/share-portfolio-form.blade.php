@@ -6,7 +6,7 @@ use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Illuminate\Support\Collection;
 use Mary\Traits\Toast;
-use App\Notifications\InvitedToPortfolioNotification;
+use App\Notifications\InvitedOnboardingNotification;
 
 new class extends Component {
 
@@ -105,7 +105,7 @@ new class extends Component {
         if (!empty($sync['attached'])) {
 
             foreach($sync['attached'] as $newUserId) {
-                User::find($newUserId)->notify(new InvitedToPortfolioNotification($this->portfolio, auth()->user()));
+                User::find($newUserId)->notify(new InvitedOnboardingNotification($this->portfolio, auth()->user()));
             };
         }
 
@@ -150,30 +150,38 @@ new class extends Component {
             <x-list-item 
                 :item="$user" 
                 avatar="profile_photo_url" 
-                value="name" 
                 no-separator
                 class="!-my-2 rounded"
                 x-data="{ loading: false, timeout: null }"
             >
+
+                <x-slot:value>
+                    {{ $user->name }}
+
+                    @if (auth()->user()->id == $user->id) 
+                        ({{ __('you') }})
+                    @endif
+                </x-slot:value>
                 <x-slot:sub-value>
                     {{ $user->email }}
+
                 </x-slot:sub-value>
                 <x-slot:actions>
+                    @if (auth()->user()->id != $user->id) 
                     <x-select 
                         class="select select-ghost border-none focus:outline-none focus:ring-0"
                         :options="[['id' => 0, 'name' => __('Read only')], ['id' => 1, 'name' => __('Full access')]]"
                         wire:model.live.number="permissions.{{ $user->id }}.full_access"
                     />
-                    @if($user->id != auth()->user()->id)
+                    
                     <x-button 
                         class="btn-sm btn-ghost btn-circle" 
                         wire:click="deleteUser('{{ $user->id }}')"
-                        spinner="deleteUser"
+                        spinner="deleteUser('{{ $user->id }}')"
                     >
                         <x-icon name="o-x-mark" class="w-4" />
-                    </x-button>
+                    </x-button>      
                     @endif
-   
                 </x-slot:actions>
             </x-list-item>
         @endforeach

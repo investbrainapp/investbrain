@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ConnectedAccountController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\InvitedOnboardingController;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
@@ -35,7 +36,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
 });
 
-// overwrites jetstream routes
+// Invited onboarding
+Route::get('invite/{portfolio}/{user}', InvitedOnboardingController::class)->name('invited_onboarding')->scopeBindings();
+
+// Overwrites Jetstream routes
 Route::get('/terms', [TermsOfServiceController::class, 'show'])->name('terms.show');
 Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('policy.show');
 
