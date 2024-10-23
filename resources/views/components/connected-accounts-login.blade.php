@@ -1,4 +1,5 @@
 <div>
+    @if(!empty(config('services.enabled_login_providers')))
     @foreach(explode(',', config('services.enabled_login_providers')) as $provider)
         <x-button 
             link="{{ route('oauth.redirect', ['provider' => $provider]) }}" 
@@ -11,4 +12,5 @@
             {{ __('Login with') }} {{ config("services.$provider.name") }} 
         </x-button>
     @endforeach
+    @endif
 </div>
