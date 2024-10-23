@@ -126,6 +126,7 @@ new class extends Component {
     </label>
 
     <div class="border-primary border rounded-sm px-2 py-5 mb-2">
+        @if ($portfolio->owner)
         <x-list-item 
             :item="$portfolio->owner" 
             avatar="profile_photo_url" 
@@ -145,6 +146,7 @@ new class extends Component {
                 {{ __('Owner') }}
             </x-slot:sub-value>
         </x-list-item>
+        @endif
 
         @foreach (collect($this->portfolio?->users)->where('pivot.owner', '!=', 1) as $user)
             <x-list-item 

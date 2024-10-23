@@ -7,7 +7,7 @@
         </x-slot:logo>
 
         <h1 class="text-2xl font-bold mb-4">{{ __('Hey again!') }} 👋</h1>
-        <p class="mb-2">{{ __('Before you can get started with Investbrain, you\'ll want to create a password:') }}</p>
+        <p class="mb-2">{{ __('Before you can get started with Investbrain, let\'s complete your profile:') }}</p>
 
         @livewire('invited-onboarding-form', [
             'portfolio' => $portfolio,

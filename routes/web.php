@@ -47,4 +47,4 @@ Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('policy.s
 Route::get('auth/verify/{connected_account}', [ConnectedAccountController::class, 'verify'])->name('oauth.verify_connected_account');
 
 Route::get('auth/{provider}', [ConnectedAccountController::class, 'redirectToProvider'])->name('oauth.redirect');
-Route::get('auth/{provider}/callback', [ConnectedAccountController::class, 'handleProviderCallback']);
+Route::get('auth/{provider}/callback', [ConnectedAccountController::class, 'handleProviderCallback'])->name('oauth.callback');

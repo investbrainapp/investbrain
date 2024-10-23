@@ -15,7 +15,7 @@ class PortfolioPolicy
     {
         $pivot = $portfolio->users()->where('user_id', $user->id)->first();
 
-        return $pivot;
+        return !!$pivot;
     }
 
     /**
