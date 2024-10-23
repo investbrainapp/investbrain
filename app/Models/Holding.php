@@ -159,10 +159,10 @@ class Holding extends Model
             ->where('portfolios.wishlist', 0);
     }
 
-    public function scopeMyHoldings($query)
+    public function scopeMyHoldings($query, $userId = null)
     {
-        return $query->whereHas('portfolio', function($query) {
-            $query->whereRelation('users', 'id', auth()->user()->id);
+        return $query->whereHas('portfolio', function($query) use ($userId) {
+            $query->whereRelation('users', 'id', $userId ?? auth()->user()->id);
         });
     }
 

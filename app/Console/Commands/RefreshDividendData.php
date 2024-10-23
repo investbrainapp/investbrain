@@ -14,7 +14,8 @@ class RefreshDividendData extends Command
      * @var string
      */
     protected $signature = 'refresh:dividend-data
-                                {--force : Refresh all holdings}';
+                                {--force : Refresh all holdings}
+                                {--user= : Limit refresh to user\'s holdings}';
 
     /**
      * The console command description.
@@ -45,6 +46,10 @@ class RefreshDividendData extends Command
         if (!($this->option('force') ?? false)) {
             $holdings->where('quantity', '>', 0);
         } 
+
+        if ($this->option('user')) {
+            $holdings->myHoldings($this->option('user'));
+        }
 
         foreach ($holdings->get(['symbol']) as $holding) {
             $this->line('Refreshing ' . $holding->symbol);

@@ -12,7 +12,8 @@ class SyncHoldingData extends Command
      *
      * @var string
      */
-    protected $signature = 'sync:holdings';
+    protected $signature = 'sync:holdings
+                            {--user= : Limit refresh to user\'s holdings}';
 
     /**
      * The console command description.
@@ -39,9 +40,13 @@ class SyncHoldingData extends Command
     public function handle()
     {
         // get all holdings
-        $holdings = Holding::get();
+        $holdings = Holding::query();
 
-        foreach ($holdings as $holding) {
+        if ($this->option('user')) {
+            $holdings->myHoldings($this->option('user'));
+        }
+
+        foreach ($holdings->get() as $holding) {
             $this->line('Refreshing ' . $holding->symbol);
 
             $holding->syncTransactionsAndDividends();
