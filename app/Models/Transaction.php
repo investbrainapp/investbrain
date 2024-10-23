@@ -52,14 +52,14 @@ class Transaction extends Model
 
             $transaction->refreshMarketData();
 
-            cache()->tags(['metrics', $transaction->portfolio_id])->flush();
+            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
         });
 
         static::deleted(function ($transaction) {
 
             $transaction->syncToHolding();
 
-            cache()->tags(['metrics', $transaction->portfolio_id])->flush();
+            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
         });
     }
 

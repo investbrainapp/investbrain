@@ -20,8 +20,8 @@ class AlphaVantageMarketData implements MarketDataInterface
         $quote = Alphavantage::core()->quoteEndpoint($symbol);
         $quote = Arr::get($quote, 'Global Quote', []);
 
-        $fundamental = cache()->tags(['quote', 'alpha-vantage', $symbol])->remember(
-            'symbol-'.$symbol, 
+        $fundamental = cache()->remember(
+            'av-symbol-'.$symbol, 
             1440, 
             function () use ($symbol) {
                 return Alphavantage::fundamentals()->overview($symbol);

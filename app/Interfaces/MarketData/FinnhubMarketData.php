@@ -30,8 +30,8 @@ class FinnhubMarketData implements MarketDataInterface
 
         $quote = $this->client->quote($symbol);
     
-        $fundamental = cache()->tags(['quote', 'finnhub', $symbol])->remember(
-            'symbol-'.$symbol, 
+        $fundamental = cache()->remember(
+            'fh-symbol-'.$symbol, 
             1440, 
             function () use ($symbol) {
                 return $this->client->companyBasicFinancials($symbol, "all");
