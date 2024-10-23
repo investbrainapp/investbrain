@@ -358,7 +358,7 @@ return [
         |
         */
         'remote_disk'         => env('TEMP_UPLOAD_DISK', null),
-        'remote_prefix'       => null,
+        'remote_prefix'       => 'excel-tmp',
 
         /*
         |--------------------------------------------------------------------------
