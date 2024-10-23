@@ -16,6 +16,7 @@ class AppLayout extends Component
                         <x-slot:body class="min-h-screen font-sans antialiased bg-base-200/50 dark:bg-base-200" x-data>
 
                             <div>
+
                                 <x-partials.nav-bar />
 
                                 <x-main with-nav full-width>
@@ -27,11 +28,19 @@ class AppLayout extends Component
                                     </x-slot:sidebar>
 
                                     <x-slot:content>
+
                                         {{ $slot }}
                                     </x-slot:content>
 
                                 </x-main>
                             
+                                @if(session('toast'))
+                                    <script lang="text/javascript">
+                                        window.addEventListener('DOMContentLoaded', function () {
+                                            window.toast(JSON.parse(@json(session('toast'))))
+                                        });
+                                    </script>
+                                @endif
                                 <x-toast />
                             </div>
                     

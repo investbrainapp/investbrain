@@ -8,8 +8,8 @@ use App\Models\ConnectedAccount;
 use Illuminate\Support\MessageBag;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Laravel\Socialite\Facades\Socialite;
-use App\Models\ConnectedAccountVerification;
 use App\Notifications\VerifyConnectedAccountNotification;
 
 class ConnectedAccountController extends Controller
@@ -52,11 +52,16 @@ class ConnectedAccountController extends Controller
             'token' => $providerUser->token,
             'secret' => $providerUser->tokenSecret,
             'refresh_token' => $providerUser->refreshToken,
-            'expires_at' => $providerUser->expiresIn
+            'expires_at' => $providerUser->expiresIn,
+            'verified_at' => false
         ]);
 
-        // already linked, let's go login
-        if ($connected_account->exists) {
+        // already linked and verified, let's go login!
+        if (
+            $connected_account->exists 
+            && !is_null($connected_account->verified_at)
+        ) {
+
             Auth::login($connected_account->user, true);
 
             return redirect(route('dashboard'));
@@ -72,6 +77,7 @@ class ConnectedAccountController extends Controller
             ]);
     
             $connected_account->user_id = $user->id;
+            $connected_account->verified_at = now();
             $connected_account->save();
     
             Auth::login($user, true);
@@ -80,16 +86,10 @@ class ConnectedAccountController extends Controller
         }
 
         // email exists already, send verification link
-        $verification = ConnectedAccountVerification::updateOrCreate([
-            'email' => $providerUser->email,
-            'provider' => $provider,
-            'verified_at' => null
-        ], [
-            'provider_id' => $providerUser->id,
-            'connected_account' => $connected_account
-        ]);
+        $connected_account->user_id = $user->id;
+        $connected_account->save();
 
-        $user->notify(new VerifyConnectedAccountNotification($verification->id));
+        $user->notify(new VerifyConnectedAccountNotification($connected_account->id));
 
         return redirect(route('login'))
                 ->with('status', __(
@@ -106,34 +106,30 @@ class ConnectedAccountController extends Controller
         }
     }
 
-    public function verify(string $verification_id)
+    public function verify(ConnectedAccount $connected_account)
     {
-
-        $verification = ConnectedAccountVerification::findOrFail($verification_id);
-
-        if (!$verification->verified_at) {
+        if (!$connected_account->verified_at) {
 
             // mark request as verified
-            $verification->verified_at = now();
-            $verification->save();
+            $connected_account->verified_at = now();
+            $connected_account->save();
 
             // mark user as verified
-            $user = User::where('email', $verification->email)->firstOrFail();
-            $user->email_verified_at = now();
-            $user->save();
+            $connected_account->user->email_verified_at = now();
+            $connected_account->user->save();
 
-            // add connected account
-            $user->connectedAccounts()->create([
-                ...$verification->connected_account, 
-                ...[
-                    'provider' => $verification->provider,
-                    'provider_id' => $verification->provider_id,
-                ]
-            ]);
-
-            Auth::login($user, true);
+            Auth::login($connected_account->user, true);
         }
 
-        return redirect(route('dashboard'));
+        return redirect(route('dashboard'))->with('toast', json_encode([
+            'toast' => [
+                'title' => __('Your :provider account has been connected.', ['provider' => config("services.{$connected_account->provider}.name")]),
+                'description' => null,
+                'css' => 'alert-success',
+                'icon' => Blade::render("<x-mary-icon class='w-7 h-7' name='o-check-circle' />"),
+                'position' => 'toast-top toast-end',
+                'timeout' => '5000'
+            ]
+        ]));
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Notifications;
 
-use App\Models\ConnectedAccountVerification;
 use Illuminate\Bus\Queueable;
+use App\Models\ConnectedAccount;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class VerifyConnectedAccountNotification extends Notification implements ShouldQueue
 {
@@ -16,7 +16,7 @@ class VerifyConnectedAccountNotification extends Notification implements ShouldQ
      * Create a new notification instance.
      */
     public function __construct(
-        public string $verification_id
+        public string $connected_account_id
     ) { }
 
     /**
@@ -34,10 +34,10 @@ class VerifyConnectedAccountNotification extends Notification implements ShouldQ
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $verification = ConnectedAccountVerification::find($this->verification_id);
-        $provider = config("services.$verification->provider.name");
+        $connected_account = ConnectedAccount::find($this->connected_account_id);
+        $provider = config("services.$connected_account->provider.name");
 
-        $url = url()->signedRoute('oauth.verify_connected_account', ['verification_id' => $this->verification_id], now()->days($days = 7));
+        $url = url()->signedRoute('oauth.verify_connected_account', ['connected_account' => $this->connected_account_id], now()->days($days = 7));
 
         return (new MailMessage)
                     ->greeting('Welcome back!')

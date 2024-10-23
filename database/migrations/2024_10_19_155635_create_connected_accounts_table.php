@@ -25,20 +25,11 @@ return new class extends Migration
             $table->string('secret')->nullable(); // OAuth1
             $table->string('refresh_token', 1000)->nullable(); // OAuth2
             $table->dateTime('expires_at')->nullable(); // OAuth2
+            $table->dateTime('verified_at')->nullable(); // OAuth2
             $table->timestamps();
 
             $table->index(['user_id', 'id']);
             $table->index(['provider', 'provider_id']);
-        });
-
-        Schema::create('connected_account_verifications', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('email');
-            $table->string('provider');
-            $table->string('provider_id');
-            $table->json('connected_account');
-            $table->timestamps();
-            $table->timestamp('verified_at')->nullable();
         });
     }
 
@@ -47,9 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        
-        Schema::dropIfExists('connected_account_verifications');
-        
+
         Schema::dropIfExists('connected_accounts');
     }
 };

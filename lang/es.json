@@ -52,6 +52,7 @@
     "Token Name": "Nombre del Token",
     "Permissions": "Permisos",
     "Profile Information": "Información del Perfil",
+    "Your :provider account has been connected.": "Su cuenta :provider ha sido conectada.",
     "Account already exists. Check your email to connect your :provider account.": "La cuenta ya existe. Revisa tu correo electrónico para conectar tu cuenta :provider.",
     "Could not login using :provider. Try again later.": "No se pudo iniciar sesión con :provider. Inténtalo nuevamente más tarde.",
     "Update your account's profile information and email address.": "Actualiza la información de perfil y la dirección de correo electrónico de tu cuenta.",

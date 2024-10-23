@@ -52,6 +52,7 @@
     "Token Name": "Token Name",
     "Permissions": "Permissions",
     "Profile Information": "Profile Information",
+    "Your :provider account has been connected.": "Your :provider account has been connected.",
     "Account already exists. Check your email to connect your :provider account.": "Account already exists. Check your email to connect your :provider account.",
     "Could not login using :provider. Try again later.": "Could not login using :provider. Try again later.",
     "Update your account\\'s profile information and email address.": "Update your account\\'s profile information and email address.",
