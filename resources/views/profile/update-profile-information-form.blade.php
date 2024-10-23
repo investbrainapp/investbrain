@@ -90,7 +90,7 @@
             {{ __('Saved.') }}
         </x-forms.action-message>
 
-        <x-button type="submit" wire:loading.attr="disabled" wire:target="photo">
+        <x-button type="submit" spinner="photo" wire:loading.attr="disabled" wire:target="photo">
             {{ __('Save') }}
         </x-button>
     </x-slot>
