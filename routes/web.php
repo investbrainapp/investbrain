@@ -26,7 +26,8 @@ Route::get('/test', function () {
 Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
-    Route::view('/import-export', 'import-export')->name('import-export')->middleware('verified');
+    Route::view('/import-export', 'import-export')->name('import-export');
+    // ->middleware('verified');
 
     Route::get('/portfolio/create', [PortfolioController::class, 'create'])->name('portfolio.create');
     Route::get('/portfolio/{portfolio}', [PortfolioController::class, 'show'])->name('portfolio.show');
