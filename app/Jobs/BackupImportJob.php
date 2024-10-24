@@ -5,10 +5,11 @@ namespace App\Jobs;
 use Throwable;
 use App\Models\User;
 use App\Models\BackupImport;
-use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\ImportSucceededNotification;
+use App\Notifications\ImportFailedNotification;
 use App\Imports\BackupImport as BackupImportExcel;
 
 class BackupImportJob implements ShouldQueue
@@ -34,12 +35,16 @@ class BackupImportJob implements ShouldQueue
      */
     public $failOnTimeout = true;
 
+    public User $user;
+
     /**
      * Create a new job instance.
      */
     public function __construct(
         public BackupImport $backupImport
-    ) { }
+    ) { 
+        $this->user = User::find($this->backupImport->user_id);
+    }
 
     /**
      * Execute the job.
@@ -47,6 +52,8 @@ class BackupImportJob implements ShouldQueue
     public function handle(): void
     {                
         Excel::import(new BackupImportExcel($this->backupImport), $this->backupImport->path, config('livewire.temporary_file_upload.disk', null));
+
+        $this->user->notify(new ImportSucceededNotification);
     }
 
     /**
@@ -60,5 +67,7 @@ class BackupImportJob implements ShouldQueue
             'has_errors' => true,
             'completed_at' => now()
         ]);
+
+        $this->user->notify(new ImportFailedNotification($e->getMessage()));
     }
 }

@@ -32,6 +32,9 @@ class Portfolio extends Model
 
             // enable queued jobs to create portfolios with owners
             static::$owner_id = auth()->user()?->id ?? $portfolio->attributes['owner_id'];
+        });
+
+        static::saving(function ($portfolio) {
             unset($portfolio->owner_id);
         });
         
