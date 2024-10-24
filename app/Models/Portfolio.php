@@ -28,12 +28,6 @@ class Portfolio extends Model
     {
         parent::boot();
 
-        static::creating(function ($portfolio) {
-
-            // enable queued jobs to create portfolios with owners
-            static::$owner_id = auth()->user()?->id ?? $portfolio->attributes['owner_id'];
-        });
-
         static::saving(function ($portfolio) {
             unset($portfolio->owner_id);
         });
@@ -95,6 +89,15 @@ class Portfolio extends Model
     public function scopeWithoutWishlists() 
     {
         return $this->where(['wishlist' => false]);
+    }
+
+    public function setOwnerIdAttribute($value)
+    {
+        // enable queued jobs to create portfolios with owners
+        if (!auth()->user()?->id && !$this->owner_id) {
+            $this->attributes['owner_id'] = $value;
+            static::$owner_id = $value;
+        }
     }
 
     public function getOwnerIdAttribute()
