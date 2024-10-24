@@ -46,6 +46,7 @@ class BackupImport extends Model
     protected function casts(): array
     {
         return [
+            'has_errors' => 'boolean',
             'completed_at' => 'datetime'
         ];
     }
