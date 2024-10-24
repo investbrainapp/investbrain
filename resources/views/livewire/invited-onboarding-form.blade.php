@@ -12,7 +12,7 @@ new class extends Component {
     public Portfolio $portfolio;
     public User $user;
 
-    #[Rule('required|string|confirmed')]
+    #[Rule('required|string|min:8|confirmed')]
     public string $password;
 
     #[Rule('required|string')]
@@ -21,7 +21,7 @@ new class extends Component {
     // methods
     public function updatePassword()
     {
-        
+
         $this->validate();
 
         $this->user->password = Hash::make($this->password);
