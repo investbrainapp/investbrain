@@ -3,6 +3,7 @@
 use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
+use App\Models\BackupImport as BackupImportModel;
 use App\Imports\BackupImport;
 use App\Exports\BackupExport;
 use Livewire\Attributes\Rule;
@@ -16,6 +17,10 @@ new class extends Component {
     #[Rule('required|extensions:xlsx|mimes:xlsx|max:2048')]
     public $file;
 
+    public bool $importStatusDialog = false;
+    public ?BackupImportModel $backupImport = null;
+    public int $percent = 10;
+
     // methods
     public function import() 
     {
@@ -27,20 +32,45 @@ new class extends Component {
             return;
         }
 
-        try {
+        $this->backupImport = BackupImportModel::create([
+            'user_id' => auth()->user()->id,
+            'path' => $this->file->getPathname()
+        ]);
 
-            $import = Excel::import(
-                new BackupImport, 
-                $this->file->getPathname(), 
-                config('livewire.temporary_file_upload.disk', null)
-            );
+        $this->importStatusDialog = true;
 
-        } catch (\Throwable $e) {
-     
-            return $this->error($e->getMessage());
+    }
+
+    public function checkImportStatus()
+    {
+        if (Str::contains($this->backupImport?->message, 'portfolios')) {
+
+            $this->percent = (1/2) * 100;
         }
 
-        $this->success(__('Successfully imported!'), redirectTo: route('dashboard'));
+        if (Str::contains($this->backupImport?->message, 'transactions')) {
+
+            $this->percent = (3/4) * 100;
+        }
+
+        if (Str::contains($this->backupImport?->message, 'daily changes')) {
+
+            $this->percent = (7/8) * 100;
+        }
+
+        if ($this->backupImport?->status == 'failed') {
+
+            unset($this->file);
+            $this->percent = 100;
+        }
+
+        if ($this->backupImport?->status == 'success') {
+
+            $this->importStatusDialog = false;
+            $this->backupImport = null;
+
+            $this->success(__('Successfully imported!'), redirectTo: route('dashboard'));
+        }
     }
 
     public function downloadTemplate()
@@ -60,13 +90,47 @@ new class extends Component {
         <strong><a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></strong>
     </x-slot>
 
-    <x-slot name="form">
+    <x-slot:form>
         
         <div class="col-span-6 sm:col-span-4">
             <x-file wire:model="file" label="{{ __('Select a file') }}" hint="" accept=".xlsx" required />
         </div>
 
-    </x-slot>
+        <x-dialog-modal wire:model.live="importStatusDialog" persistent>
+            <x-slot name="title">
+
+                @if($backupImport?->status)
+                <div 
+                    class="{{ $backupImport?->status == 'failed' ? 'text-error' : '' }}"
+                >
+                    {{ $backupImport?->message }}
+                </div>
+                @endif
+            </x-slot>
+            <x-slot name="content">
+                @if($backupImport?->status != 'failed')
+                <x-progress 
+                    :indeterminate="$backupImport?->status == 'pending'"
+                    class="progress-primary h-3"
+                    value="{{ $percent }}"
+                    max="100"
+                />
+                @endif
+            </x-slot>
+
+            <x-slot name="footer">
+                @if($backupImport?->status == 'failed')
+
+                    <x-button wire:click="$toggle('importStatusDialog')"> {{ __('Try again') }} </x-button>
+                @else
+                    <div wire:poll="checkImportStatus" class="text-gray-400 text-sm">{{ __('Your import will continue in the background.') }}</div>
+                    <x-ib-flex-spacer />
+                    <x-button wire:click="$toggle('importStatusDialog')"> {{ __('Close') }} </x-button>
+                @endif
+            </x-slot>
+        </x-dialog-modal>
+
+    </x-slot:form>
 
     <x-slot name="actions">
 

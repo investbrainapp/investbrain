@@ -20,6 +20,7 @@
     "Yes": "Yes",
     "you": "you",
     "Nothing to show here yet": "Nothing to show here yet",
+    "Try again": "Try again",
 
     "Hang on! You're doing that too much.": "Hang on! You're doing that too much.",
     "Delete Account": "Delete Account",
@@ -360,6 +361,14 @@
     "Hey again!": "Hey again!",
     "Before you can get started with Investbrain, let's complete your profile:": "Before you can get started with Investbrain, let's complete your profile:",
     "Or login with SSO:": "Or login with SSO:",
-    "Create Password": "Create Password"
+    "Create Password": "Create Password",
 
+    "You do not have access to that portfolio.": "You do not have access to that portfolio.",
+    "Import starting...": "Import starting...", 
+    "Import is in progress...": "Import is in progress...", 
+    "Importing portfolios...": "Importing portfolios...", 
+    "Importing transactions...": "Importing transactions...", 
+    "Importing daily changes...": "Importing daily changes...", 
+    "Import completed successfully!": "Import completed successfully!",
+    "Your import will continue in the background.": "Your import will continue in the background."
 }

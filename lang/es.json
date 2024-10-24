@@ -20,6 +20,7 @@
     "Yes": "Sí",
     "you": "tú",
     "Nothing to show here yet": "No hay nada que mostrar aquí todavía",
+    "Try again": "Intentar otra vez",
     
     "Hang on! You're doing that too much.": "¡Por favor espere un momento!",
     "Delete Account": "Eliminar Cuenta",
@@ -360,5 +361,14 @@
     "Hey again!": "¡Oye de nuevo!",
     "Before you can get started with Investbrain, let's complete your profile:": "Antes de poder comenzar a utilizar Investbrain, deberá crear una cuenta:",
     "Or login with SSO:": "O iniciar sesión mediante SSO:",
-    "Create Password": "Crear Contraseña"
+    "Create Password": "Crear Contraseña",
+
+    "You do not have access to that portfolio.": "No tienes acceso a ese portafolio.",
+    "Import starting...": "Iniciando la importación...",
+    "Import is in progress...": "La importación está en progreso...",
+    "Importing portfolios...": "Importando portafolios...",
+    "Importing transactions...": "Importando transacciones...",
+    "Importing daily changes...": "Importando cambios diarios...",
+    "Import completed successfully!": "¡La importación se completó con éxito!",
+    "Your import will continue in the background.": "La importación continuará en segundo plano."
 }

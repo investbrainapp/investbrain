@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <div class="flex flex-row justify-end mt-3 p-2 text-end">
+    <div class="flex flex-row items-center justify-end mt-3 p-2 text-end">
         {{ $footer }}
     </div>
 </x-ib-livewire-modal>

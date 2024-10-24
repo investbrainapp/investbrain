@@ -69,10 +69,10 @@ class Portfolio extends Model
         });
     }
 
-    public function scopeFullAccess() 
+    public function scopeFullAccess($query, $user_id = null) 
     {
-        return $this->whereHas('users', function ($query) {
-            $query->where('user_id', auth()->user()->id)
+        return $query->whereHas('users', function ($query) use ($user_id) {
+            $query->where('user_id', $user_id ?? auth()->user()->id)
                   ->where(function ($query) {
                       $query->where('full_access', true)
                             ->orWhere('owner', true);
