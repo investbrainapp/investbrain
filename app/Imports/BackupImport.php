@@ -48,19 +48,12 @@ class BackupImport implements WithMultipleSheets, WithEvents
                 
                 Artisan::queue(RefreshMarketData::class, ['--user' => $this->backupImportModel->user_id, '--force' => true])
                     ->chain([
-                        fn() => Artisan::call(RefreshDividendData::class, ['--user' => $this->backupImportModel->user_id, '--force' => true])
-                    ])
-                    ->chain([
-                        fn() => Artisan::call(SyncHoldingData::class, ['--user' => $this->backupImportModel->user_id])
-                    ])
-                    ->chain([
-                        function() {
+                        fn() => Artisan::call(RefreshDividendData::class, ['--user' => $this->backupImportModel->user_id, '--force' => true]),
+                        fn() => Artisan::call(SyncHoldingData::class, ['--user' => $this->backupImportModel->user_id]),
+                        fn() => User::find($this->backupImportModel->user_id)->portfolios->each(function($portfolio) {
 
-                            User::find($this->backupImportModel->user_id)->portfolios->each(function($portfolio) {
-
-                                Artisan::call(SyncDailyChange::class, ['portfolio_id' => $portfolio->id]);
-                            });
-                        }
+                                    Artisan::queue(SyncDailyChange::class, ['portfolio_id' => $portfolio->id]);
+                                })
                     ]);
             },
             ImportFailed::class => fn(ImportFailed $event) => $this->backupImportModel->update([

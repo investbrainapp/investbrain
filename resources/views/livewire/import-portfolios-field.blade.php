@@ -123,7 +123,7 @@ new class extends Component {
 
                     <x-button wire:click="$toggle('importStatusDialog')"> {{ __('Try again') }} </x-button>
                 @else
-                    <div wire:poll="checkImportStatus" class="text-gray-400 text-sm">{{ __('Your import will continue in the background.') }}</div>
+                    <div wire:poll="checkImportStatus" class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
                     <x-ib-flex-spacer />
                     <x-button wire:click="$toggle('importStatusDialog')"> {{ __('Close') }} </x-button>
                 @endif
