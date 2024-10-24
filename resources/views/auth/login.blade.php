@@ -28,10 +28,7 @@
             </div>
 
             <div class="block mt-4">
-                <label for="remember_me" class="flex items-center">
-                    <x-checkbox id="remember_me" name="remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-                </label>
+                <x-checkbox id="remember_me" name="remember" class="text-sm" label="{{ __('Remember me') }}" />
             </div>
 
             <div class="flex items-center justify-end mt-4">
