@@ -2,8 +2,10 @@
 
 namespace App\Imports;
 
+use App\Models\User;
 use App\Imports\Sheets\PortfoliosSheet;
 use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\SyncDailyChange;
 use App\Console\Commands\SyncHoldingData;
 use App\Imports\Sheets\DailyChangesSheet;
 use App\Imports\Sheets\TransactionsSheet;
@@ -50,6 +52,15 @@ class BackupImport implements WithMultipleSheets, WithEvents
                     ])
                     ->chain([
                         fn() => Artisan::call(SyncHoldingData::class, ['--user' => $this->backupImportModel->user_id])
+                    ])
+                    ->chain([
+                        function() {
+
+                            User::find($this->backupImportModel->user_id)->portfolios->each(function($portfolio) {
+
+                                Artisan::call(SyncDailyChange::class, ['portfolio_id' => $portfolio->id]);
+                            });
+                        }
                     ]);
             },
             ImportFailed::class => fn(ImportFailed $event) => $this->backupImportModel->update([
