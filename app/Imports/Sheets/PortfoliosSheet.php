@@ -50,8 +50,9 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
                 'title' => $portfolio['title'],
                 'wishlist' => $portfolio['wishlist'] ?? false,
                 'notes' => $portfolio['notes'],
+                'owner_id' => $this->backupImport->user_id,
             ]);
-
+            
             Artisan::queue(SyncDailyChange::class, ['portfolio_id' => $portfolio->id])->delay(30 + ($index * 10));
         }
     }

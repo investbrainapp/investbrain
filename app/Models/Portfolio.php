@@ -22,9 +22,18 @@ class Portfolio extends Model
         'wishlist',
     ];
 
+    public static ?string $owner_id = null;
+
     protected static function boot()
     {
         parent::boot();
+
+        static::creating(function ($portfolio) {
+
+            // enable queued jobs to create portfolios with owners
+            static::$owner_id = auth()->user()?->id ?? $portfolio->attributes['owner_id'];
+            unset($portfolio->owner_id);
+        });
         
         static::saved(function ($portfolio) {
 
@@ -99,10 +108,10 @@ class Portfolio extends Model
     {
         // make sure we don't remove owner access
         if (!$portfolio->owner_id) {
-            $users[auth()->user()->id] = ['owner' => true];
+            $owner[static::$owner_id ?? auth()->user()->id] = ['owner' => true];
 
             // save
-            $portfolio->users()->sync($users);
+            $portfolio->users()->sync($owner);
         }
     }
 
