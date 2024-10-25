@@ -51,6 +51,7 @@ new class extends Component {
                     SUM(total_dividends_earned) as total_dividends_earned 
                 */
             ')
+            ->withoutWishlists()
             ->groupBy('date')
             ->orderBy('date');
 
@@ -60,7 +61,7 @@ new class extends Component {
             
             $dailyChangeQuery->whereDate('date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
-        
+        // dd($dailyChangeQuery->toSql());
         $dailyChange = $dailyChangeQuery->get();
 
         return [

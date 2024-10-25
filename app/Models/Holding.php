@@ -155,8 +155,9 @@ class Holding extends Model
     }
 
     public function scopeWithoutWishlists($query) {
-        return $query->join('portfolios', 'portfolios.id', 'holdings.portfolio_id')
-            ->where('portfolios.wishlist', 0);
+        return $query->whereHas('portfolio', function ($query) {
+                $query->where('portfolios.wishlist', 0);
+            });
     }
 
     public function scopeMyHoldings($query, $userId = null)
