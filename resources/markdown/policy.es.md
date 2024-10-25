@@ -76,7 +76,6 @@ Además, valoramos genuinamente la asistencia de los investigadores de seguridad
 - Podemos tardar de 3 a 5 días en validar el problema reportado.
 - Se iniciarán acciones para corregir la vulnerabilidad de acuerdo con nuestro compromiso con la seguridad y privacidad.
 - Al realizar pruebas de seguridad, no debe violar nuestras políticas de privacidad, modificar/eliminar datos de usuarios no autenticados, interrumpir los servidores de producción o degradar la experiencia del usuario.
-- Documentar o publicar detalles de la vulnerabilidad en dominios públicos va en contra de nuestra política de divulgación responsable.
 - Mantenga la confidencialidad de la información sobre cualquier vulnerabilidad hasta que el problema sea resuelto.
 
 ## Privacidad de los niños

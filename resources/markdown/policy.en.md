@@ -1,6 +1,6 @@
 # Privacy Notice
 
-__Last updated: August 23, 2024__
+__Last updated: October 25, 2024__
 
 Your privacy is important to us. This Privacy Notice describes Investbrain’s (also referred to as “we” or “our”) practices on collection, processing, and disclosure of your information when you visit our website or use our application (collectively referred to as “Services”). This Privacy Notice also tells you about your rights and how the law protects you.
 
@@ -74,9 +74,8 @@ In addition, we genuinely value the assistance of security researchers and any o
 - We will define the severity of the issue based on the impact and the ease of exploitation.
 - We may take 3 to 5 days to validate the reported issue.
 - Actions will be initiated to fix the vulnerability in accordance with our commitment to security and privacy.
-- When conducting security testing, should not violate our privacy policies, modify/delete unauthenticated user data, disrupt production servers, or to degrade user experience.
-- Documenting or publishing the vulnerability details in public domain is against our responsible disclosure policy.
-- Keep information about any vulnerability confidential until the issue is resolved
+- When conducting security testing, you should not violate our privacy policies, modify/delete unauthenticated user data, disrupt production servers, or degrade user experience.
+- Keep information about any vulnerability confidential until the issue is resolved.
 
 ## Children’s Privacy
 No part of the Services is directed to children under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact us immediately.
