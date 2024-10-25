@@ -13,5 +13,7 @@ return [
         'fake' => App\Interfaces\MarketData\FakeMarketData::class,
     ],
 
-    'self_hosted' => env('SELF_HOSTED', true)
+    'self_hosted' => env('SELF_HOSTED', true),
+
+    'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00')
 ];
