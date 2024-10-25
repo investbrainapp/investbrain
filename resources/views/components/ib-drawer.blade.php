@@ -23,7 +23,7 @@
     <div @click="open = false" class="fixed inset-0 bg-black opacity-50"></div>
 
     <x-card
-        {{ $attributes->merge(['class' => 'min-h-screen w-full md:w-3/4 xl:w-3/5 rounded-none px-8 transition']) }} 
+        {{ $attributes->merge(['class' => 'min-h-screen w-full md:w-3/4 xl:w-3/5 rounded-none px-8 transition overflow-y-scroll']) }} 
     >
         @if($title)
             <x-slot:title>
