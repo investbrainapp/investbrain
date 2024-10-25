@@ -1,6 +1,6 @@
 # Aviso de Privacidad
 
-__Última actualización: 23 de agosto de 2024__
+__Última actualización: 25 de octubre de 2024__
 
 Su privacidad es importante para nosotros. Este Aviso de Privacidad describe las prácticas de Investbrain (también referido como “nosotros” o “nuestro”) en cuanto a la recopilación, procesamiento y divulgación de su información cuando visita nuestro sitio web o utiliza nuestra aplicación (colectivamente referidos como “Servicios”). Este Aviso de Privacidad también le informa sobre sus derechos y cómo la ley protege su información.
 
@@ -76,7 +76,6 @@ Además, valoramos genuinamente la asistencia de los investigadores de seguridad
 - Podemos tardar de 3 a 5 días en validar el problema reportado.
 - Se iniciarán acciones para corregir la vulnerabilidad de acuerdo con nuestro compromiso con la seguridad y privacidad.
 - Al realizar pruebas de seguridad, no debe violar nuestras políticas de privacidad, modificar/eliminar datos de usuarios no autenticados, interrumpir los servidores de producción o degradar la experiencia del usuario.
-- Documentar o publicar detalles de la vulnerabilidad en dominios públicos va en contra de nuestra política de divulgación responsable.
 - Mantenga la confidencialidad de la información sobre cualquier vulnerabilidad hasta que el problema sea resuelto.
 
 ## Privacidad de los niños
