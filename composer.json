@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "livewire/livewire": "^3.5",
         "livewire/volt": "^1.6",
         "maatwebsite/excel": "^3.1",
