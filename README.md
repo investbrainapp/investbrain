@@ -52,7 +52,7 @@ You can specify the provider you want to use in your .env file:
 MARKET_DATA_PROVIDER=yahoo
 ```
 
-You can also use Investbrain's built-in fallback mechanism to ensure reliable data access, even if a provider fails. If any provider fails, Investbrain will automatically attempt to retrieve data from the next available provider, continuing through your configured providers until one returns successfully.
+You can also use Investbrain's built-in fallback mechanism to ensure reliable data access. If any provider fails, Investbrain will automatically attempt to retrieve data from the next available provider, continuing through your configured providers until one returns successfully.
 
 Your selected providers should be listed in your .env file. Each should be separated by a comma:
 
@@ -64,7 +64,7 @@ In the above example, Yahoo Finance will be attempted first and the Alpha Vantag
 
 ### Custom providers
 
-If you wish to create your own market data provider, you can create your own implementation of the [MarketDataInterface](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/MarketDataInterface.php). You can refer to any existing market data implementation as an examples.
+If you wish to create your own market data provider, you can create your own implementation of the [MarketDataInterface](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/MarketDataInterface.php). You can refer to any existing market data implementation as an example.
 
 Once you've created your market data implementation, be sure add your custom provider to the Investbrain configuration file, under the interfaces section:
 
@@ -95,8 +95,12 @@ There are several optional configurations available when installing using the re
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
 | MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, or `finnhub`) | yahoo |
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
+| APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
+| DAILY_CHANGE_TIME | The time of day to capture daily change | 23:00 |
+| REGISTRATION_ENABLED | Whether to enable registration of new users | true |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
+
 
 > Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.
 
