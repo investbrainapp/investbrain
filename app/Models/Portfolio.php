@@ -107,7 +107,12 @@ class Portfolio extends Model
 
     public function getOwnerAttribute()
     {
-        return $this->users()->firstWhere('owner', 1);
+        if (!$this->relationLoaded('user')) {
+            
+            $this->load('users');
+        }
+
+        return $this->users->where('pivot.owner', true)->first();
     }
 
     public static function ensurePortfolioHasOwner(self $portfolio) 

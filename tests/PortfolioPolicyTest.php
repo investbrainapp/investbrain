@@ -14,6 +14,7 @@ class PortfolioPolicyTest extends TestCase
     use RefreshDatabase;
 
     protected $policy;
+    protected $owner;
     protected $user;
     protected $portfolio;
 
@@ -23,12 +24,12 @@ class PortfolioPolicyTest extends TestCase
 
         $this->policy = new PortfolioPolicy();
 
-        $this->user = User::factory()->create();
-
-        Auth::login($this->user);
+        $this->owner = User::factory()->create();
+        Auth::login($this->owner);
         $this->portfolio = Portfolio::factory()->create();
 
         // Attach the users to the portfolio
+        $this->user = User::factory()->create();
         $this->portfolio->users()->syncWithoutDetaching([
             $this->user->id => [
                 'full_access' => false,
@@ -37,7 +38,7 @@ class PortfolioPolicyTest extends TestCase
         ]);
     }
 
-    public function test_stranger_access_viaweb()
+    public function test_stranger_access_via_web()
     {
         $user = User::factory()->create();
 
