@@ -190,9 +190,18 @@ class Portfolio extends Model
 
         if (!empty($total_performance)) {
             DB::transaction(function () use ($total_performance) {
-                $this->daily_change()->delete();
-
-                DailyChange::insert($total_performance);
+                
+                $this->daily_change()->upsert(
+                    $total_performance,
+                    ['date', 'portfolio_id'],
+                    [
+                        'total_market_value',
+                        'total_cost_basis',
+                        'total_gain',
+                        'realized_gains',
+                        'total_dividends_earned'
+                    ]
+                );
             });
         }
     }
