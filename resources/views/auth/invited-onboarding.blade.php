@@ -14,11 +14,5 @@
             'user' => $user,
         ])
 
-        <x-section-border />
-
-        <p class="mb-4">{{ __('Or login with SSO:') }}</p>
-
-        <x-connected-accounts-login />
-
     </x-authentication-card>
 </x-guest-layout>
