@@ -25,6 +25,7 @@ new class extends Component {
         $this->validate();
 
         $this->user->password = Hash::make($this->password);
+        $this->user->email_verified_at = now();
         $this->user->save();
 
         Auth::login($this->user, true);
