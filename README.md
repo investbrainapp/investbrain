@@ -87,7 +87,7 @@ Feel free to submit a PR with any custom providers you create.
 
 ## Configuration
 
-There are several optional configurations available when installing using the recommended [Docker method](#self%20hosting). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
+There are several optional configurations available when installing using the recommended [Docker method](#self-hosting). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
 
 | Option      | Description      | Default      |
 | ------------- | ------------- | ------------- |
@@ -106,7 +106,7 @@ There are several optional configurations available when installing using the re
 
 ## Updating
 
-To update Investbrain using the recommended [Docker installation](#self%20hosting) method, you just need to stop the running containers:
+To update Investbrain using the recommended [Docker installation](#self-hosting) method, you just need to stop the running containers:
 
 ```bash
 docker compose stop
