@@ -78,7 +78,10 @@ new class extends Component {
         {{ Number::currency($row->market_gain_dollars ?? 0) }}
     @endscope
     @scope('cell_market_gain_percent', $row)
-        <x-gain-loss-arrow-badge :percent="$row->market_gain_percent" />
+        <x-gain-loss-arrow-badge 
+            :cost-basis="$row->average_cost_basis"
+            :market-value="$row->market_data->market_value"  
+        />
     @endscope
     @scope('cell_market_data_market_value', $row)
         {{ Number::currency($row->market_data_market_value ?? 0) }}

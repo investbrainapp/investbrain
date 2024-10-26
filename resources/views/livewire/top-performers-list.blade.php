@@ -36,7 +36,10 @@ new class extends Component {
 
                 {{ $holding->market_data?->name }} ({{ $holding->symbol }})
 
-                <x-gain-loss-arrow-badge :percent="$holding->market_gain_percent" />
+                <x-gain-loss-arrow-badge 
+                    :cost-basis="$holding->average_cost_basis"
+                    :market-value="$holding->market_data->market_value"
+                />
                 
             </x-slot:value>
             <x-slot:sub-value>
