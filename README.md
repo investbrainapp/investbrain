@@ -10,9 +10,9 @@ Investbrain helps you manage and track the performance of your investments.
 
 Investbrain is a Laravel PHP web application that leverages Livewire, Mary UI, and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature three market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! Finally, of course we have robust support for i18n, a11y, and dark mode. 
 
-## Installation
+## Self hosting
 
-For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which downloads all the necessary dependencies and seamlessly builds everything you need to get started quickly!
+For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which downloads all the necessary dependencies and seamlessly builds everything you need to get started quickly! 
 
 Before getting started, you should already have the following installed on your machine: [Docker Engine](https://docs.docker.com/engine/install/), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), and a wild sense of adventure.
 
@@ -46,7 +46,7 @@ Investbrain includes an extensible market data provider interface that allows yo
 
 ### Configuration
 
-You can specify the provider you want to use in your .env file:
+You can specify the market data provider you want to use in your .env file:
 
 ```bash
 MARKET_DATA_PROVIDER=yahoo
@@ -87,7 +87,7 @@ Feel free to submit a PR with any custom providers you create.
 
 ## Configuration
 
-There are several optional configurations available when installing using the recommended [Docker method](#Installation). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
+There are several optional configurations available when installing using the recommended [Docker method](#self%20hosting). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
 
 | Option      | Description      | Default      |
 | ------------- | ------------- | ------------- |
@@ -106,7 +106,7 @@ There are several optional configurations available when installing using the re
 
 ## Updating
 
-To update Investbrain using the recommended [Docker installation](#Installation) method, you just need to stop the running containers:
+To update Investbrain using the recommended [Docker installation](#self%20hosting) method, you just need to stop the running containers:
 
 ```bash
 docker compose stop
@@ -118,7 +118,7 @@ Then pull the latest updates from this repository using git:
 git pull
 ```
 
-Then bring the containers back up!
+Finally bring the containers back up!
 
 ```bash
 docker compose up
@@ -149,7 +149,7 @@ Just to be safe, we recommend backing up your portfolios before using these comm
 
 ## Testing
 
-Investbrain has a complete PHPUnit test suite that creates an in-memory SQLite database and runs any queued jobs synchronously using Laravel's array driver. You can run the entire Investbrain test suite from within the Docker container by running:
+Investbrain has a robus PHPUnit test suite that creates an in-memory SQLite database and runs any queued jobs synchronously using Laravel's array driver. You can run the entire Investbrain test suite from within the Docker container by running:
 
 ```bash
 docker exec -it investbrain-app php artisan test
