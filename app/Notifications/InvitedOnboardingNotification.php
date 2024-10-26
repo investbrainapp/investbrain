@@ -43,7 +43,7 @@ class InvitedOnboardingNotification extends Notification implements ShouldQueue
                     ->replyTo($this->sender->email, $this->sender->name)
                     ->greeting('Hey there! 👋')
                     ->subject("You've been invited to {$this->portfolio->title} on Investbrain!")
-                    ->line("{$this->sender->name} has invited you to **{$this->portfolio->title}** on Investbrain, Smart open-source investment tracker that consolidates and monitors market performance across your different brokerages.")
+                    ->line("{$this->sender->name} has invited you to **{$this->portfolio->title}** on Investbrain, a smart open-source investment tracker that consolidates and monitors market performance across your different brokerages.")
                     ->line("Once you're in, you'll be able to see all the holdings, dividends, market performance and more for {$this->portfolio->title}!")
                     ->action("Get Started", $url)
                     ->line("If you have any questions, you can reply to this email.")
