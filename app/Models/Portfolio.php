@@ -27,10 +27,6 @@ class Portfolio extends Model
     protected static function boot()
     {
         parent::boot();
-
-        static::saving(function ($portfolio) {
-            unset($portfolio->owner_id);
-        });
         
         static::saved(function ($portfolio) {
 
@@ -95,7 +91,6 @@ class Portfolio extends Model
     {
         // enable queued jobs to create portfolios with owners
         if (!auth()->user()?->id && !$this->owner_id) {
-            $this->attributes['owner_id'] = $value;
             static::$owner_id = $value;
         }
     }
