@@ -32,16 +32,12 @@
         }}
         x-data="{ 
             resize (rows) { 
-                if (rows) {
-                    $el.style.height = (rows * 32) + 'px'
-                    return;
-                }
                 $el.style.height = '0px'; 
-                $el.style.height = $el.scrollHeight + 'px' 
+                $el.style.height = ($el.scrollHeight >= rows * 32 ? $el.scrollHeight : rows * 32) + 'px';
             } 
         }"
         x-init="resize({{$rows}})"
-        @input="resize()"
+        @input="resize({{$rows}})"
         type="text" 
         placeholder = "{{ $attributes->whereStartsWith('placeholder')->first() }}"
     >{{ $slot }}</textarea>
