@@ -9,6 +9,7 @@ use Carbon\CarbonPeriod;
 use App\Models\Portfolio;
 use App\Models\DailyChange;
 use App\Models\Transaction;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -34,7 +35,11 @@ class SyncDailyChangeTest extends TestCase
         $portfolio->syncDailyChanges();
 
         $count_of_daily_changes = $portfolio->daily_change()->count('date');
-        $days_between_now_and_first_trans = (int) CarbonPeriod::create($portfolio->transactions()->min('date'), now())->filter('isWeekday')->count();
+        $days_between_now_and_first_trans = (int) CarbonPeriod::create(
+            $portfolio->transactions()->min('date'), 
+            now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day'))) ? now()->subDay() : now()
+        )->filter('isWeekday')
+        ->count();
 
         $this->assertEquals($count_of_daily_changes, $days_between_now_and_first_trans);
     }
