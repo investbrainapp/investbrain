@@ -138,7 +138,12 @@ class Portfolio extends Model
 
         $holdings->each(function($holding) use (&$total_performance, $dividends) {
 
-            $period = CarbonPeriod::create($holding->first_transaction_date, now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day'))) ? now()->subDay() : now())->filter('isWeekday');
+            $period = CarbonPeriod::create(
+                $holding->first_transaction_date, 
+                now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day'))) 
+                    ? now()->subDay() 
+                    : now()
+            );
 
             $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));
 
