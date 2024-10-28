@@ -2,22 +2,23 @@
 
 namespace App\Imports\Sheets;
 
+use App\Imports\ValidatesPortfolioAccess;
 use App\Models\DailyChange;
 use App\Models\BackupImport;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithUpserts;
-use App\Rules\PortfolioAccessValidationRule;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
 
-class DailyChangesSheet implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts, WithUpserts, SkipsEmptyRows, WithEvents
+class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows, WithEvents
 {
+    use ValidatesPortfolioAccess;
+
     public function __construct(
         public BackupImport $backupImport
     ) { }
@@ -38,34 +39,53 @@ class DailyChangesSheet implements ToModel, WithHeadingRow, WithValidation, With
         ];
     }
     
-    public function model(array $dailyChange)
+    public function collection(Collection $dailyChanges)
     {
-        return new DailyChange([
-            'total_market_value' => $dailyChange['total_market_value'],
-            'total_cost_basis' => $dailyChange['total_cost_basis'],
-            'total_gain' => $dailyChange['total_gain'],
-            'total_dividends_earned' => $dailyChange['total_dividends_earned'],
-            'realized_gains' => $dailyChange['realized_gains'],
-            'annotation' => $dailyChange['annotation'],
-            'portfolio_id' => $dailyChange['portfolio_id'],
-            'date' => Carbon::parse($dailyChange['date'])->format('Y-m-d')
-        ]);
-    }
-    
-    public function batchSize(): int
-    {
-        return 150;
+        $dailyChanges->chunk($this->batchSize())->each(function ($chunk) {
+
+            $this->validatePortfolioAccess($chunk);
+
+            // have to cast to native values
+            $chunk = $chunk->map(function ($dailyChange) {
+
+                return [
+                    'total_market_value' => $dailyChange['total_market_value'],
+                    'total_cost_basis' => $dailyChange['total_cost_basis'],
+                    'total_gain' => $dailyChange['total_gain'],
+                    'total_dividends_earned' => $dailyChange['total_dividends_earned'],
+                    'realized_gains' => $dailyChange['realized_gains'],
+                    'annotation' => $dailyChange['annotation'],
+                    'portfolio_id' => $dailyChange['portfolio_id'],
+                    'date' => Carbon::parse($dailyChange['date'])->format('Y-m-d')
+                ];
+            });
+
+            DailyChange::upsert(
+                $chunk->toArray(),
+                ['portfolio_id', 'date'],
+                [
+                    'total_market_value',
+                    'total_cost_basis',
+                    'total_gain',
+                    'total_dividends_earned',
+                    'realized_gains',
+                    'annotation',
+                    'portfolio_id',
+                    'date'
+                ]
+            );
+        });
     }
 
-    public function uniqueBy()
+    public function batchSize(): int
     {
-        return ['portfolio_id', 'date'];
+        return 750;
     }
 
     public function rules(): array
     {
         return [
-            'portfolio_id' => ['required', new PortfolioAccessValidationRule($this->backupImport->user_id)], 
+            'portfolio_id' => ['required'], 
             'date' => ['required', 'date'],
             'total_market_value' => ['sometimes', 'nullable', 'numeric'],
             'total_cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],

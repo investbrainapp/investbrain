@@ -2,24 +2,26 @@
 
 namespace App\Imports\Sheets;
 
+use App\Imports\ValidatesPortfolioAccess;
 use App\Models\Holding;
+use App\Models\Portfolio;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
 use App\Models\BackupImport;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Events\BeforeSheet;
-use Maatwebsite\Excel\Concerns\WithUpserts;
-use App\Rules\PortfolioAccessValidationRule;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\WithEvents;
 
-class TransactionsSheet implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts, WithUpserts, SkipsEmptyRows, WithEvents
+class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows, WithEvents
 {
+
+    use ValidatesPortfolioAccess;
 
     public function __construct(
         public BackupImport $backupImport
@@ -41,41 +43,64 @@ class TransactionsSheet implements ToModel, WithHeadingRow, WithValidation, With
         ];
     }
 
-    public function model(array $transaction)
+    public function collection(Collection $transactions)
     {
-        $transaction = new Transaction([
-            'id' => $transaction['transaction_id'] ?? Str::uuid()->toString(),
-            'symbol' => strtoupper($transaction['symbol']),
-            'portfolio_id' => $transaction['portfolio_id'],
-            'transaction_type' => $transaction['transaction_type'],
-            'quantity' => $transaction['quantity'],
-            'cost_basis' => $transaction['cost_basis'] ?? 0,
-            'sale_price' => $transaction['sale_price'],
-            'split' => boolval($transaction['split']) ? 1 : 0,
-            'reinvested_dividend' => boolval($transaction['reinvested_dividend']) ? 1 : 0,
-            'date' => Carbon::parse($transaction['date'])->format('Y-m-d')
-        ]);
 
-        // stub out related holding
-        Holding::firstOrCreate([
-            'symbol' => $transaction->symbol,
-            'portfolio_id' => $transaction->portfolio_id
-        ], [
-            'quantity' => 0,
-            'average_cost_basis' => 0,
-        ]);
+        $transactions->chunk($this->batchSize())->each(function ($chunk) {
 
-        return $transaction;
+            $this->validatePortfolioAccess($chunk);
+
+            // have to cast to native values
+            $chunk = $chunk->map(function ($transaction) {
+
+                return [
+                    'id' => $transaction['transaction_id'] ?? Str::uuid()->toString(),
+                    'symbol' => strtoupper($transaction['symbol']),
+                    'portfolio_id' => $transaction['portfolio_id'],
+                    'transaction_type' => $transaction['transaction_type'],
+                    'quantity' => $transaction['quantity'],
+                    'cost_basis' => $transaction['cost_basis'] ?? 0,
+                    'sale_price' => $transaction['sale_price'],
+                    'split' => boolval($transaction['split']) ? 1 : 0,
+                    'reinvested_dividend' => boolval($transaction['reinvested_dividend']) ? 1 : 0,
+                    'date' => Carbon::parse($transaction['date'])->format('Y-m-d')
+                ];
+            });
+
+            Transaction::upsert(
+                $chunk->toArray(),
+                ['id'],
+                [
+                    'id',
+                    'symbol',
+                    'portfolio_id',
+                    'transaction_type',
+                    'quantity',
+                    'cost_basis',
+                    'sale_price',
+                    'split',
+                    'reinvested_dividend',
+                    'date'
+                ]
+            );
+
+            // stub out related holdings
+            $chunk->unique('symbol')->each(function($holding) {
+                
+                Holding::firstOrCreate([
+                    'symbol' => $holding['symbol'],
+                    'portfolio_id' => $holding['portfolio_id']
+                ], [
+                    'quantity' => 0,
+                    'average_cost_basis' => 0,
+                ]);
+            });
+        });
     }
-    
+
     public function batchSize(): int
     {
-        return 150;
-    }
-
-    public function uniqueBy()
-    {
-        return 'id';
+        return 500;
     }
 
     public function rules(): array
@@ -83,7 +108,7 @@ class TransactionsSheet implements ToModel, WithHeadingRow, WithValidation, With
         return [
             'transaction_id' => ['sometimes', 'nullable'],
             'symbol' => ['required', 'string'],
-            'portfolio_id' => ['required', new PortfolioAccessValidationRule($this->backupImport->user_id)],
+            'portfolio_id' => ['required'],
             'quantity' => ['required', 'min:0', 'numeric'],
             'transaction_type' => ['required', 'in:BUY,SELL'],
             'date' => ['required', 'date'],
