@@ -85,15 +85,19 @@ class Holding extends Model
                     THEN transactions.quantity
                     ELSE 0 END
                 ) AS sold")
-                ->selectRaw('SUM(
-                    (CASE WHEN transaction_type = "BUY" 
+                ->selectRaw("SUM(
+                    (CASE WHEN transaction_type = 'BUY' 
+                        AND transactions.symbol = dividends.symbol 
+                        AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(transactions.date) <= date(dividends.date) 
                         THEN transactions.quantity ELSE 0 END
-                    - CASE WHEN transaction_type = "SELL" 
+                    - CASE WHEN transaction_type = 'SELL' 
+                        AND transactions.symbol = dividends.symbol 
+                        AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(transactions.date) <= date(dividends.date) 
                         THEN transactions.quantity ELSE 0 END)
                     * dividends.dividend_amount
-                ) AS total_received')
+                ) AS total_received")
                 ->join('transactions', 'transactions.symbol', 'dividends.symbol')
                 ->groupBy(['dividends.symbol','dividends.date','dividends.dividend_amount'])
                 ->orderBy('dividends.date', 'DESC')
