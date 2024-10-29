@@ -58,7 +58,7 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
     public function rules(): array
     {
         return [
-            'portfolio_id' => ['sometimes', 'nullable'],
+            'portfolio_id' => ['sometimes', 'nullable', 'uuid'],
             'title' => ['required', 'string'],
             'wishlist' => ['sometimes', 'nullable', 'boolean'],
             'notes' => ['sometimes', 'nullable', 'string'],

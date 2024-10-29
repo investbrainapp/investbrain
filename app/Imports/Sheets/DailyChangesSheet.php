@@ -85,7 +85,7 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
     public function rules(): array
     {
         return [
-            'portfolio_id' => ['required'], 
+            'portfolio_id' => ['required', 'uuid'], 
             'date' => ['required', 'date'],
             'total_market_value' => ['sometimes', 'nullable', 'numeric'],
             'total_cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],

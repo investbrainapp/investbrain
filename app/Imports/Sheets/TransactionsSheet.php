@@ -106,9 +106,9 @@ class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation,
     public function rules(): array
     {
         return [
-            'transaction_id' => ['sometimes', 'nullable'],
+            'transaction_id' => ['sometimes', 'nullable', 'uuid'],
             'symbol' => ['required', 'string'],
-            'portfolio_id' => ['required'],
+            'portfolio_id' => ['required', 'uuid'],
             'quantity' => ['required', 'min:0', 'numeric'],
             'transaction_type' => ['required', 'in:BUY,SELL'],
             'date' => ['required', 'date'],
