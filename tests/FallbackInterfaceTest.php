@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Interfaces\MarketData\YahooMarketData;
 use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\AlphaVantageMarketData;
+use App\Interfaces\MarketData\Types\Quote;
 
 class FallbackInterfaceTest extends TestCase
 {
@@ -32,7 +33,7 @@ class FallbackInterfaceTest extends TestCase
 
         $alphaMock = Mockery::mock(AlphaVantageMarketData::class);
         $alphaMock->shouldReceive('quote')
-                  ->andReturn(collect(['Alpha data']));
+                  ->andReturn(new Quote(['market_value' => 10]));
 
         $this->app->instance(YahooMarketData::class, $yahooMock);
         $this->app->instance(AlphaVantageMarketData::class, $alphaMock);
@@ -41,7 +42,7 @@ class FallbackInterfaceTest extends TestCase
 
         $result = $fallbackInterface->quote('ACME');
 
-        $this->assertEquals(collect(['Alpha data']), $result);
+        $this->assertEquals(new Quote(['market_value' => 10]), $result);
 
         Log::shouldHaveReceived('warning')->with('Failed calling method quote (yahoo): Yahoo failed');
     }

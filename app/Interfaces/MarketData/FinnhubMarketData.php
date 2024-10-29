@@ -5,6 +5,10 @@ namespace App\Interfaces\MarketData;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use App\Interfaces\MarketData\Types\Ohlc;
+use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\Types\Split;
+use App\Interfaces\MarketData\Types\Dividend;
 
 class FinnhubMarketData implements MarketDataInterface
 {
@@ -24,11 +28,11 @@ class FinnhubMarketData implements MarketDataInterface
         return $this->quote($symbol)->isNotEmpty();
     }
 
-    public function quote($symbol): Collection
+    public function quote(string $symbol): Quote
     {
-
-
         $quote = $this->client->quote($symbol);
+
+        if (empty($quote)) return new Quote();
     
         $fundamental = cache()->remember(
             'fh-symbol-'.$symbol, 
@@ -38,20 +42,18 @@ class FinnhubMarketData implements MarketDataInterface
             }
         );
     
-        if (empty($fundamental)) return collect();
-    
-        return collect([
+        return new Quote([
             'name' => Arr::get($fundamental, 'metric.name'),
             'symbol' => $symbol,
-            'market_value' => (float) Arr::get($quote, 'c'), 
-            'fifty_two_week_high' => (float) Arr::get($fundamental, 'metric.52WeekHigh'),
-            'fifty_two_week_low' => (float) Arr::get($fundamental, 'metric.52WeekLow'),
-            'forward_pe' => (float) Arr::get($fundamental, 'metric.forwardPE'), // confirm
-            'trailing_pe' => (float) Arr::get($fundamental, 'metric.trailingPE'), // confirm
-            'market_cap' => (int) Arr::get($fundamental, 'metric.marketCapitalization'), // confirm
-            'book_value' => (float) Arr::get($fundamental, 'metric.bookValuePerShare'), // confirm
+            'market_value' => Arr::get($quote, 'c'), 
+            'fifty_two_week_high' => Arr::get($fundamental, 'metric.52WeekHigh'),
+            'fifty_two_week_low' => Arr::get($fundamental, 'metric.52WeekLow'),
+            'forward_pe' => Arr::get($fundamental, 'metric.forwardPE'), // confirm
+            'trailing_pe' => Arr::get($fundamental, 'metric.trailingPE'), // confirm
+            'market_cap' => Arr::get($fundamental, 'metric.marketCapitalization'), // confirm
+            'book_value' => Arr::get($fundamental, 'metric.bookValuePerShare'), // confirm
             'last_dividend_date' => Arr::get($fundamental, 'metric.lastDivDate'), // confirm
-            'dividend_yield' => (float) Arr::get($fundamental, 'metric.dividendYield'), // confirm
+            'dividend_yield' => Arr::get($fundamental, 'metric.dividendYield'), // confirm
         ]);      
     }
 
@@ -61,12 +63,11 @@ class FinnhubMarketData implements MarketDataInterface
         
         return collect($dividends)->map(function($dividend) use ($symbol) {
                             
-            return [
+            return new Dividend([
                 'symbol' => $symbol,
-                'date' => Carbon::parse(Arr::get($dividend, 'date'))
-                                    ->format('Y-m-d H:i:s'),
+                'date' => Carbon::parse(Arr::get($dividend, 'date')),
                 'dividend_amount' => Arr::get($dividend, 'amount'),
-            ];
+            ]);
         });
     }
 
@@ -77,12 +78,11 @@ class FinnhubMarketData implements MarketDataInterface
 
         return collect($splits)->map(function($split) use ($symbol) {
             
-            return [
+            return new Split([
                 'symbol' => $symbol,
-                'date' => Carbon::parse(Arr::get($split, 'date'))
-                                    ->format('Y-m-d H:i:s'),
+                'date' => Carbon::parse(Arr::get($split, 'date')),
                 'split_amount' => Arr::get($split, 'toFactor') / Arr::get($split, 'fromFactor'),
-            ];
+            ]);
         });
     }
 
@@ -96,11 +96,11 @@ class FinnhubMarketData implements MarketDataInterface
 
         return collect($timestamps)->mapWithKeys(function ($timestamp, $index) use ($symbol, $closes) {
             $date = Carbon::createFromTimestamp($timestamp)->format('Y-m-d');
-            return [ $date => [
+            return [ $date => new Ohlc([
                 'symbol' => $symbol,
                 'date' => $date,
-                'close' => (float) $closes[$index],
-            ]];
+                'close' => $closes[$index],
+            ]) ];
         });
     }
 }

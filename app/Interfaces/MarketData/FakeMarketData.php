@@ -4,6 +4,10 @@ namespace App\Interfaces\MarketData;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\Types\Dividend;
+use App\Interfaces\MarketData\Types\Ohlc;
+use App\Interfaces\MarketData\Types\Split;
 
 class FakeMarketData implements MarketDataInterface
 {
@@ -13,21 +17,21 @@ class FakeMarketData implements MarketDataInterface
         return true;
     }
 
-    public function quote(String $symbol): Collection
+    public function quote(String $symbol): Quote
     {
 
-        return collect([
+        return new Quote([
             'name' => 'ACME Company Ltd',
             'symbol' => $symbol,
-            'market_value' => (float) 230.19,
-            'fifty_two_week_high' => (float) 512.90,
-            'fifty_two_week_low' => (float) 341.20,
-            'forward_pe' => (float) 20.1,
-            'trailing_pe' => (float) 30.34,
-            'market_cap' => (int) 9800700600,
-            'book_value' => (float) 4.7,
+            'market_value' => 230.19,
+            'fifty_two_week_high' => 512.90,
+            'fifty_two_week_low' => 341.20,
+            'forward_pe' => 20.1,
+            'trailing_pe' => 30.34,
+            'market_cap' => 9800700600,
+            'book_value' => 4.7,
             'last_dividend_date' => now()->subDays(45),
-            'dividend_yield' => (float) 0.033
+            'dividend_yield' => 0.033
         ]);
     }
 
@@ -35,21 +39,21 @@ class FakeMarketData implements MarketDataInterface
     {
 
         return collect([
-            [
+            new Dividend([
                 'symbol' => $symbol,
-                'date' => now()->subMonths(3)->format('Y-m-d H:i:s'),
+                'date' => now()->subMonths(3),
                 'dividend_amount' => 2.11,
-            ],
-            [
+            ]),
+            new Dividend([
                 'symbol' => $symbol,
-                'date' => now()->subMonths(6)->format('Y-m-d H:i:s'),
+                'date' => now()->subMonths(6),
                 'dividend_amount' => 1.89,
-            ],
-            [
+            ]),
+            new Dividend([
                 'symbol' => $symbol,
-                'date' => now()->subMonths(9)->format('Y-m-d H:i:s'),
+                'date' => now()->subMonths(9),
                 'dividend_amount' => 0.95,
-            ],
+            ]),
         ]);
     }
 
@@ -57,11 +61,11 @@ class FakeMarketData implements MarketDataInterface
     {   
 
         return collect([
-            [
+            new Split([
                 'symbol' => $symbol,
-                'date' => now()->subMonths(36)->format('Y-m-d H:i:s'),
+                'date' => now()->subMonths(36),
                 'split_amount' => 10,
-            ],
+            ])
         ]);
     }
 
@@ -73,11 +77,11 @@ class FakeMarketData implements MarketDataInterface
 
             $date = now()->subDays($i)->format('Y-m-d');
 
-            $series[$date] = [
+            $series[$date] = new Ohlc([
                 'symbol' => $symbol,
                 'date' => $date,
-                'close' => (float) rand(150, 400),
-            ];
+                'close' => rand(150, 400),
+            ]);
         }
         
         return collect($series);

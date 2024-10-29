@@ -4,6 +4,10 @@ namespace App\Interfaces\MarketData;
 
 use Illuminate\Support\Collection;
 use Scheb\YahooFinanceApi\ApiClient;
+use App\Interfaces\MarketData\Types\Ohlc;
+use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\Types\Split;
+use App\Interfaces\MarketData\Types\Dividend;
 use Scheb\YahooFinanceApi\ApiClientFactory as YahooFinance;
 
 class YahooMarketData implements MarketDataInterface
@@ -22,25 +26,25 @@ class YahooMarketData implements MarketDataInterface
         return $this->quote($symbol)->isNotEmpty();
     }
 
-    public function quote(String $symbol): Collection
+    public function quote(String $symbol): Quote
     {
 
         $quote = $this->client->getQuote($symbol);
 
         if (empty($quote)) return collect();
 
-        return collect([
+        return new Quote([
             'name' => $quote->getLongName() ?? $quote->getShortName(),
             'symbol' => $quote->getSymbol(),
-            'market_value' => (float) $quote->getRegularMarketPrice(),
-            'fifty_two_week_high' => (float) $quote->getFiftyTwoWeekHigh(),
-            'fifty_two_week_low' => (float) $quote->getFiftyTwoWeekLow(),
-            'forward_pe' => (float) $quote->getForwardPE(),
-            'trailing_pe' => (float) $quote->getTrailingPE(),
-            'market_cap' => (int) $quote->getMarketCap(),
-            'book_value' => (float) $quote->getBookValue(),
+            'market_value' => $quote->getRegularMarketPrice(),
+            'fifty_two_week_high' => $quote->getFiftyTwoWeekHigh(),
+            'fifty_two_week_low' => $quote->getFiftyTwoWeekLow(),
+            'forward_pe' => $quote->getForwardPE(),
+            'trailing_pe' => $quote->getTrailingPE(),
+            'market_cap' => $quote->getMarketCap(),
+            'book_value' => $quote->getBookValue(),
             'last_dividend_date' => $quote->getDividendDate(),
-            'dividend_yield' => (float) $quote->getTrailingAnnualDividendYield() * 100
+            'dividend_yield' => $quote->getTrailingAnnualDividendYield() * 100
         ]);
     }
 
@@ -50,11 +54,11 @@ class YahooMarketData implements MarketDataInterface
         return collect($this->client->getHistoricalDividendData($symbol, $startDate, $endDate))
                         ->map(function($dividend) use ($symbol) {
                             
-                            return [
+                            return new Dividend([
                                 'symbol' => $symbol,
-                                'date' => $dividend->getDate()->format('Y-m-d H:i:s'),
+                                'date' => $dividend->getDate(),
                                 'dividend_amount' => $dividend->getDividends(),
-                            ];
+                            ]);
                         });
     }
 
@@ -65,11 +69,11 @@ class YahooMarketData implements MarketDataInterface
                         ->map(function($split) use ($symbol) {
                             $split_amount = explode(':', $split->getStockSplits());
 
-                            return [
+                            return new Split([
                                 'symbol' => $symbol,
-                                'date' => $split->getDate()->format('Y-m-d H:i:s'),
+                                'date' => $split->getDate(),
                                 'split_amount' => $split_amount[0] / $split_amount[1],
-                            ];
+                            ]);
                         });
     }
 
@@ -81,11 +85,11 @@ class YahooMarketData implements MarketDataInterface
 
                 $date = $history->getDate()->format('Y-m-d');
 
-                return [ $date => [
+                return [ $date => new Ohlc([
                         'symbol' => $symbol,
                         'date' => $date,
-                        'close' => (float) $history->getClose(),
-                    ]];
+                        'close' => $history->getClose(),
+                    ]) ];
             });
     }
 }

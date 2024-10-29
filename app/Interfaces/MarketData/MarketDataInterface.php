@@ -3,6 +3,7 @@
 namespace App\Interfaces\MarketData;
 
 use Illuminate\Support\Collection;
+use App\Interfaces\MarketData\Types\Quote;
 
 interface MarketDataInterface
 {
@@ -20,9 +21,9 @@ interface MarketDataInterface
      * 
      * @param String $symbol
      * 
-     * @return Collection
+     * @return Quote
      */
-    public function quote(String $symbol): Collection;
+    public function quote(String $symbol): Quote;
 
     /**
      * Get dividend data
