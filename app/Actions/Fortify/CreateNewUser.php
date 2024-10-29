@@ -3,14 +3,21 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Traits\WithTrimStrings;
+use Laravel\Jetstream\Jetstream;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
-use Laravel\Jetstream\Jetstream;
 
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
+    use WithTrimStrings;
+
+    public function trimExceptions()
+    {
+        return ['password'];
+    }
 
     /**
      * Validate and create a newly registered user.

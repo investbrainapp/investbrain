@@ -2,6 +2,7 @@
 
 use App\Models\Portfolio;
 use App\Models\User;
+use App\Traits\WithTrimStrings;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Illuminate\Support\Collection;
@@ -11,6 +12,7 @@ use App\Notifications\InvitedOnboardingNotification;
 new class extends Component {
 
     use Toast;
+    use WithTrimStrings;
 
     // props
     public ?Portfolio $portfolio = null;
@@ -126,7 +128,7 @@ new class extends Component {
     </label>
 
     <div class="border-primary border rounded-sm px-2 py-5 mb-2 max-h-[20rem] overflow-y-scroll">
-        @if ($portfolio->owner)
+        @if ($portfolio?->owner)
         <x-list-item 
             :item="$portfolio->owner" 
             avatar="profile_photo_url" 
@@ -148,7 +150,7 @@ new class extends Component {
         </x-list-item>
         @endif
 
-        @foreach (collect($this->portfolio?->users)->where('pivot.owner', '!=', 1) as $user)
+        @foreach (collect($portfolio?->users)->where('pivot.owner', '!=', 1) as $user)
             <x-list-item 
                 :item="$user" 
                 avatar="profile_photo_url" 
@@ -220,6 +222,7 @@ new class extends Component {
                         icon="o-envelope" 
                         placeholder="{{ __('Type an email address to share portfolio') }}"
                         wire:model="emailAddress" 
+                        type="email"
                         required
                     />
                 
