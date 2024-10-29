@@ -12,6 +12,9 @@ new class extends Component {
     public Portfolio $portfolio;
     public User $user;
 
+    #[Rule('required|string')]
+    public string $name;
+
     #[Rule('required|string|min:8|confirmed')]
     public string $password;
 
@@ -19,11 +22,17 @@ new class extends Component {
     public string $password_confirmation;
 
     // methods
-    public function updatePassword()
+    public function mount()
+    {
+        $this->name = $this->user->name;
+    }
+
+    public function updateUserInformation()
     {
 
         $this->validate();
 
+        $this->user->name = $this->name;
         $this->user->password = Hash::make($this->password);
         $this->user->email_verified_at = now();
         $this->user->save();
@@ -35,11 +44,16 @@ new class extends Component {
 
 }; ?>
 
-<x-form wire:submit="updatePassword" class="">
+<x-form wire:submit="updateUserInformation" class="">
 
     <div class="mt-2">
         
-        <x-input wire:model="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" autofocus />
+        <x-input wire:model="name" label="{{ __('Name') }}" class="block mt-1 w-full" required autofocus />
+    </div>
+
+    <div class="mt-2">
+        
+        <x-input wire:model="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
     </div>
 
     <div class="mt-2">
@@ -50,7 +64,7 @@ new class extends Component {
     <div class="flex items-center justify-end mt-2">
 
         <x-button class="btn-primary" type="submit">
-            {{ __('Create Password') }}
+            {{ __('Get Started') }}
         </x-button>
     </div>
 </x-form>
