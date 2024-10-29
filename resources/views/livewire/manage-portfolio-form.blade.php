@@ -86,9 +86,9 @@ new class extends Component {
                 <x-button 
                     wire:click="$toggle('confirmingPortfolioDeletion')" 
                     wire:loading.attr="disabled"
-                    icon="o-trash"
-                    class="btn btn-ghost btn-circle text-error" 
+                    class="btn  text-error" 
                     title="{{ __('Delete Portfolio') }}"
+                    label="{{ __('Delete Portfolio') }}"
                 />
             @endif
 

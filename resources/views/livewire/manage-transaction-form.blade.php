@@ -160,9 +160,9 @@ new class extends Component {
                 <x-button 
                     wire:click="$toggle('confirmingTransactionDeletion')" 
                     wire:loading.attr="disabled"
-                    icon="o-trash"
-                    class="btn btn-ghost btn-circle text-error" 
+                    class="btn text-error" 
                     title="{{ __('Delete Transaction') }}"
+                    label="{{ __('Delete Transaction') }}"
                 />
             @endif
 

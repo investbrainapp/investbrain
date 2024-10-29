@@ -14,7 +14,7 @@
             <x-section-border class="my-3" />
         @endif
 
-        <div class="flex justify-between gap-3">
+        <div class="flex justify-end gap-3">
             {{ $actions}}
         </div>
     @endif
