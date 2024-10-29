@@ -242,6 +242,9 @@ class Holding extends Model
         if (config('database.default') === 'sqlite') {
             
             $date_interval = "date(date, '+1 day')";
+        } else {
+
+            DB::statement('SET cte_max_recursion_depth=1000000;');
         }
 
         return DB::table(DB::raw("(
