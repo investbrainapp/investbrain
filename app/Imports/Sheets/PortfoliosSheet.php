@@ -6,8 +6,6 @@ use App\Models\Portfolio;
 use App\Models\BackupImport;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Artisan;
-use App\Console\Commands\SyncDailyChange;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -41,7 +39,7 @@ class PortfoliosSheet implements ToCollection, WithValidation, WithHeadingRow, S
     {
         foreach ($portfolios as $index => $portfolio) {
 
-            Portfolio::unguard();
+            Portfolio::unguard(); // ensures we can set an owner for the portfolio
 
             $portfolio = Portfolio::fullAccess($this->backupImport->user_id)->updateOrCreate([
                 'id' => $portfolio['portfolio_id']
