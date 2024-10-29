@@ -4,7 +4,6 @@ namespace App\Imports\Sheets;
 
 use App\Imports\ValidatesPortfolioAccess;
 use App\Models\Holding;
-use App\Models\Portfolio;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
 use App\Models\BackupImport;
@@ -85,16 +84,17 @@ class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation,
             );
 
             // stub out related holdings
-            $chunk->unique('symbol')->each(function($holding) {
-                
-                Holding::firstOrCreate([
-                    'symbol' => $holding['symbol'],
-                    'portfolio_id' => $holding['portfolio_id']
-                ], [
-                    'quantity' => 0,
-                    'average_cost_basis' => 0,
-                ]);
-            });
+            $chunk->unique(fn($item) => $item['symbol'] . $item['portfolio_id'])
+                    ->each(function($holding) {
+                        
+                        Holding::firstOrCreate([
+                            'symbol' => $holding['symbol'],
+                            'portfolio_id' => $holding['portfolio_id']
+                        ], [
+                            'quantity' => 0,
+                            'average_cost_basis' => 0,
+                        ]);
+                    });
         });
     }
 

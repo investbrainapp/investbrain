@@ -79,7 +79,7 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
 
     public function batchSize(): int
     {
-        return 750;
+        return 1000;
     }
 
     public function rules(): array
