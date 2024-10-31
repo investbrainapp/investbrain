@@ -302,4 +302,17 @@ class Holding extends Model
         ->get()
         ->keyBy('date');
     }
+
+    public function getFormattedTransactions()
+    {
+        $formattedTransactions = '';
+        foreach($this->transactions->sortByDesc('date') as $transaction) {
+            $formattedTransactions .= " * ".$transaction->date->format('Y-m-d') 
+                                    ." ". $transaction->transaction_type 
+                                    ." ". $transaction->quantity
+                                    ." @ ". $transaction->cost_basis 
+                                    ." each \n\n";
+        }
+        return $formattedTransactions;
+    }
 }

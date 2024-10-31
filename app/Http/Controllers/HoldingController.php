@@ -24,21 +24,8 @@ class HoldingController extends Controller
                         ->portfolio($portfolio->id)
                         ->firstOrFail();
 
-        $formattedTransactions = $this->getFormattedTransactions($holding);
+        $formattedTransactions = $holding->getFormattedTransactions();
 
         return view('holding.show', compact(['portfolio', 'holding', 'formattedTransactions']));
-    }
-
-    public function getFormattedTransactions($holding)
-    {
-        $formattedTransactions = '';
-        foreach($holding->transactions->where('symbol', $holding->symbol)->sortByDesc('date') as $transaction) {
-            $formattedTransactions .= " * ".$transaction->date->format('Y-m-d') 
-                                    ." ". $transaction->transaction_type 
-                                    ." ". $transaction->quantity
-                                    ." @ ". $transaction->cost_basis 
-                                    ." each \n\n";
-        }
-        return $formattedTransactions;
     }
 }
