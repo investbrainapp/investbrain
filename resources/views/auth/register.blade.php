@@ -39,8 +39,8 @@
 
                             <div class="ms-2 text-sm">
                                 {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="underline">'.__('Terms of Service').'</a>',
-                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="underline">'.__('Privacy Policy').'</a>',
+                                        'terms_of_service' => '<a target="_blank" href="https://investbra.in/terms" class="underline">'.__('Terms of Service').'</a>',
+                                        'privacy_policy' => '<a target="_blank" href="https://investbra.in/privacy" class="underline">'.__('Privacy Policy').'</a>',
                                 ]) !!}
                             </div>
                         </div>
