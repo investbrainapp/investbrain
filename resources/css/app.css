@@ -5,3 +5,16 @@
 [x-cloak] {
     display: none;
 }
+
+.ai-chat ul {
+    margin-left: 1.1rem;
+}
+
+.ai-chat ul li {
+    padding-left: 1.1rem;
+    list-style-type: disc;
+}
+
+.ai-chat li, .ai-chat p {
+    padding-bottom: .25em;
+}
