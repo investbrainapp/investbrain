@@ -161,6 +161,7 @@
 
             </x-ib-card>
 
+            @if(config('services.ai_chat_enabled'))
             {{-- // TODO: add to system prompt:
                     // Additionally, here is some recent news about {$this->holding->symbol}:
                     // And their latest SEC filings: --}}
@@ -210,6 +211,7 @@
 
                         Below is the question from the investor. Considering these facts, provide a concise response to the following question (give a direct response). Limit your response to no more than 75 words and consider using a common decision framework. Use github style markdown for any formatting:"
             ])
+            @endif
 
         </div>
 

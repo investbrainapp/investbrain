@@ -2,13 +2,13 @@
 
 ## About Investbrain
 
-Investbrain helps you manage and track the performance of your investments.
+Investbrain is a smart open-source investment tracker that helps you manage, track, and make informed decisions about your investents.
 
 <p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/screenshot.png" width="100%" alt="Investbrain Screenshot"></a></p>
 
 ## Under the hood
 
-Investbrain is a Laravel PHP web application that leverages Livewire, Mary UI, and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature three market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! Finally, of course we have robust support for i18n, a11y, and dark mode. 
+Investbrain is a Laravel PHP web application that leverages Livewire and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature three market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! We also offer an integration with OpenAI's LLMs for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
 
 ## Self hosting
 
@@ -39,6 +39,14 @@ http://localhost:8000/register
 ```
 
 Congrats! You've just installed Investbrain!
+
+## Chat with your holdings
+
+Investbrain offers an AI powered chat assistant that is grounded on *your* investments. This enables you to use AI as a thought partner when making investment decisions. 
+
+When self-hosting, you can enable the chat assstant by configuring your OpenAI Secret Key and Organization ID in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file. Navigate to OpenAI to [create your keys](https://platform.openai.com/api-keys).
+
+Always keep in mind the limitations of large language models. When in doubt, consult a licensed investment advisor. 
 
 ## Market data providers
 
@@ -94,12 +102,16 @@ There are several optional configurations available when installing using the re
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
 | MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, or `finnhub`) | yahoo |
-| MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
-| APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
-| DAILY_CHANGE_TIME | The time of day to capture daily change | 23:00 |
-| REGISTRATION_ENABLED | Whether to enable registration of new users | true |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
+| MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
+| APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
+| AI_CHAT_ENABLED | Whether to enable AI chat features | `false` |
+| OPENAI_API_KEY | OpenAI secret key (required for AI chat) | `null` |
+| OPENAI_ORGANIZATION | OpenAI org id (required for AI chat) | `null` |
+| DAILY_CHANGE_TIME | The time of day to capture daily change | 23:00 |
+| REGISTRATION_ENABLED | Whether to enable registration of new users | `true` |
+
 
 
 > Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.

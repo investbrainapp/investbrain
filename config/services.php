@@ -68,5 +68,7 @@ return [
         'name' => 'Linkedin'
     ],
 
-    'enabled_login_providers' => env('ENABLED_LOGIN_PROVIDERS', '')
+    //
+    'enabled_login_providers' => env('ENABLED_LOGIN_PROVIDERS', ''),
+    'ai_chat_enabled' => env('AI_CHAT_ENABLED', false)
 ];
