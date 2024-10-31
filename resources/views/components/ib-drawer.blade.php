@@ -38,7 +38,7 @@
         @endif
 
         @if ($showClose)
-            <x-button icon="o-x-mark" class="btn-ghost btn-circle btn-sm absolute top-4 right-4 " @click="open = false" />
+            <x-button icon="o-x-mark" title="{{ __('Close') }}" class="btn-ghost btn-circle btn-sm absolute top-4 right-4 " @click="open = false" />
         @endif
 
         {{ $slot }}

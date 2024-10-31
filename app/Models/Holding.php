@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Split;
+use App\Models\AiChat;
 use App\Models\Dividend;
 use App\Models\Portfolio;
 use App\Models\MarketData;
@@ -129,6 +130,16 @@ class Holding extends Model
     {
         return $this->hasMany(Split::class, 'symbol', 'symbol')
             ->orderBy('date', 'DESC');
+    }
+
+    /**
+     * Related chats for holding
+     *
+     * @return void
+     */
+    public function chats()
+    {
+        return $this->morphMany(AiChat::class, 'chatable');
     }
 
     public function scopeWithMarketData($query)

@@ -153,6 +153,30 @@
 
             </x-ib-card> --}}
 
+            @livewire('ai-chat-window', [
+                'chatable' => $portfolio,
+                'suggested_prompts' => [
+                    [
+                        'text' => 'Which holding is most successful?',
+                        'value' => 'Which holding is most successful in this portfolio?',
+                    ],
+                    [
+                        'text' => 'Should I diversify more?',
+                        'value' => 'Is my portfolio diverse enough?',
+                    ]
+                ],
+                'system_prompt' => "
+                        You are an investment portfolio assistant providing advice to an investor.  Use the following information to provide relevant recommendations.  Use the words 'likely' or 'may' instead of concrete statements (except for obvious statements of fact or common sense):
+
+                        The investor has the following holdings in this portfolio:
+                        
+                        {$formattedHoldings}
+
+                        Based on the current market data, quantity owned, and average cost basis, you can determine the performance of any holding.
+
+                        Below is the question from the investor. Considering these facts, provide a concise response to the following question (give a direct response). Limit your response to no more than 75 words and consider using a common decision framework:"
+            ])
+
         </div>
     </div>
 </x-app-layout>

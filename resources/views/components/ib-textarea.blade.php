@@ -6,7 +6,7 @@
     'rows' => 4
 ])
 
-<div class="mt-1">
+<div {{ $attributes->class([]) }}>
     <!-- STANDARD LABEL -->
     @if($label)
         <label for="{{ $uuid }}" class="pt-0 label label-text font-semibold">
@@ -27,7 +27,7 @@
             ->class([
                 'textarea textarea-primary w-full peer',
                 'border border-dashed' => $attributes->has('readonly') && $attributes->get('readonly') == true,
-                'textarea-error' => $errors->has($errorField)
+                'textarea-error' => $errors->has($errorField),
             ]) 
         }}
         x-data="{ 

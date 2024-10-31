@@ -69,7 +69,7 @@ new class extends Component {
     <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" >
         <x-input label="{{ __('Title') }}" wire:model="title" required />
 
-        <x-ib-textarea label="{{ __('Notes') }}" wire:model="notes" rows="4" />
+        <x-ib-textarea class="mt-1" label="{{ __('Notes') }}" wire:model="notes" rows="4" />
 
         @if (isset($this->portfolio))
         @livewire('share-portfolio-form', ['portfolio' => $portfolio])

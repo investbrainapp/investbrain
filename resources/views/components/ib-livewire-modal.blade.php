@@ -25,6 +25,7 @@
             @if ($showClose)
                 <x-button 
                     icon="o-x-mark" 
+                    title="{{ __('Close') }}"
                     class="absolute top-4 right-4 btn-ghost btn-circle btn-sm" 
                     @click="$wire.{{ $attributes->wire('model')->value() }} = false"
                 />

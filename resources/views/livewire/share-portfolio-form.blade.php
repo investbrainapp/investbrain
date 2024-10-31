@@ -182,6 +182,7 @@ new class extends Component {
                         class="btn-sm btn-ghost btn-circle" 
                         wire:click="deleteUser('{{ $user->id }}')"
                         spinner="deleteUser('{{ $user->id }}')"
+                        title="{{ __('Remove Access') }}"
                     >
                         <x-icon name="o-x-mark" class="w-4" />
                     </x-button>      

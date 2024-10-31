@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\AiChat;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -62,6 +63,16 @@ class Portfolio extends Model
     public function daily_change()
     {
         return $this->hasMany(DailyChange::class);
+    }
+
+    /**
+     * Related chats for portfolio
+     *
+     * @return void
+     */
+    public function chats()
+    {
+        return $this->morphMany(AiChat::class, 'chatable');
     }
 
     public function scopeMyPortfolios() 
