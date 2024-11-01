@@ -132,7 +132,7 @@ new class extends Component {
             }); 
         } 
     }" 
-    class="flex flex-col"
+    class=""
 >
     <x-button 
         @click="$dispatch('toggle-ai-chat')"
@@ -156,7 +156,7 @@ new class extends Component {
             md:bottom-[7rem] md:right-10 md:w-[35rem] md:h-auto" 
     >
     
-        <x-card class="shadow-2xl" title="{{ __('AI Chat') }}" x-intersect="scrollChatWindow()">
+        <x-card class="h-screen md:h-auto shadow-2xl" title="{{ __('AI Chat') }}" x-intersect="scrollChatWindow()">
             {{-- close button --}}
             <x-button 
                 icon="o-x-mark" 
@@ -269,6 +269,7 @@ new class extends Component {
                             class="h-24 resize-none "
                             placeholder="{{ __('Have a question? AI might be able to help...') }}"
                             wire:keydown.enter.prevent="startCompletion"
+                            autofocus
                         ></x-textarea>
                     </div>
                     <x-button
