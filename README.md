@@ -2,7 +2,7 @@
 
 ## About Investbrain
 
-Investbrain is a smart open-source investment tracker that helps you manage, track, and make informed decisions about your investents.
+Investbrain is a smart open-source investment tracker that helps you manage, track, and make informed decisions about your investments.
 
 <p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/screenshot.png" width="100%" alt="Investbrain Screenshot"></a></p>
 
