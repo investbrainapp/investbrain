@@ -6,15 +6,33 @@
     display: none;
 }
 
-.ai-chat ul {
+.ai-chat ul, .ai-chat ol, .ai-chat ol li > ul {
     margin-left: 1.1rem;
 }
 
-.ai-chat ul li {
+.ai-chat ul > li {
     padding-left: 1.1rem;
     list-style-type: disc;
 }
 
+.ai-chat ol > li {
+    padding-left: 1.1rem;
+    list-style-type: decimal;
+}
+
+.ai-chat ol li li {
+    padding-left: 0rem;
+    list-style-type: none;
+}
+
+.ai-chat ol li li::before {
+    content: " - ";
+}
+
 .ai-chat li, .ai-chat p {
-    padding-bottom: .25em;
+    padding-bottom: .25rem;
+}
+
+.ai-chat code {
+    font-size: .75rem;
 }
