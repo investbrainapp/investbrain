@@ -60,17 +60,19 @@ new class extends Component {
         $this->resetPrompt();
 
         $this->streaming = true;
-        $this->js('$wire.generate()');
+        $this->js('$wire.generateCompletion()');
     }
 
-    public function generate(): void
+    public function generateCompletion(): void
     {
     
         try {
             $stream = OpenAI::chat()->createStreamed([
                 'model' => config('openai.model'),
                 'messages' => [
-                    ['role' => 'system', 'content' => $this->system_prompt],
+                    ['role' => 'system', 'content' => "Today's date is "
+                                                                    .now()->format('Y-m-d')
+                                                                    .".\n\n".$this->system_prompt],
                     ...array_slice($this->messages, -10)
                 ],
             ]);
@@ -96,6 +98,76 @@ new class extends Component {
         $this->chatable->chats()->save(new AiChat(['role' => 'assistant', 'content' => $this->answer]));
         array_push($this->messages, ['role' => 'assistant', 'content' => $this->answer]);
         $this->resetPrompt();
+        $this->js('$wire.generateSuggestedPrompts()');
+    }
+
+    public function generateSuggestedPrompts(): void
+    {
+        try {
+            $suggested_prompts = OpenAI::chat()->create([
+                'model' => config('openai.model'),
+                'response_format' => [
+                    'type' => 'json_schema',
+                    'json_schema' => [
+                        'name' => 'suggested_prompts_schema',
+                        'strict' => true,
+                        'schema' => [
+                            "type" => "object",
+                            "properties" => [
+                                "suggested_prompts" => [
+                                    "type" => "array",
+                                    "items" => [
+                                        "type" => "object",
+                                        "properties" => [
+                                            "text" => [
+                                                "type" => "string",
+                                                "description" => "The prompt question (no more than 5 words)"
+                                            ],
+                                            "value" => [
+                                                "type" => "string",
+                                                "description" => "The detailed version of the question"
+                                            ]
+                                        ],
+                                        "required" => ["text", "value"],
+                                        "additionalProperties" => false
+                                    ]
+                                ]
+                            ],
+                            "required" => ["suggested_prompts"],
+                            "additionalProperties" => false
+                        ]
+                    ]
+                ],
+                'messages' => [
+                    ['role' => 'system', 'content' => "
+                        Your role is to assist investors in asking thoughtful questions to their investment advisors. 
+                        
+                        When you help investors ask good questions, you should ensure the questions are based on the 
+                        provided context. Be sure to keep the questions short! 
+
+                        The questions you recommend might be based on natural follow up from the given context, requests 
+                        to clarify undefined terms, common decision frameworks, possible risks or benefits, or commonly 
+                        understood investing concepts.
+
+                        Your response should only include valid JSON.  
+                    "],
+                    ['role' => 'user', 'content' => "
+                        Generate a list of ". rand(1,5) ." follow up questions a savvy investor might ask their advisor 
+                        based on the following conversation:
+                        \n\n
+                        ".json_encode(array_slice($this->messages, -4))
+                    ],
+                ],
+            ]);
+
+            $this->suggested_prompts = json_decode($suggested_prompts->choices[0]->message->content, true)['suggested_prompts'];
+
+        } catch (\Exception $e) {
+
+            $this->suggested_prompts = [];
+            $this->error($e->getMessage());
+            return;
+        }
     }
 
     public function resetPrompt(): void
@@ -161,7 +233,7 @@ new class extends Component {
         key="ai-chat" 
         class="fixed bg-base-100 shadow-2xl rounded-none md:rounded-lg
                 inset-0 h-screen w-full 
-                md:inset-auto md:right-6 md:bottom-6 md:w-[30rem] md:h-[46rem]"
+                md:inset-auto md:right-6 md:bottom-6 md:w-[32rem] md:h-[46rem]"
     >
         <div 
             class="absolute inset-0 flex flex-col overflow-hidden p-4" 
@@ -266,9 +338,8 @@ new class extends Component {
                         @foreach($suggested_prompts as $prompt)
                         <x-button 
                             class="btn-xs btn-primary btn-outline mr-1 mb-2" 
-                            label="{{ $prompt['text'] }}" 
-                            wire:click="startCompletion('{{ $prompt['value'] }}')" 
-                        />
+                            wire:click="startCompletion('{{ addslashes($prompt['value']) }}')" 
+                        >{{ $prompt['text'] }}</x-button>
                         @endforeach
                         
                     </div>
@@ -286,7 +357,7 @@ new class extends Component {
                             ></x-textarea>
                         </div>
                         <x-button
-                            spinner="generate"
+                            spinner="generateCompletion"
                             wire:click="startCompletion"
                             class="btn btn-ghost h-24"
                             icon="o-paper-airplane"
@@ -295,7 +366,7 @@ new class extends Component {
                     </div>
                     
                     <div class="w-full mt-2">
-                        <p class="text-xs text-secondary leading-tight">{{ __('Advice generated by AI may contain errors. Use at your own risk. Always consult a licensed investment advisor.') }} </p>
+                        <p class="text-xs text-secondary leading-tight">{{ __('Advice generateCompletiond by AI may contain errors. Use at your own risk. Always consult a licensed investment advisor.') }} </p>
                     </div>
                 </form>
             </div>
