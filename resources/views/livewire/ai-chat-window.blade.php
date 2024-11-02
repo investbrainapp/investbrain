@@ -132,41 +132,53 @@ new class extends Component {
             }); 
         } 
     }" 
-    class=""
+    class="fixed z-50 bottom-8 right-8"
 >
+    {{-- toggle button --}}
     <x-button 
+        x-show="!open"
         @click="$dispatch('toggle-ai-chat')"
-        class="btn btn-circle btn-lg btn-primary fixed bottom-10 right-10" 
+        class="flex btn btn-circle md:btn-lg btn-primary" 
     >
         <x-slot:label>
-            <x-icon name="o-sparkles" class="w-8 h-8"></x-icon>
+            <x-icon name="o-sparkles" class="w-6 h-6 md:w-8 md:h-8"></x-icon>
         </x-slot:label>
     </x-button>
 
+    {{-- popup --}}
     <div 
         x-on:toggle-ai-chat.window="open = !open"
         x-show="open"
         x-trap="open" 
         x-bind:inert="!open"
-        x-transition.opacity
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform translate-y-full"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform translate-y-full"
         x-cloak
         key="ai-chat" 
-        class="fixed 
-            bottom-0 right-0 w-full h-screen
-            md:bottom-[7rem] md:right-10 md:w-[35rem] md:h-auto" 
+        class="fixed bg-base-100 shadow-2xl rounded-none md:rounded-lg
+                inset-0 h-screen w-full 
+                md:inset-auto md:right-6 md:bottom-6 md:w-[30rem] md:h-[46rem]"
     >
-    
-        <x-card class="h-screen md:h-auto shadow-2xl" title="{{ __('AI Chat') }}" x-intersect="scrollChatWindow()">
-            {{-- close button --}}
-            <x-button 
-                icon="o-x-mark" 
-                class="absolute top-5 right-4 btn-ghost btn-circle btn-sm" 
-                title="{{ __('Close') }}"
-                @click="open = false" 
-            />
+        <div 
+            class="absolute inset-0 flex flex-col overflow-hidden p-4" 
+            x-intersect="scrollChatWindow()"
+        >
+            <div class="flex grow-0 justify-between items-center pb-4 ">
+                <h2 class="text-lg text-bold">{{ __('AI Chat') }}</h2>
+                <x-button 
+                    icon="o-x-mark" 
+                    class="absolute top-5 right-4 btn-ghost btn-circle btn-sm" 
+                    title="{{ __('Close') }}"
+                    @click="open = false" 
+                />
+            </div>
 
             {{-- chat window --}}
-            <div class="h-[25rem] overflow-y-scroll ai-chat" x-ref="chatWindow">
+            <div class="grow overflow-hidden overflow-y-scroll ai-chat" x-ref="chatWindow">
 
                 <div class="flex gap-3 mb-5 flex-1">
                     <span class="
@@ -248,43 +260,45 @@ new class extends Component {
             </div>
         
             {{-- prompt input --}}
-            <form submit="startCompletion" class="mt-3">       
-                <div class="">
-                    @foreach($suggested_prompts as $prompt)
-                    <x-button 
-                        class="btn-xs btn-primary btn-outline mr-1 mb-2" 
-                        label="{{ $prompt['text'] }}" 
-                        wire:click="startCompletion('{{ $prompt['value'] }}')" 
-                    />
-                    @endforeach
-                    
-                </div>
-            
-                <div class="flex justify-between align-bottom space-x-2 mt-1">
-                    
-                    <div class="w-full">
+            <div class="mt-3 grow-0">
+                <form submit="startCompletion" >       
+                    <div class="">
+                        @foreach($suggested_prompts as $prompt)
+                        <x-button 
+                            class="btn-xs btn-primary btn-outline mr-1 mb-2" 
+                            label="{{ $prompt['text'] }}" 
+                            wire:click="startCompletion('{{ $prompt['value'] }}')" 
+                        />
+                        @endforeach
                         
-                        <x-textarea
-                            wire:model="prompt"
-                            class="h-24 resize-none "
-                            placeholder="{{ __('Have a question? AI might be able to help...') }}"
-                            wire:keydown.enter.prevent="startCompletion"
-                            autofocus
-                        ></x-textarea>
                     </div>
-                    <x-button
-                        spinner="generate"
-                        wire:click="startCompletion"
-                        class="btn btn-ghost h-24"
-                        icon="o-paper-airplane"
-                    ></x-button>
-                    
-                </div>
                 
-                <div class="w-full mt-2">
-                    <p class="text-xs text-secondary leading-tight">{{ __('Advice generated by AI may contain errors. Use at your own risk. Always consult a licensed investment advisor.') }} </p>
-                </div>
-            </form>
-        </x-card>
+                    <div class="flex justify-between align-bottom space-x-2 mt-1">
+                        
+                        <div class="w-full">
+                            
+                            <x-textarea
+                                wire:model="prompt"
+                                class="h-24 resize-none "
+                                placeholder="{{ __('Have a question? AI might be able to help...') }}"
+                                wire:keydown.enter.prevent="startCompletion"
+                                autofocus
+                            ></x-textarea>
+                        </div>
+                        <x-button
+                            spinner="generate"
+                            wire:click="startCompletion"
+                            class="btn btn-ghost h-24"
+                            icon="o-paper-airplane"
+                        ></x-button>
+                        
+                    </div>
+                    
+                    <div class="w-full mt-2">
+                        <p class="text-xs text-secondary leading-tight">{{ __('Advice generated by AI may contain errors. Use at your own risk. Always consult a licensed investment advisor.') }} </p>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
