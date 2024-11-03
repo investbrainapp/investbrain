@@ -121,7 +121,7 @@ new class extends Component {
                                         "properties" => [
                                             "text" => [
                                                 "type" => "string",
-                                                "description" => "The prompt question (no more than 5 words)"
+                                                "description" => "The suggested prompt question (no more than 5 words)"
                                             ],
                                             "value" => [
                                                 "type" => "string",
@@ -140,20 +140,21 @@ new class extends Component {
                 ],
                 'messages' => [
                     ['role' => 'system', 'content' => "
-                        Your role is to assist investors in asking thoughtful questions to their investment advisors. 
+                        Your role is to assist investors in asking thoughtful questions of their investment advisors. 
                         
-                        When you help investors ask good questions, you should ensure the questions are based on the 
-                        provided context. Be sure to keep the questions short! 
+                        When you help investors ask good questions, you should ensure the you questions you recommend 
+                        are based on the provided context. Be sure to keep the questions short! 
 
                         The questions you recommend might be based on natural follow up from the given context, requests 
-                        to clarify undefined terms, common decision frameworks, possible risks or benefits, or commonly 
-                        understood investing concepts.
+                        to further refine a previous response, clarify undefined terms, common decision frameworks, 
+                        possible risks or benefits, or commonly understood investing concepts that may require additional
+                        explanation.
 
                         Your response should only include valid JSON.  
                     "],
                     ['role' => 'user', 'content' => "
-                        Generate a list of ". rand(1,5) ." follow up questions a savvy investor might ask their advisor 
-                        based on the following conversation:
+                        Generate between 1 and 5 (no more than 5) follow up questions a savvy investor might ask their 
+                        advisor based on the following conversation:
                         \n\n
                         ".json_encode(array_slice($this->messages, -4))
                     ],
