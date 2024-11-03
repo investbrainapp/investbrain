@@ -72,7 +72,7 @@ class Portfolio extends Model
      */
     public function chats()
     {
-        return $this->morphMany(AiChat::class, 'chatable');
+        return $this->morphMany(AiChat::class, 'chatable')->where('user_id', auth()->user()->id);
     }
 
     public function scopeMyPortfolios() 
