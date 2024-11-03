@@ -93,6 +93,7 @@ class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation,
                         ], [
                             'quantity' => 0,
                             'average_cost_basis' => 0,
+                            'splits_synced_at' => now(),
                         ]);
                     });
         });
