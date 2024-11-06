@@ -5,9 +5,11 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
+use App\Traits\WithTrimStrings;
 
 new class extends Component {
     use Toast;
+    use WithTrimStrings;
 
     // props
     public ?Portfolio $portfolio;

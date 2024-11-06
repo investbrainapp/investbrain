@@ -9,9 +9,11 @@ use Livewire\Attributes\{Computed};
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 use Illuminate\Validation\Rule;
+use App\Traits\WithTrimStrings;
 
 new class extends Component {
     use Toast;
+    use WithTrimStrings;
 
     // props
     public ?Portfolio $portfolio;
