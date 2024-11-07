@@ -12,7 +12,7 @@ use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
 Route::get('/', function () {
-    if (config('investbrain.self_hosted', false) && View::exists('landing-page::index')) {
+    if (!config('investbrain.self_hosted', true) && View::exists('landing-page::index')) {
         
         return view('landing-page::index');
     }
