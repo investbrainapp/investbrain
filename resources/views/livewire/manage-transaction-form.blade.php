@@ -83,13 +83,13 @@ new class extends Component {
 
     public function save()
     {
-        $this->authorize('fullAccess', $this->portfolio);
-
-        $validated = $this->validate();
-
         if (!isset($this->portfolio)) {
             $this->portfolio = Portfolio::find($this->portfolio_id);
         }
+
+        $this->authorize('fullAccess', $this->portfolio);
+
+        $validated = $this->validate();
 
         $transaction = $this->portfolio->transactions()->create($validated);
         $transaction->save();
