@@ -159,6 +159,31 @@ Just to be safe, we recommend backing up your portfolios before using these comm
 | sync:daily-change | Re-calculates daily snapshots of your portfolio's daily performance. Useful to fill in gaps in your portfolio charts. (Note: this is an extremely resource intensive query.) |
 | sync:holdings | Re-calculates performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
 
+## Troubleshooting
+
+If you are facing issues with Investbrain, it can be handy to monitor the application's logs:
+
+```bash
+docker exec -it investbrain-app cat storage/logs/laravel.log
+```
+or you can live monitor logs using `tail`:
+
+```bash
+docker exec -it investbrain-app tail -f storage/logs/laravel.log
+```
+
+### Common issues
+
+<details>
+
+**<summary>Market data not refreshing on fresh install</summary>**
+
+If you're unable to refresh market data out of the box (i.e. your market data provider is set to Yahoo), there is a chance Yahoo is being blocked by a firewall or adblocker.  Pihole is known to block `fc.yahoo.com` which is the domain used to query Yahoo. 
+
+Once you whitelist `fc.yahoo.com` in pihole, your market data should begin populating!
+
+</details>
+
 ## Testing
 
 Investbrain has a robus PHPUnit test suite that creates an in-memory SQLite database and runs any queued jobs synchronously using Laravel's array driver. You can run the entire Investbrain test suite from within the Docker container by running:
