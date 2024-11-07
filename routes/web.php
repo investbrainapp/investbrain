@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\DashboardController;
@@ -11,16 +12,12 @@ use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
 Route::get('/', function () {
-    if (config('investbrain.self_hosted', true)) {
+    if (config('investbrain.self_hosted', false) && View::exists('landing-page::index')) {
         
-        return redirect(route('dashboard'));
+        return view('landing-page::index');
     }
 
-    return view('welcome');
-});
-
-Route::get('/test', function () {
-    //
+    return redirect(route('dashboard'));
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
