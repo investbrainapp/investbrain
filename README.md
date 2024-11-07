@@ -6,6 +6,17 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 
 <p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/screenshot.png" width="100%" alt="Investbrain Screenshot"></a></p>
 
+## Table of contents
+[Under the hood](#under-the-hood)
+[Install (self hosting)](#self-hosting)
+[Chat with your holdings](#chat-with-your-holdings)
+[Market data providers](#market-data-providers)
+[Configuration](#configuration)
+[Updating](#updating)
+[Command line utilities](#command-line-utilities)
+[Troubleshooting](#troubleshooting)
+[Testing](#testing)
+
 ## Under the hood
 
 Investbrain is a Laravel PHP web application that leverages Livewire and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature three market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! We also offer an integration with OpenAI's LLMs for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
