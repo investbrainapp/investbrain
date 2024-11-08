@@ -14,7 +14,8 @@ services:
     volumes:
       - .:/var/www/app:delegated
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - investbrain-network
   nginx:
@@ -40,6 +41,12 @@ services:
       MYSQL_USER: ${DB_USERNAME:-investbrain}
       MYSQL_PASSWORD: ${DB_PASSWORD:-investbrain}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-investbrain}
+    healthcheck:
+      test: ["CMD", "mysql", "-u${DB_USERNAME:-investbrain}", "-p${DB_PASSWORD:-investbrain}", "-e", "SELECT 1;"]
+      interval: 1s
+      timeout: 90s
+      retries: 20
+      start_period: 10s      
     volumes:
       - ./docker/mysql.conf:/etc/mysql/conf.d/my.cnf
       - investbrain-mysql:/var/lib/mysql
