@@ -50,7 +50,7 @@ class QuantityValidationRule implements ValidationRule
    
             $maxQuantity = $purchase_qty - $sales_qty;
 
-            if ($value > $maxQuantity) {
+            if (round($value, 3) > round($maxQuantity, 3)) {
                 $fail(__('The quantity must not be greater than the available quantity.'));
             }
         }

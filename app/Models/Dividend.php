@@ -50,10 +50,8 @@ class Dividend extends Model
     /**
      * Grab new dividend data
      *
-     * @param string $symbol
-     * @return void
      */
-    public static function refreshDividendData(string $symbol) 
+    public static function refreshDividendData(string $symbol): void
     {
         $dividends_meta = self::where(['symbol' => $symbol])
             ->selectRaw('COUNT(symbol) as total_dividends')
@@ -68,7 +66,13 @@ class Dividend extends Model
         // nope, refresh forward looking only
         if ( $dividends_meta->total_dividends ) {
 
-            $start_date = $dividends_meta->last_date->addHours(48);
+            $start_date = $dividends_meta->last_date->addHours(24);
+        }
+
+        // skip refresh if there's already recent data
+        if ($start_date >= $end_date) {
+
+            return;
         }
 
         // get some data
@@ -99,8 +103,6 @@ class Dividend extends Model
             $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
             $market_data->save();
         }
-
-        return $dividend_data;
     }
 
     public static function syncHoldings(string $symbol): void
