@@ -125,7 +125,7 @@ class Transaction extends Model
 
     public function scopeBeforeDate($query, $date)
     {
-        return $query->whereDate('date', '<', $date);
+        return $query->whereDate('date', '<=', $date);
     }
 
     public function scopeMyTransactions() 
