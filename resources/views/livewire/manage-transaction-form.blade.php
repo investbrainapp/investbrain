@@ -36,7 +36,7 @@ new class extends Component {
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => 'required|string|in:BUY,SELL',
             'portfolio_id' => 'required|exists:portfolios,id',
-            'date' => 'required|date_format:Y-m-d',
+            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:' . now()->format('Y-m-d')],
             'quantity' => [
                 'required', 
                 'numeric', 
