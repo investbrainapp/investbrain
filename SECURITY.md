@@ -9,4 +9,4 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within Investbrain, please create an issue in the [Github repository](https://github.com/investbrainapp/investbrain/issues/new). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within Investbrain, please submit your report via [Github](https://github.com/investbrainapp/investbrain/security/advisories/new). All security vulnerabilities will be promptly addressed. We ask that you keep any suspected vulnerabilities private and confidential until they have been appropriately addressed.
