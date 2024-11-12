@@ -8,7 +8,7 @@ use App\Console\Commands\{RefreshMarketData, CaptureDailyChange, RefreshDividend
  * This scheduled job refreshes market data from your selected data provider
  * Update the cadence with the MARKET_DATA_REFRESH key in your env file
  */
-Schedule::command(RefreshMarketData::class)->everyMinute()->weekdays();
+Schedule::command(RefreshMarketData::class)->weekdays()->everyMinute();
 
 /**
  * 
@@ -20,7 +20,7 @@ Schedule::command(CaptureDailyChange::class)->dailyAt(config('investbrain.daily_
  * 
  * Refreshes dividend data for your holdings (and syncs new dividends to holdings)
  */
-Schedule::command(RefreshDividendData::class)->days([1, 3, 5])->weekdays();
+Schedule::command(RefreshDividendData::class)->daily()->days([1, 3, 5]);
 
 /**
  * 
