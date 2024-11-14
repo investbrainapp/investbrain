@@ -27,7 +27,7 @@ class Dividend extends Model
 
     protected $casts = [
         'date' => 'datetime',
-        'last_date' => 'datetime',
+        'last_dividend_update' => 'datetime',
     ];
 
     public function marketData() {
@@ -55,22 +55,22 @@ class Dividend extends Model
     {
         $dividends_meta = self::where(['symbol' => $symbol])
             ->selectRaw('COUNT(symbol) as total_dividends')
-            ->selectRaw('MAX(date) as last_date')
+            ->selectRaw('MAX(created_at) as last_dividend_update')
             ->get()
             ->first();
 
         // assume we need to populate ALL dividend data
-        $start_date = new \DateTime('@0');
+        $start_date = new Carbon('@0');
         $end_date = now();
 
         // nope, refresh forward looking only
         if ( $dividends_meta->total_dividends ) {
-
-            $start_date = $dividends_meta->last_date->addHours(24);
+            
+            $start_date = $dividends_meta->last_dividend_update->addHours(24);
         }
-
+        
         // skip refresh if there's already recent data
-        if ($start_date >= $end_date) {
+        if ($start_date->greaterThan($end_date)) {
 
             return;
         }
