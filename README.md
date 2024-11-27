@@ -11,7 +11,7 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 - [Install (self hosting)](#self-hosting)
 - [Chat with your holdings](#chat-with-your-holdings)
 - [Market data providers](#market-data-providers)
-- [Import / Export](#import-export)
+- [Import / Export](#import--export)
 - [Configuration](#configuration)
 - [Updating](#updating)
 - [Command line utilities](#command-line-utilities)
