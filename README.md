@@ -11,6 +11,7 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 - [Install (self hosting)](#self-hosting)
 - [Chat with your holdings](#chat-with-your-holdings)
 - [Market data providers](#market-data-providers)
+- [Import / Export](#import-export)
 - [Configuration](#configuration)
 - [Updating](#updating)
 - [Command line utilities](#command-line-utilities)
@@ -103,6 +104,18 @@ MARKET_DATA_PROVIDER=yahoo,alphavantage,custom_provider
 ```
 
 Feel free to submit a PR with any custom providers you create.
+
+## Import / Export
+
+Investbrain includes a convenient feature which allows you to import and export portfolios and transaction data. 
+
+### Import
+
+Imports are "upserted" to the database. If the record does not already exist in the database, the record will be created. However, when a portfolio or transaction exists (the record's ID matches an existing record), the record will be updated. This way, you can simultaneously create new records, but also bulk update records.
+
+### Export
+
+Exporting your portfolios and transactions is a convenient way to back-up your Investbrain data. It is also a convenient way to maintain portability of *your* data.
 
 ## Configuration
 
