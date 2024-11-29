@@ -63,7 +63,9 @@
         <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
                 
             @livewire('transactions-list', [
-                'transactions' => $user->transactions
+                'transactions' => $user->transactions,
+                'showPortfolio' => true,
+                'paginate' => false
             ])
 
         </x-ib-card>

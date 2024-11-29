@@ -15,6 +15,10 @@ new class extends Component {
     public ?Portfolio $portfolio;
     public ?Transaction $editingTransaction;
     public Bool $shouldGoToHolding = true;
+    public Bool $showPortfolio = false;
+    public Bool $paginate = true;
+    public Int $perPage = 5;
+    public Int $offset = 0;
 
     protected $listeners = [
         'transaction-updated' => '$refresh',
@@ -38,17 +42,23 @@ new class extends Component {
         return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
     }
 
+    public function updateOffset($amount = 0)
+    {
+        $this->offset = $this->offset + $amount;
+    }
+
 }; ?>
 
 <div class="">
 
-    @foreach($transactions->sortByDesc('date')->take(10) as $transaction)
+    @foreach($transactions->sortByDesc('date')->slice($offset)->take($perPage) as $transaction)
 
         <x-list-item 
             no-separator 
             :item="$transaction" 
             class="cursor-pointer"
             x-data="{ loading: false, timeout: null }"
+            :key="$transaction->id"
             @click="
                 if ($wire.shouldGoToHolding) {
 
@@ -83,11 +93,43 @@ new class extends Component {
                 <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>
             <x-slot:sub-value>
+                @if($showPortfolio)
+                <span title="{{ __('Portfolio') }}">{{ $transaction->portfolio->title }} </span>
+                &middot;
+                @endif
                 <span title="{{ __('Transaction Date') }}">{{ $transaction->date->format('F j, Y') }} </span>
             </x-slot:sub-value>
         </x-list-item>
 
     @endforeach
+
+    @if ($paginate && count($transactions) > $perPage)
+        <div class="flex justify-between">
+            
+            <span>
+                @if($offset > 0)
+                <x-button 
+                    class="btn btn-sm btn-ghost text-secondary"
+                    wire:click="updateOffset(-{{ $perPage }})"
+                >
+                    {!! __('pagination.previous') !!}
+                </x-button>
+                @endif
+            </span>
+
+            <span>
+                @if(count($transactions) - $offset >  $offset)
+                <x-button 
+                    class="btn btn-sm btn-ghost text-secondary"
+                    wire:click="updateOffset({{ $perPage }})"
+                >
+                    {!! __('pagination.next') !!}
+                </x-button>
+                @endif
+            </span>
+            
+        </div>
+    @endif
 
     <x-ib-alpine-modal 
         key="manage-transaction"
@@ -96,7 +138,7 @@ new class extends Component {
         @livewire('manage-transaction-form', [
             'portfolio' => $portfolio, 
             'transaction' => $editingTransaction, 
-        ], key($editingTransaction->id ?? 'new'))
+        ], key($editingTransaction?->id.rand()))
 
     </x-ib-alpine-modal>
 </div>
