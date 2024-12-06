@@ -5,7 +5,7 @@ use App\Models\AiChat;
 use App\Models\Holding;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Volt\Component;
-use OpenAI;
+use OpenAI\Factory;
 use OpenAI\Responses\StreamResponse;
 
 new class extends Component {
@@ -201,10 +201,6 @@ new class extends Component {
         $apiKey = config('openai.api_key');
         $organization = config('openai.organization');
         $baseUri = config('openai.base_uri');
-
-        if (! is_string($apiKey) || ($organization !== null && ! is_string($organization))) {
-            throw new \InvalidArgumentException('The OpenAI API Key is missing. Please publish the [openai.php] configuration file and set the [api_key].');
-        }
 
         return OpenAI::factory()
             ->withApiKey($apiKey)
