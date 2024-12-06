@@ -20,7 +20,7 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 
 ## Under the hood
 
-Investbrain is a Laravel PHP web application that leverages Livewire and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature three market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! We also offer an integration with OpenAI's LLMs for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
+Investbrain is a Laravel PHP web application that leverages Livewire and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature three market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! We also offer an integration with OpenAI for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
 
 ## Self hosting
 
@@ -58,7 +58,9 @@ Investbrain offers an AI powered chat assistant that is grounded on *your* inves
 
 When self-hosting, you can enable the chat assistant by configuring your OpenAI Secret Key and Organization ID in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file. Navigate to OpenAI to [create your keys](https://platform.openai.com/api-keys).
 
-Always keep in mind the limitations of large language models. When in doubt, consult a licensed investment advisor. 
+If you are self-hosting your own large language models ("LLMs") that expose an OpenAI compatible API (e.g. [Ollama](https://ollama.com/blog/openai-compatibility)), you can update the `OPENAI_BASE_URI` configuration to your self-hosted instance. Ensure you also update the `OPENAI_MODEL` to an available model.
+
+Always keep in mind the limitations of LLMs. When in doubt, consult a licensed investment advisor. 
 
 ## Market data providers
 
@@ -133,9 +135,10 @@ There are several optional configurations available when installing using the re
 | AI_CHAT_ENABLED | Whether to enable AI chat features | `false` |
 | OPENAI_API_KEY | OpenAI secret key (required for AI chat) | `null` |
 | OPENAI_ORGANIZATION | OpenAI org id (required for AI chat) | `null` |
+| OPENAI_MODEL | The selected LLM used for AI chat | gpt-4o |
+| OPENAI_BASE_URI | The URI for your self-hosted LLM | api.openai.com/v1 |
 | DAILY_CHANGE_TIME | The time of day to capture daily change | 23:00 |
 | REGISTRATION_ENABLED | Whether to enable registration of new users | `true` |
-
 
 
 > Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.
