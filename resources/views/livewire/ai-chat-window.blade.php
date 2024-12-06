@@ -5,7 +5,7 @@ use App\Models\AiChat;
 use App\Models\Holding;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Volt\Component;
-use OpenAI\Laravel\Facades\OpenAI;
+use OpenAI;
 use OpenAI\Responses\StreamResponse;
 
 new class extends Component {
@@ -67,7 +67,9 @@ new class extends Component {
     {
     
         try {
-            $stream = OpenAI::chat()->createStreamed([
+            $client = $this->createOpenAiClient();
+            
+            $stream = $client->chat()->createStreamed([
                 'model' => config('openai.model'),
                 'messages' => [
                     ['role' => 'system', 'content' => "Today's date is "
@@ -104,7 +106,9 @@ new class extends Component {
     public function generateSuggestedPrompts(): void
     {
         try {
-            $suggested_prompts = OpenAI::chat()->create([
+            $client = $this->createOpenAiClient();
+
+            $suggested_prompts = $client->chat()->create([
                 'model' => config('openai.model'),
                 'response_format' => [
                     'type' => 'json_schema',
@@ -190,6 +194,25 @@ new class extends Component {
         RateLimiter::hit($rateLimitKey, 60);
 
         return false;
+    }
+
+    private function createOpenAiClient()
+    {
+        $apiKey = config('openai.api_key');
+        $organization = config('openai.organization');
+        $baseUri = config('openai.base_uri');
+
+        if (! is_string($apiKey) || ($organization !== null && ! is_string($organization))) {
+            throw new \InvalidArgumentException('The OpenAI API Key is missing. Please publish the [openai.php] configuration file and set the [api_key].');
+        }
+
+        return OpenAI::factory()
+            ->withApiKey($apiKey)
+            ->withOrganization($organization)
+            ->withHttpHeader('OpenAI-Beta', 'assistants=v2')
+            ->withHttpClient(new \GuzzleHttp\Client(['timeout' => config('openai.request_timeout', 30)]))
+            ->withBaseUri($baseUri)
+            ->make();
     }
 
 }; ?>

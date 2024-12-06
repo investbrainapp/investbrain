@@ -27,5 +27,6 @@ return [
     'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
 
     //
+    'base_uri' => env('OPENAI_BASE_URI', 'api.openai.com/v1'),
     'model' => env('OPENAI_MODEL', 'gpt-4o'),
 ];
