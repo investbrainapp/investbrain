@@ -202,10 +202,6 @@ new class extends Component {
         $organization = config('openai.organization');
         $baseUri = config('openai.base_uri');
 
-        if (! is_string($apiKey) || ($organization !== null && ! is_string($organization))) {
-            throw new \InvalidArgumentException('The OpenAI API Key is missing. Please publish the [openai.php] configuration file and set the [api_key].');
-        }
-
         return OpenAI::factory()
             ->withApiKey($apiKey)
             ->withOrganization($organization)
