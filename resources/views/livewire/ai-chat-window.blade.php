@@ -5,7 +5,7 @@ use App\Models\AiChat;
 use App\Models\Holding;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Volt\Component;
-use OpenAI;
+use OpenAI\Factory;
 use OpenAI\Responses\StreamResponse;
 
 new class extends Component {
