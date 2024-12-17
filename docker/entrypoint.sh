@@ -9,9 +9,6 @@ if [ ! -f ".env" ]; then
     cp .env.example .env
 fi
 
-echo "====================== Checking for updates...  ====================== "
-/usr/bin/git pull
-
 echo "====================== Installing Composer dependencies...  ====================== "
 /usr/local/bin/composer install
 

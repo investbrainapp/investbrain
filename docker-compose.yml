@@ -3,9 +3,7 @@ networks:
     driver: bridge
 services:
   app:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    image: investbrainapp/investbrain:latest
     container_name: investbrain-app
     restart: unless-stopped
     tty: true
@@ -15,8 +13,18 @@ services:
       - .:/var/www/app:delegated
     depends_on:
       - mysql
+      - redis
     networks:
       - investbrain-network
+  redis:
+    image: redis:alpine
+    container_name: investbrain-redis
+    restart: unless-stopped
+    tty: true
+    networks:
+      - investbrain-network
+    volumes:
+      - investbrain-redis:/data
   nginx:
     image: nginx:alpine
     container_name: investbrain-nginx
@@ -46,4 +54,5 @@ services:
     networks:
       - investbrain-network
 volumes:
+  investbrain-redis:
   investbrain-mysql:
