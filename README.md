@@ -113,7 +113,7 @@ Investbrain includes a convenient feature which allows you to maintain the porta
 
 ### Import
 
-Imports are "upserted" to the database. If the record does not already exist in the database, the record will be created. However, when a portfolio or transaction exists (the record's ID matches an existing record), the record will be updated. This way, you can simultaneously create new records, but also bulk update records.
+Imports are "upserted" to the database. If the record does not already exist in the database, the record will be created. However, when a portfolio or transaction exists (i.e. the record's ID matches an existing record), the record will be updated. This way, you can simultaneously create new records, but also bulk update records.
 
 ### Export
 
