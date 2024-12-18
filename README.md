@@ -109,7 +109,7 @@ Feel free to submit a PR with any custom providers you create.
 
 ## Import / Export
 
-Investbrain includes a convenient feature which allows you to import and export portfolios and transaction data. 
+Investbrain includes a convenient feature which allows you to maintain the portability of your portfolios and transaction data. 
 
 ### Import
 
