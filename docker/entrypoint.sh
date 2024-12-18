@@ -9,9 +9,6 @@ if [ ! -f ".env" ]; then
     cp .env.example .env
 fi
 
-echo "====================== Checking for updates...  ====================== "
-/usr/bin/git pull
-
 echo "====================== Installing Composer dependencies...  ====================== "
 /usr/local/bin/composer install
 
@@ -38,7 +35,20 @@ echo "====================== Installing NPM dependencies and building frontend..
 /usr/bin/npm run build 
 
 echo "====================== Running migrations...  ====================== "
-/usr/local/bin/php artisan migrate --force
+run_migrations() {
+    /usr/local/bin/php artisan migrate --force
+}
+RETRIES=30
+DELAY=5
+until run_migrations; do
+  RETRIES=$((RETRIES-1))
+  if [ $RETRIES -le 0 ]; then
+    echo "Database is not ready after multiple attempts. Exiting..."
+    exit 1
+  fi
+  echo "Waiting for database to be ready... retrying in $DELAY seconds."
+  sleep $DELAY
+done
 
 echo "====================== Spinning up Supervisor daemon...  ====================== "
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
