@@ -2,17 +2,17 @@
 
 cd /var/www/app
 
-echo "====================== Running entrypoint script...  ====================== "
+echo -e "\n====================== Running entrypoint script...  ====================== "
 if [ ! -f ".env" ]; then
     echo " > Ope, gotta create an .env file!"
 
     cp .env.example .env
 fi
 
-echo "====================== Installing Composer dependencies...  ====================== "
+echo -e "\n====================== Installing Composer dependencies...  ====================== "
 /usr/local/bin/composer install
 
-echo "====================== Validating environment...  ====================== "
+echo -e "\n====================== Validating environment...  ====================== "
 if [ $(stat -c '%U' .) != "www-data" ]; then
     echo " > Setting correct permissions for pwd..."
     chown -R www-data:www-data .
@@ -30,11 +30,11 @@ if [ ! -L "public/storage" ]; then
     /usr/local/bin/php artisan storage:link
 fi
 
-echo "====================== Installing NPM dependencies and building frontend...  ====================== "
+echo -e "\n====================== Installing NPM dependencies and building frontend...  ====================== "
 /usr/bin/npm install 
 /usr/bin/npm run build 
 
-echo "====================== Running migrations...  ====================== "
+echo -e "\n====================== Running migrations...  ====================== "
 run_migrations() {
     /usr/local/bin/php artisan migrate --force
 }
@@ -43,12 +43,12 @@ DELAY=5
 until run_migrations; do
   RETRIES=$((RETRIES-1))
   if [ $RETRIES -le 0 ]; then
-    echo "Database is not ready after multiple attempts. Exiting..."
+    echo " > Database is not ready after multiple attempts. Exiting..."
     exit 1
   fi
-  echo "Waiting for database to be ready... retrying in $DELAY seconds."
+  echo " > Waiting for database to be ready... retrying in $DELAY seconds."
   sleep $DELAY
 done
 
-echo "====================== Spinning up Supervisor daemon...  ====================== "
+echo -e "\n====================== Spinning up Supervisor daemon...  ====================== "
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
