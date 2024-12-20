@@ -1,5 +1,10 @@
 .git
+.env
 node_modules
 packages
 vendor
 tests
+.DS_Store
+vapor.yml
+.vapor
+storage
