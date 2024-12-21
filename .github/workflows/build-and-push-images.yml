@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Build and push Docker images
 
 on:
   push:
