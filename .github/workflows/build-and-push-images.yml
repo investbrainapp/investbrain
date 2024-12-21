@@ -28,6 +28,9 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: image=moby/buildkit:v0.11.0
+           docker/Dockerfile
 
       - name: Extract version from tag
         id: extract-version
@@ -38,6 +41,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
+          file: ./docker/Dockerfile
           push: true
           tags: |
             investbrainapp/investbrain:latest
