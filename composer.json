@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.2",
         "finnhub/client": "master@dev",
-        "laravel/framework": "^11.9",
+        "laravel/framework": "^11.35",
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
