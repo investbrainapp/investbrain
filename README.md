@@ -1,4 +1,9 @@
+
+
 <p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/investbrain-logo.png" width="400" alt="Investbrain Logo"></a></p>
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/investbrainapp/investbrain)](https://hub.docker.com/r/investbrainapp/investbrain/)
+[![Github Stars](https://img.shields.io/github/stars/investbrainapp/investbrain)](https://github.com/investbrainapp/investbrain/)
 
 ## About Investbrain
 
