@@ -6,7 +6,6 @@ use Exception;
 use App\Models\User;
 use App\Models\ConnectedAccount;
 use Illuminate\Support\MessageBag;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Laravel\Socialite\Facades\Socialite;

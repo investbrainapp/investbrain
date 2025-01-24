@@ -6,7 +6,7 @@
         </x-slot>
 
         <x-slot name="description">
-            {{ __('API tokens allow third-party services to authenticate with our application on your behalf.') }}
+            {{ __('API tokens allow third-party services to authenticate with Investbrain on your behalf.') }}
         </x-slot>
 
         <x-slot name="form">

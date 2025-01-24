@@ -1,8 +1,18 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\ApiControllers\PortfolioController;
 use Illuminate\Support\Facades\Route;
+use App\Http\ApiControllers\UserController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    // user
+    Route::get('/me', [UserController::class, 'me']);
+
+    // portfolio
+    Route::get('/portfolio', [PortfolioController::class, 'index']);
+
+    // transaction
+
+    // holding
+});
