@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\ApiControllers;
 
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
-use App\Support\FilterRequest;
+use HackerEsq\FilterModels\FilterModels;
 use App\Http\Resources\PortfolioResource;
 use App\Http\ApiControllers\Controller as ApiController;
 
 class PortfolioController extends ApiController
 {
-    public function index(Request $request)
+    public function index(FilterModels $filters)
     {
-        $filterRequest = new FilterRequest(Portfolio::class);
 
-        $filterRequest->setScopes(['myPortfolios']);
-        $filterRequest->setEagerRelations(['users', 'transactions', 'holdings']);
-        $filterRequest->setFilterableRelations(['holdings' => 'symbol', 'transactions' => 'symbol']);
-        $filterRequest->setSearchableColumns(['title', 'notes']);
-    
-        return PortfolioResource::collection($filterRequest->get());
+        $filters->setQuery(Portfolio::query());
+        $filters->setScopes(['myPortfolios']);
+        $filters->setEagerRelations(['users', 'transactions', 'holdings']);
+        $filters->setFilterableRelations(['holdings' => 'symbol', 'transactions' => 'symbol']);
+        $filters->setSearchableColumns(['title', 'notes']);
+
+        return PortfolioResource::collection($filters->paginated());
     }
 }
