@@ -35,10 +35,12 @@
     "repositories": [
         {
             "type": "vcs",
+            "no-api": true,
             "url": "https://github.com/hackeresq/filter-models"
         },
         {
             "type": "vcs",
+            "no-api": true,
             "url": "https://github.com/investbrainapp/finnhub-php"
         }
     ],
