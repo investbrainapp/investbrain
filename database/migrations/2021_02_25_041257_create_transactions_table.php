@@ -23,7 +23,7 @@ class CreateTransactionsTable extends Migration
             $table->float('quantity', 12, 4);
             $table->float('cost_basis', 12, 4);
             $table->float('sale_price', 12, 4)->nullable();
-            $table->boolean('split')->nullable();
+            $table->boolean('split')->default(false);
             $table->date('date');
             $table->timestamps();
         });
