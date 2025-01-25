@@ -1733,12 +1733,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hackerESQ/filter-models.git",
-                "reference": "4ddba2483dc3987dcdf3f637be7edb8a2c96606c"
+                "reference": "565537120ea01bd73f49051ecde90d05e4127c6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hackerESQ/filter-models/zipball/4ddba2483dc3987dcdf3f637be7edb8a2c96606c",
-                "reference": "4ddba2483dc3987dcdf3f637be7edb8a2c96606c",
+                "url": "https://api.github.com/repos/hackerESQ/filter-models/zipball/565537120ea01bd73f49051ecde90d05e4127c6b",
+                "reference": "565537120ea01bd73f49051ecde90d05e4127c6b",
                 "shasum": ""
             },
             "require": {
@@ -1764,7 +1764,7 @@
                 "source": "https://github.com/hackerESQ/filter-models/tree/main",
                 "issues": "https://github.com/hackerESQ/filter-models/issues"
             },
-            "time": "2025-01-25T01:22:46+00:00"
+            "time": "2025-01-25T04:44:58+00:00"
         },
         {
             "name": "jfcherng/php-color-output",

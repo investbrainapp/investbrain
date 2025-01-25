@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/me', [UserController::class, 'me']);
 
     // portfolio
-    Route::get('/portfolio', [PortfolioController::class, 'index']);
+    Route::apiResource('/portfolio', PortfolioController::class);
 
     // transaction
     Route::get('/transaction', [TransactionController::class, 'index']);

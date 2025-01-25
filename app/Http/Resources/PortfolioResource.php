@@ -19,6 +19,7 @@ class PortfolioResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'notes' => $this->notes,
             'wishlist' => $this->wishlist,
             'owner' => UserResource::make($this->owner),
             'transactions' => TransactionResource::collection($this->whenLoaded('transactions')),
