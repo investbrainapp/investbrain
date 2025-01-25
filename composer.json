@@ -21,7 +21,8 @@
         "robsontenorio/mary": "^1.35",
         "scheb/yahoo-finance-api": "^4.11",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
-        "tschucki/alphavantage-laravel": "^0.0"
+        "tschucki/alphavantage-laravel": "^0.0",
+        "hackeresq/filter-models": "dev-main"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -32,6 +33,10 @@
         "phpunit/phpunit": "^11.0.1"
     },
     "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/hackeresq/filter-models"
+        },
         {
             "type": "vcs",
             "url": "https://github.com/investbrainapp/finnhub-php"
