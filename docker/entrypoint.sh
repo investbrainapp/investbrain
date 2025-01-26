@@ -2,10 +2,11 @@
 
 cd /var/www/app
 
-echo -e "\n====================== Validating environment...  ====================== "
-run_as_www_user() {
+artisan_as_www_user() {
     su - www-data -c "/usr/local/bin/php /var/www/app/artisan $1"
 }
+
+echo -e "\n====================== Validating environment...  ====================== "
 
 if [[ -z "$APP_KEY" ]]; then
     echo " > Oops! The required APP_KEY configuration is missing in your .env file! "
@@ -29,12 +30,12 @@ fi
 if [ ! -L "public/storage" ]; then
     echo " > Creating symbolic link for app public storage..."
     
-    run_as_www_user "storage:link"
+    artisan_as_www_user "storage:link"
 fi
 
 echo -e "\n====================== Running migrations...  ====================== "
 run_migrations() {
-    run_as_www_user "migrate --force"
+    artisan_as_www_user "migrate --force"
 }
 RETRIES=30
 DELAY=5
