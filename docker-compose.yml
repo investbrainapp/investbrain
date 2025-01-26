@@ -9,15 +9,12 @@ services:
     tty: true
     ports:
       - "${APP_PORT:-8000}:80"
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       - mysql
       - redis
     networks:
       - investbrain-network
-    volumes:
-      - .:/var/www/app/:rw
   redis:
     image: redis:alpine
     container_name: investbrain-redis
@@ -36,8 +33,9 @@ services:
       MYSQL_USER: ${DB_USERNAME:-investbrain}
       MYSQL_PASSWORD: ${DB_PASSWORD:-investbrain}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-investbrain}
+    command: --cte-max-recursion-depth=1000
     volumes:
-      - ./docker/mysql.conf:/etc/mysql/conf.d/my.cnf
+      # - ./docker/mysql.conf:/etc/mysql/conf.d/my.cnf
       - investbrain-mysql:/var/lib/mysql
     networks:
       - investbrain-network
