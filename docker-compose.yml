@@ -7,15 +7,16 @@ services:
     container_name: investbrain-app
     restart: unless-stopped
     tty: true
-    expose:
-      - "9000"
-    volumes:
-      - .:/var/www/app:delegated
+    ports:
+      - "${APP_PORT:-8000}:80"
     depends_on:
       - mysql
       - redis
     networks:
       - investbrain-network
+    volumes:
+      - ./storage:/var/www/app/storage
+      - .env:/var/www/app/.env
   redis:
     image: redis:alpine
     container_name: investbrain-redis
@@ -25,20 +26,6 @@ services:
       - investbrain-network
     volumes:
       - investbrain-redis:/data
-  nginx:
-    image: nginx:alpine
-    container_name: investbrain-nginx
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "${APP_PORT:-8000}:80"
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-      - .:/var/www/app:delegated
-    depends_on:
-      - app
-    networks:
-      - investbrain-network
   mysql:
     image: mysql:8.0
     container_name: investbrain-mysql

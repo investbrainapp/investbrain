@@ -9,15 +9,7 @@ if [ ! -f ".env" ]; then
     cp .env.example .env
 fi
 
-echo -e "\n====================== Installing Composer dependencies...  ====================== "
-/usr/local/bin/composer install
-
 echo -e "\n====================== Validating environment...  ====================== "
-if [ $(stat -c '%U' .) != "www-data" ]; then
-    echo " > Setting correct permissions for pwd..."
-    chown -R www-data:www-data .
-fi
-
 if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
     echo " > Ah, APP_KEY is missing in .env file. Generating a new key!"
     
@@ -29,10 +21,6 @@ if [ ! -L "public/storage" ]; then
     
     /usr/local/bin/php artisan storage:link
 fi
-
-echo -e "\n====================== Installing NPM dependencies and building frontend...  ====================== "
-/usr/bin/npm install 
-/usr/bin/npm run build 
 
 echo -e "\n====================== Running migrations...  ====================== "
 run_migrations() {
