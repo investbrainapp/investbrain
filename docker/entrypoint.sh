@@ -26,6 +26,15 @@ if [[ -z "$APP_KEY" ]]; then
     draw_box $APP_KEY
 fi
 
+for dir in storage/framework/cache storage/framework/sessions storage/framework/views; do
+    if [ ! -d "$dir" ]; then
+        echo " > $dir is missing. Creating scaffold for storage directory..."
+        mkdir -p storage/framework/{cache,sessions,views}
+        chmod -R 775 storage
+        chown -R www-data:www-data storage
+    fi
+done
+
 if [ ! -L "public/storage" ]; then
     echo " > Creating symbolic link for app public storage..."
     
