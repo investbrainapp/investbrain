@@ -6,6 +6,8 @@ echo -e "\n====================== Running entrypoint script...  ================
 if [ ! -f ".env" ]; then
     echo " > Ope, gotta create an .env file!"
 
+    [ -d ".env" ] && rm -rf .env
+
     cp .env.example .env
 fi
 
