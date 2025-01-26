@@ -9,7 +9,8 @@ services:
     tty: true
     ports:
       - "${APP_PORT:-8000}:80"
-    env_file: .env
+    volumes:
+      - ./storage:/var/www/app/storage:delegated
     depends_on:
       - mysql
       - redis

@@ -7,10 +7,10 @@ artisan_as_www_user() {
 }
 
 echo -e "\n====================== Validating environment...  ====================== "
-
 if [[ -z "$APP_KEY" ]]; then
-    echo " > Oops! The required APP_KEY configuration is missing in your .env file! "
-    echo " > Copy and paste the below key into your .env file and restart the container... "
+    echo " > Oops! The required APP_KEY configuration is missing in your environment! "
+    echo " > Generating a key (see below) but this will NOT be persisted between container restarts. "
+    echo " > You should set this APP_KEY in your .env file! "
 
     draw_box() {
       local text="$1"
@@ -22,9 +22,8 @@ if [[ -z "$APP_KEY" ]]; then
       echo "$border"
     }
 
-    draw_box "base64:$(openssl rand -base64 32)"
-
-    exit 1;
+    $APP_KEY="base64:$(openssl rand -base64 32)"
+    draw_box $APP_KEY
 fi
 
 if [ ! -L "public/storage" ]; then

@@ -1,6 +1,22 @@
 FROM php:8.3-fpm
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV APP_URL="http://localhost:8000"
+ENV ASSET_URL="http://localhost:8000"
+ENV APP_DEBUG=true
+ENV SELF_HOSTED=true
+ENV DB_CONNECTION=mysql
+ENV DB_HOST=investbrain-mysql
+ENV DB_PORT=3306
+ENV DB_DATABASE=investbrain
+ENV DB_USERNAME=investbrain
+ENV DB_PASSWORD=investbrain
+ENV SESSION_DRIVER=redis
+ENV QUEUE_CONNECTION=redis
+ENV CACHE_STORE=redis
+ENV REDIS_HOST=investbrain-redis
+ENV REDIS_PATH=/tmp/database_server.sock
+ENV VITE_APP_NAME=Investbrain
 
 # Set the working directory
 COPY . /var/www/app
