@@ -22,7 +22,7 @@ if [[ -z "$APP_KEY" ]]; then
       echo "$border"
     }
 
-    $APP_KEY=base64:$(openssl rand -base64 32)
+    export APP_KEY=base64:$(openssl rand -base64 32)
     draw_box $APP_KEY
 fi
 
