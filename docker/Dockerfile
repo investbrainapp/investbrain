@@ -8,7 +8,7 @@ WORKDIR /var/www/app
 
 # Set permissions
 RUN chown -R www-data:www-data . \ 
-    && mkdir ./storage && chmod -R 775 ./storage \
+    && chmod -R 775 ./storage \
     && chmod +x ./docker/entrypoint.sh \
 # Install common php extension dependencies
     && apt-get update && apt-get install -y \
