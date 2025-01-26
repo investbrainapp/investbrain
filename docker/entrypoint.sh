@@ -18,9 +18,19 @@ run_as_www_user() {
 }
 
 if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
-    echo " > Ah, APP_KEY is missing in .env file. Generating a new key!"
-    
-    run_as_www_user "key:generate --force"
+    echo " > The required APP_KEY configuration is missing in your .env file. Copy and paste this key into your .env file. Then restart the container!"
+
+    draw_box() {
+      local text="$1"
+      local length=${#text}
+      local border=$(printf '%*s' "$((length + 4))" | tr ' ' '*')
+
+      echo "*$border*"
+      echo "* $text *"
+      echo "*$border*"
+    }
+
+    draw_box "base64:$(openssl rand -base64 32)"
 fi
 
 if [ ! -L "public/storage" ]; then
