@@ -6,6 +6,9 @@
     "license": "CC-BY-NC 4.0",
     "require": {
         "php": "^8.2",
+        "ext-gd": "^8.2",
+        "ext-mbstring": "^8.2",
+        "ext-zip": "^1.22",
         "finnhub/client": "master@dev",
         "laravel/framework": "^11.35",
         "laravel/jetstream": "^5.1",
@@ -81,12 +84,6 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        },
-        "platform": {
-            "php": "8.4.0",
-            "ext-gd": "8.4.0",
-            "ext-mbstring": "8.4.0",
-            "ext-zip": "8.4.0"
         }
     },
     "minimum-stability": "stable",
