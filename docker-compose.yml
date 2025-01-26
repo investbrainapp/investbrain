@@ -33,7 +33,8 @@ services:
       MYSQL_USER: ${DB_USERNAME:-investbrain}
       MYSQL_PASSWORD: ${DB_PASSWORD:-investbrain}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-investbrain}
-    command: bash -c "echo -e '[mysqld]\ncte_max_recursion_depth = 25000' > /etc/mysql/conf.d/my.cnf && docker-entrypoint.sh mysqld"
+    command: 
+      - --cte-max-recursion-depth=25000
     volumes:
       - investbrain-mysql:/var/lib/mysql
     networks:
