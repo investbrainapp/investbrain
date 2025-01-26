@@ -7,12 +7,6 @@ run_as_www_user() {
     su - www-data -c "/usr/local/bin/php /var/www/app/artisan $1"
 }
 
-if [ ! -f ".env" ]; then
-    echo " > Ope, you forgot to create an .env file! Create the required .env file and restart the container!"
-
-    exit 1;
-fi
-
 if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
     echo " > The required APP_KEY configuration is missing in your .env file. Copy and paste this key into your .env file. Then restart the container!"
 
