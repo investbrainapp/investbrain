@@ -6,9 +6,9 @@
     "license": "CC-BY-NC 4.0",
     "require": {
         "php": "^8.2",
-        "ext-gd": "^8.2",
-        "ext-mbstring": "^8.2",
-        "ext-zip": "^1.22",
+        "ext-gd": "*",
+        "ext-mbstring": "*",
+        "ext-zip": "*",
         "finnhub/client": "master@dev",
         "laravel/framework": "^11.35",
         "laravel/jetstream": "^5.1",

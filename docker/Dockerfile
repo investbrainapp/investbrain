@@ -6,21 +6,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 COPY . /var/www/app
 WORKDIR /var/www/app
 
-# Install Composer and Node.js
-RUN apt-get update && apt-get install -y \
-        curl \
-        unzip \
-        git \
-        nodejs \
-        npm \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install PHP dependencies
-RUN composer install --no-scripts --optimize-autoloader
-
-# Install Node dependencies and build assets
-RUN npm install && npm run build
-
 # Set permissions
 RUN chown -R www-data:www-data . \ 
     && chmod +x ./docker/entrypoint.sh \
@@ -35,7 +20,6 @@ RUN chown -R www-data:www-data . \
         libicu-dev \
         supervisor \
         && docker-php-ext-configure gd --with-freetype --with-jpeg \
-        && docker-php-ext-configure zip \
         && docker-php-ext-install -j$(nproc) \
                 gd \
                 zip \
@@ -44,6 +28,21 @@ RUN chown -R www-data:www-data . \
                 intl \
 # remove default nginx config
     && rm /etc/nginx/sites-enabled/default
+
+# Install Composer and Node.js
+RUN apt-get update && apt-get install -y \
+        curl \
+        unzip \
+        git \
+        nodejs \
+        npm \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Install PHP dependencies
+RUN composer install --no-scripts --optimize-autoloader
+
+# Install Node dependencies and build assets
+RUN npm install && npm run build
 
 # Copy the custom Nginx configuration
 COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
