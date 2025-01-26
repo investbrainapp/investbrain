@@ -9,14 +9,15 @@ services:
     tty: true
     ports:
       - "${APP_PORT:-8000}:80"
+    env_file:
+      - .env
     depends_on:
       - mysql
       - redis
     networks:
       - investbrain-network
     volumes:
-      - ./storage:/var/www/app/storage
-      - .env:/var/www/app/.env
+      - .:/var/www/app/:rw
   redis:
     image: redis:alpine
     container_name: investbrain-redis
