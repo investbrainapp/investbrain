@@ -8,16 +8,17 @@ run_as_www_user() {
 }
 
 if [[ -z "$APP_KEY" ]]; then
-    echo " > The required APP_KEY configuration is missing in your .env file. Copy and paste this key into your .env file. Then restart the container!"
+    echo " > The required APP_KEY configuration is missing in your .env file. "
+    echo " > Copy and paste this key into your .env file. Then restart the container! "
 
     draw_box() {
       local text="$1"
       local length=${#text}
       local border=$(printf '%*s' "$((length + 4))" | tr ' ' '*')
 
-      echo "*$border*"
+      echo "$border"
       echo "* $text *"
-      echo "*$border*"
+      echo "$border"
     }
 
     draw_box "base64:$(openssl rand -base64 32)"
