@@ -13,26 +13,25 @@ if [ ! -f ".env" ]; then
 fi
 
 echo -e "\n====================== Validating environment...  ====================== "
-if [ $(stat -c "%U" .) != "www-data" ]; then
-    echo " > Setting correct permissions for application..."
-    chown -R www-data:www-data .
-fi
+run_as_www_user() {
+    su - www-data -c "/usr/local/bin/php /var/www/app/artisan $1"
+}
 
 if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
     echo " > Ah, APP_KEY is missing in .env file. Generating a new key!"
     
-    su - www-data -c "/usr/local/bin/php artisan key:generate --force"
+    run_as_www_user "key:generate --force"
 fi
 
 if [ ! -L "public/storage" ]; then
     echo " > Creating symbolic link for app public storage..."
     
-    su - www-data -c "/usr/local/bin/php artisan storage:link"
+    run_as_www_user "storage:link"
 fi
 
 echo -e "\n====================== Running migrations...  ====================== "
 run_migrations() {
-    su - www-data -c "/usr/local/bin/php artisan migrate --force"
+    run_as_www_user "migrate --force"
 }
 RETRIES=30
 DELAY=5
