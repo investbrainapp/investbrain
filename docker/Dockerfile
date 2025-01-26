@@ -45,10 +45,8 @@ RUN composer install --no-scripts --optimize-autoloader
 # Install Node dependencies and build assets
 RUN npm install && npm run build
 
-# Copy the custom Nginx configuration
+# Copy over configs
 COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy over supervisor configuration
 COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Serve on port 80
@@ -56,8 +54,6 @@ EXPOSE 80
 
 # Set up healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost || exit 1
-
-USER www-data
 
 # Run everything else
 ENTRYPOINT ["/bin/bash", "./docker/entrypoint.sh"]
