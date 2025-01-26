@@ -10,6 +10,7 @@ WORKDIR /var/www/app
 RUN chown -R www-data:www-data . \ 
     && chmod -R 775 ./storage \
     && chmod +x ./docker/entrypoint.sh \
+    && usermod -s /bin/bash www-data \
 # Install common php extension dependencies
     && apt-get update && apt-get install -y \
         nginx \
