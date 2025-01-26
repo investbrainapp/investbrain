@@ -8,8 +8,8 @@ run_as_www_user() {
 }
 
 if [[ -z "$APP_KEY" ]]; then
-    echo " > The required APP_KEY configuration is missing in your .env file. "
-    echo " > Copy and paste this key into your .env file. Then restart the container! "
+    echo " > Oops! The required APP_KEY configuration is missing in your .env file! "
+    echo " > Copy and paste the below key into your .env file and restart the container... "
 
     draw_box() {
       local text="$1"
