@@ -57,6 +57,8 @@ EXPOSE 80
 # Set up healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost || exit 1
 
+USER www-data
+
 # Run everything else
 ENTRYPOINT ["/bin/bash", "./docker/entrypoint.sh"]
 CMD ["./docker/entrypoint.sh"]
