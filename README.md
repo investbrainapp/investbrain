@@ -32,27 +32,25 @@ Investbrain is a Laravel PHP web application that leverages Livewire and Tailwin
 
 ## Self hosting
 
-For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which downloads all the necessary dependencies and seamlessly builds everything you need to get started quickly! 
+For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which uses the official Investbrain Docker image and includes all the necessary dependencies to seamlessly build everything you need to get started quickly! 
 
-Before getting started, you should already have the following installed on your machine: [Docker Engine](https://docs.docker.com/engine/install/), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), and a wild sense of adventure.
+Before getting started, you should already have [Docker Engine](https://docs.docker.com/engine/install/) installed on your machine. 
 
 Ready? Let's get started! 
 
-First, you can clone this repository:
+**1. Copy [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml)**
 
-```bash
-git clone https://github.com/investbrainapp/investbrain.git && cd investbrain
-```
+Grab a copy of the [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and paste the contents where you plan to install Investbrain.
 
-Then, build the Docker image and bring up the container (this will take a few minutes):
+**2. Copy [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example)**
 
-```bash
-docker compose up
-```
+Copy over the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file to the same directory as the compose file you created above. 
 
-In the previous step, all of the default configurations are set automatically. This includes creating a .env file and setting the required Laravel `APP_KEY`. 
+> Don't forget: You need to set the `APP_KEY` value in your .env!  If you're unsure, you can run `openssl rand -base64 32` from your terminal to generate a strong key!
 
-If everything worked as expected, you should now be able to access Investbrain in the browser at. You should create an account by visiting:
+**3. Run `docker compose up`**
+
+This might take a few minutes. But if everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
 
 ```bash
 http://localhost:8000/register
@@ -135,6 +133,7 @@ There are several optional configurations available when installing using the re
 | ------------- | ------------- | ------------- |
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
+| APP_KEY | Must be set during install - encryption key for various security-related functions | `null` |
 | MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, or `finnhub`) | yahoo |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
@@ -149,7 +148,7 @@ There are several optional configurations available when installing using the re
 | REGISTRATION_ENABLED | Whether to enable registration of new users | `true` |
 
 
-> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.
+> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and are cached during run-time. If change any .env values, you'll have to restart the containers before your changes take effect.
 
 ## Updating
 
