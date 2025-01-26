@@ -57,4 +57,4 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhos
 
 # Run everything else
 ENTRYPOINT ["/bin/bash", "./docker/entrypoint.sh"]
-CMD ["./docker/entrypoint.sh"]
+
