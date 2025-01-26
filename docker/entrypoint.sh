@@ -12,6 +12,11 @@ if [ ! -f ".env" ]; then
 fi
 
 echo -e "\n====================== Validating environment...  ====================== "
+if [ $(stat -c '%U' .) != "www-data" ]; then
+    echo " > Setting correct permissions for application..."
+    chown -R www-data:www-data .
+fi
+
 if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
     echo " > Ah, APP_KEY is missing in .env file. Generating a new key!"
     
