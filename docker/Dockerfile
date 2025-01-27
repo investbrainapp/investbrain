@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 # Install PHP extensions
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg CFLAGS="-fPIC" \
     && docker-php-ext-install -j$(nproc) \
         gd pgsql zip pdo_mysql mysqli intl
 
