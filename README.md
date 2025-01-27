@@ -38,17 +38,23 @@ Before getting started, you should already have [Docker Engine](https://docs.doc
 
 Ready? Let's get started! 
 
-**1. Copy Docker Compose file**
+**1. Download copy of Docker Compose file**
 
-Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and paste the contents into the directory where you plan to install Investbrain.
+Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) using `wget`, `curl` or similar:
+
+```bash
+curl -O https://raw.githubusercontent.com/investbrainapp/investbrain/main/docker-compose.yml
+```
 
 **2. Set your environment**
 
-Adjust the `environment` properties in the Docker Compose file to your preferences. Alternatively, create a .env file in the same directory as your compose file, then reference the .env file using the `env_file` property. 
+Adjust the `environment` properties in the compose file to your preferences. 
 
-_Importantly_, you need to set the `APP_KEY` value to a complex random value.  If you're unsure, Investbrain will generate an `APP_KEY` for you on first run - but you must **manually** update your environment configuration with this generated value!
+**Importantly**, you need to set the `APP_KEY` value.  If you're unsure, Investbrain will generate an `APP_KEY` for you on first run, but it will not persist. You must _manually_ update your environment configuration with this generated value!
 
-> Tip: Want to know what other configuration options are available? You can reference the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file in this respository for available environment  configurations. 
+Alternatively, create a .env file in the same directory as your compose file, then reference the .env file using the `env_file` property. 
+
+> Want to know what other configuration options are available? You can reference the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file in this respository for available environment  configurations. 
 
 **3. Run `docker compose up`**
 
