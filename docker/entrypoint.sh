@@ -53,5 +53,5 @@ until run_migrations; do
   sleep $DELAY
 done
 
-echo -e "\n====================== Spinning up Supervisor daemon...  ====================== "
+echo -e "\n====================== Spinning up Supervisor daemon...  ====================== \n"
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
