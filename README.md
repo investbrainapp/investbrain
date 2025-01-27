@@ -40,7 +40,7 @@ Ready? Let's get started!
 
 **1. Copy Docker Compose file**
 
-Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml)** file and paste the contents into the directory where you plan to install Investbrain.
+Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and paste the contents into the directory where you plan to install Investbrain.
 
 **2. Set your environment**
 
