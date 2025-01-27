@@ -10,19 +10,19 @@ services:
     ports:
       - "${APP_PORT:-8000}:80"
     environment:
-      - APP_KEY= # Generate a key using `openssl rand -base64 32`
-      - APP_URL="http://localhost:8000"
-      - ASSET_URL="http://localhost:8000"
-      - DB_CONNECTION=mysql
-      - DB_HOST=investbrain-mysql
-      - DB_PORT=3306
-      - DB_DATABASE=investbrain
-      - DB_USERNAME=investbrain
-      - DB_PASSWORD=investbrain
-      - SESSION_DRIVER=redis
-      - QUEUE_CONNECTION=redis
-      - CACHE_STORE=redis
-      - REDIS_HOST=investbrain-redis
+      APP_KEY: "" # Generate a key using `openssl rand -base64 32`
+      APP_URL: "http://localhost:8000"
+      ASSET_URL: "http://localhost:8000"
+      DB_CONNECTION: mysql
+      DB_HOST: investbrain-mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-investbrain}
+      DB_USERNAME: ${DB_USERNAME:-investbrain}
+      DB_PASSWORD: ${DB_PASSWORD:-investbrain}
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      REDIS_HOST: investbrain-redis
     volumes:
       - ./storage:/var/www/app/storage:delegated
     depends_on:
