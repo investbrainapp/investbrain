@@ -12,7 +12,7 @@ WORKDIR /var/www/app
 
 # Install required packages
 RUN apt-get update && apt-get upgrade -y \
-    && apt-get install -y \
+    && apt-get upgrade -y \
         nginx \
         libfreetype-dev \
         libjpeg62-turbo-dev \
@@ -21,21 +21,18 @@ RUN apt-get update && apt-get upgrade -y \
         libzip-dev \
         libicu-dev \
         libpq-dev \
+        binutils libc6-dev \
         supervisor \
-        unzip git \
+        unzip curl git \
         nodejs npm \
-# Install PHP extensions
-    && curl -sSL https://packages.sury.org/php/README.txt | bash -x && apt-get update \
-    && apt-get install -y \
-        php8.3-gd \
-        php8.3-pgsql \
-        php8.3-zip \
-        php8.3-mysql \
-        php8.3-intl \
 # Clean up APT
     && apt-get -y autoremove \
         && apt-get clean \
-        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
+        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+# Install PHP extensions
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        gd pgsql zip pdo_mysql mysqli intl
 
 # Set permissions
 RUN chown -R www-data:www-data . \ 
