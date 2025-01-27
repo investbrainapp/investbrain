@@ -19,11 +19,10 @@ RUN apt-get update && apt-get install -y \
         zlib1g-dev \
         libzip-dev \
         libicu-dev \
-        libpq-dev \
         supervisor \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        gd pgsql zip pdo_mysql mysqli intl \
+        gd zip pdo_mysql mysqli intl \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
