@@ -38,15 +38,15 @@ Before getting started, you should already have [Docker Engine](https://docs.doc
 
 Ready? Let's get started! 
 
-**1. Copy [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml)**
+**1. Copy Docker Compose file**
 
-Grab a copy of the [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and paste the contents where you plan to install Investbrain.
+Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml)** file and paste the contents into the directory where you plan to install Investbrain.
 
 **2. Set your environment**
 
-Adjust the `environment` property in the Docker Compose file to your preferences.  
+Adjust the `environment` properties in the Docker Compose file to your preferences.  
 
-Particularly, you need to set the `APP_KEY` value for your environment.  If you're unsure, you can run `openssl rand -base64 32` from your terminal to generate a strong key.
+_Particularly_, you need to set the `APP_KEY` value to a complex random value.  If you're unsure, you can run `openssl rand -base64 32` from your terminal to generate a strong application key.
 
 > Tip: Want to know what options are available? You can reference the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file in this respository for available environment  configurations. 
 
