@@ -10,6 +10,8 @@ ENV SELF_HOSTED=true
 COPY . /var/www/app
 WORKDIR /var/www/app
 
+ENV CFLAGS="-fstack-protector-strong -fpic -fPIC -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+
 # Install required packages
 RUN apt-get update && apt-get upgrade -y \
     && apt-get upgrade -y \
