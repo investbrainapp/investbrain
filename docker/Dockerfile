@@ -10,6 +10,7 @@ ENV SELF_HOSTED=true
 COPY . /var/www/app
 WORKDIR /var/www/app
 
+# Allow PHP installs to be built cross-platform
 ENV CFLAGS="-fstack-protector-strong -fpic -fPIC -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 
 # Install required packages

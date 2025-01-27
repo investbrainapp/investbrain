@@ -29,6 +29,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Increase swap space
+        run: sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=4096 && sudo /sbin/mkswap /var/swap.1 && sudo /sbin/swapon /var/swap.1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Extract version from tag
         id: extract-version
         run: |
@@ -45,5 +56,3 @@ jobs:
             investbrainapp/investbrain:${{ env.version }}
             ghcr.io/investbrainapp/investbrain:latest
             ghcr.io/investbrainapp/investbrain:${{ env.version }}
-
-
