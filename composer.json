@@ -5,7 +5,10 @@
     "keywords": ["stocks", "dividends", "investments", "tracking"],
     "license": "CC-BY-NC 4.0",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
+        "ext-gd": "*",
+        "ext-mbstring": "*",
+        "ext-zip": "*",
         "finnhub/client": "master@dev",
         "laravel/framework": "^11.35",
         "laravel/jetstream": "^5.1",

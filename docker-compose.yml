@@ -7,10 +7,24 @@ services:
     container_name: investbrain-app
     restart: unless-stopped
     tty: true
-    expose:
-      - "9000"
+    ports:
+      - "${APP_PORT:-8000}:80"
+    environment:
+      - APP_KEY= # Generate a key using `openssl rand -base64 32`
+      - APP_URL="http://localhost:8000"
+      - ASSET_URL="http://localhost:8000"
+      - DB_CONNECTION=mysql
+      - DB_HOST=investbrain-mysql
+      - DB_PORT=3306
+      - DB_DATABASE=investbrain
+      - DB_USERNAME=investbrain
+      - DB_PASSWORD=investbrain
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - CACHE_STORE=redis
+      - REDIS_HOST=investbrain-redis
     volumes:
-      - .:/var/www/app:delegated
+      - ./storage:/var/www/app/storage:delegated
     depends_on:
       - mysql
       - redis
@@ -25,20 +39,6 @@ services:
       - investbrain-network
     volumes:
       - investbrain-redis:/data
-  nginx:
-    image: nginx:alpine
-    container_name: investbrain-nginx
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "${APP_PORT:-8000}:80"
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-      - .:/var/www/app:delegated
-    depends_on:
-      - app
-    networks:
-      - investbrain-network
   mysql:
     image: mysql:8.0
     container_name: investbrain-mysql
@@ -48,8 +48,9 @@ services:
       MYSQL_USER: ${DB_USERNAME:-investbrain}
       MYSQL_PASSWORD: ${DB_PASSWORD:-investbrain}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-investbrain}
+    command: 
+      - --cte-max-recursion-depth=25000
     volumes:
-      - ./docker/mysql.conf:/etc/mysql/conf.d/my.cnf
       - investbrain-mysql:/var/lib/mysql
     networks:
       - investbrain-network

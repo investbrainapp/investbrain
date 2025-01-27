@@ -2,53 +2,56 @@
 
 cd /var/www/app
 
-echo -e "\n====================== Running entrypoint script...  ====================== "
-if [ ! -f ".env" ]; then
-    echo " > Ope, gotta create an .env file!"
-
-    cp .env.example .env
-fi
-
-echo -e "\n====================== Installing Composer dependencies...  ====================== "
-/usr/local/bin/composer install
-
 echo -e "\n====================== Validating environment...  ====================== "
-if [ $(stat -c '%U' .) != "www-data" ]; then
-    echo " > Setting correct permissions for pwd..."
-    chown -R www-data:www-data .
+if [[ -z "$APP_KEY" ]]; then
+    echo -e "\n > Oops! The required APP_KEY configuration is missing in your environment! "
+    echo -e "\n > Generating a key (see below) but this will NOT be persisted between container restarts. "
+    echo -e "\n > You should set this APP_KEY in your .env file! "
+
+    draw_box() {
+      local text="$1"
+      local length=${#text}
+      local border=$(printf '%*s' "$((length + 4))" | tr ' ' '*')
+
+      echo -e "\n\n$border"
+      echo "* $text *"
+      echo "$border"
+    }
+
+    export APP_KEY=base64:$(openssl rand -base64 32)
+    draw_box $APP_KEY
 fi
 
-if ( ! grep -q "^APP_KEY=" ".env" || grep -q "^APP_KEY=$" ".env"); then
-    echo " > Ah, APP_KEY is missing in .env file. Generating a new key!"
-    
-    /usr/local/bin/php artisan key:generate --force
-fi
+for dir in storage/framework/cache storage/framework/sessions storage/framework/views; do
+    if [ ! -d "$dir" ]; then
+        echo -e "\n > $dir is missing. Creating scaffold for storage directory... "
+        mkdir -p storage/framework/{cache,sessions,views}
+        chmod -R 775 storage
+        chown -R www-data:www-data storage
+    fi
+done
 
 if [ ! -L "public/storage" ]; then
-    echo " > Creating symbolic link for app public storage..."
+    echo -e "\n > Creating symbolic link for app public storage... "
     
-    /usr/local/bin/php artisan storage:link
+    /usr/local/bin/php /var/www/app/artisan storage:link
 fi
-
-echo -e "\n====================== Installing NPM dependencies and building frontend...  ====================== "
-/usr/bin/npm install 
-/usr/bin/npm run build 
 
 echo -e "\n====================== Running migrations...  ====================== "
 run_migrations() {
-    /usr/local/bin/php artisan migrate --force
+    /usr/local/bin/php /var/www/app/artisan migrate --force
 }
-RETRIES=30
+RETRIES=10
 DELAY=5
 until run_migrations; do
   RETRIES=$((RETRIES-1))
   if [ $RETRIES -le 0 ]; then
-    echo " > Database is not ready after multiple attempts. Exiting..."
+    echo -e "\n > Database is not ready after $RETRIES attempts. Exiting... "
     exit 1
   fi
-  echo " > Waiting for database to be ready... retrying in $DELAY seconds."
+  echo -e "\n > Waiting for database to be ready... retrying in $DELAY seconds. "
   sleep $DELAY
 done
 
-echo -e "\n====================== Spinning up Supervisor daemon...  ====================== "
+echo -e "\n====================== Spinning up Supervisor daemon...  ====================== \n"
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
