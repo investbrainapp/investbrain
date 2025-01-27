@@ -44,15 +44,15 @@ Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/invest
 
 **2. Set your environment**
 
-Adjust the `environment` properties in the Docker Compose file to your preferences.  
+Adjust the `environment` properties in the Docker Compose file to your preferences. Alternatively, create a .env file in the same directory as your compose file, then reference the .env file using the `env_file` property. 
 
-_Particularly_, you need to set the `APP_KEY` value to a complex random value.  If you're unsure, you can run `openssl rand -base64 32` from your terminal to generate a strong application key.
+_Importantly_, you need to set the `APP_KEY` value to a complex random value.  If you're unsure, Investbrain will generate an `APP_KEY` for you on first run - but you must **manually** update your environment configuration with this generated value!
 
-> Tip: Want to know what options are available? You can reference the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file in this respository for available environment  configurations. 
+> Tip: Want to know what other configuration options are available? You can reference the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file in this respository for available environment  configurations. 
 
 **3. Run `docker compose up`**
 
-This might take a few minutes. But if everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
+This might take a few minutes to pull the Docker images. But assuming everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
 
 ```bash
 http://localhost:8000/register
@@ -76,7 +76,7 @@ Investbrain includes an extensible market data provider interface that allows yo
 
 ### Configuration
 
-You can specify the market data provider you want to use in your .env file:
+You can specify the market data provider you want to use in your environment variables:
 
 ```bash
 MARKET_DATA_PROVIDER=yahoo
@@ -84,7 +84,7 @@ MARKET_DATA_PROVIDER=yahoo
 
 You can also use Investbrain's built-in fallback mechanism to ensure reliable data access. If any provider fails, Investbrain will automatically attempt to retrieve data from the next available provider, continuing through your configured providers until one returns successfully.
 
-Your selected providers should be listed in your .env file. Each should be separated by a comma:
+Your selected providers should be listed in your environment variables. Each should be separated by a comma:
 
 ```bash
 MARKET_DATA_PROVIDER=yahoo,alphavantage
@@ -129,7 +129,7 @@ Exporting your portfolios and transactions is a convenient way to back-up your I
 
 ## Configuration
 
-There are several optional configurations available when installing using the recommended [Docker method](#self-hosting). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
+There are several optional configurations available when installing using the recommended [Docker method](#self-hosting). These options are configurable using an environment file. Configurations can be added to your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file or to the `environment` property in the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file. 
 
 | Option      | Description      | Default      |
 | ------------- | ------------- | ------------- |
@@ -150,7 +150,7 @@ There are several optional configurations available when installing using the re
 | REGISTRATION_ENABLED | Whether to enable registration of new users | `true` |
 
 
-> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and are cached during run-time. If change any .env values, you'll have to restart the containers before your changes take effect.
+> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and are cached during run-time. If change any environment configurations, you'll have to restart the container before your changes take effect.
 
 ## Updating
 
@@ -160,10 +160,10 @@ To update Investbrain using the recommended [Docker installation](#self-hosting)
 docker compose stop
 ```
 
-Then pull the latest updates from this repository using git:
+Then pull the latest Docker image:
 
 ```bash
-git pull
+docker image pull investbrainapp/investbrain:latest
 ```
 
 Finally bring the containers back up!
