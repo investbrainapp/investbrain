@@ -23,13 +23,8 @@ ENV VITE_APP_NAME=Investbrain
 COPY . /var/www/app
 WORKDIR /var/www/app
 
-# Set permissions
-RUN chown -R www-data:www-data . \ 
-    && chmod -R 775 ./storage \
-    && chmod +x ./docker/entrypoint.sh \
-    && usermod -s /bin/bash www-data \
 # Install common php extension dependencies
-    && apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
         nginx \
         libfreetype-dev \
         libjpeg62-turbo-dev \
@@ -38,15 +33,18 @@ RUN chown -R www-data:www-data . \
         libzip-dev \
         libicu-dev \
         supervisor \
-        && docker-php-ext-configure gd --with-freetype --with-jpeg \
-        && docker-php-ext-install -j$(nproc) \
-                gd \
-                zip \
-                pdo_mysql \
-                mysqli \
-                intl \
-# remove default nginx config
-    && rm /etc/nginx/sites-enabled/default
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        gd pgsql bcmath zip pdo_mysql mysqli intl \
+    && apt-get -y autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Set permissions
+RUN chown -R www-data:www-data . \ 
+    && chmod -R 775 ./storage \
+    && chmod +x ./docker/entrypoint.sh \
+    && usermod -s /bin/bash www-data
 
 # Install Composer and Node.js
 RUN apt-get update && apt-get install -y \
@@ -60,6 +58,9 @@ RUN apt-get update && apt-get install -y \
 # Install PHP dependencies and build front end assets
 RUN composer install --no-scripts --optimize-autoloader \
     && npm install && npm run build
+
+# Remove default nginx config
+RUN rm /etc/nginx/sites-enabled/default
 
 # Copy over configs
 COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
