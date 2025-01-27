@@ -22,11 +22,10 @@ RUN apt-get update && apt-get upgrade -y \
         libicu-dev \
         libpq-dev \
         supervisor \
-        unzip curl git \
+        unzip git \
         nodejs npm \
 # Install PHP extensions
-    && curl -sSL https://packages.sury.org/php/README.txt | bash -x \
-        apt-get update \
+    && curl -sSL https://packages.sury.org/php/README.txt | bash -x && apt-get update \
     && apt-get install -y \
         php8.3-gd \
         php8.3-pgsql \
