@@ -13,9 +13,9 @@ if [[ -z "$APP_KEY" ]]; then
       local length=${#text}
       local border=$(printf '%*s' "$((length + 4))" | tr ' ' '*')
 
-      echo -e "$border"
+      echo "$border"
       echo "* $text *"
-      echo -e "$border"
+      echo "$border"
     }
 
     export APP_KEY=base64:$(openssl rand -base64 32)
