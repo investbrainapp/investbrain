@@ -41,16 +41,25 @@ echo -e "\n====================== Running migrations...  ====================== 
 run_migrations() {
     /usr/local/bin/php /var/www/app/artisan migrate --force
 }
-RETRIES=30
+RETRIES=10
 DELAY=5
 until run_migrations; do
-  RETRIES=$((RETRIES-1))
-  if [ $RETRIES -le 0 ]; then
-    echo " > Database is not ready after multiple attempts. Exiting..."
-    exit 1
+  EXIT_STATUS=$?
+  
+  if [ $EXIT_STATUS -ne 0 ]; then
+
+    RETRIES=$((RETRIES-1))
+    if [ $RETRIES -le 0 ]; then
+      echo " > Database is not ready after $RETRIES attempts. Exiting..."
+      exit 1
+    fi
+    echo " > Waiting for database to be ready... retrying in $DELAY seconds."
+    sleep $DELAY
+  else
+    # If migration was successful, break out of the loop
+    echo " > Migration succeeded."
+    break
   fi
-  echo " > Waiting for database to be ready... retrying in $DELAY seconds."
-  sleep $DELAY
 done
 
 echo -e "\n====================== Spinning up Supervisor daemon...  ====================== "
