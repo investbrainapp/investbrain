@@ -1,6 +1,7 @@
 FROM php:8.3-fpm
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV APP_NAME=Investbrain
 ENV APP_URL="http://localhost:8000"
 ENV ASSET_URL="http://localhost:8000"
 ENV APP_DEBUG=true
@@ -56,11 +57,9 @@ RUN apt-get update && apt-get install -y \
         npm \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install PHP dependencies
-RUN composer install --no-scripts --optimize-autoloader
-
-# Install Node dependencies and build assets
-RUN npm install && npm run build
+# Install PHP dependencies and build front end assets
+RUN composer install --no-scripts --optimize-autoloader \
+    && npm install && npm run build
 
 # Copy over configs
 COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf

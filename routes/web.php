@@ -11,6 +11,9 @@ use App\Http\Controllers\InvitedOnboardingController;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
+Route::get('/test', function() {
+    dd(env('APP_NAME'), env('DB_CONNECTION'));
+});
 Route::get('/', function () {
     if (!config('investbrain.self_hosted', true) && View::exists('landing-page::index')) {
         

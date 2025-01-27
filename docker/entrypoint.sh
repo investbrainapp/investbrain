@@ -24,6 +24,10 @@ if [[ -z "$APP_KEY" ]]; then
 
     export APP_KEY=base64:$(openssl rand -base64 32)
     draw_box $APP_KEY
+
+
+
+    # persist the ENVs to a file so laravel can access?
 fi
 
 for dir in storage/framework/cache storage/framework/sessions storage/framework/views; do
