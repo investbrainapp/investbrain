@@ -58,7 +58,7 @@ Alternatively, create a .env file in the same directory as your compose file, th
 
 **3. Run `docker compose up`**
 
-This might take a few minutes to pull the Docker images. But assuming everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
+It might take a few minutes to pull the Docker images. But assuming everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
 
 ```bash
 http://localhost:8000/register
