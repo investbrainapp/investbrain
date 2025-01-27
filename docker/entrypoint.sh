@@ -4,9 +4,9 @@ cd /var/www/app
 
 echo -e "\n====================== Validating environment...  ====================== "
 if [[ -z "$APP_KEY" ]]; then
-    echo " > Oops! The required APP_KEY configuration is missing in your environment! "
-    echo " > Generating a key (see below) but this will NOT be persisted between container restarts. "
-    echo " > You should set this APP_KEY in your .env file! "
+    echo "\n > Oops! The required APP_KEY configuration is missing in your environment!  \n\n"
+    echo "\n > Generating a key (see below) but this will NOT be persisted between container restarts.  \n\n"
+    echo "\n > You should set this APP_KEY in your .env file!  \n\n"
 
     draw_box() {
       local text="$1"
@@ -24,7 +24,7 @@ fi
 
 for dir in storage/framework/cache storage/framework/sessions storage/framework/views; do
     if [ ! -d "$dir" ]; then
-        echo " > $dir is missing. Creating scaffold for storage directory..."
+        echo "\n > $dir is missing. Creating scaffold for storage directory... \n\n"
         mkdir -p storage/framework/{cache,sessions,views}
         chmod -R 775 storage
         chown -R www-data:www-data storage
@@ -32,7 +32,7 @@ for dir in storage/framework/cache storage/framework/sessions storage/framework/
 done
 
 if [ ! -L "public/storage" ]; then
-    echo " > Creating symbolic link for app public storage..."
+    echo "\n > Creating symbolic link for app public storage... \n\n"
     
     /usr/local/bin/php /var/www/app/artisan storage:link
 fi
@@ -44,22 +44,13 @@ run_migrations() {
 RETRIES=10
 DELAY=5
 until run_migrations; do
-  EXIT_STATUS=$?
-  
-  if [ $EXIT_STATUS -ne 0 ]; then
-
-    RETRIES=$((RETRIES-1))
-    if [ $RETRIES -le 0 ]; then
-      echo " > Database is not ready after $RETRIES attempts. Exiting..."
-      exit 1
-    fi
-    echo " > Waiting for database to be ready... retrying in $DELAY seconds."
-    sleep $DELAY
-  else
-    # If migration was successful, break out of the loop
-    echo " > Migration succeeded."
-    break
+  RETRIES=$((RETRIES-1))
+  if [ $RETRIES -le 0 ]; then
+    echo "\n > Database is not ready after $RETRIES attempts. Exiting... \n\n"
+    exit 1
   fi
+  echo "\n > Waiting for database to be ready... retrying in $DELAY seconds. \n\n"
+  sleep $DELAY
 done
 
 echo -e "\n====================== Spinning up Supervisor daemon...  ====================== "
