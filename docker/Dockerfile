@@ -10,7 +10,7 @@ ENV SELF_HOSTED=true
 COPY . /var/www/app
 WORKDIR /var/www/app
 
-# Install common php extension dependencies
+# Install required packages
 RUN apt-get update && apt-get install -y \
         nginx \
         libfreetype-dev \
@@ -20,13 +20,18 @@ RUN apt-get update && apt-get install -y \
         libzip-dev \
         libicu-dev \
         libpq-dev \
+        binutils libc6-dev \
         supervisor \
+        unzip curl git \
+        nodejs npm \
+# Clean up APT
+    && apt-get -y autoremove \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+# Install PHP extensions
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        gd pgsql zip pdo_mysql mysqli intl \
-    && apt-get -y autoremove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        gd pgsql zip pdo_mysql mysqli intl
 
 # Set permissions
 RUN chown -R www-data:www-data . \ 
@@ -34,17 +39,9 @@ RUN chown -R www-data:www-data . \
     && chmod +x ./docker/entrypoint.sh \
     && usermod -s /bin/bash www-data
 
-# Install Composer and Node.js
-RUN apt-get update && apt-get install -y \
-        curl \
-        unzip \
-        git \
-        nodejs \
-        npm \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install PHP dependencies and build front end assets
-RUN composer install --no-scripts --optimize-autoloader \
+# Install Composer and Node.js Install PHP dependencies and build front end assets
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer install --no-scripts --optimize-autoloader \
     && npm install && npm run build
 
 # Remove default nginx config
