@@ -10,6 +10,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up swap space
+        run: |
+          sudo fallocate -l 5G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -29,8 +36,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Increase swap space
-        run: sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=4096 && sudo /sbin/mkswap /var/swap.1 && sudo /sbin/swapon /var/swap.1
+      - name: Set up swap space
+        run: |
+          sudo fallocate -l 4G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
 
       - name: Cache Docker layers
         uses: actions/cache@v4
@@ -48,6 +59,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          options: --memory=4g  #
           platforms: linux/amd64,linux/arm64
           file: ./docker/Dockerfile
           push: true
@@ -56,3 +68,8 @@ jobs:
             investbrainapp/investbrain:${{ env.version }}
             ghcr.io/investbrainapp/investbrain:latest
             ghcr.io/investbrainapp/investbrain:${{ env.version }}
+      
+      - name: Clean up swap space
+        run: |
+          sudo swapoff /swapfile
+          sudo rm /swapfile
