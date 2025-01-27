@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 #ubuntu-latest
     steps:
       - name: Increase swap space
         run: sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=5120 && sudo chmod 600 /var/swap.1 && sudo /sbin/mkswap /var/swap.1 && sudo /sbin/swapon /var/swap.1
