@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Holding;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PortfolioController extends Controller
 {
@@ -22,9 +23,7 @@ class PortfolioController extends Controller
      */
     public function show(Request $request, Portfolio $portfolio)
     {
-        if ($request->user()->cannot('readOnly', $portfolio)) {
-            abort(403);
-        }
+        Gate::authorize('readOnly', $portfolio);
 
         $portfolio->load(['transactions', 'holdings']);
         

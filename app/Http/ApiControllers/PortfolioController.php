@@ -8,8 +8,7 @@ use App\Models\Portfolio;
 use Illuminate\Support\Facades\Gate;
 use HackerEsq\FilterModels\FilterModels;
 use App\Http\Resources\PortfolioResource;
-use App\Http\Requests\StorePortfolioRequest;
-use App\Http\Requests\UpdatePortfolioRequest;
+use App\Http\Requests\PortfolioRequest;
 use App\Http\ApiControllers\Controller as ApiController;
 
 class PortfolioController extends ApiController
@@ -25,7 +24,7 @@ class PortfolioController extends ApiController
         return PortfolioResource::collection($filters->paginated());
     }
 
-    public function store(StorePortfolioRequest $request)
+    public function store(PortfolioRequest $request)
     {
         $portfolio = Portfolio::create($request->validated());
         
@@ -39,7 +38,7 @@ class PortfolioController extends ApiController
         return PortfolioResource::make($portfolio);
     }
 
-    public function update(UpdatePortfolioRequest $request, Portfolio $portfolio)
+    public function update(PortfolioRequest $request, Portfolio $portfolio)
     {
         Gate::authorize('fullAccess', $portfolio);
 
@@ -51,6 +50,8 @@ class PortfolioController extends ApiController
     public function destroy(Portfolio $portfolio)
     {
         Gate::authorize('fullAccess', $portfolio);
+
+        $portfolio->delete();
 
         return response()->noContent();
     }
