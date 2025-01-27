@@ -33,7 +33,7 @@ jobs:
         run: sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=4096 && sudo /sbin/mkswap /var/swap.1 && sudo /sbin/swapon /var/swap.1
 
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
