@@ -7,20 +7,20 @@ use App\Http\ApiControllers\PortfolioController;
 use App\Http\ApiControllers\MarketDataController;
 use App\Http\ApiControllers\TransactionController;
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->name('api.')->group(function () {
 
     // user
-    Route::get('/me', [UserController::class, 'me']);
+    Route::get('/me', [UserController::class, 'me'])->name('me');
 
     // portfolio
     Route::apiResource('/portfolio', PortfolioController::class);
 
     // transaction
-    Route::get('/transaction', [TransactionController::class, 'index']);
+    Route::apiResource('/transaction', TransactionController::class);
 
     // holding
-    Route::get('/holding', [HoldingController::class, 'index']);
+    Route::get('/holding', [HoldingController::class, 'index'])->name('holding.index');
 
     // market data
-    Route::get('/market-data/{symbol}', [MarketDataController::class, 'show']);
+    Route::get('/market-data/{symbol}', [MarketDataController::class, 'show'])->name('market-data.show');
 });

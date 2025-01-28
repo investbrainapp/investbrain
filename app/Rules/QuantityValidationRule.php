@@ -13,10 +13,10 @@ class QuantityValidationRule implements ValidationRule
      * @return void
      */
     public function __construct(
-        protected Portfolio $portfolio, 
-        protected string $symbol, 
-        protected string $transactionType,
-        protected string $date
+        protected ?Portfolio $portfolio, 
+        protected ?string $symbol, 
+        protected ?string $transactionType,
+        protected ?string $date
     ) {
         $this->portfolio = $portfolio;
         $this->symbol = $symbol; 
@@ -34,6 +34,11 @@ class QuantityValidationRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
+        if (is_null($this->portfolio) || is_null($this->symbol) || is_null($this->transactionType) || is_null($this->date)) {
+            //
+            $fail(__('The quantity must not be greater than the available quantity.'));
+        }
+
         if ($this->transactionType == 'SELL') {
 
             $purchase_qty = $this->portfolio->transactions()

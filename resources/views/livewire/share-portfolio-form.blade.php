@@ -7,7 +7,6 @@ use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Illuminate\Support\Collection;
 use Mary\Traits\Toast;
-use App\Notifications\InvitedOnboardingNotification;
 
 new class extends Component {
 
@@ -75,7 +74,7 @@ new class extends Component {
         
         unset($this->permissions[$userId]);
 
-        $this->portfolio->users()->sync($this->permissions);
+        $this->portfolio->unShare($userId);
 
         $this->portfolio->refresh();
 
@@ -92,24 +91,7 @@ new class extends Component {
 
         $this->validate();
 
-        $user = User::firstOrCreate([
-            'email' => $this->emailAddress
-        ], [
-            'name' => Str::title(Str::before($this->emailAddress, '@'))
-        ]);
-
-        $this->permissions[$user->id] = [
-            'full_access' => $this->fullAccess
-        ];
-
-        $sync = $this->portfolio->users()->sync($this->permissions);
-
-        if (!empty($sync['attached'])) {
-
-            foreach($sync['attached'] as $newUserId) {
-                User::find($newUserId)->notify(new InvitedOnboardingNotification($this->portfolio, auth()->user()));
-            };
-        }
+        $this->portfolio->share($this->emailAddress, $this->fullAccess);
 
         $this->success(__('Shared portfolio with user'));
         $this->portfolio->refresh();

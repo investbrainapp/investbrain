@@ -3,6 +3,7 @@
 namespace App\Http\ApiControllers;
 
 use App\Models\Holding;
+use App\Models\Portfolio;
 use Illuminate\Http\Request;
 use App\Http\Resources\HoldingResource;
 use HackerEsq\FilterModels\FilterModels;
@@ -19,5 +20,17 @@ class HoldingController extends ApiController
         $filters->setSearchableColumns(['symbol']);
 
         return HoldingResource::collection($filters->paginated());
+    }
+
+    public function show(Portfolio $portfolio, string $symbol)
+    {
+
+        //
+    }
+
+    public function put(FilterModels $filters)
+    {
+
+        //
     }
 }

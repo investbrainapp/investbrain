@@ -23,7 +23,9 @@ class TransactionController extends ApiController
     }
 
     public function store(TransactionRequest $request)
-    {
+    {   
+        Gate::authorize('fullAccess', $request->portfolio);
+
         $transaction = Transaction::create($request->validated());
         
         return TransactionResource::make($transaction);
@@ -31,14 +33,14 @@ class TransactionController extends ApiController
 
     public function show(Transaction $transaction)
     {
-        Gate::authorize('readOnly', $transaction);
+        Gate::authorize('readOnly', $transaction->portfolio);
 
         return TransactionResource::make($transaction);
     }
 
     public function update(TransactionRequest $request, Transaction $transaction)
     {
-        Gate::authorize('fullAccess', $transaction);
+        Gate::authorize('fullAccess', $transaction->portfolio);
 
         $transaction->update($request->validated());
 
@@ -47,7 +49,7 @@ class TransactionController extends ApiController
 
     public function destroy(Transaction $transaction)
     {
-        Gate::authorize('fullAccess', $transaction);
+        Gate::authorize('fullAccess', $transaction->portfolio);
 
         $transaction->delete();
 
