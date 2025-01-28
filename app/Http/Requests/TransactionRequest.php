@@ -10,8 +10,6 @@ use App\Rules\QuantityValidationRule;
 class TransactionRequest extends FormRequest
 {
 
-    public ?Portfolio $portfolio;
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -19,10 +17,9 @@ class TransactionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $this->portfolio = Portfolio::findOrFail($this->requestOrModelValue('portfolio_id', 'transaction'));
 
         $rules = [
-            'portfolio_id' => [], // validated by findOrFail() above
+            'portfolio_id' => ['required', 'exists:portfolios,id'],
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => ['required', 'string', 'in:BUY,SELL'],
             'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:' . now()->format('Y-m-d')],
@@ -31,7 +28,7 @@ class TransactionRequest extends FormRequest
                 'numeric', 
                 'min:0', 
                 new QuantityValidationRule(
-                    $this->portfolio,
+                    $this->requestOrModelValue('symbol', 'transaction'),
                     $this->requestOrModelValue('symbol', 'transaction'),
                     $this->requestOrModelValue('transaction_type', 'transaction'),
                     $this->requestOrModelValue('date', 'transaction')
@@ -42,6 +39,7 @@ class TransactionRequest extends FormRequest
         ];
 
         if (!is_null($this->transaction)) {
+            $rules['portfolio_id'][0] = 'sometimes';
             $rules['symbol'][0] = 'sometimes';
             $rules['transaction_type'][0] = 'sometimes';
             $rules['date'][0] = 'sometimes';
