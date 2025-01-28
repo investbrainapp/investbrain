@@ -18,7 +18,6 @@ class MarketDataSeeder extends Seeder
         $chunkSize = 500;
 
         // Path to the CSV file
-        // $csvFilePath = storage_path('app/market_data_seed.csv');
         $csvFilePath = realpath(__DIR__.'/market_data_seed.csv');
 
         // Open the file in read mode
