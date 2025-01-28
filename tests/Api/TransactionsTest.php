@@ -77,7 +77,8 @@ class TransactionsTest extends TestCase
             'cost_basis' => 150,
         ];
 
-        $this->postJson(route('api.transaction.store'), $data)
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), $data)
             ->assertCreated()
             ->assertJsonStructure([
                 'id',

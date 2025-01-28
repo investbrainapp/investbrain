@@ -10,6 +10,14 @@ use App\Rules\QuantityValidationRule;
 class TransactionRequest extends FormRequest
 {
 
+    protected function prepareForValidation(): void
+    {
+
+        $this->merge([
+            'portfolio' => Portfolio::find($this->requestOrModelValue('portfolio_id', 'transaction'))
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -17,7 +25,7 @@ class TransactionRequest extends FormRequest
      */
     public function rules(): array
     {
-
+        
         $rules = [
             'portfolio_id' => ['required', 'exists:portfolios,id'],
             'symbol' => ['required', 'string', new SymbolValidationRule],
@@ -28,7 +36,7 @@ class TransactionRequest extends FormRequest
                 'numeric', 
                 'min:0', 
                 new QuantityValidationRule(
-                    $this->requestOrModelValue('symbol', 'transaction'),
+                    $this->input('portfolio'),
                     $this->requestOrModelValue('symbol', 'transaction'),
                     $this->requestOrModelValue('transaction_type', 'transaction'),
                     $this->requestOrModelValue('date', 'transaction')
