@@ -70,7 +70,7 @@
     "API Token": "API Token",
     "Please copy your new API token. For your security, it won\\'t be shown again.": "Please copy your new API token. For your security, it won\\'t be shown again.",
     "API Token Permissions": "API Token Permissions",
-    "API tokens allow third-party services to authenticate with our application on your behalf.": "API tokens allow third-party services to authenticate with our application on your behalf.",
+    "API tokens allow third-party services to authenticate with Investbrain on your behalf.": "API tokens allow third-party services to authenticate with Investbrain on your behalf.",
     "Delete API Token": "Delete API Token",
     "Are you sure you would like to delete this API token?": "Are you sure you would like to delete this API token?",
     "This is a secure area of the application. Please confirm your password before continuing.": "This is a secure area of the application. Please confirm your password before continuing.",

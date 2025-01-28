@@ -36,11 +36,6 @@ class Holding extends Model
         'reinvest_dividends' => 'boolean'
     ];
 
-    protected $attributes = [
-        'realized_gain_dollars' => 0,
-        'dividends_earned' => 0,
-    ];
-
     /**
      * Market data for holding
      *

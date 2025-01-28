@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('holdings', function (Blueprint $table) {
-            $table->boolean('reinvest_dividends')->nullable()->after('quantity');
+            $table->boolean('reinvest_dividends')->default(false)->after('quantity');
         });
 
         Schema::table('transactions', function (Blueprint $table) {
-            $table->boolean('reinvested_dividend')->nullable()->after('split');
+            $table->boolean('reinvested_dividend')->default(false)->after('split');
         });
     }
 

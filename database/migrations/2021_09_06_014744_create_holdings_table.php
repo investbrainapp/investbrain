@@ -20,10 +20,10 @@ class CreateHoldingsTable extends Migration
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
             $table->foreignIdFor(MarketData::class, 'symbol');
             $table->float('quantity', 12, 4);
-            $table->float('average_cost_basis', 12, 4);
-            $table->float('total_cost_basis', 12, 4)->nullable();
-            $table->float('realized_gain_dollars', 12, 4)->nullable();
-            $table->float('dividends_earned', 12, 4)->nullable();
+            $table->float('average_cost_basis', 12, 4)->default(0);
+            $table->float('total_cost_basis', 12, 4)->default(0);
+            $table->float('realized_gain_dollars', 12, 4)->default(0);
+            $table->float('dividends_earned', 12, 4)->default(0);
             $table->timestamp('splits_synced_at')->nullable();
             $table->timestamps();
         });

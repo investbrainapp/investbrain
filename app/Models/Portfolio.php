@@ -5,11 +5,13 @@ namespace App\Models;
 use App\Models\AiChat;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Notifications\InvitedOnboardingNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Portfolio extends Model
@@ -129,6 +131,7 @@ class Portfolio extends Model
 
             // save
             $portfolio->users()->sync($owner);
+            static::$owner_id = null;
         }
     }
 
@@ -252,5 +255,45 @@ class Portfolio extends Model
                                     ."\n\n";
         }
         return $formattedHoldings;
+    }
+
+    /**
+     * Share a portfolio with a user
+     *
+     * @param string $email
+     * @param boolean $fullAccess
+     * @return void
+     */
+    public function share(string $email, bool $fullAccess = false): void
+    {
+        $user = User::firstOrCreate([
+            'email' => $email
+        ], [
+            'name' => Str::title(Str::before($email, '@'))
+        ]);
+
+        $permissions[$user->id] = [
+            'full_access' => $fullAccess
+        ];
+
+        $sync = $this->users()->syncWithoutDetaching($permissions);
+
+        if (!empty($sync['attached'])) {
+
+            foreach($sync['attached'] as $newUserId) {
+                User::find($newUserId)->notify(new InvitedOnboardingNotification($this, auth()->user()));
+            };
+        }
+    }
+
+    /**
+     * Un-share a portfolio
+     *
+     * @param string $userId
+     * @return void
+     */
+    public function unShare(string $userId): void
+    {
+        $this->users()->detach($userId);
     }
 }

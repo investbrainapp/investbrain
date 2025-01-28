@@ -70,7 +70,7 @@
     "API Token": "Token API",
     "Please copy your new API token. For your security, it won't be shown again.": "Por favor, copia tu nuevo token API. Por seguridad, no se mostrará nuevamente.",
     "API Token Permissions": "Permisos del Token API",
-    "API tokens allow third-party services to authenticate with our application on your behalf.": "Los tokens API permiten que servicios de terceros se autentiquen con nuestra aplicación en tu nombre.",
+    "API tokens allow third-party services to authenticate with Investbrain on your behalf.": "Los tokens API permiten que servicios de terceros se autentiquen con Investbrain en tu nombre.",
     "Delete API Token": "Eliminar Token API",
     "Are you sure you would like to delete this API token?": "¿Estás seguro de que deseas eliminar este token API?",
     "This is a secure area of the application. Please confirm your password before continuing.": "Esta es un área segura de la aplicación. Por favor, confirma tu contraseña antes de continuar.",

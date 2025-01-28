@@ -17,7 +17,7 @@ class PortfolioFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->word,
+            'title' => $this->faker->words(4, true),
             'created_at' => now(),
             'updated_at' => now(),
         ];
