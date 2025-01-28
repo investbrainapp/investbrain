@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     'refresh' => env('MARKET_DATA_REFRESH', 30), // minutes

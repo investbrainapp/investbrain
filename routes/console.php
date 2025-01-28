@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Console\Commands\CaptureDailyChange;
 use App\Console\Commands\RefreshDividendData;
 use App\Console\Commands\RefreshMarketData;

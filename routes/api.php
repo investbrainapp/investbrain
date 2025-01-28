@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\ApiControllers\HoldingController;
 use App\Http\ApiControllers\MarketDataController;
 use App\Http\ApiControllers\PortfolioController;

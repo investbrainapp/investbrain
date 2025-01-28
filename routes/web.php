@@ -1,13 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HoldingController;
+declare(strict_types=1);
+
+use App\Http\Controllers\ConnectedAccountController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HoldingController;
+use App\Http\Controllers\InvitedOnboardingController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\ConnectedAccountController;
-use App\Http\Controllers\InvitedOnboardingController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Laravel\Jetstream\Http\Controllers\Livewire\ApiTokenController;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
@@ -26,7 +28,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
     Route::view('/import-export', 'import-export')
         ->name('import-export')
-        ->when(!config('investbrain.self_hosted'), function($route) {
+        ->when(! config('investbrain.self_hosted'), function ($route) {
             return $route->middleware('verified');
         });
 
@@ -44,7 +46,7 @@ Route::get('invite/{portfolio}/{user}', InvitedOnboardingController::class)->nam
 // Overwrites Jetstream routes
 Route::get('/user/api-tokens', [ApiTokenController::class, 'index'])
     ->name('api-tokens.index')
-    ->when(!config('investbrain.self_hosted'), function($route) {
+    ->when(! config('investbrain.self_hosted'), function ($route) {
         return $route->middleware('verified');
     });
 Route::get('/terms', [TermsOfServiceController::class, 'show'])->name('terms.show');
