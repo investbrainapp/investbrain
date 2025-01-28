@@ -6,11 +6,15 @@ use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\TransactionController;
+use App\Interfaces\MarketData\MarketDataInterface;
 use App\Http\Controllers\ConnectedAccountController;
 use App\Http\Controllers\InvitedOnboardingController;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
+Route::get('/test', function() {
+    dd(app(MarketDataInterface::class)->quote('BTCUSD'));
+});
 Route::get('/', function () {
     if (!config('investbrain.self_hosted', true) && View::exists('landing-page::index')) {
         

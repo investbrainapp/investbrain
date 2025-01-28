@@ -35,7 +35,7 @@ class YahooMarketData implements MarketDataInterface
 
         return new Quote([
             'name' => $quote->getLongName() ?? $quote->getShortName(),
-            'symbol' => $quote->getSymbol(),
+            'symbol' => $symbol,
             'market_value' => $quote->getRegularMarketPrice(),
             'fifty_two_week_high' => $quote->getFiftyTwoWeekHigh(),
             'fifty_two_week_low' => $quote->getFiftyTwoWeekLow(),

@@ -36,7 +36,7 @@ class AlphaVantageMarketData implements MarketDataInterface
 
         return new Quote([
             'name' => Arr::get($fundamental, 'Name'),
-            'symbol' => Arr::get($fundamental, 'Symbol'),
+            'symbol' => $symbol,
             'market_value' => Arr::get($quote, '05. price'),
             'fifty_two_week_high' => Arr::get($fundamental, '52WeekHigh'),
             'fifty_two_week_low' => Arr::get($fundamental, '52WeekLow'),
