@@ -20,6 +20,8 @@ Route::middleware(['auth:sanctum'])->name('api.')->group(function () {
 
     // holding
     Route::get('/holding', [HoldingController::class, 'index'])->name('holding.index');
+    Route::get('/holding/{portfolio}/{symbol}', [HoldingController::class, 'show'])->name('holding.show')->scopeBindings();
+    Route::put('/holding/{portfolio}/{symbol}', [HoldingController::class, 'update'])->name('holding.update')->scopeBindings();
 
     // market data
     Route::get('/market-data/{symbol}', [MarketDataController::class, 'show'])->name('market-data.show');
