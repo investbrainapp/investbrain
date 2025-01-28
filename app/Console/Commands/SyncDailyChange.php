@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Portfolio;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+
 use function Laravel\Prompts\search;
 
 class SyncDailyChange extends Command implements PromptsForMissingInput
@@ -61,14 +62,14 @@ class SyncDailyChange extends Command implements PromptsForMissingInput
     public function handle()
     {
         try {
-            
+
             $portfolio = Portfolio::findOrFail($this->argument('portfolio_id'));
 
             $this->line('Syncing daily change history... This may take a moment.');
 
             $portfolio->syncDailyChanges();
 
-            $this->line('Awesome! Daily change history for '. $portfolio->title .' has been completed.');
+            $this->line('Awesome! Daily change history for '.$portfolio->title.' has been completed.');
 
         } catch (\Throwable $e) {
 

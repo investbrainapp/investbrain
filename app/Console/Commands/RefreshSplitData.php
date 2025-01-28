@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Split;
 use App\Models\Holding;
+use App\Models\Split;
 use Illuminate\Console\Command;
 
 class RefreshSplitData extends Command
@@ -42,14 +42,14 @@ class RefreshSplitData extends Command
     {
         $holdings = Holding::distinct();
 
-        if (!($this->option('force') ?? false)) {
+        if (! ($this->option('force') ?? false)) {
             $holdings->where('quantity', '>', 0);
-        } 
+        }
 
         foreach ($holdings->get(['symbol']) as $holding) {
-            $this->line('Refreshing ' . $holding->symbol);
-            
+            $this->line('Refreshing '.$holding->symbol);
+
             Split::refreshSplitData($holding->symbol);
-        }   
+        }
     }
 }

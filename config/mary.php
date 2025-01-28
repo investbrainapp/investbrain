@@ -13,7 +13,6 @@ return [
      *    prefix => 'mary-'
      *               <x-mary-button />
      *               <x-mary-card />
-     *
      */
     'prefix' => '',
 
@@ -40,6 +39,6 @@ return [
     'components' => [
         'spotlight' => [
             'class' => 'App\Support\Spotlight',
-        ]
-    ]
+        ],
+    ],
 ];

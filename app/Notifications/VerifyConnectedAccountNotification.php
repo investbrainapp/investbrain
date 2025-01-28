@@ -2,11 +2,11 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
 use App\Models\ConnectedAccount;
-use Illuminate\Notifications\Notification;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class VerifyConnectedAccountNotification extends Notification implements ShouldQueue
 {
@@ -17,7 +17,7 @@ class VerifyConnectedAccountNotification extends Notification implements ShouldQ
      */
     public function __construct(
         public string $connected_account_id
-    ) { }
+    ) {}
 
     /**
      * Get the notification's delivery channels.
@@ -40,11 +40,11 @@ class VerifyConnectedAccountNotification extends Notification implements ShouldQ
         $url = url()->signedRoute('oauth.verify_connected_account', ['connected_account' => $this->connected_account_id], now()->days($days = 7));
 
         return (new MailMessage)
-                    ->greeting('Welcome back!')
-                    ->subject("Connect your $provider account with Investbrain")
-                    ->line("You recently attempted to log into an existing Investbrain account using $provider. To safeguard your Investbrain account, please confirm this was you by pressing the 'Connect $provider' button below:")
-                    ->action("Connect $provider", $url)
-                    ->line("If you do not recognize this activity, we recommend [changing your password](".route('profile.show').") as soon as possible. Otherwise, you can disregard this message. This link will expire in {$days} days.");
+            ->greeting('Welcome back!')
+            ->subject("Connect your $provider account with Investbrain")
+            ->line("You recently attempted to log into an existing Investbrain account using $provider. To safeguard your Investbrain account, please confirm this was you by pressing the 'Connect $provider' button below:")
+            ->action("Connect $provider", $url)
+            ->line('If you do not recognize this activity, we recommend [changing your password]('.route('profile.show').") as soon as possible. Otherwise, you can disregard this message. This link will expire in {$days} days.");
     }
 
     /**

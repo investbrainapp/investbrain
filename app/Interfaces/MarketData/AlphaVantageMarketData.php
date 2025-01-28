@@ -2,33 +2,35 @@
 
 namespace App\Interfaces\MarketData;
 
+use App\Interfaces\MarketData\Types\Dividend;
+use App\Interfaces\MarketData\Types\Ohlc;
+use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\Types\Split;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use App\Interfaces\MarketData\Types\Quote;
-use App\Interfaces\MarketData\Types\Split;
-use App\Interfaces\MarketData\Types\Dividend;
-use App\Interfaces\MarketData\Types\Ohlc;
 use Tschucki\Alphavantage\Facades\Alphavantage;
 
 class AlphaVantageMarketData implements MarketDataInterface
 {
-    public function exists(String $symbol): Bool
+    public function exists(string $symbol): bool
     {
 
         return $this->quote($symbol)->isNotEmpty();
     }
 
-    public function quote(String $symbol): Quote
+    public function quote(string $symbol): Quote
     {
         $quote = Alphavantage::core()->quoteEndpoint($symbol);
         $quote = Arr::get($quote, 'Global Quote', []);
 
-        if (empty($quote)) return new Quote();
+        if (empty($quote)) {
+            return new Quote;
+        }
 
         $fundamental = cache()->remember(
-            'av-symbol-'.$symbol, 
-            1440, 
+            'av-symbol-'.$symbol,
+            1440,
             function () use ($symbol) {
                 return Alphavantage::fundamentals()->overview($symbol);
             }
@@ -49,71 +51,71 @@ class AlphaVantageMarketData implements MarketDataInterface
                         : null,
             'dividend_yield' => Arr::get($fundamental, 'DividendYield') != 'None'
                         ? Arr::get($fundamental, 'DividendYield')
-                        : null
-        ]);        
+                        : null,
+        ]);
     }
 
-    public function dividends(String $symbol, $startDate, $endDate): Collection
+    public function dividends(string $symbol, $startDate, $endDate): Collection
     {
         $dividends = Alphavantage::fundamentals()->dividends($symbol);
         $dividends = Arr::get($dividends, 'data', []);
 
         return collect($dividends)
-                        ->filter(function($dividend) use ($startDate, $endDate) {
-                            
-                            return Carbon::parse(Arr::get($dividend, 'ex_dividend_date'))->between($startDate, $endDate);
-                        })
-                        ->map(function($dividend) use ($symbol) {
-                            
-                            return new Dividend([
-                                'symbol' => $symbol,
-                                'date' => Carbon::parse(Arr::get($dividend, 'ex_dividend_date')),
-                                'dividend_amount' => Arr::get($dividend, 'amount'),
-                            ]);
-                        });
+            ->filter(function ($dividend) use ($startDate, $endDate) {
+
+                return Carbon::parse(Arr::get($dividend, 'ex_dividend_date'))->between($startDate, $endDate);
+            })
+            ->map(function ($dividend) use ($symbol) {
+
+                return new Dividend([
+                    'symbol' => $symbol,
+                    'date' => Carbon::parse(Arr::get($dividend, 'ex_dividend_date')),
+                    'dividend_amount' => Arr::get($dividend, 'amount'),
+                ]);
+            });
     }
 
-    public function splits(String $symbol, $startDate, $endDate): Collection
-    {   
+    public function splits(string $symbol, $startDate, $endDate): Collection
+    {
         $splits = Alphavantage::fundamentals()->splits($symbol);
         $splits = Arr::get($splits, 'data', []);
 
         return collect($splits)
-                        ->filter(function($split) use ($startDate, $endDate) {
-                                            
-                            return Carbon::parse(Arr::get($split, 'effective_date'))->between($startDate, $endDate);
-                        })
-                        ->map(function($split) use ($symbol) {
-                            
-                            return new Split([
-                                'symbol' => $symbol,
-                                'date' => Carbon::parse(Arr::get($split, 'effective_date')),
-                                'split_amount' => Arr::get($split, 'split_factor'),
-                            ]);
-                        });
+            ->filter(function ($split) use ($startDate, $endDate) {
+
+                return Carbon::parse(Arr::get($split, 'effective_date'))->between($startDate, $endDate);
+            })
+            ->map(function ($split) use ($symbol) {
+
+                return new Split([
+                    'symbol' => $symbol,
+                    'date' => Carbon::parse(Arr::get($split, 'effective_date')),
+                    'split_amount' => Arr::get($split, 'split_factor'),
+                ]);
+            });
     }
 
-    public function history(String $symbol, $startDate, $endDate): Collection
+    public function history(string $symbol, $startDate, $endDate): Collection
     {
 
         $history = Alphavantage::timeSeries()->daily($symbol, 'full');
 
         $history = Arr::get($history, 'Time Series (Daily)', []);
-        
+
         return collect($history)
-                    ->filter(function ($history, $date) use ($startDate, $endDate) {
+            ->filter(function ($history, $date) use ($startDate, $endDate) {
 
-                        return Carbon::parse($date)->between($startDate, $endDate);
-                    })
-                    ->mapWithKeys(function($history, $date) use ($symbol) {
+                return Carbon::parse($date)->between($startDate, $endDate);
+            })
+            ->mapWithKeys(function ($history, $date) use ($symbol) {
 
-                        $date = Carbon::parse($date)->format('Y-m-d');
-                        
-                        return [ $date => new Ohlc([
-                                'symbol' => $symbol,
-                                'date' => $date,
-                                'close' => Arr::get($history, '4. close')
-                            ]) ];
-                    });
+                $date = Carbon::parse($date)->format('Y-m-d');
+
+                return [$date => new Ohlc([
+                    'symbol' => $symbol,
+                    'date' => $date,
+                    'close' => Arr::get($history, '4. close'),
+                ])];
+            });
     }
 }

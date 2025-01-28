@@ -4,13 +4,13 @@ namespace App\Interfaces\MarketData\Types;
 
 use DateTime;
 use Illuminate\Support\Carbon;
-use App\Interfaces\MarketData\Types\MarketDataType;
 
 class Ohlc extends MarketDataType
 {
     public function setSymbol(string $symbol): self
     {
         $this->items['symbol'] = $symbol;
+
         return $this;
     }
 
@@ -22,6 +22,7 @@ class Ohlc extends MarketDataType
     public function setOpen($open): self
     {
         $this->items['open'] = (float) $open;
+
         return $this;
     }
 
@@ -33,6 +34,7 @@ class Ohlc extends MarketDataType
     public function setHigh($high): self
     {
         $this->items['high'] = (float) $high;
+
         return $this;
     }
 
@@ -44,6 +46,7 @@ class Ohlc extends MarketDataType
     public function setLow($low): self
     {
         $this->items['low'] = (float) $low;
+
         return $this;
     }
 
@@ -55,6 +58,7 @@ class Ohlc extends MarketDataType
     public function setClose($close): self
     {
         $this->items['close'] = (float) $close;
+
         return $this;
     }
 
@@ -63,9 +67,10 @@ class Ohlc extends MarketDataType
         return $this->items['close'] ?? 0.0;
     }
 
-    public function setDate(String|DateTime $date): self
+    public function setDate(string|DateTime $date): self
     {
         $this->items['date'] = Carbon::parse($date)->format('Y-m-d H:i:s');
+
         return $this;
     }
 

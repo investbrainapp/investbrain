@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\MarketData;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class Transaction extends Model
 {
@@ -23,7 +22,7 @@ class Transaction extends Model
         'cost_basis',
         'sale_price',
         'split',
-        'reinvested_dividend'
+        'reinvested_dividend',
     ];
 
     protected $hidden = [];
@@ -31,7 +30,7 @@ class Transaction extends Model
     protected $casts = [
         'date' => 'datetime',
         'split' => 'boolean',
-        'reinvested_dividend' => 'boolean'
+        'reinvested_dividend' => 'boolean',
     ];
 
     protected static function boot()
@@ -52,14 +51,14 @@ class Transaction extends Model
 
             $transaction->refreshMarketData();
 
-            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
+            cache()->forget('portfolio-metrics-'.$transaction->portfolio_id);
         });
 
         static::deleted(function ($transaction) {
 
             $transaction->syncToHolding();
 
-            cache()->forget('portfolio-metrics-' . $transaction->portfolio_id);
+            cache()->forget('portfolio-metrics-'.$transaction->portfolio_id);
         });
     }
 
@@ -96,13 +95,13 @@ class Transaction extends Model
     public function scopeWithMarketData($query)
     {
         return $query->withAggregate('market_data', 'name')
-                    ->withAggregate('market_data', 'market_value')
-                    ->withAggregate('market_data', 'fifty_two_week_low')
-                    ->withAggregate('market_data', 'fifty_two_week_high')
-                    ->withAggregate('market_data', 'updated_at')
-                    ->join('market_data', 'transactions.symbol', 'market_data.symbol');
+            ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'fifty_two_week_low')
+            ->withAggregate('market_data', 'fifty_two_week_high')
+            ->withAggregate('market_data', 'updated_at')
+            ->join('market_data', 'transactions.symbol', 'market_data.symbol');
     }
-    
+
     public function scopePortfolio($query, $portfolio)
     {
         return $query->where('portfolio_id', $portfolio);
@@ -128,7 +127,7 @@ class Transaction extends Model
         return $query->whereDate('date', '<=', $date);
     }
 
-    public function scopeMyTransactions() 
+    public function scopeMyTransactions()
     {
         return $this->whereHas('portfolio', function ($query) {
             $query->whereHas('users', function ($query) {
@@ -137,7 +136,7 @@ class Transaction extends Model
         });
     }
 
-    public function refreshMarketData() 
+    public function refreshMarketData()
     {
         return MarketData::getMarketData($this->attributes['symbol']);
     }
@@ -154,7 +153,7 @@ class Transaction extends Model
             'symbol' => $this->symbol,
             'transaction_type' => 'BUY',
         ])->whereDate('date', '<=', $this->date)
-        ->average('cost_basis');
+            ->average('cost_basis');
 
         $this->cost_basis = $average_cost_basis ?? 0;
 
@@ -166,7 +165,8 @@ class Transaction extends Model
      *
      * @return void
      */
-    public function syncToHolding() {
+    public function syncToHolding()
+    {
 
         // if symbol name changed, sync previous symbol too
         if (Arr::has($this->changes, 'symbol')) {
@@ -181,7 +181,7 @@ class Transaction extends Model
         // get the holding for a symbol and portfolio (or create one)
         Holding::firstOrNew([
             'portfolio_id' => $this->portfolio_id,
-            'symbol' => $this->symbol
+            'symbol' => $this->symbol,
         ], [
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,

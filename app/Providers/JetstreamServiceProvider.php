@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Arr;
-use Laravel\Jetstream\Features;
 use App\Actions\Jetstream\DeleteUser;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Jetstream;
 
 class JetstreamServiceProvider extends ServiceProvider
@@ -29,7 +29,7 @@ class JetstreamServiceProvider extends ServiceProvider
 
         Jetstream::deleteUsersUsing(DeleteUser::class);
 
-        if ( config('investbrain.self_hosted', false) ) {
+        if (config('investbrain.self_hosted', false)) {
 
             Config::set(
                 'jetstream.features',

@@ -2,27 +2,29 @@
 
 namespace Tests;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Portfolio;
+use App\Models\User;
 use App\Policies\PortfolioPolicy;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 
 class PortfolioPolicyTest extends TestCase
 {
     use RefreshDatabase;
 
     protected $policy;
+
     protected $owner;
+
     protected $user;
+
     protected $portfolio;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->policy = new PortfolioPolicy();
+        $this->policy = new PortfolioPolicy;
 
         $this->owner = User::factory()->create();
         Auth::login($this->owner);
@@ -34,7 +36,7 @@ class PortfolioPolicyTest extends TestCase
             $this->user->id => [
                 'full_access' => false,
                 'owner' => false,
-            ]
+            ],
         ]);
     }
 
@@ -109,5 +111,4 @@ class PortfolioPolicyTest extends TestCase
         $result = $this->policy->owner($this->user, $this->portfolio);
         $this->assertFalse($result, 'User should not be the owner');
     }
-
 }

@@ -2,13 +2,12 @@
 
 namespace App\Http\ApiControllers;
 
-use App\Models\Transaction;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use HackerEsq\FilterModels\FilterModels;
+use App\Http\ApiControllers\Controller as ApiController;
 use App\Http\Requests\TransactionRequest;
 use App\Http\Resources\TransactionResource;
-use App\Http\ApiControllers\Controller as ApiController;
+use App\Models\Transaction;
+use HackerEsq\FilterModels\FilterModels;
+use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends ApiController
 {
@@ -23,11 +22,11 @@ class TransactionController extends ApiController
     }
 
     public function store(TransactionRequest $request)
-    {   
+    {
         Gate::authorize('fullAccess', $request->portfolio);
 
         $transaction = Transaction::create($request->validated());
-        
+
         return TransactionResource::make($transaction);
     }
 

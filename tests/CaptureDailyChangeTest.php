@@ -2,19 +2,18 @@
 
 namespace Tests;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Portfolio;
 use App\Models\DailyChange;
+use App\Models\Portfolio;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 
 class CaptureDailyChangeTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,8 +24,6 @@ class CaptureDailyChangeTest extends TestCase
         $this->transaction = Transaction::factory()->sell()->lastMonth()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
     }
 
-    /**
-    */
     public function test_daily_change_for_portfolios()
     {
         // Run the command
@@ -47,10 +44,10 @@ class CaptureDailyChangeTest extends TestCase
         $this->assertCount(1, $daily_change);
 
         $this->assertEqualsWithDelta(
-            $this->transaction->sale_price - $this->transaction->cost_basis, 
+            $this->transaction->sale_price - $this->transaction->cost_basis,
             $daily_change->first()->realized_gains,
             0.01
         );
-        
+
     }
 }

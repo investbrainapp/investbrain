@@ -3,42 +3,39 @@
 namespace App\Imports\Sheets;
 
 use App\Imports\ValidatesPortfolioAccess;
-use App\Models\DailyChange;
 use App\Models\BackupImport;
+use App\Models\DailyChange;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Events\BeforeSheet;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Events\BeforeSheet;
 
-class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows, WithEvents
+class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadingRow, WithValidation
 {
     use ValidatesPortfolioAccess;
 
     public function __construct(
         public BackupImport $backupImport
-    ) { }
+    ) {}
 
-    /**
-     * @return array
-     */
     public function registerEvents(): array
     {
         return [
-            BeforeSheet::class => function(BeforeSheet $event) {
+            BeforeSheet::class => function (BeforeSheet $event) {
                 DB::commit();
                 $this->backupImport->update([
                     'message' => __('Importing daily changes...'),
                 ]);
                 DB::beginTransaction();
-            }
+            },
         ];
     }
-    
+
     public function collection(Collection $dailyChanges)
     {
         $dailyChanges->chunk($this->batchSize())->each(function ($chunk) {
@@ -56,7 +53,7 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
                     'realized_gains' => $dailyChange['realized_gains'],
                     'annotation' => $dailyChange['annotation'],
                     'portfolio_id' => $dailyChange['portfolio_id'],
-                    'date' => Carbon::parse($dailyChange['date'])->format('Y-m-d')
+                    'date' => Carbon::parse($dailyChange['date'])->format('Y-m-d'),
                 ];
             });
 
@@ -71,7 +68,7 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
                     'realized_gains',
                     'annotation',
                     'portfolio_id',
-                    'date'
+                    'date',
                 ]
             );
         });
@@ -85,7 +82,7 @@ class DailyChangesSheet implements ToCollection, WithHeadingRow, WithValidation,
     public function rules(): array
     {
         return [
-            'portfolio_id' => ['required', 'uuid'], 
+            'portfolio_id' => ['required', 'uuid'],
             'date' => ['required', 'date'],
             'total_market_value' => ['sometimes', 'nullable', 'numeric'],
             'total_cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],

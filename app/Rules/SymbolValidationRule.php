@@ -22,11 +22,6 @@ class SymbolValidationRule implements ValidationRule
 
     /**
      * Validate the attribute.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  \Closure  $fail
-     * @return void
      */
     public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
@@ -38,8 +33,8 @@ class SymbolValidationRule implements ValidationRule
         }
 
         // Check if the symbol exists in the Market Data table first (avoid API call)
-        if (!app(MarketDataInterface::class)->exists($value)) {
-            $fail('The symbol provided (' . $this->symbol . ') is not valid');
+        if (! app(MarketDataInterface::class)->exists($value)) {
+            $fail('The symbol provided ('.$this->symbol.') is not valid');
         }
     }
 }

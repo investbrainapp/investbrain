@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\ApiControllers\UserController;
 use App\Http\ApiControllers\HoldingController;
-use App\Http\ApiControllers\PortfolioController;
 use App\Http\ApiControllers\MarketDataController;
+use App\Http\ApiControllers\PortfolioController;
 use App\Http\ApiControllers\TransactionController;
+use App\Http\ApiControllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->name('api.')->group(function () {
 

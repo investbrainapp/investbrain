@@ -3,18 +3,16 @@
 namespace App\Http\Requests;
 
 use App\Models\Portfolio;
-use App\Http\Requests\FormRequest;
-use App\Rules\SymbolValidationRule;
 use App\Rules\QuantityValidationRule;
+use App\Rules\SymbolValidationRule;
 
 class TransactionRequest extends FormRequest
 {
-
     protected function prepareForValidation(): void
     {
 
         $this->merge([
-            'portfolio' => Portfolio::find($this->requestOrModelValue('portfolio_id', 'transaction'))
+            'portfolio' => Portfolio::find($this->requestOrModelValue('portfolio_id', 'transaction')),
         ]);
     }
 
@@ -25,28 +23,28 @@ class TransactionRequest extends FormRequest
      */
     public function rules(): array
     {
-        
+
         $rules = [
             'portfolio_id' => ['required', 'exists:portfolios,id'],
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => ['required', 'string', 'in:BUY,SELL'],
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:' . now()->format('Y-m-d')],
+            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->format('Y-m-d')],
             'quantity' => [
-                'required', 
-                'numeric', 
-                'min:0', 
+                'required',
+                'numeric',
+                'min:0',
                 new QuantityValidationRule(
                     $this->input('portfolio'),
                     $this->requestOrModelValue('symbol', 'transaction'),
                     $this->requestOrModelValue('transaction_type', 'transaction'),
                     $this->requestOrModelValue('date', 'transaction')
-                )
+                ),
             ],
             'cost_basis' => ['exclude_if:transaction_type,SELL', 'min:0', 'numeric'],
             'sale_price' => ['exclude_if:transaction_type,BUY', 'min:0', 'numeric'],
         ];
 
-        if (!is_null($this->transaction)) {
+        if (! is_null($this->transaction)) {
             $rules['portfolio_id'][0] = 'sometimes';
             $rules['symbol'][0] = 'sometimes';
             $rules['transaction_type'][0] = 'sometimes';
@@ -64,7 +62,7 @@ class TransactionRequest extends FormRequest
             ) {
                 $rules['cost_basis'][0] = 'required';
             }
-        } 
+        }
 
         return $rules;
     }

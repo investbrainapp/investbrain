@@ -41,7 +41,7 @@ return [
         'redirect' => '/auth/github/callback',
         'logo' => 'github-icon',
         'color' => '#393939',
-        'name' => 'GitHub'
+        'name' => 'GitHub',
     ],
 
     'google' => [
@@ -49,7 +49,7 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => '/auth/google/callback',
         'color' => '#4285F4',
-        'name' => 'Google'
+        'name' => 'Google',
     ],
 
     'facebook' => [
@@ -57,7 +57,7 @@ return [
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
         'redirect' => '/auth/facebook/callback',
         'color' => '#0165E1',
-        'name' => 'Facebook'
+        'name' => 'Facebook',
     ],
 
     'linkedin-openid' => [
@@ -65,10 +65,10 @@ return [
         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
         'redirect' => '/auth/linkedin-openid/callback',
         'color' => '#0a66c2',
-        'name' => 'Linkedin'
+        'name' => 'Linkedin',
     ],
 
     //
     'enabled_login_providers' => env('ENABLED_LOGIN_PROVIDERS', ''),
-    'ai_chat_enabled' => env('AI_CHAT_ENABLED', false)
+    'ai_chat_enabled' => env('AI_CHAT_ENABLED', false),
 ];

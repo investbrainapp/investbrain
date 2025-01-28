@@ -4,13 +4,13 @@ namespace App\Interfaces\MarketData\Types;
 
 use DateTime;
 use Illuminate\Support\Carbon;
-use App\Interfaces\MarketData\Types\MarketDataType;
 
 class Split extends MarketDataType
 {
     public function setSymbol(string $symbol): self
     {
         $this->items['symbol'] = $symbol;
+
         return $this;
     }
 
@@ -22,6 +22,7 @@ class Split extends MarketDataType
     public function setSplitAmount($splitAmount): self
     {
         $this->items['split_amount'] = (float) $splitAmount;
+
         return $this;
     }
 
@@ -30,9 +31,10 @@ class Split extends MarketDataType
         return $this->items['split_amount'] ?? 0.0;
     }
 
-    public function setDate(String|DateTime $date): self
+    public function setDate(string|DateTime $date): self
     {
         $this->items['date'] = Carbon::parse($date)->format('Y-m-d H:i:s');
+
         return $this;
     }
 

@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
-use App\Models\User;
 use App\Models\ConnectedAccount;
-use Illuminate\Support\MessageBag;
+use App\Models\User;
+use App\Notifications\VerifyConnectedAccountNotification;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\MessageBag;
 use Laravel\Socialite\Facades\Socialite;
-use App\Notifications\VerifyConnectedAccountNotification;
 
 class ConnectedAccountController extends Controller
 {
-
     /**
      * Redirect the user to the GitHub authentication page.
-     *
      */
     public function redirectToProvider(string $provider)
     {
@@ -27,7 +25,6 @@ class ConnectedAccountController extends Controller
 
     /**
      * Obtain the user information from GitHub.
-     *
      */
     public function handleProviderCallback(string $provider)
     {
@@ -44,21 +41,21 @@ class ConnectedAccountController extends Controller
         }
 
         // check if this account is already linked
-        $connected_account = ConnectedAccount::firstOrNew([ 
+        $connected_account = ConnectedAccount::firstOrNew([
             'provider' => $provider,
-            'provider_id' => $providerUser->id
+            'provider_id' => $providerUser->id,
         ], [
             'token' => $providerUser->token,
             'secret' => $providerUser->tokenSecret,
             'refresh_token' => $providerUser->refreshToken,
             'expires_at' => $providerUser->expiresIn,
-            'verified_at' => false
+            'verified_at' => false,
         ]);
 
         // already linked and verified, let's go login!
         if (
-            $connected_account->exists 
-            && !is_null($connected_account->verified_at)
+            $connected_account->exists
+            && ! is_null($connected_account->verified_at)
         ) {
 
             Auth::login($connected_account->user, true);
@@ -67,20 +64,20 @@ class ConnectedAccountController extends Controller
         }
 
         // new user, let's create one
-        if (!$user = User::where('email', $providerUser->email)->first()) {
+        if (! $user = User::where('email', $providerUser->email)->first()) {
 
             $user = User::create([
                 'name' => $providerUser->name,
                 'email' => $providerUser->email,
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
             ]);
-    
+
             $connected_account->user_id = $user->id;
             $connected_account->verified_at = now();
             $connected_account->save();
-    
+
             Auth::login($user, true);
-    
+
             return redirect(route('dashboard'));
         }
 
@@ -91,23 +88,23 @@ class ConnectedAccountController extends Controller
         $user->notify(new VerifyConnectedAccountNotification($connected_account->id));
 
         return redirect(route('login'))
-                ->with('status', __(
-                    'Account already exists. Check your email to connect your :provider account.', 
-                    ['provider' => config("services.$provider.name")]
-                ));
+            ->with('status', __(
+                'Account already exists. Check your email to connect your :provider account.',
+                ['provider' => config("services.$provider.name")]
+            ));
     }
 
     protected function validateProvider($provider): void
     {
-        if (!in_array($provider, explode(',', config('services.enabled_login_providers')))) {
-            
+        if (! in_array($provider, explode(',', config('services.enabled_login_providers')))) {
+
             throw new Exception('Please provide a valid social provider.');
         }
     }
 
     public function verify(ConnectedAccount $connected_account)
     {
-        if (!$connected_account->verified_at) {
+        if (! $connected_account->verified_at) {
 
             // mark request as verified
             $connected_account->verified_at = now();
@@ -127,8 +124,8 @@ class ConnectedAccountController extends Controller
                 'css' => 'alert-success',
                 'icon' => Blade::render("<x-mary-icon class='w-7 h-7' name='o-check-circle' />"),
                 'position' => 'toast-top toast-end',
-                'timeout' => '5000'
-            ]
+                'timeout' => '5000',
+            ],
         ]));
     }
 }

@@ -2,11 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\FormRequest;
-
 class PortfolioRequest extends FormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -21,9 +18,9 @@ class PortfolioRequest extends FormRequest
             'wishlist' => ['sometimes', 'nullable', 'boolean'],
         ];
 
-        if (!is_null($this->portfolio)) {
+        if (! is_null($this->portfolio)) {
             $rules['title'][0] = 'sometimes';
-        } 
+        }
 
         return $rules;
     }

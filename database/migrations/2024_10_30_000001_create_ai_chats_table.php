@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Builder;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Support\Facades\Schema;
 
 class CreateAiChatsTable extends Migration
 {
@@ -18,7 +18,7 @@ class CreateAiChatsTable extends Migration
         Builder::morphUsingUuids();
 
         Schema::create('ai_chats', function (Blueprint $table) {
-            $table->uuid('id')->primary(); 
+            $table->uuid('id')->primary();
             $table->foreignIdFor(User::class, 'user_id')->constrained()->onDelete('cascade');
             $table->morphs('chatable');
             $table->string('role');

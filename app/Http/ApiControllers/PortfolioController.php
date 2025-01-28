@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\ApiControllers;
 
-use App\Models\Portfolio;
-use Illuminate\Support\Facades\Gate;
-use HackerEsq\FilterModels\FilterModels;
-use App\Http\Resources\PortfolioResource;
-use App\Http\Requests\PortfolioRequest;
 use App\Http\ApiControllers\Controller as ApiController;
+use App\Http\Requests\PortfolioRequest;
+use App\Http\Resources\PortfolioResource;
+use App\Models\Portfolio;
+use HackerEsq\FilterModels\FilterModels;
+use Illuminate\Support\Facades\Gate;
 
 class PortfolioController extends ApiController
 {
@@ -27,7 +27,7 @@ class PortfolioController extends ApiController
     public function store(PortfolioRequest $request)
     {
         $portfolio = Portfolio::create($request->validated());
-        
+
         return PortfolioResource::make($portfolio);
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits; 
+namespace App\Traits;
 
 trait HasCompositePrimaryKey
 {
@@ -17,17 +17,18 @@ trait HasCompositePrimaryKey
     /**
      * Set the keys for a save update query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function setKeysForSaveQuery($query)
     {
         foreach ($this->getKeyName() as $key) {
             // UPDATE: Added isset() per devflow's comment.
-            if (isset($this->$key))
+            if (isset($this->$key)) {
                 $query->where($key, '=', $this->$key);
-            else
-                throw new \Exception(__METHOD__ . 'Missing part of the primary key: ' . $key);
+            } else {
+                throw new \Exception(__METHOD__.'Missing part of the primary key: '.$key);
+            }
         }
 
         return $query;
@@ -37,7 +38,7 @@ trait HasCompositePrimaryKey
     /**
      * Execute a query for a single record by ID.
      *
-     * @param  array  $ids Array of keys, like [column => value].
+     * @param  array  $ids  Array of keys, like [column => value].
      * @param  array  $columns
      * @return mixed|static
      */
@@ -48,6 +49,7 @@ trait HasCompositePrimaryKey
         foreach ($me->getKeyName() as $key) {
             $query->where($key, '=', $ids[$key]);
         }
+
         return $query->first($columns);
     }
 }

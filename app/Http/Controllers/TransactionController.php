@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 class TransactionController extends Controller
 {
-
     /**
      * Display the specified resource.
      */

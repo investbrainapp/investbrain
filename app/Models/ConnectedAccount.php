@@ -29,7 +29,7 @@ class ConnectedAccount extends Model
     ];
 
     protected $with = [
-        'user'
+        'user',
     ];
 
     /**

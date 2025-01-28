@@ -2,12 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Models\User;
-use App\Models\Portfolio;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ImportSucceededNotification extends Notification implements ShouldQueue
 {
@@ -16,7 +14,7 @@ class ImportSucceededNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct() { }
+    public function __construct() {}
 
     /**
      * Get the notification's delivery channels.
@@ -34,10 +32,10 @@ class ImportSucceededNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->greeting('Woot! 🎉')
-                    ->subject("Your Investbrain import was successful!")
-                    ->line("Just a heads up that your Investbrain import succeeded! Your portfolios, transactions, and daily changes are now available in your account.")
-                    ->action("Get Started", route('dashboard'));
+            ->greeting('Woot! 🎉')
+            ->subject('Your Investbrain import was successful!')
+            ->line('Just a heads up that your Investbrain import succeeded! Your portfolios, transactions, and daily changes are now available in your account.')
+            ->action('Get Started', route('dashboard'));
     }
 
     /**

@@ -11,7 +11,7 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
 {
     public function __construct(
         public bool $empty = false
-    ) { }
+    ) {}
 
     public function headings(): array
     {
@@ -23,21 +23,18 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
             'Total Gain',
             'Total Dividends Earned',
             'Realized Gains',
-            'Annotation'
+            'Annotation',
         ];
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return $this->empty ? collect() : DailyChange::myDailyChanges()->get();
     }
 
-     /**
-     * @return string
-     */
     public function title(): string
     {
         return 'Daily Changes';

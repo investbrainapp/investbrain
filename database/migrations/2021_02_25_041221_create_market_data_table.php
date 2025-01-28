@@ -1,10 +1,10 @@
 <?php
 
 use Database\Seeders\MarketDataSeeder;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMarketDataTable extends Migration
 {
@@ -34,7 +34,7 @@ class CreateMarketDataTable extends Migration
 
         Artisan::call('db:seed', [
             '--class' => MarketDataSeeder::class,
-            '--force' => true
+            '--force' => true,
         ]);
     }
 

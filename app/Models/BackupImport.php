@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Database\Eloquent\Model;
-use App\Imports\BackupImport as BackupImportExcel;
 use App\Jobs\BackupImportJob;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
 
 class BackupImport extends Model
 {
@@ -20,7 +18,7 @@ class BackupImport extends Model
         'status', // pending, in_progress, success, failed
         'message', // Import starting, Import is in progress, Importing portfolios, Importing transactions, Importing daily changes, Import completed successfully
         'has_errors',
-        'completed_at'
+        'completed_at',
     ];
 
     protected static function boot()
@@ -32,9 +30,9 @@ class BackupImport extends Model
             $import->status = 'pending';
             $import->message = __('Import starting...');
         });
-        
+
         static::created(function ($import) {
-            
+
             BackupImportJob::dispatch($import);
         });
     }
@@ -47,7 +45,7 @@ class BackupImport extends Model
     {
         return [
             'has_errors' => 'boolean',
-            'completed_at' => 'datetime'
+            'completed_at' => 'datetime',
         ];
     }
 }

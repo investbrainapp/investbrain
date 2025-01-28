@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HoldingController;
+use App\Http\Controllers\ConnectedAccountController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HoldingController;
+use App\Http\Controllers\InvitedOnboardingController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\ConnectedAccountController;
-use App\Http\Controllers\InvitedOnboardingController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
 use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
 Route::get('/', function () {
-    if (!config('investbrain.self_hosted', true) && View::exists('landing-page::index')) {
-        
+    if (! config('investbrain.self_hosted', true) && View::exists('landing-page::index')) {
+
         return view('landing-page::index');
     }
 

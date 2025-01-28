@@ -1,5 +1,5 @@
 <?php
- 
+
 // if (!function_exists('formatMoney')) {
 //     /**
 //      * Returns a formatted string for currency

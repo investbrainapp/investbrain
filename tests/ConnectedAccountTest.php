@@ -2,13 +2,12 @@
 
 namespace Tests;
 
-use Tests\TestCase;
-use App\Models\User;
+use App\Http\Controllers\ConnectedAccountController;
 use App\Models\ConnectedAccount;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Http\Controllers\ConnectedAccountController;
 
 class ConnectedAccountTest extends TestCase
 {
@@ -19,7 +18,7 @@ class ConnectedAccountTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->controller = new ConnectedAccountController();
+        $this->controller = new ConnectedAccountController;
     }
 
     public function test_handle_provider_callback_with_already_connected_account()
@@ -33,7 +32,7 @@ class ConnectedAccountTest extends TestCase
             'email' => 'alice@example.com',
             'email_verified_at' => now(),
         ]);
-        $providerUser = (object)[
+        $providerUser = (object) [
             'id' => '67890',
             'name' => 'Alice Smith',
             'email' => 'alice@example.com',
@@ -47,9 +46,9 @@ class ConnectedAccountTest extends TestCase
             'provider_id' => $providerUser->id,
             'user_id' => $user->id,
             'token' => $providerUser->token,
-            'verified_at' => now()
+            'verified_at' => now(),
         ]);
-        
+
         Socialite::shouldReceive('driver')
             ->with($provider)
             ->andReturnSelf()
@@ -68,7 +67,7 @@ class ConnectedAccountTest extends TestCase
     {
         $provider = 'github';
         config(['services.enabled_login_providers' => 'github,google']);
-        $providerUser = (object)[
+        $providerUser = (object) [
             'id' => '12345',
             'name' => 'John Doe',
             'email' => 'john@example.com',
@@ -109,7 +108,7 @@ class ConnectedAccountTest extends TestCase
             'email' => 'jane@example.com',
             'email_verified_at' => now(),
         ]);
-        $providerUser = (object)[
+        $providerUser = (object) [
             'id' => '54321',
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',
@@ -164,5 +163,4 @@ class ConnectedAccountTest extends TestCase
         $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('toast');
     }
-
 }

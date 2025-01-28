@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Transaction;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Split extends Model
 {
@@ -28,22 +27,23 @@ class Split extends Model
         'last_date' => 'datetime',
     ];
 
-    public function holdings() {
+    public function holdings()
+    {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');
     }
 
-    public function transactions() {
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }
 
     /**
      * Grab new split data
      *
-     * @param string $symbol
-     * @param \DateTimeInterface|null $start_date
+     * @param  \DateTimeInterface|null  $start_date
      * @return void
      */
-    public static function refreshSplitData(string $symbol) 
+    public static function refreshSplitData(string $symbol)
     {
         // dates for split data
         $splits_meta = self::where(['symbol' => $symbol])
@@ -58,9 +58,9 @@ class Split extends Model
 
         // nope, need to populate newer split data
         if ($splits_meta->total_splits) {
-            
+
             $start_date = $splits_meta->last_date->addHours(48);
-            $end_date =  now();
+            $end_date = now();
         }
 
         // get some data
@@ -71,10 +71,10 @@ class Split extends Model
         if ($split_data->isNotEmpty()) {
 
             // insert records
-            (new self)->insert($split_data->map(function($split) {
+            (new self)->insert($split_data->map(function ($split) {
 
                 return [...$split, ...['id' => Str::uuid()->toString()]];
-            })->toArray());   
+            })->toArray());
         }
 
         // sync to transactions
@@ -84,39 +84,39 @@ class Split extends Model
     /**
      * Syncs all transactions of symbol with split data
      *
-     * @param string $symbol
+     * @param  string  $symbol
      * @return void
      */
-    public static function syncToTransactions($symbol) 
+    public static function syncToTransactions($symbol)
     {
         // get splits joined with matching holdings
         $splits = self::select([
-                        'splits.date', 
-                        'splits.symbol', 
-                        'splits.split_amount', 
-                        'holdings.portfolio_id'
-                    ])
-                    ->where([
-                        'splits.symbol' => $symbol,
-                    ])
-                    ->whereDate('splits.date', '>', DB::raw('IFNULL(holdings.splits_synced_at, "0000-00-00")'))
-                    ->where('holdings.quantity', '>', 0)
-                    ->join('holdings', 'splits.symbol', 'holdings.symbol')
-                    ->orderBy('splits.date', 'ASC')
-                    ->get();
+            'splits.date',
+            'splits.symbol',
+            'splits.split_amount',
+            'holdings.portfolio_id',
+        ])
+            ->where([
+                'splits.symbol' => $symbol,
+            ])
+            ->whereDate('splits.date', '>', DB::raw('IFNULL(holdings.splits_synced_at, "0000-00-00")'))
+            ->where('holdings.quantity', '>', 0)
+            ->join('holdings', 'splits.symbol', 'holdings.symbol')
+            ->orderBy('splits.date', 'ASC')
+            ->get();
 
-        foreach($splits as $split) {
+        foreach ($splits as $split) {
 
             // get qty owned when split was issued
             $qty_owned = Transaction::where([
-                    'symbol' => $split->symbol, 
-                    'portfolio_id' => $split->portfolio_id
-                ])
+                'symbol' => $split->symbol,
+                'portfolio_id' => $split->portfolio_id,
+            ])
                 ->whereDate('transactions.date', '<', $split->date->format('Y-m-d'))
                 ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) -
                             SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS qty_owned')
                 ->value('qty_owned');
-                
+
             if ($qty_owned > 0) {
 
                 Transaction::create([
@@ -128,14 +128,14 @@ class Split extends Model
                     'cost_basis' => 0,
                     'split' => true,
                     'created_at' => now(),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
 
                 Holding::where([
                     'symbol' => $split->symbol,
-                    'portfolio_id' => $split->portfolio_id
+                    'portfolio_id' => $split->portfolio_id,
                 ])->update([
-                    'splits_synced_at' => now()
+                    'splits_synced_at' => now(),
                 ]);
             }
         }

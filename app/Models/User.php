@@ -3,27 +3,27 @@
 namespace App\Models;
 
 use App\Traits\HasConnectedAccounts;
-use Laravel\Sanctum\HasApiTokens;
-use Laravel\Jetstream\HasProfilePhoto;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Sanctum\HasApiTokens;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
+    use HasConnectedAccounts;
     use HasFactory;
     use HasProfilePhoto;
+    use HasRelationships;
+    use HasUuids;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    use HasUuids;
-    use HasRelationships;
-    use HasConnectedAccounts;
 
     protected $fillable = [
         'name',
@@ -65,7 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasManyDeep(Holding::class, ['portfolio_user', Portfolio::class])
             ->withMarketData()
-            ->withPerformance();    
+            ->withPerformance();
     }
 
     public function transactions(): HasManyDeep
@@ -78,6 +78,6 @@ class User extends Authenticatable implements MustVerifyEmail
                     WHEN transaction_type = \'SELL\' 
                     THEN COALESCE(transactions.sale_price - transactions.cost_basis, 0)
                     ELSE COALESCE(market_data.market_value - transactions.cost_basis, 0)
-                END AS gain_dollars');   
+                END AS gain_dollars');
     }
 }

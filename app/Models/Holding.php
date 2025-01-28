@@ -2,16 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Split;
-use App\Models\AiChat;
-use App\Models\Dividend;
-use App\Models\Portfolio;
-use App\Models\MarketData;
-use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Holding extends Model
 {
@@ -27,13 +21,13 @@ class Holding extends Model
         'realized_gain_dollars',
         'dividends_earned',
         'splits_synced_at',
-        'reinvest_dividends'
+        'reinvest_dividends',
     ];
 
     protected $casts = [
         'splits_synced_at' => 'datetime',
         'first_transaction_date' => 'datetime',
-        'reinvest_dividends' => 'boolean'
+        'reinvest_dividends' => 'boolean',
     ];
 
     /**
@@ -41,7 +35,7 @@ class Holding extends Model
      *
      * @return void
      */
-    public function market_data() 
+    public function market_data()
     {
         return $this->hasOne(MarketData::class, 'symbol', 'symbol');
     }
@@ -51,7 +45,7 @@ class Holding extends Model
      *
      * @return void
      */
-    public function transactions() 
+    public function transactions()
     {
         return $this->hasManyThrough(Transaction::class, Portfolio::class, 'id', 'portfolio_id', 'portfolio_id', 'id')->orderBy('date', 'DESC');
     }
@@ -61,11 +55,11 @@ class Holding extends Model
      *
      * @return void
      */
-    public function dividends() 
+    public function dividends()
     {
         return $this->hasMany(Dividend::class, 'symbol', 'symbol')
-                ->select(['dividends.symbol','dividends.date','dividends.dividend_amount'])
-                ->selectRaw("SUM(
+            ->select(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount'])
+            ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'BUY' 
                         AND transactions.symbol = dividends.symbol 
                         AND transactions.portfolio_id = '$this->portfolio_id'
@@ -73,7 +67,7 @@ class Holding extends Model
                     THEN transactions.quantity
                     ELSE 0 END
                 ) AS purchased")
-                ->selectRaw("SUM(
+            ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'SELL'
                         AND transactions.symbol = dividends.symbol 
                         AND transactions.portfolio_id = '$this->portfolio_id' 
@@ -81,7 +75,7 @@ class Holding extends Model
                     THEN transactions.quantity
                     ELSE 0 END
                 ) AS sold")
-                ->selectRaw("SUM(
+            ->selectRaw("SUM(
                     (CASE WHEN transaction_type = 'BUY' 
                         AND transactions.symbol = dividends.symbol 
                         AND transactions.portfolio_id = '$this->portfolio_id'
@@ -94,16 +88,16 @@ class Holding extends Model
                         THEN transactions.quantity ELSE 0 END)
                     * dividends.dividend_amount
                 ) AS total_received")
-                ->join('transactions', 'transactions.symbol', 'dividends.symbol')
-                ->groupBy(['dividends.symbol','dividends.date','dividends.dividend_amount'])
-                ->orderBy('dividends.date', 'DESC')
-                ->where('dividends.date', '>=', function ($query) {
-                    $query->selectRaw('min(transactions.date)')
-                        ->from('transactions')
-                        ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
-                        ->whereRaw("transactions.symbol = '$this->symbol'");
-                })
-                ->having('total_received', '>', 0);
+            ->join('transactions', 'transactions.symbol', 'dividends.symbol')
+            ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount'])
+            ->orderBy('dividends.date', 'DESC')
+            ->where('dividends.date', '>=', function ($query) {
+                $query->selectRaw('min(transactions.date)')
+                    ->from('transactions')
+                    ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
+                    ->whereRaw("transactions.symbol = '$this->symbol'");
+            })
+            ->having('total_received', '>', 0);
     }
 
     /**
@@ -111,7 +105,7 @@ class Holding extends Model
      *
      * @return void
      */
-    public function portfolio() 
+    public function portfolio()
     {
         return $this->belongsTo(Portfolio::class);
     }
@@ -121,7 +115,7 @@ class Holding extends Model
      *
      * @return void
      */
-    public function splits() 
+    public function splits()
     {
         return $this->hasMany(Split::class, 'symbol', 'symbol')
             ->orderBy('date', 'DESC');
@@ -140,11 +134,11 @@ class Holding extends Model
     public function scopeWithMarketData($query)
     {
         return $query->withAggregate('market_data', 'name')
-                    ->withAggregate('market_data', 'market_value')
-                    ->withAggregate('market_data', 'fifty_two_week_low')
-                    ->withAggregate('market_data', 'fifty_two_week_high')
-                    ->withAggregate('market_data', 'updated_at')
-                    ->join('market_data', 'holdings.symbol', 'market_data.symbol');
+            ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'fifty_two_week_low')
+            ->withAggregate('market_data', 'fifty_two_week_high')
+            ->withAggregate('market_data', 'updated_at')
+            ->join('market_data', 'holdings.symbol', 'market_data.symbol');
     }
 
     public function scopeWithPerformance($query)
@@ -164,49 +158,50 @@ class Holding extends Model
         return $query->where('holdings.symbol', $symbol);
     }
 
-    public function scopeWithoutWishlists($query) {
+    public function scopeWithoutWishlists($query)
+    {
         return $query->whereHas('portfolio', function ($query) {
-                $query->where('portfolios.wishlist', 0);
-            });
+            $query->where('portfolios.wishlist', 0);
+        });
     }
 
     public function scopeMyHoldings($query, $userId = null)
     {
-        return $query->whereHas('portfolio', function($query) use ($userId) {
+        return $query->whereHas('portfolio', function ($query) use ($userId) {
             $query->whereRelation('users', 'id', $userId ?? auth()->user()->id);
         });
     }
 
-    public function scopeWithPortfolioMetrics($query) 
+    public function scopeWithPortfolioMetrics($query)
     {
         return $query->selectRaw('COALESCE(SUM(holdings.dividends_earned), 0) AS total_dividends_earned')
-                    ->selectRaw('COALESCE(SUM(holdings.realized_gain_dollars), 0) AS realized_gain_dollars')
-                    ->selectRaw('COALESCE(SUM(holdings.quantity * market_data.market_value), 0) AS total_market_value')
-                    ->selectRaw('COALESCE(SUM(holdings.total_cost_basis), 0) AS total_cost_basis')
-                    ->selectRaw('COALESCE(SUM(holdings.quantity * market_data.market_value), 0) - COALESCE(SUM(holdings.total_cost_basis), 0) AS total_gain_dollars')
+            ->selectRaw('COALESCE(SUM(holdings.realized_gain_dollars), 0) AS realized_gain_dollars')
+            ->selectRaw('COALESCE(SUM(holdings.quantity * market_data.market_value), 0) AS total_market_value')
+            ->selectRaw('COALESCE(SUM(holdings.total_cost_basis), 0) AS total_cost_basis')
+            ->selectRaw('COALESCE(SUM(holdings.quantity * market_data.market_value), 0) - COALESCE(SUM(holdings.total_cost_basis), 0) AS total_gain_dollars')
                     // ->selectRaw('COALESCE((@total_gain_dollars / @sum_total_cost_basis) * 100,0) AS total_gain_percent')
-                    ->join('market_data', 'market_data.symbol', '=', 'holdings.symbol');            
+            ->join('market_data', 'market_data.symbol', '=', 'holdings.symbol');
     }
 
     public function syncTransactionsAndDividends()
     {
         // pull existing transaction data
         $query = Transaction::where([
-                            'portfolio_id' => $this->portfolio_id,
-                            'symbol' => $this->symbol,
-                        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
-                        ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
-                        ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `total_cost_basis`')
-                        ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS `total_sale_price`')
-                        ->first();
+            'portfolio_id' => $this->portfolio_id,
+            'symbol' => $this->symbol,
+        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `total_cost_basis`')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS `total_sale_price`')
+            ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
 
         $average_cost_basis = (
-                                $query->qty_purchases > 0 
-                                && $total_quantity > 0
-                              )
-                                    ? $query->total_cost_basis / $query->qty_purchases 
+            $query->qty_purchases > 0
+            && $total_quantity > 0
+        )
+                                    ? $query->total_cost_basis / $query->qty_purchases
                                     : 0;
 
         // update holding
@@ -214,18 +209,20 @@ class Holding extends Model
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->qty_purchases > 0 && $query->total_sale_price > 0 
-                    ? $query->total_sale_price - ($query->qty_sales * ($query->total_cost_basis / $query->qty_purchases)) 
+            'realized_gain_dollars' => $query->qty_purchases > 0 && $query->total_sale_price > 0
+                    ? $query->total_sale_price - ($query->qty_sales * ($query->total_cost_basis / $query->qty_purchases))
                     : 0,
-            'dividends_earned' => $this->dividends->sum('total_received')
+            'dividends_earned' => $this->dividends->sum('total_received'),
         ]);
 
         $this->save();
     }
 
-    public function qtyOwned(\Illuminate\Support\Carbon $date = null)
+    public function qtyOwned(?\Illuminate\Support\Carbon $date = null)
     {
-        if ($date == null) $date = now();
+        if ($date == null) {
+            $date = now();
+        }
 
         $transactions = $this->transactions->where('date', '<=', $date);
 
@@ -237,16 +234,20 @@ class Holding extends Model
     }
 
     public function dailyPerformance(
-        \Illuminate\Support\Carbon $start_date = null, 
-        \Illuminate\Support\Carbon $end_date = null, 
+        ?\Illuminate\Support\Carbon $start_date = null,
+        ?\Illuminate\Support\Carbon $end_date = null,
     ) {
-        if ($start_date == null) $start_date = now();
-        if ($end_date == null) $end_date = now();
+        if ($start_date == null) {
+            $start_date = now();
+        }
+        if ($end_date == null) {
+            $end_date = now();
+        }
 
-        $date_interval = "DATE_ADD(date, INTERVAL 1 DAY)";
+        $date_interval = 'DATE_ADD(date, INTERVAL 1 DAY)';
 
         if (config('database.default') === 'sqlite') {
-            
+
             $date_interval = "date(date, '+1 day')";
         } else {
 
@@ -265,14 +266,14 @@ class Holding extends Model
                 FROM date_series
             ) as date_series")
         )
-        ->select([
-            'date_series.date',
-            DB::raw("
+            ->select([
+                'date_series.date',
+                DB::raw("
                 ROUND(
                 COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
                 COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS `owned`
             "),
-            DB::raw("
+                DB::raw("
                COALESCE(CASE 
                     WHEN (
                         ROUND(
@@ -285,29 +286,30 @@ class Holding extends Model
                     END)
                 END, 0) AS cost_basis
             "),
-            DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS `realized_gains`")
-        ])
-        ->leftJoin('transactions', function ($join) {
-            $join->on(DB::raw('DATE(transactions.date)'), '<=', 'date_series.date')
-                ->where('transactions.symbol', '=', $this->symbol)
-                ->where('transactions.portfolio_id', '=', $this->portfolio_id);
-        })
-        ->groupBy('date_series.date')
-        ->orderBy('date_series.date')
-        ->get()
-        ->keyBy('date');
+                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS `realized_gains`"),
+            ])
+            ->leftJoin('transactions', function ($join) {
+                $join->on(DB::raw('DATE(transactions.date)'), '<=', 'date_series.date')
+                    ->where('transactions.symbol', '=', $this->symbol)
+                    ->where('transactions.portfolio_id', '=', $this->portfolio_id);
+            })
+            ->groupBy('date_series.date')
+            ->orderBy('date_series.date')
+            ->get()
+            ->keyBy('date');
     }
 
     public function getFormattedTransactions()
     {
         $formattedTransactions = '';
-        foreach($this->transactions->sortByDesc('date') as $transaction) {
-            $formattedTransactions .= " * ".$transaction->date->format('Y-m-d') 
-                                    ." ". $transaction->transaction_type 
-                                    ." ". $transaction->quantity
-                                    ." @ ". $transaction->cost_basis 
+        foreach ($this->transactions->sortByDesc('date') as $transaction) {
+            $formattedTransactions .= ' * '.$transaction->date->format('Y-m-d')
+                                    .' '.$transaction->transaction_type
+                                    .' '.$transaction->quantity
+                                    .' @ '.$transaction->cost_basis
                                     ." each \n\n";
         }
+
         return $formattedTransactions;
     }
 }

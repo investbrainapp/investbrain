@@ -3,15 +3,15 @@
 namespace App\Exports\Sheets;
 
 use App\Models\Transaction;
-use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithTitle;
 
 class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
 {
     public function __construct(
         public bool $empty = false
-    ) { }
+    ) {}
 
     public function headings(): array
     {
@@ -27,21 +27,18 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
             'Reinvested Dividend',
             'Date',
             'Created',
-            'Updated'
+            'Updated',
         ];
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return $this->empty ? collect() : Transaction::myTransactions()->get();
     }
 
-     /**
-     * @return string
-     */
     public function title(): string
     {
         return 'Transactions';

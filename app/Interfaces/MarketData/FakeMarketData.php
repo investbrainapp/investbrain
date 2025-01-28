@@ -2,22 +2,22 @@
 
 namespace App\Interfaces\MarketData;
 
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
+use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class FakeMarketData implements MarketDataInterface
 {
-    public function exists(String $symbol): Bool
+    public function exists(string $symbol): bool
     {
 
         return true;
     }
 
-    public function quote(String $symbol): Quote
+    public function quote(string $symbol): Quote
     {
 
         return new Quote([
@@ -31,11 +31,11 @@ class FakeMarketData implements MarketDataInterface
             'market_cap' => 9800700600,
             'book_value' => 4.7,
             'last_dividend_date' => now()->subDays(45),
-            'dividend_yield' => 0.033
+            'dividend_yield' => 0.033,
         ]);
     }
 
-    public function dividends(String $symbol, $startDate, $endDate): Collection
+    public function dividends(string $symbol, $startDate, $endDate): Collection
     {
 
         return collect([
@@ -57,23 +57,23 @@ class FakeMarketData implements MarketDataInterface
         ]);
     }
 
-    public function splits(String $symbol, $startDate, $endDate): Collection
-    {   
+    public function splits(string $symbol, $startDate, $endDate): Collection
+    {
 
         return collect([
             new Split([
                 'symbol' => $symbol,
                 'date' => now()->subMonths(36),
                 'split_amount' => 10,
-            ])
+            ]),
         ]);
     }
 
-    public function history(String $symbol, $startDate, $endDate): Collection
+    public function history(string $symbol, $startDate, $endDate): Collection
     {
         $numDays = Carbon::parse($startDate)->diffInDays($endDate, true);
 
-        for ($i = 0; $i < $numDays; $i++) { 
+        for ($i = 0; $i < $numDays; $i++) {
 
             $date = now()->subDays($i)->format('Y-m-d');
 
@@ -83,7 +83,7 @@ class FakeMarketData implements MarketDataInterface
                 'close' => rand(150, 400),
             ]);
         }
-        
+
         return collect($series);
     }
 }

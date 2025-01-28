@@ -47,7 +47,7 @@ class SyncHoldingData extends Command
         }
 
         foreach ($holdings->get() as $holding) {
-            $this->line('Refreshing ' . $holding->symbol);
+            $this->line('Refreshing '.$holding->symbol);
 
             $holding->syncTransactionsAndDividends();
         }

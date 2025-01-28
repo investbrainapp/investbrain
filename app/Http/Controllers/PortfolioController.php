@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Gate;
 
 class PortfolioController extends Controller
 {
-
     /**
      * Show the form for creating a new resource.
      */
@@ -26,21 +25,21 @@ class PortfolioController extends Controller
         Gate::authorize('readOnly', $portfolio);
 
         $portfolio->load(['transactions', 'holdings']);
-        
+
         // get portfolio metrics
         $metrics = cache()->remember(
-            'portfolio-metrics-' . $portfolio->id, 
-            60, 
+            'portfolio-metrics-'.$portfolio->id,
+            60,
             function () use ($portfolio) {
                 return Holding::query()
-                        ->portfolio($portfolio->id)
-                        ->withPortfolioMetrics()
-                        ->first();
+                    ->portfolio($portfolio->id)
+                    ->withPortfolioMetrics()
+                    ->first();
             }
         );
 
         $formattedHoldings = $portfolio->getFormattedHoldings();
-        
+
         return view('portfolio.show', compact(['portfolio', 'metrics', 'formattedHoldings']));
     }
 }

@@ -5,7 +5,6 @@ namespace Tests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
-use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {

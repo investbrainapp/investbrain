@@ -3,42 +3,38 @@
 namespace App\Imports\Sheets;
 
 use App\Imports\ValidatesPortfolioAccess;
+use App\Models\BackupImport;
 use App\Models\Holding;
 use App\Models\Transaction;
-use Illuminate\Support\Str;
-use App\Models\BackupImport;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Events\BeforeSheet;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\ToCollection;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Events\BeforeSheet;
 
-class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows, WithEvents
+class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadingRow, WithValidation
 {
-
     use ValidatesPortfolioAccess;
 
     public function __construct(
         public BackupImport $backupImport
-    ) { }
+    ) {}
 
-    /**
-     * @return array
-     */
     public function registerEvents(): array
     {
         return [
-            BeforeSheet::class => function(BeforeSheet $event) {
+            BeforeSheet::class => function (BeforeSheet $event) {
                 DB::commit();
                 $this->backupImport->update([
                     'message' => __('Importing transactions...'),
                 ]);
                 DB::beginTransaction();
-            }
+            },
         ];
     }
 
@@ -62,7 +58,7 @@ class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation,
                     'sale_price' => $transaction['sale_price'],
                     'split' => boolval($transaction['split']) ? 1 : 0,
                     'reinvested_dividend' => boolval($transaction['reinvested_dividend']) ? 1 : 0,
-                    'date' => Carbon::parse($transaction['date'])->format('Y-m-d')
+                    'date' => Carbon::parse($transaction['date'])->format('Y-m-d'),
                 ];
             });
 
@@ -79,23 +75,23 @@ class TransactionsSheet implements ToCollection, WithHeadingRow, WithValidation,
                     'sale_price',
                     'split',
                     'reinvested_dividend',
-                    'date'
+                    'date',
                 ]
             );
 
             // stub out related holdings
-            $chunk->unique(fn($item) => $item['symbol'] . $item['portfolio_id'])
-                    ->each(function($holding) {
-                        
-                        Holding::firstOrCreate([
-                            'symbol' => $holding['symbol'],
-                            'portfolio_id' => $holding['portfolio_id']
-                        ], [
-                            'quantity' => 0,
-                            'average_cost_basis' => 0,
-                            'splits_synced_at' => now(),
-                        ]);
-                    });
+            $chunk->unique(fn ($item) => $item['symbol'].$item['portfolio_id'])
+                ->each(function ($holding) {
+
+                    Holding::firstOrCreate([
+                        'symbol' => $holding['symbol'],
+                        'portfolio_id' => $holding['portfolio_id'],
+                    ], [
+                        'quantity' => 0,
+                        'average_cost_basis' => 0,
+                        'splits_synced_at' => now(),
+                    ]);
+                });
         });
     }
 

@@ -16,15 +16,15 @@ class DashboardController extends Controller
 
         // get portfolio metrics
         $metrics = cache()->remember(
-            'dashboard-metrics-' . $user->id, 
-            10, 
+            'dashboard-metrics-'.$user->id,
+            10,
             function () {
                 return
                  Holding::query()
-                    ->myHoldings()
-                    ->withoutWishlists()
-                    ->withPortfolioMetrics()
-                    ->first();
+                     ->myHoldings()
+                     ->withoutWishlists()
+                     ->withPortfolioMetrics()
+                     ->first();
             }
         );
 

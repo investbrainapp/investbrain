@@ -2,18 +2,15 @@
 
 namespace App\Interfaces\MarketData\Types;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class MarketDataType extends Collection
 {
-    /**
-     * 
-     */
     public function __construct($items = [])
     {
 
-        foreach($this->getArrayableItems($items) as $key => $value) {
+        foreach ($this->getArrayableItems($items) as $key => $value) {
 
             $this->{$key} = $value;
         }

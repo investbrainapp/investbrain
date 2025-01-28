@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Holding;
-use App\Models\MarketData;
-use App\Models\Transaction;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class Dividend extends Model
 {
@@ -30,15 +27,18 @@ class Dividend extends Model
         'last_dividend_update' => 'datetime',
     ];
 
-    public function marketData() {
+    public function marketData()
+    {
         return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
     }
 
-    public function holdings() {
+    public function holdings()
+    {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');
     }
 
-    public function transactions() {
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }
 
@@ -49,7 +49,6 @@ class Dividend extends Model
 
     /**
      * Grab new dividend data
-     *
      */
     public static function refreshDividendData(string $symbol): void
     {
@@ -64,11 +63,11 @@ class Dividend extends Model
         $end_date = now();
 
         // nope, refresh forward looking only
-        if ( $dividends_meta->total_dividends ) {
-            
+        if ($dividends_meta->total_dividends) {
+
             $start_date = $dividends_meta->last_dividend_update->addHours(24);
         }
-        
+
         // skip refresh if there's already recent data
         if ($start_date->greaterThan($end_date)) {
 
@@ -83,7 +82,7 @@ class Dividend extends Model
         // ah, we found some dividends...
         if ($dividend_data->isNotEmpty()) {
             // create mass insert
-            foreach ($dividend_data as $index => $dividend){
+            foreach ($dividend_data as $index => $dividend) {
                 $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
             }
 
@@ -109,7 +108,7 @@ class Dividend extends Model
     {
         // group by holdings
         $dividends = self::select(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
-                        ->selectRaw('
+            ->selectRaw('
                             (COALESCE(CASE WHEN transactions.transaction_type = "BUY" 
                                 AND date(transactions.date) <= date(dividends.date) 
                                 THEN transactions.quantity ELSE 0 END, 0)
@@ -119,22 +118,22 @@ class Dividend extends Model
                             * dividends.dividend_amount
                                 AS total_received
                         ')
-                        ->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
-                        ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
-                        ->where('dividends.symbol', $symbol)
-                        ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
-                        ->havingRaw('total_received > 0')
-                        ->get();
+            ->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
+            ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
+            ->where('dividends.symbol', $symbol)
+            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
+            ->havingRaw('total_received > 0')
+            ->get();
 
-        // iterate through holdings and update 
+        // iterate through holdings and update
         Holding::where(['symbol' => $symbol])
-                ->get()
-                ->each(function ($holding) use ($dividends) {
-                    $holding->update([
-                        'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
-                                                        ->sum('total_received')
-                    ]);
-                });
+            ->get()
+            ->each(function ($holding) use ($dividends) {
+                $holding->update([
+                    'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
+                        ->sum('total_received'),
+                ]);
+            });
     }
 
     public static function reinvestDividends(iterable $dividend_data, MarketData $market_data): void
@@ -144,21 +143,21 @@ class Dividend extends Model
             'symbol' => $market_data->symbol,
             'reinvest_dividends' => true,
         ])
-        ->get()
-        ->each(function($holding) use ($dividend_data, $market_data) {
+            ->get()
+            ->each(function ($holding) use ($dividend_data, $market_data) {
 
-            foreach($dividend_data as $dividend) {
+                foreach ($dividend_data as $dividend) {
 
-                Transaction::create([
-                    'date' => $dividend['date'],
-                    'portfolio_id' => $holding->portfolio_id,
-                    'symbol' => $holding->symbol,
-                    'transaction_type' => "BUY",
-                    'reinvested_dividend' => true,
-                    'cost_basis' => 0,
-                    'quantity' => ($dividend['dividend_amount'] * $holding->qtyOwned(Carbon::parse($dividend['date']))) / $market_data->market_value,
-                ]);
-            }
-        });
+                    Transaction::create([
+                        'date' => $dividend['date'],
+                        'portfolio_id' => $holding->portfolio_id,
+                        'symbol' => $holding->symbol,
+                        'transaction_type' => 'BUY',
+                        'reinvested_dividend' => true,
+                        'cost_basis' => 0,
+                        'quantity' => ($dividend['dividend_amount'] * $holding->qtyOwned(Carbon::parse($dividend['date']))) / $market_data->market_value,
+                    ]);
+                }
+            });
     }
 }

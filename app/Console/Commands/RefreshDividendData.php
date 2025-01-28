@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Holding;
 use App\Models\Dividend;
+use App\Models\Holding;
 use Illuminate\Console\Command;
 
 class RefreshDividendData extends Command
@@ -43,17 +43,17 @@ class RefreshDividendData extends Command
     {
         $holdings = Holding::distinct();
 
-        if (!($this->option('force') ?? false)) {
+        if (! ($this->option('force') ?? false)) {
             $holdings->where('quantity', '>', 0);
-        } 
+        }
 
         if ($this->option('user')) {
             $holdings->myHoldings($this->option('user'));
         }
 
         foreach ($holdings->get(['symbol']) as $holding) {
-            $this->line('Refreshing ' . $holding->symbol);
-            
+            $this->line('Refreshing '.$holding->symbol);
+
             Dividend::refreshDividendData($holding->symbol);
         }
     }

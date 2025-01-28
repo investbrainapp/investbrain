@@ -3,9 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ImportFailedNotification extends Notification implements ShouldQueue
 {
@@ -16,7 +16,7 @@ class ImportFailedNotification extends Notification implements ShouldQueue
      */
     public function __construct(
         public string $errorMessage
-    ) { }
+    ) {}
 
     /**
      * Get the notification's delivery channels.
@@ -34,12 +34,12 @@ class ImportFailedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->greeting('Oh no!')
-                    ->subject("Your Investbrain import failed!")
-                    ->line("Heads up, your Investbrain import was unable to successfully complete. There were errors which caused the import to fail.")
-                    ->action("Try again?", route('import-export'))
-                    ->line("**Technical details:**")
-                    ->line($this->errorMessage);
+            ->greeting('Oh no!')
+            ->subject('Your Investbrain import failed!')
+            ->line('Heads up, your Investbrain import was unable to successfully complete. There were errors which caused the import to fail.')
+            ->action('Try again?', route('import-export'))
+            ->line('**Technical details:**')
+            ->line($this->errorMessage);
     }
 
     /**

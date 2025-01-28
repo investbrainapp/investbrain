@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Portfolio;
 use App\Models\MarketData;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use App\Models\Portfolio;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateHoldingsTable extends Migration
 {
@@ -16,7 +16,7 @@ class CreateHoldingsTable extends Migration
     public function up()
     {
         Schema::create('holdings', function (Blueprint $table) {
-            $table->uuid('id')->primary(); 
+            $table->uuid('id')->primary();
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
             $table->foreignIdFor(MarketData::class, 'symbol');
             $table->float('quantity', 12, 4);

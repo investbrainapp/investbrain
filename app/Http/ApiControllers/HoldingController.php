@@ -2,14 +2,13 @@
 
 namespace App\Http\ApiControllers;
 
-use App\Models\Holding;
-use App\Models\Portfolio;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use App\Http\ApiControllers\Controller as ApiController;
 use App\Http\Requests\HoldingRequest;
 use App\Http\Resources\HoldingResource;
+use App\Models\Holding;
+use App\Models\Portfolio;
 use HackerEsq\FilterModels\FilterModels;
-use App\Http\ApiControllers\Controller as ApiController;
+use Illuminate\Support\Facades\Gate;
 
 class HoldingController extends ApiController
 {

@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Traits\HasCompositePrimaryKey;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class DailyChange extends Model
 {
-    use HasFactory, HasCompositePrimaryKey;
+    use HasCompositePrimaryKey, HasFactory;
 
     public $timestamps = false;
 
@@ -32,13 +32,13 @@ class DailyChange extends Model
     protected $casts = [
         'date' => 'datetime',
     ];
-    
+
     public function scopePortfolio($query, $portfolio)
     {
         return $query->where('portfolio_id', $portfolio);
     }
 
-    public function scopeMyDailyChanges() 
+    public function scopeMyDailyChanges()
     {
         return $this->whereHas('portfolio', function ($query) {
             $query->whereHas('users', function ($query) {
@@ -47,12 +47,13 @@ class DailyChange extends Model
         });
     }
 
-    public function scopeWithoutWishlists($query) {
+    public function scopeWithoutWishlists($query)
+    {
         return $query->whereHas('portfolio', function ($query) {
             $query->where('portfolios.wishlist', 0);
         });
     }
-    
+
     public function portfolio()
     {
         return $this->belongsTo(Portfolio::class);

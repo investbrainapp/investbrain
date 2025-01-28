@@ -2,17 +2,18 @@
 
 namespace Tests\Api;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Portfolio;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class TransactionsTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $user;
+
     protected Portfolio $portfolio;
 
     protected function setUp(): void
@@ -21,7 +22,7 @@ class TransactionsTest extends TestCase
 
         // make user
         $this->user = User::factory()->create();
-        
+
         // make portfolio
         $this->portfolio = Portfolio::factory()->makeOne();
         $this->portfolio->setOwnerIdAttribute($this->user->id);
@@ -33,14 +34,14 @@ class TransactionsTest extends TestCase
         $this->actingAs($this->user);
 
         Transaction::factory(10)->create();
-        
+
         $this->actingAs($this->user)
             ->getJson(route('api.transaction.index', ['page' => 1, 'itemsPerPage' => 5]))
             ->assertOk()
             ->assertJsonStructure([
                 'data' => [['id', 'symbol', 'transaction_type', 'portfolio_id', 'date']],
                 'meta' => ['current_page', 'last_page', 'total'],
-                'links' => ['first', 'last', 'prev', 'next']
+                'links' => ['first', 'last', 'prev', 'next'],
             ]);
     }
 
@@ -49,7 +50,7 @@ class TransactionsTest extends TestCase
         // create transactions with existing user
         $this->actingAs($this->user);
         Transaction::factory(10)->create();
-        
+
         // Create a new user
         $this->actingAs($user = User::factory()->create());
         Transaction::factory(1)->create();
@@ -88,7 +89,7 @@ class TransactionsTest extends TestCase
                 'quantity',
                 'date',
                 'cost_basis',
-                'sale_price'
+                'sale_price',
             ]);
     }
 
@@ -97,7 +98,7 @@ class TransactionsTest extends TestCase
         $this->actingAs($this->user)
             ->postJson(route('api.transaction.store'), [
                 'portfolio_id' => $this->portfolio->id,
-                'symbol' => null
+                'symbol' => null,
             ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['symbol']);
@@ -133,7 +134,7 @@ class TransactionsTest extends TestCase
             'symbol' => 'ZZZ',
             'transaction_type' => 'BUY',
             'cost_basis' => 200.19,
-            'quantity' => 5
+            'quantity' => 5,
         ];
 
         $this->actingAs($this->user)
@@ -162,7 +163,7 @@ class TransactionsTest extends TestCase
             ->putJson(route('api.transaction.update', $transaction), ['symbol' => 'ZZZ'])
             ->assertOk()
             ->assertJsonFragment([
-                'symbol' => 'ZZZ'
+                'symbol' => 'ZZZ',
             ]);
     }
 

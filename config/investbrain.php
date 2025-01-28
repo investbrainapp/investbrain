@@ -15,5 +15,5 @@ return [
 
     'self_hosted' => env('SELF_HOSTED', true),
 
-    'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00')
+    'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00'),
 ];

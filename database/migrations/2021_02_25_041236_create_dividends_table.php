@@ -15,7 +15,7 @@ class CreateDividendsTable extends Migration
     public function up()
     {
         Schema::create('dividends', function (Blueprint $table) {
-            $table->uuid('id')->primary(); 
+            $table->uuid('id')->primary();
             $table->date('date');
             $table->foreignIdFor(MarketData::class, 'symbol');
             $table->float('dividend_amount', 12, 4);

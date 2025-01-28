@@ -11,7 +11,7 @@ class MainLayout extends Component
 
         // Slots
         public mixed $body = null,
-    ) { }
+    ) {}
 
     /**
      * Get the view / contents that represents the component.

@@ -2,9 +2,9 @@
 
 namespace App\Http\ApiControllers;
 
-use Illuminate\Http\Request;
-use App\Http\Resources\UserResource;
 use App\Http\ApiControllers\Controller as ApiController;
+use App\Http\Resources\UserResource;
+use Illuminate\Http\Request;
 
 class UserController extends ApiController
 {

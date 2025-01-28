@@ -13,24 +13,19 @@ class QuantityValidationRule implements ValidationRule
      * @return void
      */
     public function __construct(
-        protected ?Portfolio $portfolio, 
-        protected ?string $symbol, 
+        protected ?Portfolio $portfolio,
+        protected ?string $symbol,
         protected ?string $transactionType,
         protected ?string $date
     ) {
         $this->portfolio = $portfolio;
-        $this->symbol = $symbol; 
+        $this->symbol = $symbol;
         $this->transactionType = $transactionType;
         $this->date = $date;
     }
 
     /**
      * Validate the attribute.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  \Closure  $fail
-     * @return void
      */
     public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
@@ -42,17 +37,17 @@ class QuantityValidationRule implements ValidationRule
         if ($this->transactionType == 'SELL') {
 
             $purchase_qty = $this->portfolio->transactions()
-                                        ->symbol($this->symbol)
-                                        ->buy()
-                                        ->beforeDate($this->date)
-                                        ->sum('quantity');
+                ->symbol($this->symbol)
+                ->buy()
+                ->beforeDate($this->date)
+                ->sum('quantity');
 
             $sales_qty = $this->portfolio->transactions()
-                                        ->symbol($this->symbol)
-                                        ->sell()
-                                        ->beforeDate($this->date)
-                                        ->sum('quantity');
-   
+                ->symbol($this->symbol)
+                ->sell()
+                ->beforeDate($this->date)
+                ->sum('quantity');
+
             $maxQuantity = $purchase_qty - $sales_qty;
 
             if (round($value, 3) > round($maxQuantity, 3)) {

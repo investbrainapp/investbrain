@@ -11,8 +11,8 @@ class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
 {
     public function __construct(
         public bool $empty = false
-    ) { }
-    
+    ) {}
+
     public function headings(): array
     {
         return [
@@ -21,21 +21,18 @@ class PortfoliosSheet implements FromCollection, WithHeadings, WithTitle
             'Notes',
             'Wishlist',
             'Created',
-            'Updated'
+            'Updated',
         ];
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return $this->empty ? collect() : Portfolio::myPortfolios()->get();
     }
 
-     /**
-     * @return string
-     */
     public function title(): string
     {
         return 'Portfolios';

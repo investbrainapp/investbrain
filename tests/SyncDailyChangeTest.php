@@ -2,23 +2,20 @@
 
 namespace Tests;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Holding;
-use Carbon\CarbonPeriod;
-use App\Models\Portfolio;
 use App\Models\DailyChange;
+use App\Models\Holding;
+use App\Models\Portfolio;
 use App\Models\Transaction;
+use App\Models\User;
+use Carbon\CarbonPeriod;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SyncDailyChangeTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     */
     public function test_can_sync_daily_change_history(): void
     {
         $this->actingAs($user = User::factory()->create());
@@ -36,16 +33,14 @@ class SyncDailyChangeTest extends TestCase
 
         $count_of_daily_changes = $portfolio->daily_change()->count('date');
         $days_between_now_and_first_trans = (int) CarbonPeriod::create(
-            $portfolio->transactions()->min('date'), 
+            $portfolio->transactions()->min('date'),
             now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day'))) ? now()->subDay() : now()
         )->filter('isWeekday')
-        ->count();
+            ->count();
 
         $this->assertEquals($count_of_daily_changes, $days_between_now_and_first_trans);
     }
 
-    /**
-     */
     public function test_cost_basis_is_synced(): void
     {
         $this->actingAs($user = User::factory()->create());
@@ -56,33 +51,31 @@ class SyncDailyChangeTest extends TestCase
         Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
         $holding = Holding::symbol('ACME')->portfolio($portfolio->id)->first();
         $daily_change = DailyChange::whereDate('date', '<=', $first_transaction->date->addDays(2))
-                                ->whereDate('date', '>=', $first_transaction->date->subDays(2))
-                                ->orderByDesc('date')
-                                ->first();
+            ->whereDate('date', '>=', $first_transaction->date->subDays(2))
+            ->orderByDesc('date')
+            ->first();
 
         $this->assertEquals($holding->average_cost_basis, $daily_change->total_cost_basis);
 
         $second_transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
         Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
         $daily_change = DailyChange::whereDate('date', '<=', $second_transaction->date->addDays(2))
-                                ->whereDate('date', '>=', $second_transaction->date->subDays(2))
-                                ->orderByDesc('date')
-                                ->first();
-        
-        $this->assertEqualsWithDelta($first_transaction->cost_basis + $second_transaction->cost_basis, $daily_change->total_cost_basis, 0.01);        
+            ->whereDate('date', '>=', $second_transaction->date->subDays(2))
+            ->orderByDesc('date')
+            ->first();
+
+        $this->assertEqualsWithDelta($first_transaction->cost_basis + $second_transaction->cost_basis, $daily_change->total_cost_basis, 0.01);
 
         $third_transaction = Transaction::factory(2)->sell()->lastMonth()->portfolio($portfolio->id)->symbol('ACME')->create()->first();
         Artisan::call('sync:daily-change', ['portfolio_id' => $portfolio->id]);
         $daily_change = DailyChange::whereDate('date', '<=', $third_transaction->date->addDays(2))
-                                ->whereDate('date', '>=', $third_transaction->date->subDays(2))
-                                ->orderByDesc('date')
-                                ->first();
+            ->whereDate('date', '>=', $third_transaction->date->subDays(2))
+            ->orderByDesc('date')
+            ->first();
 
-        $this->assertEquals(0, $daily_change->total_cost_basis);        
+        $this->assertEquals(0, $daily_change->total_cost_basis);
     }
 
-    /**
-     */
     public function test_sales_are_captured_as_realized_gains(): void
     {
         $this->actingAs($user = User::factory()->create());

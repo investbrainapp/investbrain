@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\ApiControllers;
 
+use App\Http\ApiControllers\Controller as ApiController;
+use App\Http\Resources\MarketDataResource;
 use App\Models\MarketData;
 use Illuminate\Http\Request;
-use App\Http\Resources\MarketDataResource;
-use App\Http\ApiControllers\Controller as ApiController;
 
 class MarketDataController extends ApiController
 {

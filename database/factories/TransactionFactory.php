@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class TransactionFactory extends Factory
 {
-     protected static ?string $transaction_type;
+    protected static ?string $transaction_type;
 
     /**
      * Define the model's default state.
@@ -24,15 +24,15 @@ class TransactionFactory extends Factory
         return [
             'symbol' => $this->faker->randomElement(['AAPL', 'GOOG', 'AMZN']),
             'transaction_type' => $transaction_type,
-            'portfolio_id' => Portfolio::factory()->create()->id, 
+            'portfolio_id' => Portfolio::factory()->create()->id,
             'date' => $this->faker->date('Y-m-d'),
             'quantity' => 1,
-            'cost_basis' => $transaction_type == 'BUY' 
+            'cost_basis' => $transaction_type == 'BUY'
                 ? $this->faker->randomFloat(2, 10, 500)
-                : null, 
-            'sale_price' => $transaction_type == 'SELL' 
+                : null,
+            'sale_price' => $transaction_type == 'SELL'
                 ? $this->faker->randomFloat(2, 10, 500)
-                : null, 
+                : null,
         ];
     }
 
@@ -83,7 +83,7 @@ class TransactionFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'transaction_type' => 'BUY',
             'cost_basis' => $this->faker->randomFloat(2, 10, 500),
-            'sale_price' => null
+            'sale_price' => null,
         ]);
     }
 

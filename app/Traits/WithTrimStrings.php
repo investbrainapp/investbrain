@@ -13,7 +13,7 @@ trait WithTrimStrings
 
     public function updatedWithTrimStrings(string $property, mixed $value): void
     {
-        if (is_string($value) && !in_array($property, $this->trimExceptions())) {
+        if (is_string($value) && ! in_array($property, $this->trimExceptions())) {
             $this->fill([
                 $property => Str::trim($value),
             ]);

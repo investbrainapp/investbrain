@@ -1,25 +1,24 @@
-<?php 
+<?php
 
 namespace Tests;
 
-use Mockery;
-use Tests\TestCase;
-use Illuminate\Support\Facades\Log;
-use App\Interfaces\MarketData\YahooMarketData;
-use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\AlphaVantageMarketData;
+use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\YahooMarketData;
+use Illuminate\Support\Facades\Log;
+use Mockery;
 
 class FallbackInterfaceTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         Log::spy();
     }
 
-    public function testFallbackToNextProviderOnFailure()
+    public function test_fallback_to_next_provider_on_failure()
     {
         config()->set('investbrain.provider', 'yahoo,alphavantage');
         config()->set('investbrain.interfaces', [
@@ -29,16 +28,16 @@ class FallbackInterfaceTest extends TestCase
 
         $yahooMock = Mockery::mock(YahooMarketData::class);
         $yahooMock->shouldReceive('quote')
-                  ->andThrow(new \Exception("Yahoo failed"));
+            ->andThrow(new \Exception('Yahoo failed'));
 
         $alphaMock = Mockery::mock(AlphaVantageMarketData::class);
         $alphaMock->shouldReceive('quote')
-                  ->andReturn(new Quote(['market_value' => 10]));
+            ->andReturn(new Quote(['market_value' => 10]));
 
         $this->app->instance(YahooMarketData::class, $yahooMock);
         $this->app->instance(AlphaVantageMarketData::class, $alphaMock);
 
-        $fallbackInterface = new FallbackInterface();
+        $fallbackInterface = new FallbackInterface;
 
         $result = $fallbackInterface->quote('ACME');
 
@@ -47,7 +46,7 @@ class FallbackInterfaceTest extends TestCase
         Log::shouldHaveReceived('warning')->with('Failed calling method quote (yahoo): Yahoo failed');
     }
 
-    public function testAllProvidersFail()
+    public function test_all_providers_fail()
     {
         config()->set('investbrain.provider', 'yahoo,alpha');
         config()->set('investbrain.interfaces', [
@@ -57,16 +56,16 @@ class FallbackInterfaceTest extends TestCase
 
         $yahooMock = Mockery::mock(YahooMarketData::class);
         $yahooMock->shouldReceive('quote')
-                  ->andThrow(new \Exception("Yahoo failed"));
+            ->andThrow(new \Exception('Yahoo failed'));
 
         $alphaMock = Mockery::mock(AlphaVantageMarketData::class);
         $alphaMock->shouldReceive('quote')
-                  ->andThrow(new \Exception("Alpha failed"));
+            ->andThrow(new \Exception('Alpha failed'));
 
         $this->app->instance(YahooMarketData::class, $yahooMock);
         $this->app->instance(AlphaVantageMarketData::class, $alphaMock);
 
-        $fallbackInterface = new FallbackInterface();
+        $fallbackInterface = new FallbackInterface;
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Could not get market data: Provider [alpha] is not a valid market data interface.');

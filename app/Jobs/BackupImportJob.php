@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
-use Throwable;
-use App\Models\User;
-use App\Models\BackupImport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use App\Notifications\ImportSucceededNotification;
-use App\Notifications\ImportFailedNotification;
 use App\Imports\BackupImport as BackupImportExcel;
+use App\Models\BackupImport;
+use App\Models\User;
+use App\Notifications\ImportFailedNotification;
+use App\Notifications\ImportSucceededNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Maatwebsite\Excel\Facades\Excel;
+use Throwable;
 
 class BackupImportJob implements ShouldQueue
 {
@@ -19,7 +19,7 @@ class BackupImportJob implements ShouldQueue
     /**
      * The number of times the job may be attempted.
      */
-    public $tries = 1; 
+    public $tries = 1;
 
     /**
      * The number of seconds the job can run before timing out.
@@ -42,7 +42,7 @@ class BackupImportJob implements ShouldQueue
      */
     public function __construct(
         public BackupImport $backupImport
-    ) { 
+    ) {
         $this->user = User::find($this->backupImport->user_id);
     }
 
@@ -50,7 +50,7 @@ class BackupImportJob implements ShouldQueue
      * Execute the job.
      */
     public function handle(): void
-    {                
+    {
         Excel::import(new BackupImportExcel($this->backupImport), $this->backupImport->path, config('livewire.temporary_file_upload.disk', null));
 
         $this->user->notify(new ImportSucceededNotification);
@@ -63,9 +63,9 @@ class BackupImportJob implements ShouldQueue
     {
         $this->backupImport->update([
             'status' => 'failed',
-            'message' => 'Error: '. substr($e->getMessage(), 0, 220),
+            'message' => 'Error: '.substr($e->getMessage(), 0, 220),
             'has_errors' => true,
-            'completed_at' => now()
+            'completed_at' => now(),
         ]);
 
         $this->user->notify(new ImportFailedNotification($e->getMessage()));

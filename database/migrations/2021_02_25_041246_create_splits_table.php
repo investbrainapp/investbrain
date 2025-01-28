@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\MarketData;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateSplitsTable extends Migration
 {
@@ -15,7 +15,7 @@ class CreateSplitsTable extends Migration
     public function up()
     {
         Schema::create('splits', function (Blueprint $table) {
-            $table->uuid('id')->primary(); 
+            $table->uuid('id')->primary();
             $table->date('date');
             $table->foreignIdFor(MarketData::class, 'symbol');
             $table->float('split_amount', 12, 4);

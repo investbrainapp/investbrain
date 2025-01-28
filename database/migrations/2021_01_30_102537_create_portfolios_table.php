@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('portfolios', function (Blueprint $table) {
-            $table->uuid('id')->primary(); 
+            $table->uuid('id')->primary();
             $table->string('title');
             $table->text('notes')->nullable();
             $table->boolean('wishlist')->default(false);

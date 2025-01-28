@@ -2,16 +2,17 @@
 
 namespace Tests\Api;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Portfolio;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class PortfoliosTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $user;
+
     protected Portfolio $portfolio;
 
     protected function setUp(): void
@@ -27,14 +28,14 @@ class PortfoliosTest extends TestCase
         $this->actingAs($this->user);
 
         Portfolio::factory(10)->create();
-        
+
         $this->actingAs($this->user)
             ->getJson(route('api.portfolio.index', ['page' => 1, 'itemsPerPage' => 5]))
             ->assertOk()
             ->assertJsonStructure([
                 'data' => [['id', 'title', 'owner', 'holdings', 'transactions']],
                 'meta' => ['current_page', 'last_page', 'total'],
-                'links' => ['first', 'last', 'prev', 'next']
+                'links' => ['first', 'last', 'prev', 'next'],
             ]);
     }
 
@@ -43,7 +44,7 @@ class PortfoliosTest extends TestCase
         // create portfolios with existing user
         $this->actingAs($this->user);
         Portfolio::factory(10)->create();
-        
+
         // Create a new user
         $this->actingAs($user = User::factory()->create());
         Portfolio::factory(1)->create();
@@ -61,12 +62,12 @@ class PortfoliosTest extends TestCase
     public function test_can_create_a_portfolio()
     {
         $data = Portfolio::factory()->make()->toArray();
-        
+
         $this->actingAs($this->user)
             ->postJson(route('api.portfolio.store'), $data)
             ->assertCreated()
             ->assertJsonStructure(['id', 'title', 'owner']);
-        
+
         $this->assertDatabaseHas('portfolios', ['title' => $data['title']]);
     }
 
@@ -102,12 +103,12 @@ class PortfoliosTest extends TestCase
 
         $this->actingAs($this->user);
         $portfolio = Portfolio::factory()->create();
-        
+
         $this->actingAs($this->user)
             ->putJson(route('api.portfolio.update', $portfolio), $updatedData)
             ->assertOk()
             ->assertJson($updatedData);
-        
+
         $this->assertDatabaseHas('portfolios', $updatedData);
     }
 
@@ -126,7 +127,7 @@ class PortfoliosTest extends TestCase
             ->putJson(route('api.portfolio.update', $portfolio), ['title' => 'A brand new updated title'])
             ->assertOk()
             ->assertJsonFragment([
-                'title' => 'A brand new updated title'
+                'title' => 'A brand new updated title',
             ]);
     }
 
@@ -185,7 +186,7 @@ class PortfoliosTest extends TestCase
         $this->actingAs($this->user)
             ->deleteJson(route('api.portfolio.destroy', $portfolio))
             ->assertNoContent();
-        
+
         $this->assertDatabaseMissing('portfolios', ['id' => $portfolio->id]);
     }
 

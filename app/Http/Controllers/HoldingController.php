@@ -8,21 +8,20 @@ use Illuminate\Http\Request;
 
 class HoldingController extends Controller
 {
-
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Portfolio $portfolio, String $symbol)
+    public function show(Request $request, Portfolio $portfolio, string $symbol)
     {
         $holding = Holding::with([
-                            'market_data',
-                            'transactions' => function ($query) use ($symbol) {
-                                $query->where('transactions.symbol', $symbol);
-                            }
-                        ])
-                        ->symbol($symbol)
-                        ->portfolio($portfolio->id)
-                        ->firstOrFail();
+            'market_data',
+            'transactions' => function ($query) use ($symbol) {
+                $query->where('transactions.symbol', $symbol);
+            },
+        ])
+            ->symbol($symbol)
+            ->portfolio($portfolio->id)
+            ->firstOrFail();
 
         $formattedTransactions = $holding->getFormattedTransactions();
 

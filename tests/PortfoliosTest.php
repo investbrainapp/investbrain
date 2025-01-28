@@ -2,17 +2,14 @@
 
 namespace Tests;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Portfolio;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PortfoliosTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     */
     public function test_owner_is_assigned_to_portfolio_on_create(): void
     {
         $this->actingAs($user = User::factory()->create());
@@ -22,8 +19,6 @@ class PortfoliosTest extends TestCase
         $this->assertEquals($user->id, $portfolio->owner_id);
     }
 
-    /**
-     */
     public function test_owner_can_be_forced_on_create(): void
     {
         $this->actingAs($user = User::factory()->create());
@@ -35,8 +30,6 @@ class PortfoliosTest extends TestCase
         $this->assertEquals($user->id, $portfolio->owner_id);
     }
 
-    /**
-     */
     public function test_owner_cannot_be_changed_on_update(): void
     {
         $this->actingAs($owner = User::factory()->create());
@@ -49,6 +42,4 @@ class PortfoliosTest extends TestCase
 
         $this->assertEquals($owner->id, $portfolio->owner_id);
     }
-
-   
 }

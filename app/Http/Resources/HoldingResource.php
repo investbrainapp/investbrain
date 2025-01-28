@@ -31,7 +31,7 @@ class HoldingResource extends JsonResource
             'market_gain_dollars' => $this->market_gain_dollars,
             'market_gain_percent' => $this->market_gain_percent,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
         ];
     }
 }
