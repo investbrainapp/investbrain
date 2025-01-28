@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Rules;
 
 use App\Models\Portfolio;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class QuantityValidationRule implements ValidationRule
@@ -18,7 +19,7 @@ class QuantityValidationRule implements ValidationRule
         protected ?Portfolio $portfolio,
         protected ?string $symbol,
         protected ?string $transactionType,
-        protected ?string $date
+        protected string|Carbon|null $date
     ) {
         $this->portfolio = $portfolio;
         $this->symbol = $symbol;
