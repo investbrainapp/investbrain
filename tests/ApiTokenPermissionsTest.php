@@ -17,6 +17,7 @@ class ApiTokenPermissionsTest extends TestCase
 
     public function test_api_tokens_can_be_deleted(): void
     {
+
         if (! Features::hasApiFeatures()) {
             $this->markTestSkipped('API support is not enabled.');
         }
@@ -38,6 +39,7 @@ class ApiTokenPermissionsTest extends TestCase
 
     public function test_api_tokens_can_be_created(): void
     {
+
         if (! Features::hasApiFeatures()) {
             $this->markTestSkipped('API support is not enabled.');
         }
