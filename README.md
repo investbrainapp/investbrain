@@ -1,4 +1,12 @@
+
+
 <p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/investbrain-logo.png" width="400" alt="Investbrain Logo"></a></p>
+
+[![GitHub Repo Stars](https://img.shields.io/github/stars/investbrainapp/investbrain?style=for-the-badge&color=%23CCCCCC)](https://github.com/investbrainapp/investbrain/)
+[![GitHub Contributors](https://img.shields.io/github/contributors/investbrainapp/investbrain?style=for-the-badge)](https://github.com/investbrainapp/investbrain/)
+[![GitHub Issues](https://img.shields.io/github/issues/investbrainapp/investbrain?style=for-the-badge)](https://github.com/investbrainapp/investbrain/issues)
+[![Docker Pulls](https://img.shields.io/docker/pulls/investbrainapp/investbrain?style=for-the-badge)](https://hub.docker.com/r/investbrainapp/investbrain/)
+
 
 ## About Investbrain
 
@@ -24,27 +32,33 @@ Investbrain is a Laravel PHP web application that leverages Livewire and Tailwin
 
 ## Self hosting
 
-For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which downloads all the necessary dependencies and seamlessly builds everything you need to get started quickly! 
+For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which uses the official Investbrain Docker image and includes all the necessary dependencies to seamlessly build everything you need to get started quickly! 
 
-Before getting started, you should already have the following installed on your machine: [Docker Engine](https://docs.docker.com/engine/install/), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), and a wild sense of adventure.
+Before getting started, you should already have [Docker Engine](https://docs.docker.com/engine/install/) installed on your machine. 
 
 Ready? Let's get started! 
 
-First, you can clone this repository:
+**1. Download copy of Docker Compose file**
+
+Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) using `wget`, `curl` or similar:
 
 ```bash
-git clone https://github.com/investbrainapp/investbrain.git && cd investbrain
+curl -O https://raw.githubusercontent.com/investbrainapp/investbrain/main/docker-compose.yml
 ```
 
-Then, build the Docker image and bring up the container (this will take a few minutes):
+**2. Set your environment**
 
-```bash
-docker compose up
-```
+Adjust the `environment` properties in the compose file to your preferences. 
 
-In the previous step, all of the default configurations are set automatically. This includes creating a .env file and setting the required Laravel `APP_KEY`. 
+**Importantly**, you need to set the `APP_KEY` value.  If you're unsure, Investbrain will generate an `APP_KEY` for you on first run, but it will not persist. You must _manually_ update your environment configuration with this generated value!
 
-If everything worked as expected, you should now be able to access Investbrain in the browser at. You should create an account by visiting:
+Alternatively, create a .env file in the same directory as your compose file, then reference the .env file using the `env_file` property. 
+
+> Want to know what other configuration options are available? You can reference the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file in this respository for available environment  configurations. 
+
+**3. Run `docker compose up`**
+
+It might take a few minutes to pull the Docker images. But assuming everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
 
 ```bash
 http://localhost:8000/register
@@ -68,7 +82,7 @@ Investbrain includes an extensible market data provider interface that allows yo
 
 ### Configuration
 
-You can specify the market data provider you want to use in your .env file:
+You can specify the market data provider you want to use in your environment variables:
 
 ```bash
 MARKET_DATA_PROVIDER=yahoo
@@ -76,7 +90,7 @@ MARKET_DATA_PROVIDER=yahoo
 
 You can also use Investbrain's built-in fallback mechanism to ensure reliable data access. If any provider fails, Investbrain will automatically attempt to retrieve data from the next available provider, continuing through your configured providers until one returns successfully.
 
-Your selected providers should be listed in your .env file. Each should be separated by a comma:
+Your selected providers should be listed in your environment variables. Each should be separated by a comma:
 
 ```bash
 MARKET_DATA_PROVIDER=yahoo,alphavantage
@@ -121,12 +135,13 @@ Exporting your portfolios and transactions is a convenient way to back-up your I
 
 ## Configuration
 
-There are several optional configurations available when installing using the recommended [Docker method](#self-hosting). These options are configurable using an environment file. Changes can be made in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file before installation. 
+There are several optional configurations available when installing using the recommended [Docker method](#self-hosting). These options are configurable using an environment file. Configurations can be added to your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file or to the `environment` property in the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file. 
 
 | Option      | Description      | Default      |
 | ------------- | ------------- | ------------- |
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
+| APP_KEY | Must be set during install - encryption key for various security-related functions | `null` |
 | MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, or `finnhub`) | yahoo |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
@@ -141,7 +156,7 @@ There are several optional configurations available when installing using the re
 | REGISTRATION_ENABLED | Whether to enable registration of new users | `true` |
 
 
-> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, so if you decide to make any changes to these default configurations, you'll have to restart the Docker containers before your changes take effect.
+> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and are cached during run-time. If change any environment configurations, you'll have to restart the container before your changes take effect.
 
 ## Updating
 
@@ -151,10 +166,10 @@ To update Investbrain using the recommended [Docker installation](#self-hosting)
 docker compose stop
 ```
 
-Then pull the latest updates from this repository using git:
+Then pull the latest Docker image:
 
 ```bash
-git pull
+docker image pull investbrainapp/investbrain:latest
 ```
 
 Finally bring the containers back up!
