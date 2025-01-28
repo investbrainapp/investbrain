@@ -38,7 +38,7 @@
             </x-slot:trigger>
             
             <x-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
-            <x-menu-item title="{{ __('API Tokens') }}" icon="o-user" link="{{ @route('api-tokens.index') }}" />
+            <x-menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
             <x-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 
             <x-section-border class="py-1" />
