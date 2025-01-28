@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b8a88dbb7545ee8284282a6dda2ab3f",
+    "content-hash": "7c42cf98f7e8a2c0e2a81e6eea2f640b",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -1809,17 +1809,21 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hackeresq/filter-models",
-                "reference": "565537120ea01bd73f49051ecde90d05e4127c6b"
+                "reference": "847950d3277fe7df3a2dcdcdd3ba37d3b07ee667"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hackeresq/filter-models/zipball/565537120ea01bd73f49051ecde90d05e4127c6b",
-                "reference": "565537120ea01bd73f49051ecde90d05e4127c6b",
+                "url": "https://api.github.com/repos/hackeresq/filter-models/zipball/847950d3277fe7df3a2dcdcdd3ba37d3b07ee667",
+                "reference": "847950d3277fe7df3a2dcdcdd3ba37d3b07ee667",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^11.9",
                 "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.9",
+                "phpunit/phpunit": "^10.0|^11.0"
             },
             "default-branch": true,
             "type": "library",
@@ -1835,8 +1839,13 @@
                     "HackerEsq\\FilterModels\\": "src/"
                 }
             },
+            "autoload-dev": {
+                "psr-4": {
+                    "HackerESQ\\FilterModels\\Tests\\": "tests"
+                }
+            },
             "description": "Simple package to filter your Laravel models with query parameters",
-            "time": "2025-01-25T04:44:58+00:00"
+            "time": "2025-01-27T23:18:08+00:00"
         },
         {
             "name": "jfcherng/php-color-output",
@@ -11082,7 +11091,10 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2"
+        "php": "^8.3",
+        "ext-gd": "*",
+        "ext-mbstring": "*",
+        "ext-zip": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"
