@@ -13,8 +13,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('supported_currencies', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('currency', 3)->after('profile_photo_path');
+        });
+
+        Schema::table('market_data', function (Blueprint $table) {
+            $table->string('currency', 3)->after('market_value');
+        });
+
+        Schema::create('currencies', function (Blueprint $table) {
+            $table->string('currency', 3)->primary(); // ISO 4217
+            $table->string('label');
+            $table->float('rate_to_usd', 12, 4);
         });
     }
 
@@ -23,6 +33,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('supported_currencies');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('currency');
+        });
+
+        Schema::table('market_data', function (Blueprint $table) {
+            $table->dropColumn('currency');
+        });
+
+        Schema::dropIfExists('currencies');
     }
 };
