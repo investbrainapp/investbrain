@@ -101,6 +101,7 @@ class FallbackInterfaceTest extends TestCase
 
         $result = $fallbackInterface->exists('ZZZ');
 
+        $this->assertIsBool($result);
         $this->assertFalse($result);
     }
 }
