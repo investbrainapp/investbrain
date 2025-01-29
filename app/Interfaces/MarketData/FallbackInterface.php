@@ -20,6 +20,7 @@ class FallbackInterface
             $provider = trim($provider);
 
             try {
+                Log::warning("Calling method {$method} ({$provider})");
 
                 if (! in_array($provider, array_keys(config('investbrain.interfaces', [])))) {
 
@@ -36,6 +37,13 @@ class FallbackInterface
 
                 Log::warning("Failed calling method {$method} ({$provider}): {$this->latest_error}");
             }
+        }
+
+        // don't need to throw error if calling exists
+        if ($method == 'exists') {
+
+            // symbol prob just doesn't exist
+            return false;
         }
 
         throw new \Exception("Could not get market data: {$this->latest_error}");

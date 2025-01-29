@@ -26,7 +26,7 @@ class YahooMarketData implements MarketDataInterface
     public function exists(string $symbol): bool
     {
 
-        return $this->quote($symbol)->isNotEmpty();
+        return (bool) $this->quote($symbol);
     }
 
     public function quote(string $symbol): Quote
@@ -34,22 +34,18 @@ class YahooMarketData implements MarketDataInterface
 
         $quote = $this->client->getQuote($symbol);
 
-        if (empty($quote)) {
-            return collect();
-        }
-
         return new Quote([
-            'name' => $quote->getLongName() ?? $quote->getShortName(),
+            'name' => $quote?->getLongName() ?? $quote?->getShortName(),
             'symbol' => $symbol,
-            'market_value' => $quote->getRegularMarketPrice(),
-            'fifty_two_week_high' => $quote->getFiftyTwoWeekHigh(),
-            'fifty_two_week_low' => $quote->getFiftyTwoWeekLow(),
-            'forward_pe' => $quote->getForwardPE(),
-            'trailing_pe' => $quote->getTrailingPE(),
-            'market_cap' => $quote->getMarketCap(),
-            'book_value' => $quote->getBookValue(),
-            'last_dividend_date' => $quote->getDividendDate(),
-            'dividend_yield' => $quote->getTrailingAnnualDividendYield() * 100,
+            'market_value' => $quote?->getRegularMarketPrice(),
+            'fifty_two_week_high' => $quote?->getFiftyTwoWeekHigh(),
+            'fifty_two_week_low' => $quote?->getFiftyTwoWeekLow(),
+            'forward_pe' => $quote?->getForwardPE(),
+            'trailing_pe' => $quote?->getTrailingPE(),
+            'market_cap' => $quote?->getMarketCap(),
+            'book_value' => $quote?->getBookValue(),
+            'last_dividend_date' => $quote?->getDividendDate(),
+            'dividend_yield' => $quote?->getTrailingAnnualDividendYield() * 100,
         ]);
     }
 

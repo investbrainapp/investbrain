@@ -18,17 +18,13 @@ class AlphaVantageMarketData implements MarketDataInterface
     public function exists(string $symbol): bool
     {
 
-        return $this->quote($symbol)->isNotEmpty();
+        return (bool) $this->quote($symbol);
     }
 
     public function quote(string $symbol): Quote
     {
         $quote = Alphavantage::core()->quoteEndpoint($symbol);
         $quote = Arr::get($quote, 'Global Quote', []);
-
-        if (empty($quote)) {
-            return new Quote;
-        }
 
         $fundamental = cache()->remember(
             'av-symbol-'.$symbol,

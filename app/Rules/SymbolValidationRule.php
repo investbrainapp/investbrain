@@ -29,12 +29,13 @@ class SymbolValidationRule implements ValidationRule
     {
         $this->symbol = $value;
 
+        // Check if the symbol exists in the Market Data table first (avoid API call)
         if (MarketData::find($this->symbol)) {
 
             return;
         }
 
-        // Check if the symbol exists in the Market Data table first (avoid API call)
+        // Then check against market data provider
         if (! app(MarketDataInterface::class)->exists($value)) {
             $fail('The symbol provided ('.$this->symbol.') is not valid');
         }

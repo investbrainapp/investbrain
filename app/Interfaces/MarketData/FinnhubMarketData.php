@@ -28,16 +28,12 @@ class FinnhubMarketData implements MarketDataInterface
     public function exists(string $symbol): bool
     {
 
-        return $this->quote($symbol)->isNotEmpty();
+        return (bool) $this->quote($symbol);
     }
 
     public function quote(string $symbol): Quote
     {
         $quote = $this->client->quote($symbol);
-
-        if (empty($quote)) {
-            return new Quote;
-        }
 
         $fundamental = cache()->remember(
             'fh-symbol-'.$symbol,
