@@ -60,10 +60,9 @@ return [
     */
 
     'features' => [
-        Features::termsAndPrivacyPolicy(),
+        ! env('SELF_HOSTED', true) ? Features::termsAndPrivacyPolicy() : null,
         Features::profilePhotos(),
         Features::api(),
-        // Features::teams(['invitations' => true]),
         Features::accountDeletion(),
     ],
 

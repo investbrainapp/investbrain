@@ -67,7 +67,11 @@
         <div class="col-span-6 sm:col-span-4">
             <x-input id="email" label="{{ __('Email') }}" type="email" class="mt-1 block w-full" wire:model="state.email" error-field="email" required autocomplete="username" />
 
-            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! $this->user->hasVerifiedEmail())
+            @if (
+                ! config('investbrain.self_hosted')
+                && Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) 
+                && ! $this->user->hasVerifiedEmail()
+            )
                 <p class="text-sm mt-2 dark:text-white">
                     {{ __('Your email address is unverified.') }}
 
