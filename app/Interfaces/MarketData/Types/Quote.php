@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 
 class Quote extends MarketDataType
 {
-    public function setName($name): self
+    public function setName(string $name): self
     {
         $this->items['name'] = (string) $name;
 
@@ -21,7 +21,7 @@ class Quote extends MarketDataType
         return $this->items['name'] ?? '';
     }
 
-    public function setSymbol($symbol): self
+    public function setSymbol(string $symbol): self
     {
         $this->items['symbol'] = (string) $symbol;
 

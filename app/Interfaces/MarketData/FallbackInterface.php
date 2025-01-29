@@ -20,6 +20,7 @@ class FallbackInterface
             $provider = trim($provider);
 
             try {
+                Log::warning("Calling method {$method} ({$provider})");
 
                 if (! in_array($provider, array_keys(config('investbrain.interfaces', [])))) {
 

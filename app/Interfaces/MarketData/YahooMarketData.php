@@ -26,7 +26,15 @@ class YahooMarketData implements MarketDataInterface
     public function exists(string $symbol): bool
     {
 
-        return $this->quote($symbol)->isNotEmpty();
+        try {
+            $this->quote($symbol);
+
+            return true;
+
+        } catch (\Throwable $e) {
+
+            return false;
+        }
     }
 
     public function quote(string $symbol): Quote
@@ -34,8 +42,8 @@ class YahooMarketData implements MarketDataInterface
 
         $quote = $this->client->getQuote($symbol);
 
-        if (empty($quote)) {
-            return collect();
+        if (is_null($quote)) {
+            throw new \Exception('Symbol ('.$symbol.') does not exist');
         }
 
         return new Quote([
