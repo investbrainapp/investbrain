@@ -34,8 +34,22 @@ class JetstreamServiceProvider extends ServiceProvider
      */
     protected function configurePermissions(): void
     {
-        Jetstream::defaultApiTokenPermissions([]);
+        Jetstream::defaultApiTokenPermissions([
+            // 'portfolio:read',
+            // 'portfolio:write',
+            // 'holding:read',
+            // 'holding:write',
+            // 'transaction:read',
+            // 'transaction:write',
+        ]);
 
-        Jetstream::permissions([]);
+        Jetstream::permissions([
+            // 'Read Portfolios' => 'portfolio:read',
+            // 'Create Portfolios' => 'portfolio:write',
+            // 'Read Holdings' => 'holding:read',
+            // 'Update Holdings' => 'holding:write',
+            // 'Read Transactions' => 'transaction:read',
+            // 'Create Transactions' => 'transaction:write',
+        ]);
     }
 }
