@@ -39,6 +39,13 @@ class FallbackInterface
             }
         }
 
+        // don't need to throw error if calling exists
+        if ($method == 'exists') {
+
+            // symbol prob just doesn't exist
+            return false;
+        }
+
         throw new \Exception("Could not get market data: {$this->latest_error}");
     }
 }

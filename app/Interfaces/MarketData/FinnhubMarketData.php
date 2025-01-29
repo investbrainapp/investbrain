@@ -28,15 +28,7 @@ class FinnhubMarketData implements MarketDataInterface
     public function exists(string $symbol): bool
     {
 
-        try {
-            $this->quote($symbol);
-
-            return true;
-
-        } catch (\Throwable $e) {
-
-            return false;
-        }
+        return (bool) $this->quote($symbol);
     }
 
     public function quote(string $symbol): Quote

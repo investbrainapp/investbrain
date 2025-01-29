@@ -143,6 +143,7 @@ class Transaction extends Model
 
     public function refreshMarketData(): void
     {
+
         MarketData::getMarketData($this->attributes['symbol']);
     }
 

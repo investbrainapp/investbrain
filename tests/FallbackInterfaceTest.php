@@ -77,4 +77,30 @@ class FallbackInterfaceTest extends TestCase
         Log::shouldHaveReceived('warning')->with('Failed calling method quote (yahoo): Yahoo failed');
         Log::shouldHaveReceived('warning')->with('Failed calling method quote (alpha): Alpha failed');
     }
+
+    public function test_exists_method_fails_without_exception()
+    {
+        config()->set('investbrain.provider', 'yahoo,alpha');
+        config()->set('investbrain.interfaces', [
+            'yahoo' => YahooMarketData::class,
+            'alphavantage' => AlphaVantageMarketData::class,
+        ]);
+
+        $yahooMock = Mockery::mock(YahooMarketData::class);
+        $yahooMock->shouldReceive('exists')
+            ->andThrow(new \Exception('Yahoo failed'));
+
+        $alphaMock = Mockery::mock(AlphaVantageMarketData::class);
+        $alphaMock->shouldReceive('exists')
+            ->andThrow(new \Exception('Alpha failed'));
+
+        $this->app->instance(YahooMarketData::class, $yahooMock);
+        $this->app->instance(AlphaVantageMarketData::class, $alphaMock);
+
+        $fallbackInterface = new FallbackInterface;
+
+        $result = $fallbackInterface->exists('ZZZ');
+
+        $this->assertFalse($result);
+    }
 }
