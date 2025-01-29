@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 
 class Transaction extends Model
@@ -79,7 +82,7 @@ class Transaction extends Model
      *
      * @return void
      */
-    public function market_data()
+    public function market_data(): HasOne
     {
         return $this->hasOne(MarketData::class, 'symbol', 'symbol');
     }
@@ -89,12 +92,12 @@ class Transaction extends Model
      *
      * @return void
      */
-    public function portfolio()
+    public function portfolio(): BelongsTo
     {
         return $this->belongsTo(Portfolio::class);
     }
 
-    public function scopeWithMarketData($query)
+    public function scopeWithMarketData($query): Builder
     {
         return $query->withAggregate('market_data', 'name')
             ->withAggregate('market_data', 'market_value')
@@ -104,32 +107,32 @@ class Transaction extends Model
             ->join('market_data', 'transactions.symbol', 'market_data.symbol');
     }
 
-    public function scopePortfolio($query, $portfolio)
+    public function scopePortfolio($query, $portfolio): Builder
     {
         return $query->where('portfolio_id', $portfolio);
     }
 
-    public function scopeSymbol($query, $symbol)
+    public function scopeSymbol($query, $symbol): Builder
     {
         return $query->where('symbol', $symbol);
     }
 
-    public function scopeBuy($query)
+    public function scopeBuy($query): Builder
     {
         return $query->where('transaction_type', 'BUY');
     }
 
-    public function scopeSell($query)
+    public function scopeSell($query): Builder
     {
         return $query->where('transaction_type', 'SELL');
     }
 
-    public function scopeBeforeDate($query, $date)
+    public function scopeBeforeDate($query, $date): Builder
     {
         return $query->whereDate('date', '<=', $date);
     }
 
-    public function scopeMyTransactions()
+    public function scopeMyTransactions(): Builder
     {
         return $this->whereHas('portfolio', function ($query) {
             $query->whereHas('users', function ($query) {
@@ -138,17 +141,15 @@ class Transaction extends Model
         });
     }
 
-    public function refreshMarketData()
+    public function refreshMarketData(): void
     {
-        return MarketData::getMarketData($this->attributes['symbol']);
+        MarketData::getMarketData($this->attributes['symbol']);
     }
 
     /**
      * Writes average cost basis to a sale transaction
-     *
-     * @return Transaction
      */
-    public function ensureCostBasisIsAddedToSale()
+    public function ensureCostBasisIsAddedToSale(): Transaction
     {
         $average_cost_basis = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
@@ -164,10 +165,8 @@ class Transaction extends Model
 
     /**
      * Syncs the holding related to this transaction
-     *
-     * @return void
      */
-    public function syncToHolding()
+    public function syncToHolding(): void
     {
 
         // if symbol name changed, sync previous symbol too
