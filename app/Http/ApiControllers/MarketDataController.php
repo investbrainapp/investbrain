@@ -14,8 +14,17 @@ class MarketDataController extends ApiController
     public function show(Request $request, string $symbol)
     {
 
-        return MarketDataResource::make(
-            MarketData::getMarketData($symbol)
-        );
+        try {
+
+            return MarketDataResource::make(
+                MarketData::getMarketData($symbol)
+            );
+        } catch (\Throwable $e) {
+
+            return response([
+                'message' => 'Symbol '.$symbol.' not found.',
+            ], 404);
+        }
+
     }
 }
