@@ -10,7 +10,7 @@ services:
     ports:
       - "${APP_PORT:-8000}:80"
     environment:
-      APP_KEY: "" # Generate a key using `openssl rand -base64 32`
+      APP_KEY: "" # Generate a key using `echo base64:$(openssl rand -base64 32)`
       APP_URL: "http://localhost:8000"
       ASSET_URL: "http://localhost:8000"
       DB_CONNECTION: mysql
@@ -24,7 +24,7 @@ services:
       CACHE_STORE: redis
       REDIS_HOST: investbrain-redis
     volumes:
-      - ./storage:/var/www/app/storage:delegated
+      - ./storage:/var/app/storage
     depends_on:
       - mysql
       - redis
