@@ -7,15 +7,12 @@ ENV APP_DEBUG=true
 ENV SELF_HOSTED=true
 
 # Set the working directory
-COPY . /var/www/app
-WORKDIR /var/www/app
-
-# Allow PHP installs to be built cross-platform
-#ENV CFLAGS="-fstack-protector-strong -fpic -fPIC -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+COPY . /var/app
+WORKDIR /var/app
 
 # Install required packages
 RUN apt-get update && apt-get upgrade -y \
-    && apt-get upgrade -y \
+    && apt-get install -y \
         nginx \
         libfreetype-dev \
         libjpeg62-turbo-dev \
@@ -37,19 +34,21 @@ RUN apt-get update && apt-get upgrade -y \
     && docker-php-ext-install -j$(nproc) \
         gd pgsql zip pdo_mysql mysqli intl
 
-# Set permissions
+# Remove default nginx config
+RUN rm /etc/nginx/sites-enabled/default \
+    && rm -rf /var/www/html \
+    && ln -s /var/app /var/www/app
+
+# Set permissions and ensure www-data has a shell available
 RUN chown -R www-data:www-data . \ 
     && chmod -R 775 ./storage \
     && chmod +x ./docker/entrypoint.sh \
-    && usermod -s /bin/bash www-data
+    && usermod -s /bin/bash www-data 
 
 # Install Composer and Node.js Install PHP dependencies and build front end assets
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && composer install --no-scripts --optimize-autoloader \
     && npm install && npm run build
-
-# Remove default nginx config
-RUN rm /etc/nginx/sites-enabled/default
 
 # Copy over configs
 COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
