@@ -58,7 +58,7 @@ COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 80
 
 # Set up healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost/up || exit 1
 
 # Run everything else
 ENTRYPOINT ["/bin/bash", "./docker/entrypoint.sh"]
