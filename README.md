@@ -214,6 +214,14 @@ docker exec -it investbrain-app tail -f storage/logs/laravel.log
 
 <details>
 
+**<summary>Application styling is broken and images are too big</summary>**
+
+If you're serving Investbrain from a DNS name (e.g. example.com), it's likely that you haven't updated the `ASSET_URL` environment yet. The URL provided there will be used to generate absolute URLs for images, JS, and CSS assets on the front end of the application.
+
+</details>
+
+<details>
+
 **<summary>Market data not refreshing on fresh install</summary>**
 
 If you're unable to refresh market data out of the box (i.e. your market data provider is set to Yahoo), there is a chance Yahoo is being blocked by a firewall or adblocker.  Pihole is known to block `fc.yahoo.com` which is the domain used to query Yahoo. 
