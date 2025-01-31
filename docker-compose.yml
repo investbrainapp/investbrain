@@ -8,23 +8,24 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - "${APP_PORT:-8000}:80"
-    environment:
+      - 8000:80
+    environment: # You can either use these properties OR an .env file. Do not use both!
       APP_KEY: "" # Generate a key using `echo base64:$(openssl rand -base64 32)`
       APP_URL: "http://localhost:8000"
       ASSET_URL: "http://localhost:8000"
       DB_CONNECTION: mysql
       DB_HOST: investbrain-mysql
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-investbrain}
-      DB_USERNAME: ${DB_USERNAME:-investbrain}
-      DB_PASSWORD: ${DB_PASSWORD:-investbrain}
+      DB_DATABASE: investbrain
+      DB_USERNAME: investbrain
+      DB_PASSWORD: investbrain
       SESSION_DRIVER: redis
       QUEUE_CONNECTION: redis
       CACHE_STORE: redis
       REDIS_HOST: investbrain-redis
     volumes:
-      - ./storage:/var/app/storage
+      - investbrain-storage:/var/app/storage # You can use a volume... 
+      # - /path/to/storage:/var/app/storage # ...or you can use a path on host
     depends_on:
       - mysql
       - redis
@@ -55,5 +56,6 @@ services:
     networks:
       - investbrain-network
 volumes:
+  investbrain-storage:
   investbrain-redis:
   investbrain-mysql:
