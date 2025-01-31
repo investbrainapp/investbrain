@@ -47,12 +47,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Set permissions and ensure www-data has a shell available
-RUN chown -R www-data:www-data . \ 
-    && chmod -R 775 ./storage \
-    && chmod +x ./docker/entrypoint.sh 
-
-#    && usermod -s /bin/bash www-data 
+# Set permissions and link storage
+RUN php artisan storage:link \
+    && chown -R www-data:www-data . \ 
+    && chmod +x ./docker/entrypoint.sh
 
 # Serve on port 80
 EXPOSE 80

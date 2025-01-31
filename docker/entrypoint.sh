@@ -16,15 +16,6 @@ chown -R www-data:www-data storage
 
 echo -e "\n > Storage directory scaffolding is OK... "
 
-# Ensure storage symlink exists
-if [[ ! -L "public/storage" ]]; then
-    echo -e "\n > Creating symbolic link for app public storage... "
-    
-    php artisan storage:link
-else
-    echo -e "\n > Storage linked... "
-fi
-
 # Ensure app key is generated
 if [[ -z "$APP_KEY" ]]; then
     echo -e "\n > Oops! The required APP_KEY configuration is missing in your environment! "
