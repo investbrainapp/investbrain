@@ -60,7 +60,6 @@ return [
     */
 
     'features' => [
-        ! env('SELF_HOSTED', true) ? Features::termsAndPrivacyPolicy() : null,
         Features::profilePhotos(),
         Features::api(),
         Features::accountDeletion(),
