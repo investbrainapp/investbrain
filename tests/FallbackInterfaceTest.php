@@ -34,7 +34,12 @@ class FallbackInterfaceTest extends TestCase
 
         $alphaMock = Mockery::mock(AlphaVantageMarketData::class);
         $alphaMock->shouldReceive('quote')
-            ->andReturn(new Quote(['market_value' => 10]));
+            ->andReturn(new Quote([
+                'name' => 'Test Quote',
+                'symbol' => 'ACME',
+                'currency' => 'USD',
+                'market_value' => 10,
+            ]));
 
         $this->app->instance(YahooMarketData::class, $yahooMock);
         $this->app->instance(AlphaVantageMarketData::class, $alphaMock);
@@ -43,9 +48,14 @@ class FallbackInterfaceTest extends TestCase
 
         $result = $fallbackInterface->quote('ACME');
 
-        $this->assertEquals(new Quote(['market_value' => 10]), $result);
+        $this->assertEquals(new Quote([
+            'name' => 'Test Quote',
+            'symbol' => 'ACME',
+            'currency' => 'USD',
+            'market_value' => 10,
+        ]), $result);
 
-        Log::shouldHaveReceived('warning')->with('Failed calling method quote (yahoo): Yahoo failed');
+        Log::shouldHaveReceived('warning')->with('Failed calling method quote for ACME (yahoo): Yahoo failed');
     }
 
     public function test_all_providers_fail()
@@ -70,12 +80,12 @@ class FallbackInterfaceTest extends TestCase
         $fallbackInterface = new FallbackInterface;
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Could not get market data: Provider [alpha] is not a valid market data interface.');
+        $this->expectExceptionMessage('Could not get market data calling method quote: Provider [alpha] is not a valid market data interface.');
 
         $fallbackInterface->quote('AAPL');
 
-        Log::shouldHaveReceived('warning')->with('Failed calling method quote (yahoo): Yahoo failed');
-        Log::shouldHaveReceived('warning')->with('Failed calling method quote (alpha): Alpha failed');
+        Log::shouldHaveReceived('warning')->with('Failed calling method quote for AAPL (yahoo): Yahoo failed');
+        Log::shouldHaveReceived('warning')->with('Failed calling method quote for AAPL (alpha): Alpha failed');
     }
 
     public function test_exists_method_fails_without_exception()

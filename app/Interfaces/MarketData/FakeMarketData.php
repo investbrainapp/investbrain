@@ -25,6 +25,7 @@ class FakeMarketData implements MarketDataInterface
         return new Quote([
             'name' => 'ACME Company Ltd',
             'symbol' => $symbol,
+            'currency' => 'USD',
             'market_value' => 230.19,
             'fifty_two_week_high' => 512.90,
             'fifty_two_week_low' => 341.20,
@@ -34,6 +35,7 @@ class FakeMarketData implements MarketDataInterface
             'book_value' => 4.7,
             'last_dividend_date' => now()->subDays(45),
             'dividend_yield' => 0.033,
+            'meta_data' => [],
         ]);
     }
 
@@ -82,6 +84,9 @@ class FakeMarketData implements MarketDataInterface
             $series[$date] = new Ohlc([
                 'symbol' => $symbol,
                 'date' => $date,
+                'open' => rand(150, 400),
+                'high' => rand(150, 400),
+                'low' => rand(150, 400),
                 'close' => rand(150, 400),
             ]);
         }

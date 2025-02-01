@@ -35,26 +35,38 @@ class FinnhubMarketData implements MarketDataInterface
     {
         $quote = $this->client->quote($symbol);
 
+        if (is_null(Arr::get($quote, 'd'))) {
+            throw new \Exception('Could not find ticker on Finnhub');
+        }
+
         $fundamental = cache()->remember(
             'fh-symbol-'.$symbol,
             1440,
             function () use ($symbol) {
-                return $this->client->companyBasicFinancials($symbol, 'all');
+                return array_merge(
+                    (array) $this->client->companyProfile2($symbol),
+                    (array) $this->client->companyBasicFinancials($symbol, 'all')
+                );
             }
         );
 
         return new Quote([
             'name' => Arr::get($fundamental, 'metric.name'),
             'symbol' => $symbol,
+            'currency' => Arr::get($fundamental, 'currency'),
             'market_value' => Arr::get($quote, 'c'),
             'fifty_two_week_high' => Arr::get($fundamental, 'metric.52WeekHigh'),
             'fifty_two_week_low' => Arr::get($fundamental, 'metric.52WeekLow'),
-            'forward_pe' => Arr::get($fundamental, 'metric.forwardPE'), // confirm
-            'trailing_pe' => Arr::get($fundamental, 'metric.trailingPE'), // confirm
-            'market_cap' => Arr::get($fundamental, 'metric.marketCapitalization'), // confirm
-            'book_value' => Arr::get($fundamental, 'metric.bookValuePerShare'), // confirm
-            'last_dividend_date' => Arr::get($fundamental, 'metric.lastDivDate'), // confirm
-            'dividend_yield' => Arr::get($fundamental, 'metric.dividendYield'), // confirm
+            'forward_pe' => Arr::get($fundamental, 'metric.peAnnual'),
+            'trailing_pe' => Arr::get($fundamental, 'metric.peTTM'),
+            'market_cap' => Arr::get($fundamental, 'metric.marketCapitalization'),
+            'book_value' => Arr::get($fundamental, 'metric.bookValuePerShareAnnual'),
+            'dividend_yield' => Arr::get($fundamental, 'metric.dividendYieldIndicatedAnnual'),
+            'meta_data' => [
+                'country' => Arr::get($fundamental, 'country'),
+                'exchange' => Arr::get($fundamental, 'exchange'),
+                'first_trade_year' => Arr::get($fundamental, 'ipo') ? Carbon::parse(Arr::get($fundamental, 'ipo'))->format('Y') : null,
+            ],
         ]);
     }
 

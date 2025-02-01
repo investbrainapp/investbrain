@@ -9,6 +9,11 @@ use Illuminate\Support\Carbon;
 
 class Quote extends MarketDataType
 {
+    public function getRequiredItems(): array
+    {
+        return ['name', 'symbol', 'currency'];
+    }
+
     public function setName(string $name): self
     {
         $this->items['name'] = (string) $name;
@@ -31,6 +36,18 @@ class Quote extends MarketDataType
     public function getSymbol(): string
     {
         return $this->items['symbol'] ?? '';
+    }
+
+    public function setCurrency(string $currency): self
+    {
+        $this->items['currency'] = (string) $currency;
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->items['currency'] ?? '';
     }
 
     public function setMarketValue($marketValue): self
@@ -139,5 +156,17 @@ class Quote extends MarketDataType
     public function getDividendYield(): float
     {
         return $this->items['dividend_yield'] ?? 0.0;
+    }
+
+    public function setMetaData(array $meta_data): self
+    {
+        $this->items['meta_data'] = array_merge($this->items['meta_data'] ?? [], $meta_data);
+
+        return $this;
+    }
+
+    public function getMetaData(): array
+    {
+        return $this->items['meta_data'];
     }
 }

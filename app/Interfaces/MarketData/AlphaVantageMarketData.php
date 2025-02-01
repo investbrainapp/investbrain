@@ -26,6 +26,10 @@ class AlphaVantageMarketData implements MarketDataInterface
         $quote = Alphavantage::core()->quoteEndpoint($symbol);
         $quote = Arr::get($quote, 'Global Quote', []);
 
+        if (empty($quote)) {
+            throw new \Exception('Could not find ticker on Alphavantage');
+        }
+
         $fundamental = cache()->remember(
             'av-symbol-'.$symbol,
             1440,
@@ -38,6 +42,7 @@ class AlphaVantageMarketData implements MarketDataInterface
             'name' => Arr::get($fundamental, 'Name'),
             'symbol' => $symbol,
             'market_value' => Arr::get($quote, '05. price'),
+            'currency' => Arr::get($fundamental, 'Currency'),
             'fifty_two_week_high' => Arr::get($fundamental, '52WeekHigh'),
             'fifty_two_week_low' => Arr::get($fundamental, '52WeekLow'),
             'forward_pe' => Arr::get($fundamental, 'ForwardPE'),
@@ -50,6 +55,14 @@ class AlphaVantageMarketData implements MarketDataInterface
             'dividend_yield' => Arr::get($fundamental, 'DividendYield') != 'None'
                         ? Arr::get($fundamental, 'DividendYield')
                         : null,
+            'meta_data' => [
+                'industry' => Arr::get($fundamental, 'Industry'),
+                'country' => Arr::get($fundamental, 'Country'),
+                'exchange' => Arr::get($fundamental, 'Exchange'),
+                'description' => Arr::get($fundamental, 'Description'),
+                'asset_type' => Arr::get($fundamental, 'AssetType'),
+                'sector' => Arr::get($fundamental, 'Sector'),
+            ],
         ]);
     }
 

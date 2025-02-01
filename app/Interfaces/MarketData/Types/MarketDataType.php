@@ -12,7 +12,14 @@ class MarketDataType extends Collection
     public function __construct($items = [])
     {
 
-        foreach ($this->getArrayableItems($items) as $key => $value) {
+        $items = $this->getArrayableItems($items);
+
+        // check for required items
+        if (! empty($missing = array_diff($this->getRequiredItems(), array_keys($items)))) {
+            throw new \Exception('Missing required properties ('.implode(', ', $missing).')');
+        }
+
+        foreach ($items as $key => $value) {
 
             $this->{$key} = $value;
         }
@@ -31,5 +38,10 @@ class MarketDataType extends Collection
     public function __get($key)
     {
         return $this->items[$key] ?? null;
+    }
+
+    public function getRequiredItems(): array
+    {
+        return [];
     }
 }

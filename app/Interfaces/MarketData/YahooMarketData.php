@@ -34,9 +34,14 @@ class YahooMarketData implements MarketDataInterface
 
         $quote = $this->client->getQuote($symbol);
 
+        if (is_null($quote?->getRegularMarketPrice())) {
+            throw new \Exception('Could not find ticker on Yahoo');
+        }
+
         return new Quote([
             'name' => $quote?->getLongName() ?? $quote?->getShortName(),
             'symbol' => $symbol,
+            'currency' => $quote?->getCurrency(),
             'market_value' => $quote?->getRegularMarketPrice(),
             'fifty_two_week_high' => $quote?->getFiftyTwoWeekHigh(),
             'fifty_two_week_low' => $quote?->getFiftyTwoWeekLow(),
@@ -46,6 +51,10 @@ class YahooMarketData implements MarketDataInterface
             'book_value' => $quote?->getBookValue(),
             'last_dividend_date' => $quote?->getDividendDate(),
             'dividend_yield' => $quote?->getTrailingAnnualDividendYield() * 100,
+            'meta_data' => [
+                'exchange' => $quote?->getExchange(),
+                'asset_type' => $quote?->getQuoteType(),
+            ],
         ]);
     }
 

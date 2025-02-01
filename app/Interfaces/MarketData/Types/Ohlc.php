@@ -9,6 +9,11 @@ use Illuminate\Support\Carbon;
 
 class Ohlc extends MarketDataType
 {
+    public function getRequiredItems(): array
+    {
+        return ['symbol', 'date', 'open', 'high', 'low', 'close'];
+    }
+
     public function setSymbol(string $symbol): self
     {
         $this->items['symbol'] = $symbol;

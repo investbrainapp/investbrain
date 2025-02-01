@@ -35,7 +35,7 @@ class FallbackInterface
 
                 $this->latest_error = $e->getMessage();
 
-                Log::warning("Failed calling method {$method} ({$provider}): {$this->latest_error}");
+                Log::warning("Failed calling method {$method} for {$arguments[0]} ({$provider}): {$this->latest_error}");
             }
         }
 
@@ -46,6 +46,6 @@ class FallbackInterface
             return false;
         }
 
-        throw new \Exception("Could not get market data: {$this->latest_error}");
+        throw new \Exception("Could not get market data calling method {$method}: {$this->latest_error}");
     }
 }

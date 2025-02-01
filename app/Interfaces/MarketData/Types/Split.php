@@ -9,6 +9,11 @@ use Illuminate\Support\Carbon;
 
 class Split extends MarketDataType
 {
+    public function getRequiredItems(): array
+    {
+        return ['symbol', 'date', 'split_amount'];
+    }
+
     public function setSymbol(string $symbol): self
     {
         $this->items['symbol'] = $symbol;
