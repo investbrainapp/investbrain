@@ -34,10 +34,14 @@ class CreateMarketDataTable extends Migration
             $table->timestamps();
         });
 
-        Artisan::call('db:seed', [
-            '--class' => MarketDataSeeder::class,
-            '--force' => true,
-        ]);
+        if (config('app.env') != 'testing') {
+
+            Artisan::call('db:seed', [
+                '--class' => MarketDataSeeder::class,
+                '--force' => true,
+            ]);
+        }
+
     }
 
     /**
