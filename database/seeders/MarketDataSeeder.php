@@ -44,18 +44,14 @@ class MarketDataSeeder extends Seeder
                         $rows[] = [
                             'symbol' => $data['symbol'],
                             'name' => $data['name'],
-                            'meta_data' => json_encode([
-                                'country' => $data['country'],
-                                'first_trade_year' => $data['first_trade_year'],
-                                'sector' => $data['sector'],
-                                'industry' => $data['industry'],
-                            ]),
+                            'currency' => $data['currency'],
+                            'meta_data' => base64_decode($data['meta_data']),
                         ];
 
                         $rowCount++;
 
                         if ($rowCount % $chunkSize == 0) {
-                            DB::table('market_data')->insertOrIgnore($rows);
+                            DB::table('market_data')->upsert($rows, ['symbol'], ['name', 'currency', 'meta_data']);
                             $rows = [];
                         }
                     } catch (\Throwable $e) {

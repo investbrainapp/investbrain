@@ -21,6 +21,7 @@ class MarketData extends Model
     protected $fillable = [
         'symbol',
         'name',
+        'currency',
         'market_value',
         'fifty_two_week_high',
         'fifty_two_week_low',
@@ -30,6 +31,7 @@ class MarketData extends Model
         'book_value',
         'last_dividend_date',
         'dividend_yield',
+        'meta_data',
     ];
 
     protected $casts = [
@@ -42,6 +44,7 @@ class MarketData extends Model
         'market_cap' => 'float',
         'book_value' => 'float',
         'dividend_yield' => 'float',
+        'meta_data' => 'json',
     ];
 
     public function holdings()

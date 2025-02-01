@@ -31,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'currency',
     ];
 
     protected $hidden = [
@@ -43,6 +44,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $appends = [
         'profile_photo_url',
+    ];
+
+    protected $attributes = [
+        'currency' => 'USD',
     ];
 
     protected function casts(): array

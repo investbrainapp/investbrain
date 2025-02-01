@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\MarketDataSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 class CreateMarketDataTable extends Migration
@@ -33,14 +31,6 @@ class CreateMarketDataTable extends Migration
             $table->json('meta_data')->nullable();
             $table->timestamps();
         });
-
-        if (config('app.env') != 'testing') {
-
-            Artisan::call('db:seed', [
-                '--class' => MarketDataSeeder::class,
-                '--force' => true,
-            ]);
-        }
 
     }
 

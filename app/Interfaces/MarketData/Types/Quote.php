@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Interfaces\MarketData\Types;
 
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 
 class Quote extends MarketDataType
 {
     public function getRequiredItems(): array
     {
-        return ['name', 'symbol', 'currency'];
+        return ['symbol', 'currency'];
     }
 
-    public function setName(string $name): self
+    public function setName($name): self
     {
         $this->items['name'] = (string) $name;
 
@@ -160,7 +161,18 @@ class Quote extends MarketDataType
 
     public function setMetaData(array $meta_data): self
     {
-        $this->items['meta_data'] = array_merge($this->items['meta_data'] ?? [], $meta_data);
+        $defaults = [
+            'sector' => null,
+            'industry' => null,
+            'country' => null,
+            'exchange' => null,
+            'description' => null,
+            'asset_type' => null,
+            'first_trade_year' => null,
+        ];
+
+        // merges the NEW values with highest priority over previous values and defaults
+        $this->items['meta_data'] = array_merge($defaults, $this->items['meta_data'] ?? [], Arr::skipEmpty($meta_data));
 
         return $this;
     }

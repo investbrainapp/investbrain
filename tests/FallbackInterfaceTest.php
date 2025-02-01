@@ -8,11 +8,14 @@ use App\Interfaces\MarketData\AlphaVantageMarketData;
 use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\YahooMarketData;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
 class FallbackInterfaceTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();

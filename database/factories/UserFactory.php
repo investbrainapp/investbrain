@@ -34,6 +34,7 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),
             'profile_photo_path' => null,
+            'currency' => 'USD',
         ];
     }
 
@@ -44,6 +45,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the model's currency.
+     */
+    public function currency($currency): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'currency' => $currency,
         ]);
     }
 }

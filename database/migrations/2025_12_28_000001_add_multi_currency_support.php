@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use Database\Seeders\MarketDataSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,6 +28,14 @@ return new class extends Migration
             $table->string('label');
             $table->float('rate_to_usd', 12, 4);
         });
+
+        if (config('app.env') != 'testing') {
+
+            Artisan::call('db:seed', [
+                '--class' => MarketDataSeeder::class,
+                '--force' => true,
+            ]);
+        }
     }
 
     /**
