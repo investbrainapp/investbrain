@@ -95,7 +95,10 @@ class Dividend extends Model
             self::syncHoldings($symbol);
 
             // get market data
-            $market_data = MarketData::firstOrNew(['symbol' => $symbol]);
+            $market_data = MarketData::firstOr(['symbol' => $symbol], function () use ($symbol) {
+
+                return MarketData::getMarketData($symbol);
+            });
 
             // re-invest dividends
             self::reinvestDividends($dividend_data, $market_data);
