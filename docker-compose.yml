@@ -36,10 +36,12 @@ services:
     container_name: investbrain-redis
     restart: unless-stopped
     tty: true
-    networks:
-      - investbrain-network
+    command:
+      - --loglevel warning
     volumes:
       - investbrain-redis:/data
+    networks:
+      - investbrain-network
   mysql:
     image: mysql:8.0
     container_name: investbrain-mysql
