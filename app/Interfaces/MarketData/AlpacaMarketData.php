@@ -64,6 +64,7 @@ class AlpacaMarketData implements MarketDataInterface
         return new Quote([
             'name' => Arr::get($fundamental, 'name'),
             'symbol' => $symbol,
+            'currency' => 'USD', // Alpaca only has US equitities
             'market_value' => Arr::get($quote, 'p'),
             'fifty_two_week_high' => Arr::get($fundamental, 'bars.0.h'),
             'fifty_two_week_low' => Arr::get($fundamental, 'bars.0.l'),
