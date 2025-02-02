@@ -45,6 +45,10 @@ class AlpacaMarketData implements MarketDataInterface
 
         $quote = $response->json('trade');
 
+        if (is_null(Arr::get($quote, 'p'))) {
+            throw new \Exception('Could not find ticker on Alpaca');
+        }
+
         $fundamental = cache()->remember(
             'ap-symbol-'.$symbol,
             1440,
