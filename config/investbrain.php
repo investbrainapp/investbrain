@@ -11,6 +11,7 @@ return [
     'interfaces' => [
         'yahoo' => App\Interfaces\MarketData\YahooMarketData::class,
         'alphavantage' => App\Interfaces\MarketData\AlphaVantageMarketData::class,
+        'alpaca' => App\Interfaces\MarketData\AlpacaMarketData::class,
         'finnhub' => App\Interfaces\MarketData\FinnhubMarketData::class,
         'fake' => App\Interfaces\MarketData\FakeMarketData::class,
     ],
