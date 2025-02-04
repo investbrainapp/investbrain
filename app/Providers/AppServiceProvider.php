@@ -28,11 +28,12 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
 
-        Arr::macro('skipEmpty', function (array $array) {
-            return Arr::mapWithKeys($array, function (array $item, int $key) {
+        Arr::macro('skipEmptyValues', function (array $array) {
+
+            return Arr::mapWithKeys($array, function (mixed $value, mixed $key) {
                 $result = [];
-                if (! empty($item[$key])) {
-                    $result[] = [$key => $item[$key]];
+                if (! empty($value)) {
+                    $result[] = [$key => $value];
                 }
 
                 return $result;

@@ -10,11 +10,6 @@ use Illuminate\Support\Carbon;
 
 class Quote extends MarketDataType
 {
-    public function getRequiredItems(): array
-    {
-        return ['symbol', 'currency'];
-    }
-
     public function setName($name): self
     {
         $this->items['name'] = (string) $name;
@@ -51,7 +46,7 @@ class Quote extends MarketDataType
         return $this->items['currency'] ?? '';
     }
 
-    public function setMarketValue($marketValue): self
+    public function setMarketValue(int|float $marketValue): self
     {
         $this->items['market_value'] = (float) $marketValue;
 
@@ -172,7 +167,7 @@ class Quote extends MarketDataType
         ];
 
         // merges the NEW values with highest priority over previous values and defaults
-        $this->items['meta_data'] = array_merge($defaults, $this->items['meta_data'] ?? [], Arr::skipEmpty($meta_data));
+        $this->items['meta_data'] = array_merge($defaults, $this->items['meta_data'] ?? [], Arr::skipEmptyValues($meta_data));
 
         return $this;
     }

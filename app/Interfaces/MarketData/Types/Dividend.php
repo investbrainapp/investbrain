@@ -9,11 +9,6 @@ use Illuminate\Support\Carbon;
 
 class Dividend extends MarketDataType
 {
-    public function getRequiredItems(): array
-    {
-        return ['symbol', 'date', 'dividend_amount'];
-    }
-
     public function setSymbol(string $symbol): self
     {
         $this->items['symbol'] = $symbol;
@@ -26,7 +21,7 @@ class Dividend extends MarketDataType
         return $this->items['symbol'] ?? '';
     }
 
-    public function setDividendAmount($dividendAmount): self
+    public function setDividendAmount(int|float $dividendAmount): self
     {
         $this->items['dividend_amount'] = (float) $dividendAmount;
 

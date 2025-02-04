@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Interfaces\MarketData\Types\Quote;
 use App\Models\MarketData;
 use Database\Seeders\MarketDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,5 +41,23 @@ class MarketDataTest extends TestCase
         $this->assertIsArray($market_data->meta_data);
         $this->assertArrayHasKey('country', $market_data->meta_data);
         $this->assertArrayHasKey('industry', $market_data->meta_data);
+    }
+
+    public function test_market_data_type_can_set_values()
+    {
+        $quote = new Quote([
+            'symbol' => 'ZZZ',
+        ]);
+
+        $this->assertEquals('ZZZ', $quote->getSymbol());
+    }
+
+    public function test_market_data_type_validates_types()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Quote([
+            'symbol' => 123,
+        ]);
     }
 }

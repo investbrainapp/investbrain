@@ -8,6 +8,7 @@ use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
+use Finnhub\ObjectSerializer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -43,9 +44,10 @@ class FinnhubMarketData implements MarketDataInterface
             'fh-symbol-'.$symbol,
             1440,
             function () use ($symbol) {
+
                 return array_merge(
-                    (array) $this->client->companyProfile2($symbol),
-                    (array) $this->client->companyBasicFinancials($symbol, 'all')
+                    (array) ObjectSerializer::sanitizeForSerialization($this->client->companyProfile2($symbol)),
+                    (array) ObjectSerializer::sanitizeForSerialization($this->client->companyBasicFinancials($symbol, 'all')),
                 );
             }
         );

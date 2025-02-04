@@ -39,7 +39,7 @@ class FallbackInterface
             }
         }
 
-        // don't need to throw error if calling exists
+        // don't need to throw error if calling exists method...
         if ($method == 'exists') {
 
             // symbol prob just doesn't exist
