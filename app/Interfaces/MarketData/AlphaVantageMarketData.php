@@ -41,10 +41,10 @@ class AlphaVantageMarketData implements MarketDataInterface
         return new Quote([
             'name' => Arr::get($fundamental, 'Name'),
             'symbol' => $symbol,
-            'market_value' => Arr::get($quote, '05. price'),
+            'market_value' => (float) Arr::get($quote, '05. price'),
             'currency' => Arr::get($fundamental, 'Currency'),
-            'fifty_two_week_high' => Arr::get($fundamental, '52WeekHigh'),
-            'fifty_two_week_low' => Arr::get($fundamental, '52WeekLow'),
+            'fifty_two_week_high' => (float) Arr::get($fundamental, '52WeekHigh'),
+            'fifty_two_week_low' => (float) Arr::get($fundamental, '52WeekLow'),
             'forward_pe' => Arr::get($fundamental, 'ForwardPE'),
             'trailing_pe' => Arr::get($fundamental, 'TrailingPE'),
             'market_cap' => Arr::get($fundamental, 'MarketCapitalization'),
@@ -62,6 +62,7 @@ class AlphaVantageMarketData implements MarketDataInterface
                 'description' => Arr::get($fundamental, 'Description'),
                 'asset_type' => Arr::get($fundamental, 'AssetType'),
                 'sector' => Arr::get($fundamental, 'Sector'),
+                'source' => 'alphavantage',
             ],
         ]);
     }

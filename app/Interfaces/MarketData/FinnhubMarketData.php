@@ -45,15 +45,28 @@ class FinnhubMarketData implements MarketDataInterface
             1440,
             function () use ($symbol) {
 
+                $i = 0;
+                $methodsToTry = ['etfsProfile', 'mutualFundProfile', 'bondProfile'];
+                $profile = $this->client->companyProfile2($symbol);
+                while (is_null($profile->getName())) {
+                    $profile = $this->client->{$methodsToTry[$i]}($symbol);
+
+                    if ($i == count($methodsToTry)) {
+                        throw new \Exception;
+                    }
+
+                    $i++;
+                }
+
                 return array_merge(
-                    (array) ObjectSerializer::sanitizeForSerialization($this->client->companyProfile2($symbol)),
+                    (array) ObjectSerializer::sanitizeForSerialization($profile),
                     (array) ObjectSerializer::sanitizeForSerialization($this->client->companyBasicFinancials($symbol, 'all')),
                 );
             }
         );
 
         return new Quote([
-            'name' => Arr::get($fundamental, 'metric.name'),
+            'name' => Arr::get($fundamental, 'name'),
             'symbol' => $symbol,
             'currency' => Arr::get($fundamental, 'currency'),
             'market_value' => Arr::get($quote, 'c'),
@@ -68,6 +81,7 @@ class FinnhubMarketData implements MarketDataInterface
                 'country' => Arr::get($fundamental, 'country'),
                 'exchange' => Arr::get($fundamental, 'exchange'),
                 'first_trade_year' => Arr::get($fundamental, 'ipo') ? Carbon::parse(Arr::get($fundamental, 'ipo'))->format('Y') : null,
+                'source' => 'finnhub',
             ],
         ]);
     }

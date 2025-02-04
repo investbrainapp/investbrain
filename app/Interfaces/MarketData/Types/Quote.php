@@ -164,6 +164,7 @@ class Quote extends MarketDataType
             'description' => null,
             'asset_type' => null,
             'first_trade_year' => null,
+            'source' => null,
         ];
 
         // merges the NEW values with highest priority over previous values and defaults

@@ -59,5 +59,13 @@ class MarketDataTest extends TestCase
         new Quote([
             'symbol' => 123,
         ]);
+
+        new Quote([
+            'symbol' => null,
+        ]);
+
+        new Quote([
+            'symbol' => '',
+        ]);
     }
 }

@@ -54,6 +54,7 @@ class YahooMarketData implements MarketDataInterface
             'meta_data' => [
                 'exchange' => $quote?->getExchange(),
                 'asset_type' => $quote?->getQuoteType(),
+                'source' => 'yahoo',
             ],
         ]);
     }

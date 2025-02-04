@@ -18,9 +18,10 @@ class FallbackInterface
         foreach ($providers as $provider) {
 
             $provider = trim($provider);
+            $symbol = $arguments[0];
 
             try {
-                Log::warning("Calling method {$method} ({$provider})");
+                Log::info("Calling method {$method} for {$symbol} ({$provider})");
 
                 if (! in_array($provider, array_keys(config('investbrain.interfaces', [])))) {
 
@@ -35,7 +36,7 @@ class FallbackInterface
 
                 $this->latest_error = $e->getMessage();
 
-                Log::warning("Failed calling method {$method} for {$arguments[0]} ({$provider}): {$this->latest_error}");
+                Log::error("Failed calling method {$method} for {$symbol} ({$provider}): {$this->latest_error}");
             }
         }
 

@@ -17,13 +17,16 @@ class MarketDataType extends Collection
 
         foreach ($items as $key => $value) {
 
-            $this->{$key} = $value;
+            $this->validateRequiredTypes($key, $value);
+
+            if (! is_null($value)) {
+                $this->{$key} = $value;
+            }
         }
     }
 
     public function __set($key, $value)
     {
-        $this->validateRequiredTypes($key, $value);
 
         $this->{$this->getSetMethodName($key)}($value);
     }
@@ -83,6 +86,6 @@ class MarketDataType extends Collection
             }
         }
 
-        throw new \InvalidArgumentException("Invalid type for {$key}. Expected ".implode(', ', array_map(fn ($t) => $t, Arr::wrap($expected))).' but got '.get_debug_type($value));
+        throw new \InvalidArgumentException("Invalid type for {$key}. Expected ".implode('|', array_map(fn ($t) => $t, Arr::wrap($expected))).' but got '.get_debug_type($value));
     }
 }

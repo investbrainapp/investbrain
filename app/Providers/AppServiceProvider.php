@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             return Arr::mapWithKeys($array, function (mixed $value, mixed $key) {
                 $result = [];
                 if (! empty($value)) {
-                    $result[] = [$key => $value];
+                    $result[$key] = $value;
                 }
 
                 return $result;
