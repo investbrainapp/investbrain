@@ -45,21 +45,8 @@ class FinnhubMarketData implements MarketDataInterface
             1440,
             function () use ($symbol) {
 
-                $i = 0;
-                $methodsToTry = ['etfsProfile', 'mutualFundProfile', 'bondProfile'];
-                $profile = $this->client->companyProfile2($symbol);
-                while (is_null($profile->getName())) {
-                    $profile = $this->client->{$methodsToTry[$i]}($symbol);
-
-                    if ($i == count($methodsToTry)) {
-                        throw new \Exception;
-                    }
-
-                    $i++;
-                }
-
                 return array_merge(
-                    (array) ObjectSerializer::sanitizeForSerialization($profile),
+                    (array) ObjectSerializer::sanitizeForSerialization($this->client->companyProfile2($symbol)),
                     (array) ObjectSerializer::sanitizeForSerialization($this->client->companyBasicFinancials($symbol, 'all')),
                 );
             }

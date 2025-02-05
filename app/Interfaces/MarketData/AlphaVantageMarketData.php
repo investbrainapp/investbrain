@@ -23,26 +23,42 @@ class AlphaVantageMarketData implements MarketDataInterface
 
     public function quote(string $symbol): Quote
     {
-        $quote = Alphavantage::core()->quoteEndpoint($symbol);
-        $quote = Arr::get($quote, 'Global Quote', []);
 
-        if (empty($quote)) {
+        $search = Alphavantage::core()->search($symbol);
+        $search = Arr::get($search, 'bestMatches.0', null);
+
+        if (Arr::get($search, '9. matchScore') !== '1.0000') {
             throw new \Exception('Could not find ticker on Alphavantage');
         }
+
+        $quote = Alphavantage::core()->quoteEndpoint($symbol);
+        $quote = Arr::get($quote, 'Global Quote', []);
 
         $fundamental = cache()->remember(
             'av-symbol-'.$symbol,
             1440,
-            function () use ($symbol) {
-                return Alphavantage::fundamentals()->overview($symbol);
+            function () use ($symbol, $search) {
+                if (Arr::get($search, '3. type') === 'Equity') {
+
+                    $fundamental = (array) Alphavantage::fundamentals()->overview($symbol);
+                } else {
+
+                    $fundamental = (array) Alphavantage::fundamentals()->etfProfile($symbol);
+
+                    Arr::set($fundamental, 'DividendYield', Arr::get($fundamental, 'dividend_yield'));
+                    Arr::set($fundamental, 'MarketCapitalization', Arr::get($fundamental, 'net_assets'));
+                    Arr::set($fundamental, 'InceptionDate', Arr::get($fundamental, 'inception_date'));
+                }
+
+                return $fundamental;
             }
         );
 
         return new Quote([
-            'name' => Arr::get($fundamental, 'Name'),
+            'name' => Arr::get($search, '2. name'),
             'symbol' => $symbol,
             'market_value' => (float) Arr::get($quote, '05. price'),
-            'currency' => Arr::get($fundamental, 'Currency'),
+            'currency' => Arr::get($search, '8. currency'),
             'fifty_two_week_high' => (float) Arr::get($fundamental, '52WeekHigh'),
             'fifty_two_week_low' => (float) Arr::get($fundamental, '52WeekLow'),
             'forward_pe' => Arr::get($fundamental, 'ForwardPE'),
@@ -53,15 +69,18 @@ class AlphaVantageMarketData implements MarketDataInterface
                         ? Arr::get($fundamental, 'DividendDate')
                         : null,
             'dividend_yield' => Arr::get($fundamental, 'DividendYield') != 'None'
-                        ? Arr::get($fundamental, 'DividendYield')
+                        ? Arr::get($fundamental, 'DividendYield') * 100
                         : null,
             'meta_data' => [
                 'industry' => Arr::get($fundamental, 'Industry'),
-                'country' => Arr::get($fundamental, 'Country'),
+                'country' => Arr::get($search, '4. region'),
                 'exchange' => Arr::get($fundamental, 'Exchange'),
                 'description' => Arr::get($fundamental, 'Description'),
-                'asset_type' => Arr::get($fundamental, 'AssetType'),
+                'asset_type' => Arr::get($search, '3. type'),
                 'sector' => Arr::get($fundamental, 'Sector'),
+                'first_trade_year' => Arr::get($fundamental, 'InceptionDate')
+                                    ? Carbon::parse(Arr::get($fundamental, 'InceptionDate'))->format('Y')
+                                    : null,
                 'source' => 'alphavantage',
             ],
         ]);
