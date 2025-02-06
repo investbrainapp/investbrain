@@ -41,7 +41,7 @@ class MarketDataSeeder extends Seeder
                     try {
                         $data = array_combine($header, $row);
 
-                        $meta_data = json_decode(base64_decode($data['meta_data']));
+                        $meta_data = json_decode(base64_decode($data['meta_data']), true);
                         $meta_data['source'] = 'market_data_seeder';
 
                         $rows[] = [

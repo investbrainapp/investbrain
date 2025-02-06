@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61f4684da15779e44eb45ce4e90aecb1",
+    "content-hash": "3f7489867b187ff57ebf1cb5c6af0b61",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -1846,6 +1846,36 @@
             },
             "description": "Simple package to filter your Laravel models with query parameters",
             "time": "2025-01-27T23:18:08+00:00"
+        },
+        {
+            "name": "investbrainapp/frankfurter-client",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/investbrainapp/frankfurter-client",
+                "reference": "aa2676650824a1042047ae6feb59bd34e8d0dea8"
+            },
+            "require": {
+                "laravel/framework": "^11.9",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Investbrain\\Frankfurter\\FrankfurterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Investbrain\\Frankfurter\\": "src/"
+                }
+            },
+            "description": "Laravel SDK for interacting with the Frankfurter currency exchange API",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "jfcherng/php-color-output",
@@ -11086,7 +11116,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "finnhub/client": 20,
-        "hackeresq/filter-models": 20
+        "hackeresq/filter-models": 20,
+        "investbrainapp/frankfurter-client": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

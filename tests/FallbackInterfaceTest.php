@@ -58,7 +58,7 @@ class FallbackInterfaceTest extends TestCase
             'market_value' => 10,
         ]), $result);
 
-        Log::shouldHaveReceived('warning')->with('Failed calling method quote for ACME (yahoo): Yahoo failed');
+        Log::shouldHaveReceived('error')->with('Failed calling method quote for ACME (yahoo): Yahoo failed');
     }
 
     public function test_all_providers_fail()
@@ -87,8 +87,8 @@ class FallbackInterfaceTest extends TestCase
 
         $fallbackInterface->quote('AAPL');
 
-        Log::shouldHaveReceived('warning')->with('Failed calling method quote for AAPL (yahoo): Yahoo failed');
-        Log::shouldHaveReceived('warning')->with('Failed calling method quote for AAPL (alpha): Alpha failed');
+        Log::shouldHaveReceived('error')->with('Failed calling method quote for AAPL (yahoo): Yahoo failed');
+        Log::shouldHaveReceived('error')->with('Failed calling method quote for AAPL (alpha): Alpha failed');
     }
 
     public function test_exists_method_fails_without_exception()

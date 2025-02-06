@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Console\Commands\CaptureDailyChange;
+use App\Console\Commands\RefreshCurrencyData;
 use App\Console\Commands\RefreshDividendData;
 use App\Console\Commands\RefreshMarketData;
 use App\Console\Commands\RefreshSplitData;
@@ -34,3 +35,8 @@ Schedule::command(RefreshSplitData::class)->weekly();
  * Periodically reconciles your holdings with transactions and dividends
  */
 Schedule::command(SyncHoldingData::class)->yearly();
+
+/**
+ * Refreshes currency exchange data several times daily
+ */
+Schedule::command(RefreshCurrencyData::class)->daily()->everySixHours();
