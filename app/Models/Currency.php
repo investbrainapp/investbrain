@@ -52,7 +52,7 @@ class Currency extends Model
         }
 
         // get from rate
-        $from = self::where('currency', $from)->firstOrFail();
+        $from = self::where('currency', $from)->select('rate')->firstOrFail();
         $rate_to_base = 1 / $from->rate;
 
         // get value in base currency
@@ -62,7 +62,7 @@ class Currency extends Model
         if (empty($to)) {
             $to = config('investbrain.base_currency');
         }
-        $to = self::where('currency', $to)->firstOrFail();
+        $to = self::where('currency', $to)->select('rate')->firstOrFail();
 
         return $base_currency_value * $to->rate;
     }
