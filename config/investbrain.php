@@ -18,4 +18,6 @@ return [
     'self_hosted' => env('SELF_HOSTED', true),
 
     'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00'),
+
+    'base_currency' => env('BASE_CURRENCY', 'USD'),
 ];

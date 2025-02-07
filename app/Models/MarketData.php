@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Interfaces\MarketData\MarketDataInterface;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -55,6 +56,31 @@ class MarketData extends Model
     public function scopeSymbol($query, $symbol)
     {
         return $query->where('symbol', $symbol);
+    }
+
+    /**
+     * Ensure market values are saved in the base currency
+     */
+    protected function marketValue(): Attribute
+    {
+        return Attribute::make(
+            // convert to base currency
+            set: function ($value) {
+                if ($this->attributes['currency'] != config('investbrain.base_currency')) {
+                    return Currency::convert($value, $this->attributes['currency']);
+                }
+
+                return $value;
+            },
+            // display in user's preferred currency
+            get: function ($value) {
+                if (auth()->user()->currency != config('investbrain.base_currency')) {
+                    return Currency::convert($value, $this->attributes['currency'], auth()->user()->currency);
+                }
+
+                return $value;
+            },
+        );
     }
 
     public static function getMarketData($symbol, $force = false)

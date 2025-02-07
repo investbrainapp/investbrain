@@ -27,7 +27,7 @@ return new class extends Migration
         Schema::create('currencies', function (Blueprint $table) {
             $table->string('currency', 3)->primary(); // ISO 4217
             $table->string('label');
-            $table->float('rate_to_usd', 12, 4);
+            $table->float('rate', 12, 4);
             $table->timestamps();
         });
 
