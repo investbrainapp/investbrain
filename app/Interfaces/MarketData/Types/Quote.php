@@ -130,6 +130,18 @@ class Quote extends MarketDataType
         return $this->items['book_value'] ?? 0.0;
     }
 
+    public function setLastDividendAmount($value): self
+    {
+        $this->items['last_dividend_amount'] = (float) $value;
+
+        return $this;
+    }
+
+    public function getLastDividendAmount(): float
+    {
+        return $this->items['last_dividend_amount'] ?? 0.0;
+    }
+
     public function setLastDividendDate(mixed $date): self
     {
         $this->items['last_dividend_date'] = is_null($date) ? null : Carbon::parse($date)->format('Y-m-d H:i:s');

@@ -61,7 +61,7 @@ class FinnhubMarketData implements MarketDataInterface
             'fifty_two_week_low' => Arr::get($fundamental, 'metric.52WeekLow'),
             'forward_pe' => Arr::get($fundamental, 'metric.peAnnual'),
             'trailing_pe' => Arr::get($fundamental, 'metric.peTTM'),
-            'market_cap' => Arr::get($fundamental, 'metric.marketCapitalization'),
+            'market_cap' => Arr::get($fundamental, 'metric.marketCapitalization', 0) * 1000000,
             'book_value' => Arr::get($fundamental, 'metric.bookValuePerShareAnnual'),
             'dividend_yield' => Arr::get($fundamental, 'metric.dividendYieldIndicatedAnnual'),
             'meta_data' => [

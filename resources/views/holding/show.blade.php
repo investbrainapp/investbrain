@@ -67,7 +67,7 @@
 
                 <p>
                     <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    {{ Number::currencySymbol() }}{{ Number::forHumans($holding->market_data->market_cap ?? 0) }} 
+                    {{ Number::currencySymbol() }}{{ Number::forHumans($holding->market_data->market_cap ?? 0) }}
                 </p>
 
                 <p>
@@ -82,7 +82,7 @@
 
                 <p>
                     <span class="font-bold">{{ __('Book Value') }}: </span>
-                    {{ $holding->market_data->book_value }} 
+                    {{ Number::currency($holding->market_data->book_value) }} 
                 </p>
 
                 <p>
@@ -106,6 +106,11 @@
                 <p>
                     <span class="font-bold">{{ __('Last Dividend Paid') }}: </span>
                     {{ $holding->market_data?->last_dividend_date?->format('F d, Y') ?? '' }} 
+                </p>
+
+                <p>
+                    <span class="font-bold">{{ __('Currency') }}: </span>
+                    {{ $holding->market_data?->currency ?? '' }} 
                 </p>
                 
             </x-ib-card>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\LocalizedCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,19 +32,21 @@ class MarketData extends Model
         'market_cap',
         'book_value',
         'last_dividend_date',
+        'last_dividend_amount',
         'dividend_yield',
         'meta_data',
     ];
 
     protected $casts = [
-        'last_dividend_date' => 'datetime',
-        'market_value' => 'float',
-        'fifty_two_week_high' => 'float',
-        'fifty_two_week_low' => 'float',
+        'market_value' => LocalizedCurrency::class,
+        'fifty_two_week_high' => LocalizedCurrency::class,
+        'fifty_two_week_low' => LocalizedCurrency::class,
         'forward_pe' => 'float',
         'trailing_pe' => 'float',
-        'market_cap' => 'float',
-        'book_value' => 'float',
+        'market_cap' => LocalizedCurrency::class,
+        'book_value' => LocalizedCurrency::class,
+        'last_dividend_date' => 'datetime',
+        'last_dividend_amount' => LocalizedCurrency::class,
         'dividend_yield' => 'float',
         'meta_data' => 'json',
     ];
@@ -58,30 +61,16 @@ class MarketData extends Model
         return $query->where('symbol', $symbol);
     }
 
-    /**
-     * Ensure market values are saved in the base currency
-     */
-    protected function marketValue(): Attribute
-    {
-        return Attribute::make(
-            // convert to base currency
-            set: function ($value) {
-                if ($this->attributes['currency'] != config('investbrain.base_currency')) {
-                    return Currency::convert($value, $this->attributes['currency']);
-                }
-
-                return $value;
-            },
-            // display in user's preferred currency
-            get: function ($value) {
-                if (auth()->user()->getCurrency() != config('investbrain.base_currency')) {
-                    return Currency::convert($value, $this->attributes['currency'], auth()->user()->getCurrency());
-                }
-
-                return $value;
-            },
-        );
-    }
+    // /**
+    //  * Ensure market values are saved in the base currency
+    //  */
+    // protected function marketValue(): Attribute
+    // {
+    //     return Attribute::make(
+    //         set: fn ($value) => Currency::toBaseCurrency($value, from: $this->attributes['currency']),
+    //         get: fn ($value) => Currency::toDisplayCurrency($value)
+    //     );
+    // }
 
     public static function getMarketData($symbol, $force = false)
     {

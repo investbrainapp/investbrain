@@ -46,8 +46,9 @@ Route::get('invite/{portfolio}/{user}', InvitedOnboardingController::class)->nam
 // Overwrites Jetstream routes
 Route::get('/user/api-tokens', [ApiTokenController::class, 'index'])
     ->name('api-tokens.index')
+    ->middleware('auth:sanctum')
     ->when(! config('investbrain.self_hosted'), function ($route) {
-        return $route->middleware('verified');
+        return $route->middleware(['verified']);
     });
 Route::get('/terms', [TermsOfServiceController::class, 'show'])->name('terms.show');
 Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('policy.show');
