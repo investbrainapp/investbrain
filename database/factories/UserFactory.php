@@ -34,7 +34,10 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),
             'profile_photo_path' => null,
-            'currency' => 'USD',
+            'options' => [
+                'currency' => 'USD',
+                'locale' => 'en',
+            ],
         ];
     }
 
@@ -53,8 +56,8 @@ class UserFactory extends Factory
      */
     public function currency($currency): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => array_merge($attributes['options'], [
             'currency' => $currency,
-        ]);
+        ]));
     }
 }

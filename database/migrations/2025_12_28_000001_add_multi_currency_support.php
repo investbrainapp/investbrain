@@ -17,7 +17,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('currency', 3)->after('profile_photo_path');
+            $table->json('options')->nullable()->after('profile_photo_path');
         });
 
         Schema::table('market_data', function (Blueprint $table) {
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('currency', 3)->primary(); // ISO 4217
             $table->string('label');
             $table->float('rate', 12, 4);
+            $table->boolean('is_alias')->nullable();
             $table->timestamps();
         });
 

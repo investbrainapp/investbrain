@@ -1,17 +1,93 @@
-<x-forms.form-section submit="updatePassword">
+<?php
+
+use App\Models\Currency;
+use App\Models\User;
+use Illuminate\Support\Collection;
+use Livewire\Volt\Component;
+
+new class extends Component
+{
+    // props
+
+    public Collection $currencies;
+
+    public string $display_currency;
+
+    public ?string $locale;
+
+    public ?User $user;
+
+    // methods
+    public function rules()
+    {
+        return [
+            'locale' => ['required', 'in:'.implode(',', Arr::pluck(config('app.available_locales'), 'locale'))],
+            'display_currency' => ['required', 'exists:currencies,currency'],
+        ];
+    }
+
+    public function mount()
+    {
+        $this->currencies = Currency::withoutAliases()->get();
+        $this->display_currency = auth()->user()->getCurrency();
+        $this->locale = auth()->user()->getLocale();
+        $this->user = auth()->user();
+    }
+
+    public function updateProfileInformation()
+    {
+        $this->resetErrorBag();
+
+        $this->validate();
+
+        $this->user->options = array_merge($this->user->options ?? [], [
+            'locale' => $this->locale,
+            'display_currency' => $this->display_currency,
+        ]);
+
+        $this->user->save();
+
+        $this->dispatch('saved');
+
+        $this->js('window.location.reload();');
+    }
+}; ?>
+<x-forms.form-section submit="updateProfileInformation">
     <x-slot name="title">
-        {{ __('Locale Settings') }}
+        {{ __('Locale Options') }}
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Adjust currency display settings to your region.') }}
+        {{ __('Adjust localization options for your preferred region.') }}
     </x-slot>
 
     <x-slot name="form">
 
         <div class="col-span-6 sm:col-span-4">
+            <x-select 
+                label="{{ __('Locale') }}"
+                class="select block mt-1 w-full"
+                :options="config('app.available_locales')"
+                option-value="locale"
+                option-label="label"
+                placeholder="Choose a locale"
+                wire:model="locale"
+                id="locale"
+            />
             
-            <x-input id="password_confirmation" label="{{ __('Currency') }}" type="password" class="mt-1 block w-full" wire:model="state.password_confirmation" error-field="password_confirmation" autocomplete="new-password" />
+        </div>
+
+        <div class="col-span-6 sm:col-span-4">
+            <x-select 
+                label="{{ __('Display Currency') }}"
+                class="select block mt-1 w-full"
+                :options="$currencies"
+                option-value="currency"
+                option-label="label"
+                placeholder="Choose a display currency"
+                wire:model="display_currency"
+                id="display_currency"
+            />
             
         </div>
 

@@ -20,4 +20,9 @@ return [
     'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00'),
 
     'base_currency' => env('BASE_CURRENCY', 'USD'),
+
+    'currency_aliases' => [
+        'GBP' => ['currency' => 'GBX', 'label' => 'British Sterling Pence', 'adjustment' => 100],
+        'ZAR' => ['currency' => 'ZAC', 'label' => 'South Africa Rand Cent', 'adjustment' => 100],
+    ],
 ];

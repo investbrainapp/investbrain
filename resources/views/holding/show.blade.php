@@ -67,7 +67,7 @@
 
                 <p>
                     <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    ${{ Number::forHumans($holding->market_data->market_cap ?? 0) }} 
+                    {{ Number::currencySymbol() }}{{ Number::forHumans($holding->market_data->market_cap ?? 0) }} 
                 </p>
 
                 <p>

@@ -74,8 +74,8 @@ class MarketData extends Model
             },
             // display in user's preferred currency
             get: function ($value) {
-                if (auth()->user()->currency != config('investbrain.base_currency')) {
-                    return Currency::convert($value, $this->attributes['currency'], auth()->user()->currency);
+                if (auth()->user()->getCurrency() != config('investbrain.base_currency')) {
+                    return Currency::convert($value, $this->attributes['currency'], auth()->user()->getCurrency());
                 }
 
                 return $value;

@@ -34,11 +34,19 @@ class CreateNewUser implements CreatesNewUsers
             'terms' => config('investbrain.self_hosted') ? '' : ['accepted', 'required'],
         ])->validate();
 
-        return User::create([
+        $user = User::make([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
-            'currency' => 'USD',
         ]);
+
+        // ensure first user is flagged as an admin
+        if (User::count() === 0) {
+            $user->admin = true;
+        }
+
+        $user->save();
+
+        return $user;
     }
 }

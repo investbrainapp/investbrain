@@ -85,6 +85,89 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
+    'available_locales' => [
+        [
+            'locale' => 'en_AU',
+            'label' => 'English (Australia)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_BE',
+            'label' => 'English (Belgium)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_CA',
+            'label' => 'English (Canada)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_HK',
+            'label' => 'English (Hong Kong SAR China)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_IN',
+            'label' => 'English (India)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_IE',
+            'label' => 'English (Ireland)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_MT',
+            'label' => 'English (Malta)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_NZ',
+            'label' => 'English (New Zealand)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_PH',
+            'label' => 'English (Philippines)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_SG',
+            'label' => 'English (Singapore)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_ZA',
+            'label' => 'English (South Africa)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_GB',
+            'label' => 'English (United Kingdom)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'en_US',
+            'label' => 'English (United States)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'es_419',
+            'label' => 'Spanish (Latin America)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'es_ES',
+            'label' => 'Spanish (Spain)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'es_US',
+            'label' => 'Spanish (United States)',
+            'flag' => '',
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

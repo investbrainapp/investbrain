@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Investbrain\Frankfurter\Frankfurter;
@@ -25,6 +26,7 @@ class Currency extends Model
         'currency',
         'label',
         'rate',
+        'is_alias',
     ];
 
     /**
@@ -37,7 +39,15 @@ class Currency extends Model
         return [
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
+            'is_alias' => 'boolean',
         ];
+    }
+
+    public function scopeWithoutAliases($query): Builder
+    {
+        return $query->where(function ($query) {
+            return $query->whereNull('is_alias')->orWhere('is_alias', false);
+        });
     }
 
     /**
@@ -70,10 +80,12 @@ class Currency extends Model
     public static function refreshCurrencyData($force = false): void
     {
 
-        $query = self::query();
+        $query = self::withoutAliases();
 
         if (! $force) {
-            $query->whereNull('updated_at')->orWhere('updated_at', '<=', now()->subMinutes(60));
+            $query->where(function ($query) {
+                return $query->whereNull('updated_at')->orWhere('updated_at', '<=', now()->subMinutes(60));
+            });
         }
 
         $currencies = $query->get()->keyBy('currency');
@@ -85,16 +97,13 @@ class Currency extends Model
         $updates = [];
         foreach (Arr::get($rates, 'rates', []) as $currency => $rate) {
 
-            // update cent currencies
-            $cents = [
-                'GBP' => ['currency' => 'GBX', 'label' => 'British Sterling Pence'],
-                'ZAR' => ['currency' => 'ZAC', 'label' => 'South Africa Rand Cent'],
-            ];
-            if (array_key_exists($currency, $cents)) {
+            // handle currency aliases
+            if (array_key_exists($currency, config('investbrain.currency_aliases'))) {
                 $updates[] = [
-                    'label' => $cents[$currency]['label'],
-                    'currency' => $cents[$currency]['currency'],
-                    'rate' => $rate * 100,
+                    'label' => config('investbrain.currency_aliases.'.$currency.'.label'),
+                    'currency' => config('investbrain.currency_aliases.'.$currency.'.currency'),
+                    'rate' => $rate * config('investbrain.currency_aliases.'.$currency.'.adjustment'),
+                    'is_alias' => true,
                 ];
             }
 
@@ -103,6 +112,7 @@ class Currency extends Model
                 'label' => $currencies->get($currency)->label,
                 'currency' => $currency,
                 'rate' => $rate,
+                'is_alias' => null,
             ];
         }
 

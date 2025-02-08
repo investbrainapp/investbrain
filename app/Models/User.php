@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Arr;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
@@ -31,7 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'currency',
+        'options',
     ];
 
     protected $hidden = [
@@ -46,15 +47,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
-    protected $attributes = [
-        'currency' => 'USD',
-    ];
-
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'admin' => 'boolean',
+            'options' => 'json',
         ];
     }
 
@@ -86,5 +85,17 @@ class User extends Authenticatable implements MustVerifyEmail
                     THEN COALESCE(transactions.sale_price - transactions.cost_basis, 0)
                     ELSE COALESCE(market_data.market_value - transactions.cost_basis, 0)
                 END AS gain_dollars');
+    }
+
+    public function getCurrency(): string
+    {
+        return Arr::get($this->options, 'display_currency') ?? config('investbrain.base_currency');
+    }
+
+    public function getLocale(): string
+    {
+        $available_locales = Arr::pluck(config('app.available_locales'), 'locale');
+
+        return Arr::get($this->options, 'locale') ?? request()->getPreferredLanguage($available_locales);
     }
 }
