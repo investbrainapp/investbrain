@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\LocalizedCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -27,19 +30,20 @@ class Dividend extends Model
     protected $casts = [
         'date' => 'datetime',
         'last_dividend_update' => 'datetime',
+        'dividend_amount' => LocalizedCurrency::class,
     ];
 
-    public function marketData()
+    public function marketData(): BelongsTo
     {
         return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
     }
 
-    public function holdings()
+    public function holdings(): HasMany
     {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }

@@ -8,6 +8,8 @@ use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -29,12 +31,17 @@ class Split extends Model
         'last_date' => 'datetime',
     ];
 
-    public function holdings()
+    public function marketData(): BelongsTo
+    {
+        return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
+    }
+
+    public function holdings(): HasMany
     {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }
