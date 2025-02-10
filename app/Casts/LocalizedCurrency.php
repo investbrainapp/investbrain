@@ -17,11 +17,7 @@ class LocalizedCurrency implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        if (auth()->user()->getCurrency() != config('investbrain.base_currency')) {
-            $value = Currency::convert($value, config('investbrain.base_currency'), auth()->user()->getCurrency());
-        }
-
-        return round($value, 2);
+        return Currency::toDisplayCurrency($value);
     }
 
     /**
@@ -31,10 +27,10 @@ class LocalizedCurrency implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        if ($attributes['currency'] != config('investbrain.base_currency')) {
-            $value = Currency::convert($value, $attributes['currency']);
-        }
+        // if (! isset($model->currency)) {
+        //     dump($model);
+        // }
 
-        return round($value, 2);
+        return Currency::toBaseCurrency($value, $attributes['currency']);
     }
 }

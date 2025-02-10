@@ -50,30 +50,30 @@ class Currency extends Model
         });
     }
 
-    // /**
-    //  * Convert from provided to base currency
-    //  */
-    // public static function toBaseCurrency(?float $value, string $from)
-    // {
-    //     if ($from != config('investbrain.base_currency')) {
-    //         return Currency::convert($value, $from);
-    //     }
+    /**
+     * Convert from provided to base currency
+     */
+    public static function toBaseCurrency(?float $value, string $from)
+    {
+        if ($from != config('investbrain.base_currency')) {
+            $value = Currency::convert($value, $from);
+        }
 
-    //     return $value;
-    // }
+        return round($value, 3);
+    }
 
-    // /**
-    //  * Convert from base to user's preferred currency
-    //  */
-    // public static function toDisplayCurrency(?float $value)
-    // {
-    //     //
-    //     if (auth()->user()->getCurrency() != config('investbrain.base_currency')) {
-    //         return Currency::convert($value, config('investbrain.base_currency'), auth()->user()->getCurrency());
-    //     }
+    /**
+     * Convert from base to user's preferred currency
+     */
+    public static function toDisplayCurrency(?float $value)
+    {
+        //
+        if (auth()->user()->getCurrency() != config('investbrain.base_currency')) {
+            $value = Currency::convert($value, config('investbrain.base_currency'), auth()->user()->getCurrency());
+        }
 
-    //     return $value;
-    // }
+        return round($value, 3);
+    }
 
     /**
      * Converts between supported currencies

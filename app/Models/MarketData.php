@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Casts\LocalizedCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -60,17 +59,6 @@ class MarketData extends Model
     {
         return $query->where('symbol', $symbol);
     }
-
-    // /**
-    //  * Ensure market values are saved in the base currency
-    //  */
-    // protected function marketValue(): Attribute
-    // {
-    //     return Attribute::make(
-    //         set: fn ($value) => Currency::toBaseCurrency($value, from: $this->attributes['currency']),
-    //         get: fn ($value) => Currency::toDisplayCurrency($value)
-    //     );
-    // }
 
     public static function getMarketData($symbol, $force = false)
     {
