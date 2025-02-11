@@ -131,14 +131,16 @@ class Currency extends Model
         foreach (Arr::get($rates, 'rates', []) as $currency => $rate) {
 
             // handle currency aliases
-            if (array_key_exists($currency, config('investbrain.currency_aliases'))) {
-                $updates[] = [
-                    'label' => config('investbrain.currency_aliases.'.$currency.'.label'),
-                    'currency' => config('investbrain.currency_aliases.'.$currency.'.currency'),
-                    'rate' => $rate * config('investbrain.currency_aliases.'.$currency.'.adjustment'),
-                    'is_alias' => true,
-                ];
-            }
+            collect(config('investbrain.currency_aliases', []))
+                ->where('alias_of', $currency)
+                ->each(function ($value, $alias) use ($rate, &$updates) {
+                    $updates[] = [
+                        'label' => $value['label'],
+                        'currency' => $alias,
+                        'rate' => $rate * $value['adjustment'],
+                        'is_alias' => true,
+                    ];
+                });
 
             // update currency
             $updates[] = [

@@ -22,8 +22,8 @@ return [
     'base_currency' => env('BASE_CURRENCY', 'USD'),
 
     'currency_aliases' => [
-        'CNY' => ['currency' => 'RMB', 'label' => 'Chinese Yuan (Renminbi)', 'adjustment' => 1],
-        'GBP' => ['currency' => 'GBX', 'label' => 'British Sterling Pence', 'adjustment' => 100],
-        'ZAR' => ['currency' => 'ZAC', 'label' => 'South Africa Rand Cent', 'adjustment' => 100],
+        'RMB' => ['alias_of' => 'CNY', 'label' => 'Chinese Yuan (Renminbi)', 'adjustment' => 1],
+        'GBX' => ['alias_of' => 'GBP', 'label' => 'British Sterling Pence', 'adjustment' => 100],
+        'ZAC' => ['alias_of' => 'ZAR', 'label' => 'South Africa Rand Cent', 'adjustment' => 100],
     ],
 ];
