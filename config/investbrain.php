@@ -22,6 +22,7 @@ return [
     'base_currency' => env('BASE_CURRENCY', 'USD'),
 
     'currency_aliases' => [
+        'CNY' => ['currency' => 'RMB', 'label' => 'Chinese Yuan (Renminbi)', 'adjustment' => 1],
         'GBP' => ['currency' => 'GBX', 'label' => 'British Sterling Pence', 'adjustment' => 100],
         'ZAR' => ['currency' => 'ZAC', 'label' => 'South Africa Rand Cent', 'adjustment' => 100],
     ],
