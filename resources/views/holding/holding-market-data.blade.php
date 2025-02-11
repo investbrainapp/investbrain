@@ -19,7 +19,7 @@ new class extends Component
 
 <div>
     <div class="font-bold text-2xl py-1 flex items-center">
-        {{ Number::currency($holding->market_data->market_value ?? 0) }} 
+        {{ currency($holding->market_data->market_value ?? 0) }} 
         
         <x-gain-loss-arrow-badge 
             :cost-basis="$holding->average_cost_basis"
@@ -34,22 +34,22 @@ new class extends Component
 
     <p>
         <span class="font-bold">{{ __('Average Cost Basis') }}: </span>
-        {{ Number::currency($holding->average_cost_basis ?? 0) }} 
+        {{ currency($holding->average_cost_basis ?? 0) }} 
     </p>
 
     <p>
         <span class="font-bold">{{ __('Total Cost Basis') }}: </span>
-        {{ Number::currency($holding->total_cost_basis ?? 0) }} 
+        {{ currency($holding->total_cost_basis ?? 0) }} 
     </p>
 
     <p>
         <span class="font-bold">{{ __('Realized Gain/Loss') }}: </span>
-        {{ Number::currency($holding->realized_gain_dollars ?? 0) }} 
+        {{ currency($holding->realized_gain_dollars ?? 0) }} 
     </p>
 
     <p>
         <span class="font-bold">{{ __('Dividends Earned') }}: </span>
-        {{ Number::currency($holding->dividends_earned ?? 0) }} 
+        {{ currency($holding->dividends_earned ?? 0) }} 
     </p>
 
     <p class="pt-2 text-sm" title="{{ \Carbon\Carbon::parse($holding->market_data->updated_at)->toIso8601String() }}">

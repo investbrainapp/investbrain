@@ -1,7 +1,7 @@
 <span
     class="" 
     style="width:90em;overflow: hidden; white-space: nowrap;"
-    title="{{ Number::currency($low ?? 0) }} - {{ Number::currency($high ?? 0) }}"
+    title="{{ currency($low ?? 0) }} - {{ currency($high ?? 0) }}"
 >
 
     @php

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\LocalizedCurrency;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -36,6 +37,8 @@ class Transaction extends Model
         'date' => 'datetime',
         'split' => 'boolean',
         'reinvested_dividend' => 'boolean',
+        'cost_basis' => LocalizedCurrency::class,
+        'sale_price' => LocalizedCurrency::class,
     ];
 
     protected static function boot()

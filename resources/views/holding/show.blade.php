@@ -67,7 +67,9 @@
 
                 <p>
                     <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    {{ Number::currencySymbol() }}{{ Number::forHumans($holding->market_data->market_cap ?? 0) }}
+                    {{ Number::withCurrency($holding->market_data->currency, function() {
+                        return Number::currencySymbol();
+                    }) }}{{ Number::forHumans($holding->market_data->market_cap) }}
                 </p>
 
                 <p>
@@ -82,7 +84,7 @@
 
                 <p>
                     <span class="font-bold">{{ __('Book Value') }}: </span>
-                    {{ Number::currency($holding->market_data->book_value) }} 
+                    {{ currency($holding->market_data->book_value) }} 
                 </p>
 
                 <p>

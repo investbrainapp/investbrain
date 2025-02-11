@@ -60,31 +60,30 @@
         ])
 
         <div class="grid sm:grid-cols-5 gap-5">
-
             
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Market Gain/Loss') }}</div>
-                <div class="font-black text-xl"> {{ Number::currency($metrics->total_gain_dollars) }} </div>
+                <div class="font-black text-xl"> {{ currency($metrics->total_gain_dollars) }} </div>
             </x-card>
             
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Total Cost Basis') }}</div>
-                <div class="font-black text-xl"> {{ Number::currency($metrics->total_cost_basis) }} </div>
+                <div class="font-black text-xl"> {{ currency($metrics->total_cost_basis) }} </div>
             </x-card>
             
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Total Market Value') }}</div>
-                <div class="font-black text-xl"> {{ Number::currency($metrics->total_market_value) }} </div>
+                <div class="font-black text-xl"> {{ currency($metrics->total_market_value) }} </div>
             </x-card>
             
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Realized Gain/Loss') }}</div>
-                <div class="font-black text-xl"> {{ Number::currency($metrics->realized_gain_dollars) }} </div>
+                <div class="font-black text-xl"> {{ currency($metrics->realized_gain_dollars) }} </div>
             </x-card>
 
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Dividends Earned') }}</div>
-                <div class="font-black text-xl"> {{ Number::currency($metrics->total_dividends_earned) }} </div>
+                <div class="font-black text-xl"> {{ currency($metrics->total_dividends_earned) }} </div>
             </x-card>
                 
         </div>

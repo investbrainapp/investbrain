@@ -18,7 +18,7 @@ class LocalizedCurrency implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        return Currency::toDisplayCurrency($value);
+        return $value;
     }
 
     /**
@@ -28,7 +28,8 @@ class LocalizedCurrency implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        // for models without currency as an attribute, we need to ensure market data is available.
+        // for market data and transactions the `currency` attribute is available...
+        // but for dividends and other types, need to make sure `market_data` is loaded
         if (is_null($model?->currency) && is_null($model->market_data)) {
 
             $model->setRelation('market_data', MarketData::where('symbol', $attributes['symbol'])->first());

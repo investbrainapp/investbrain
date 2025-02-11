@@ -27,9 +27,9 @@ new class extends Component
                 $owned = ($dividend->purchased - $dividend->sold);
             @endphp 
 
-            {{ Number::currency($dividend->dividend_amount) }}
+            {{ currency($dividend->dividend_amount) }}
             x {{ $owned }}
-            = {{ Number::currency($owned * $dividend->dividend_amount) }}
+            = {{ currency($owned * $dividend->dividend_amount) }}
 
         </x-slot:value>
         <x-slot:sub-value>

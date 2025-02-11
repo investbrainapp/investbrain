@@ -1,13 +1,11 @@
 <?php
 
-use App\Models\Holding;
 use App\Models\Portfolio;
-use App\Models\Transaction;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // props
     public Portfolio $portfolio;
 
@@ -40,13 +38,13 @@ new class extends Component {
     {
 
         $holdings = $this->portfolio
-                        ->holdings()
-                        ->withCount(['transactions as num_transactions' => function($query) {
-                            return $query->whereRaw('transactions.symbol = holdings.symbol');
-                        }])
-                        ->orderBy(...array_values($this->sortBy))
+            ->holdings()
+            ->withCount(['transactions as num_transactions' => function ($query) {
+                return $query->whereRaw('transactions.symbol = holdings.symbol');
+            }])
+            ->orderBy(...array_values($this->sortBy))
                         // ->where('holdings.quantity', '>', 0)
-                        ->get();
+            ->get();
 
         return $holdings;
     }
@@ -55,7 +53,6 @@ new class extends Component {
     {
         return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
     }
-
 }; ?>
 
 
@@ -66,16 +63,16 @@ new class extends Component {
     @row-click="$wire.goToHolding($event.detail)"
 >
     @scope('cell_average_cost_basis', $row)
-        {{ Number::currency($row->average_cost_basis ?? 0) }}
+        {{ currency($row->average_cost_basis ?? 0) }}
     @endscope
     @scope('cell_total_cost_basis', $row)
-        {{ Number::currency($row->total_cost_basis ?? 0) }}
+        {{ currency($row->total_cost_basis ?? 0) }}
     @endscope
     @scope('cell_realized_gain_dollars', $row)
-        {{ Number::currency($row->realized_gain_dollars ?? 0) }}
+        {{ currency($row->realized_gain_dollars ?? 0) }}
     @endscope
     @scope('cell_market_gain_dollars', $row)
-        {{ Number::currency($row->market_gain_dollars ?? 0) }}
+        {{ currency($row->market_gain_dollars ?? 0) }}
     @endscope
     @scope('cell_market_gain_percent', $row)
         <x-gain-loss-arrow-badge 
@@ -84,19 +81,19 @@ new class extends Component {
         />
     @endscope
     @scope('cell_market_data_market_value', $row)
-        {{ Number::currency($row->market_data_market_value ?? 0) }}
+        {{ currency($row->market_data_market_value ?? 0) }}
     @endscope
     @scope('cell_market_data_fifty_two_week_low', $row)
-        {{ Number::currency($row->market_data_fifty_two_week_low ?? 0) }}
+        {{ currency($row->market_data_fifty_two_week_low ?? 0) }}
     @endscope
     @scope('cell_market_data_fifty_two_week_high', $row)
-        {{ Number::currency($row->market_data_fifty_two_week_high ?? 0) }}
+        {{ currency($row->market_data_fifty_two_week_high ?? 0) }}
     @endscope
     @scope('cell_total_market_value', $row)
-        {{ Number::currency($row->total_market_value ?? 0) }}
+        {{ currency($row->total_market_value ?? 0) }}
     @endscope
     @scope('cell_dividends_earned', $row)
-        {{ Number::currency($row->dividends_earned ?? 0) }}
+        {{ currency($row->dividends_earned ?? 0) }}
     @endscope
     @scope('cell_market_data_updated_at', $row)
         {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}

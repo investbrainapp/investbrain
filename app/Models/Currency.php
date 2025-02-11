@@ -86,18 +86,26 @@ class Currency extends Model
             return 0;
         }
 
-        // get from rate
-        $from = self::where('currency', $from)->select('rate')->firstOrFail();
-        $rate_to_base = 1 / $from->rate;
-
-        // get value in base currency
-        $base_currency_value = $value * $rate_to_base;
-
         // get to rate
         if (empty($to)) {
             $to = config('investbrain.base_currency');
         }
-        $to = self::where('currency', $to)->select('rate')->firstOrFail();
+
+        // get rates from cache
+        [$from, $to] = [
+            cache()->remember($from.'_rate', 10, function () use ($from) {
+                return self::where('currency', $from)->select('rate')->firstOrFail();
+            }),
+            cache()->remember($to.'_rate', 10, function () use ($to) {
+                return self::where('currency', $to)->select('rate')->firstOrFail();
+            }),
+        ];
+
+        // get from rate
+        $rate_to_base = 1 / $from->rate;
+
+        // get value in base currency
+        $base_currency_value = $value * $rate_to_base;
 
         return $base_currency_value * $to->rate;
     }
