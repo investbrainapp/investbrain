@@ -11,7 +11,6 @@ WORKDIR /var/app
 # Install required packages
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y \
-        nginx \
         libfreetype-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
@@ -20,7 +19,6 @@ RUN apt-get update && apt-get upgrade -y \
         libicu-dev \
         libpq-dev \
         binutils libc6-dev \
-        supervisor \
         unzip curl git \
         nodejs npm \
     && apt-get -y autoremove \
