@@ -260,8 +260,8 @@ class Holding extends Model
             // Determine if running MySQL or MariaDB
             $versionString = Arr::get(
                 DB::select('SELECT VERSION() as version;'),
-                '0.version', ''
-            );
+                '0', new \stdClass
+            )->version;
             if (stripos($versionString, 'MariaDB') !== false) {
                 $max_recursion_var_name = 'max_recursive_iterations'; // Must be MariaDB
             }
