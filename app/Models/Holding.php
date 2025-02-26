@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class Holding extends Model
@@ -62,8 +63,8 @@ class Holding extends Model
         return $this->hasMany(Dividend::class, 'symbol', 'symbol')
             ->select(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount'])
             ->selectRaw("SUM(
-                    CASE WHEN transaction_type = 'BUY' 
-                        AND transactions.symbol = dividends.symbol 
+                    CASE WHEN transaction_type = 'BUY'
+                        AND transactions.symbol = dividends.symbol
                         AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
@@ -71,22 +72,22 @@ class Holding extends Model
                 ) AS purchased")
             ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'SELL'
-                        AND transactions.symbol = dividends.symbol 
-                        AND transactions.portfolio_id = '$this->portfolio_id' 
+                        AND transactions.symbol = dividends.symbol
+                        AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
                     ELSE 0 END
                 ) AS sold")
             ->selectRaw("SUM(
-                    (CASE WHEN transaction_type = 'BUY' 
-                        AND transactions.symbol = dividends.symbol 
+                    (CASE WHEN transaction_type = 'BUY'
+                        AND transactions.symbol = dividends.symbol
                         AND transactions.portfolio_id = '$this->portfolio_id'
-                        AND date(transactions.date) <= date(dividends.date) 
+                        AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END
-                    - CASE WHEN transaction_type = 'SELL' 
-                        AND transactions.symbol = dividends.symbol 
+                    - CASE WHEN transaction_type = 'SELL'
+                        AND transactions.symbol = dividends.symbol
                         AND transactions.portfolio_id = '$this->portfolio_id'
-                        AND date(transactions.date) <= date(dividends.date) 
+                        AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END)
                     * dividends.dividend_amount
                 ) AS total_received")
@@ -253,7 +254,19 @@ class Holding extends Model
             $date_interval = "date(date, '+1 day')";
         } else {
 
-            DB::statement('SET cte_max_recursion_depth=1000000;');
+            // MySQL default
+            $max_recursion_var_name = 'cte_max_recursion_depth';
+
+            // Determine if running MySQL or MariaDB
+            $versionString = Arr::get(
+                DB::select('SELECT VERSION() as version;'),
+                '0.version', ''
+            );
+            if (stripos($versionString, 'MariaDB') !== false) {
+                $max_recursion_var_name = 'max_recursive_iterations'; // Must be MariaDB
+            }
+
+            DB::statement("SET $max_recursion_var_name=1000000;");
         }
 
         return DB::table(DB::raw("(
@@ -276,15 +289,15 @@ class Holding extends Model
                 COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS `owned`
             "),
                 DB::raw("
-               COALESCE(CASE 
+               COALESCE(CASE
                     WHEN (
                         ROUND(
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) - 
+                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
                         COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3)
                     ) = 0 THEN 0
-                    ELSE SUM(CASE 
-                        WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis 
-                        ELSE 0 
+                    ELSE SUM(CASE
+                        WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis
+                        ELSE 0
                     END)
                 END, 0) AS cost_basis
             "),
