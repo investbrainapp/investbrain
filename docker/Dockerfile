@@ -27,8 +27,7 @@ RUN apt-get update && apt-get upgrade -y \
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-        gd pgsql zip pdo_mysql mysqli intl
+    && docker-php-ext-install -j$(nproc) gd zip
 
 # Copy application files
 COPY . .
