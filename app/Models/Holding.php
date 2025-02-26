@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class Holding extends Model
@@ -252,11 +253,19 @@ class Holding extends Model
 
             $date_interval = "date(date, '+1 day')";
         } else {
+
+            // MySQL default
             $max_recursion_var_name = 'cte_max_recursion_depth';
-            $results = DB::select("SHOW VARIABLES LIKE '$max_recursion_var_name';");
-            if(count($results) == 0) {
-                $max_recursion_var_name = 'max_recursive_iterations'; // Must be mariadb
+
+            // Determine if running MySQL or MariaDB
+            $versionString = Arr::get(
+                DB::select('SELECT VERSION() as version;'),
+                '0.version', ''
+            );
+            if (stripos($versionString, 'MariaDB') !== false) {
+                $max_recursion_var_name = 'max_recursive_iterations'; // Must be MariaDB
             }
+
             DB::statement("SET $max_recursion_var_name=1000000;");
         }
 
