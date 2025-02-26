@@ -72,8 +72,8 @@ new class extends Component
             $this->portfolio_id = $this->transaction->portfolio_id;
             $this->date = $this->transaction->date->format('Y-m-d');
             $this->quantity = $this->transaction->quantity;
-            $this->cost_basis = $this->transaction->cost_basis;
-            $this->sale_price = $this->transaction->sale_price;
+            $this->cost_basis = Currency::toDisplayCurrency($this->transaction->cost_basis);
+            $this->sale_price = Currency::toDisplayCurrency($this->transaction->sale_price);
 
         } else {
             $this->transaction_type = 'BUY';

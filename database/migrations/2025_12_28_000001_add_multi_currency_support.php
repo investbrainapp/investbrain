@@ -24,6 +24,10 @@ return new class extends Migration
             $table->string('currency', 3)->after('market_value');
         });
 
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->string('currency', 3)->after('sale_price');
+        });
+
         Schema::create('currencies', function (Blueprint $table) {
             $table->string('currency', 3)->primary(); // ISO 4217
             $table->string('label');
