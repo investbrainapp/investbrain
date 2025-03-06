@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 class Holding extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -31,16 +33,6 @@ class Holding extends Model
         'first_transaction_date' => 'datetime',
         'reinvest_dividends' => 'boolean',
     ];
-
-    /**
-     * Market data for holding
-     *
-     * @return void
-     */
-    public function market_data()
-    {
-        return $this->hasOne(MarketData::class, 'symbol', 'symbol');
-    }
 
     /**
      * Related transactions for holding

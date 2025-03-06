@@ -36,7 +36,7 @@ class Quote extends MarketDataType
 
     public function setCurrency(string $currency): self
     {
-        $this->items['currency'] = (string) $currency;
+        $this->items['currency'] = strtoupper((string) $currency);
 
         return $this;
     }

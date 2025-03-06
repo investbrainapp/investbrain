@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Casts;
 
 use App\Models\Currency;
-use App\Models\MarketData;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,9 +29,9 @@ class LocalizedCurrency implements CastsAttributes
     {
         // for market data and transactions the `currency` attribute is available...
         // but for dividends and other types, need to make sure `market_data` is loaded
-        if (is_null($model?->currency) && is_null($model->market_data)) {
+        if (is_null($model?->currency)) {
 
-            $model->setRelation('market_data', MarketData::where('symbol', $attributes['symbol'])->first());
+            $model->loadMarketData();
         }
 
         return Currency::toBaseCurrency($value, $model?->currency ?? $model->market_data?->currency);

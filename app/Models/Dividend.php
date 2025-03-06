@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Casts\LocalizedCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class Dividend extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -30,13 +31,7 @@ class Dividend extends Model
     protected $casts = [
         'date' => 'datetime',
         'last_dividend_update' => 'datetime',
-        'dividend_amount' => LocalizedCurrency::class,
     ];
-
-    public function marketData(): BelongsTo
-    {
-        return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
-    }
 
     public function holdings(): HasMany
     {
@@ -87,8 +82,17 @@ class Dividend extends Model
 
         // ah, we found some dividends...
         if ($dividend_data->isNotEmpty()) {
+
+            $market_data = MarketData::getMarketData($symbol);
+
+            // get historic conversion rates
+            $rate_to_base = Currency::timeSeriesRates($market_data->currency, config('investbrain.base_currency'), $start_date, $end_date);
+
             // create mass insert
             foreach ($dividend_data as $index => $dividend) {
+
+                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->format('Y-m-d'), 1);
+
                 $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
             }
 
@@ -97,9 +101,6 @@ class Dividend extends Model
 
             // sync to holdings
             self::syncHoldings($symbol);
-
-            // get market data
-            $market_data = MarketData::getMarketData($symbol);
 
             // re-invest dividends
             self::reinvestDividends($dividend_data, $market_data);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -51,6 +52,18 @@ class Currency extends Model
     }
 
     /**
+     * Convert from base currency to provided currency
+     */
+    public static function fromBaseCurrency(?float $value, string $to)
+    {
+        if ($to != config('investbrain.base_currency')) {
+            $value = Currency::convert($value, config('investbrain.base_currency'), $to);
+        }
+
+        return $value;
+    }
+
+    /**
      * Convert from provided to base currency
      */
     public static function toBaseCurrency(?float $value, string $from)
@@ -59,7 +72,7 @@ class Currency extends Model
             $value = Currency::convert($value, $from);
         }
 
-        return round($value, 3);
+        return $value;
     }
 
     /**
@@ -72,7 +85,7 @@ class Currency extends Model
             $value = Currency::convert($value, config('investbrain.base_currency'), auth()->user()->getCurrency());
         }
 
-        return round($value, 3);
+        return $value;
     }
 
     /**
@@ -108,6 +121,49 @@ class Currency extends Model
         $base_currency_value = $value * $rate_to_base;
 
         return $base_currency_value * $to->rate;
+    }
+
+    public static function historicRate(string $from, ?string $to, string|\DateTime $date): float
+    {
+        // get to rate
+        if (empty($to)) {
+            $to = config('investbrain.base_currency');
+        }
+
+        if ($from === $to) {
+            return 1;
+        }
+
+        $rate = Frankfurter::setBaseCurrency($from)->setSymbols($to)->historical($date);
+        $rate = Arr::get($rate, "rates.{$to}");
+
+        return $rate;
+    }
+
+    public static function timeSeriesRates(string $from, ?string $to, string|\DateTime $start, mixed $end = null): array
+    {
+        // get to rate
+        if (empty($to)) {
+            $to = config('investbrain.base_currency');
+        }
+
+        // no need to send network request - just generate 1s
+        if ($from === $to) {
+            $period = CarbonPeriod::create($start, $end);
+
+            $dateRange = [];
+            foreach ($period as $date) {
+                $dateRange[$date->format('Y-m-d')] = 1;
+            }
+
+            return $dateRange;
+        }
+
+        $rates = Frankfurter::setBaseCurrency($from)->setSymbols($to)->timeSeries($start, $end);
+        $rates = Arr::get($rates, 'rates', []);
+        $rates = Arr::map($rates, fn ($value) => $value[$to]);
+
+        return $rates;
     }
 
     public static function refreshCurrencyData($force = false): void

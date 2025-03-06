@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Currency;
+use App\Models\MarketData;
 use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Rules\QuantityValidationRule;
@@ -30,8 +31,6 @@ new class extends Component
 
     public float $quantity;
 
-    public string $currency;
-
     public ?float $cost_basis;
 
     public ?float $sale_price;
@@ -39,6 +38,10 @@ new class extends Component
     public bool $confirmingTransactionDeletion = false;
 
     public Collection $currencies;
+
+    public bool $disable_currency = false;
+
+    public string $currency;
 
     // methods
     public function rules()
@@ -67,15 +70,25 @@ new class extends Component
 
         if (isset($this->transaction)) {
 
+            $this->currency = $this->transaction->market_data->currency;
+            $this->disable_currency = true;
+
             $this->symbol = $this->transaction->symbol;
             $this->transaction_type = $this->transaction->transaction_type;
             $this->portfolio_id = $this->transaction->portfolio_id;
             $this->date = $this->transaction->date->format('Y-m-d');
             $this->quantity = $this->transaction->quantity;
-            $this->cost_basis = Currency::toDisplayCurrency($this->transaction->cost_basis);
-            $this->sale_price = Currency::toDisplayCurrency($this->transaction->sale_price);
+            $this->cost_basis = $this->transaction->cost_basis;
+            $this->sale_price = $this->transaction->sale_price;
 
         } else {
+
+            if (isset($this->symbol)) {
+
+                $this->currency = MarketData::getMarketData($this->symbol)?->currency;
+                $this->disable_currency = true;
+            }
+
             $this->transaction_type = 'BUY';
             $this->portfolio_id = isset($this->portfolio) ? $this->portfolio->id : '';
             $this->date = now()->format('Y-m-d');
@@ -166,6 +179,7 @@ new class extends Component
                         option-label="currency"
                         wire:model="currency"
                         id="currency"
+                        :disabled="$disable_currency"
                     />
                 </x-slot:prepend>
             </x-input>
@@ -186,6 +200,7 @@ new class extends Component
                         option-label="currency"
                         wire:model="currency"
                         id="currency"
+                        :disabled="$disable_currency"
                     />
                 </x-slot:prepend>
             </x-input>

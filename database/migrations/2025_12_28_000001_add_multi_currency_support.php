@@ -16,6 +16,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // todo: need to create default settings!
         Schema::table('users', function (Blueprint $table) {
             $table->json('options')->nullable()->after('profile_photo_path');
         });
@@ -24,8 +25,15 @@ return new class extends Migration
             $table->string('currency', 3)->after('market_value');
         });
 
+        // todo: need to copy over values to these cells!
         Schema::table('transactions', function (Blueprint $table) {
-            $table->string('currency', 3)->after('sale_price');
+            $table->float('cost_basis_base', 12, 4)->after('sale_price');
+            $table->float('sale_price_base', 12, 4)->nullable()->after('cost_basis_base');
+        });
+
+        // todo: need to copy over values to these cells!
+        Schema::table('dividends', function (Blueprint $table) {
+            $table->float('dividend_amount_base', 12, 4)->after('dividend_amount');
         });
 
         Schema::create('currencies', function (Blueprint $table) {

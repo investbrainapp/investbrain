@@ -6,13 +6,14 @@ use App\Models\Currency;
 use Illuminate\Support\Number;
 
 /**
- * Returns currency in user's preferred currency
+ * Converts from base currency to user's preferred currency
  * */
 if (! function_exists('currency')) {
 
-    function currency($value): string
+    function currency($value, $to = null): string
     {
-        $value = Currency::toDisplayCurrency($value);
+
+        $value = Currency::convert($value, $to ?? auth()->user()->getCurrency());
 
         return Number::currency($value);
     }

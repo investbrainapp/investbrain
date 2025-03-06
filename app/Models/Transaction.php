@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Casts\LocalizedCurrency;
+use App\Traits\HasMarketData;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 
 class Transaction extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -29,7 +29,6 @@ class Transaction extends Model
         'sale_price',
         'split',
         'reinvested_dividend',
-        'currency',
     ];
 
     protected $hidden = [];
@@ -38,8 +37,6 @@ class Transaction extends Model
         'date' => 'datetime',
         'split' => 'boolean',
         'reinvested_dividend' => 'boolean',
-        'cost_basis' => LocalizedCurrency::class,
-        'sale_price' => LocalizedCurrency::class,
     ];
 
     protected static function boot()
@@ -48,17 +45,23 @@ class Transaction extends Model
 
         static::saving(function ($transaction) {
 
+            $transaction->loadMarketData();
+
+            $rate_to_base = Currency::historicRate($transaction->market_data->currency, config('investbrain.base_currency'), $transaction->date);
+
             if ($transaction->transaction_type == 'SELL') {
 
                 $transaction->ensureCostBasisIsAddedToSale();
+
+                $transaction->sale_price_base = $transaction->sale_price * $rate_to_base;
             }
+
+            $transaction->cost_basis_base = $transaction->cost_basis * $rate_to_base;
         });
 
         static::saved(function ($transaction) {
 
             $transaction->syncToHolding();
-
-            $transaction->refreshMarketData();
 
             cache()->forget('portfolio-metrics-'.$transaction->portfolio_id);
         });
@@ -79,16 +82,6 @@ class Transaction extends Model
         return Attribute::make(
             set: fn (string $value) => strtoupper($value)
         );
-    }
-
-    /**
-     * Related market data for transaction
-     *
-     * @return void
-     */
-    public function market_data(): HasOne
-    {
-        return $this->hasOne(MarketData::class, 'symbol', 'symbol');
     }
 
     /**
@@ -143,11 +136,6 @@ class Transaction extends Model
                 $query->where('id', auth()->id());
             });
         });
-    }
-
-    public function refreshMarketData(): void
-    {
-        MarketData::getMarketData($this->attributes['symbol']);
     }
 
     /**
