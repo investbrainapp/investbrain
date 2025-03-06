@@ -8,7 +8,11 @@ echo "CiAgKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi
 echo -e "\n====================== Validating environment...  ====================== "
 
 # Ensure app storage directory is scaffolded
-mkdir -p storage/{{framework/cache,framework/sessions,framework/views},app,logs}
+mkdir -p storage/framework/cache \
+          storage/framework/sessions \
+          storage/framework/views \
+          storage/app \
+          storage/logs
 
 # Ensure storage directory is permissioned for www-data
 chmod -R 775 storage
@@ -16,9 +20,9 @@ chown -R www-data:www-data storage
 
 echo -e "\n > Storage directory scaffolding is OK... "
 
-# Ensure app key is generated
-if [[ -z "$APP_KEY" ]]; then
-    echo -e "\n > Oops! The required APP_KEY configuration is missing in your environment! "
+# Ensure app key exists / generate if required
+KEY_FILE="storage/app/.key"
+if [ -z "$APP_KEY" ] && [ ! -s "$KEY_FILE" ]; then
 
     draw_box() {
       local text="$1"
@@ -30,7 +34,12 @@ if [[ -z "$APP_KEY" ]]; then
       echo "$border"
     }
 
-    export APP_KEY=$(php artisan key:generate --show)
+    export APP_KEY="$(php artisan key:generate --show)"
+
+    echo -e "\n > Oops! The required APP_KEY configuration is missing! Generated app key and saved in $KEY_FILE ."
+
+    echo "$APP_KEY" > "$KEY_FILE"
+
     draw_box $APP_KEY
 else
     echo -e "\n > APP_KEY is OK... "
