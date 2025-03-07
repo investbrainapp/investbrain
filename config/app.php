@@ -100,7 +100,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'key' => env('APP_KEY') ?: when(file_exists('storage/app/.key'), fn () => trim(file_get_contents('storage/app/.key'))),
+    'key' => env('APP_KEY')
+        ?: when(file_exists(storage_path('app/.key')), fn () => trim(file_get_contents(storage_path('app/.key')))),
 
     'previous_keys' => [
         ...array_filter(

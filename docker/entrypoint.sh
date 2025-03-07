@@ -14,11 +14,13 @@ mkdir -p storage/framework/cache \
           storage/app \
           storage/logs
 
+echo -e "\n > Storage directory scaffolding is OK... "
+
 # Ensure storage directory is permissioned for www-data
 chmod -R 775 storage
 chown -R www-data:www-data storage
 
-echo -e "\n > Storage directory scaffolding is OK... "
+echo -e "\n > Permissions are OK... "
 
 # Ensure app key exists / generate if required
 KEY_FILE="storage/app/.key"
@@ -36,7 +38,7 @@ if [ -z "$APP_KEY" ] && [ ! -s "$KEY_FILE" ]; then
 
     export APP_KEY="$(php artisan key:generate --show)"
 
-    echo -e "\n > Oops! The required APP_KEY configuration is missing! Generated app key and saved in $KEY_FILE ."
+    echo -e "\n > Oops! The required APP_KEY configuration is missing! Generated app key and saved in $KEY_FILE"
 
     echo "$APP_KEY" > "$KEY_FILE"
 
