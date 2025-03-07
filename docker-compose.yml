@@ -10,7 +10,6 @@ services:
     ports:
       - 8000:80
     environment: # You can either use these properties OR an .env file. Do not use both!
-      APP_KEY: "" # Generate a key using `echo base64:$(openssl rand -base64 32)`
       APP_URL: "http://localhost:8000"
       ASSET_URL: "http://localhost:8000"
       DB_CONNECTION: mysql
@@ -25,7 +24,7 @@ services:
       REDIS_HOST: investbrain-redis
     volumes:
       - investbrain-storage:/var/app/storage # You can use a volume... 
-      # - /path/to/storage:/var/app/storage # ...or you can use a path on host
+      # - /path/to/storage:/var/app/storage:delegated # ...or you can use a path on host
     depends_on:
       - mysql
       - redis
