@@ -37,6 +37,8 @@
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-holding-options')"
             />
+            @else
+            <x-icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
             @endcan
 
             <x-ib-flex-spacer />

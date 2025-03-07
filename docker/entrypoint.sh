@@ -1,12 +1,30 @@
 #!/bin/bash
 
-cd /var/www/app
+cd /var/app
+
+# Starting Investbrain
+echo "CiAgKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICAqICBJSUkgICBOICAgTiAgViAgIFYgIEVFRUVFICBTU1NTICBUVFRUVCAgQkJCQkIgICBSUlJSICAgIEFBQUFBICBJSUkgICBOICAgTiAgKgogICogICBJICAgIE5OICBOICBWICAgViAgRSAgICAgIFMgICAgICAgVCAgICBCICAgIEIgIFIgICBSICAgQSAgIEEgICBJICAgIE5OICBOICAqCiAgKiAgIEkgICAgTiBOIE4gIFYgICBWICBFRUVFICAgU1NTUyAgICBUICAgIEJCQkJCICAgUlJSUiAgICBBQUFBQSAgIEkgICAgTiBOIE4gICoKICAqICAgSSAgICBOICBOTiAgViAgIFYgIEUgICAgICAgICAgUyAgIFQgICAgQiAgICBCICBSICBSICAgIEEgICBBICAgSSAgICBOICBOTiAgKgogICogIElJSSAgIE4gICBOICAgVlZWICAgRUVFRUUgIFNTU1MgICAgVCAgICBCQkJCQiAgIFIgICBSICAgQSAgIEEgIElJSSAgIE4gICBOICAqCiAgKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICA=" | base64 -d
 
 echo -e "\n====================== Validating environment...  ====================== "
-if [[ -z "$APP_KEY" ]]; then
-    echo -e "\n > Oops! The required APP_KEY configuration is missing in your environment! "
-    echo -e "\n > Generating a key (see below) but this will NOT be persisted between container restarts. "
-    echo -e "\n > You should set this APP_KEY in your .env file! "
+
+# Ensure app storage directory is scaffolded
+mkdir -p storage/framework/cache \
+          storage/framework/sessions \
+          storage/framework/views \
+          storage/app \
+          storage/logs
+
+echo -e "\n > Storage directory scaffolding is OK... "
+
+# Ensure storage directory is permissioned for www-data
+chmod -R 775 storage
+chown -R www-data:www-data storage
+
+echo -e "\n > Permissions are OK... "
+
+# Ensure app key exists / generate if required
+KEY_FILE="storage/app/.key"
+if [ -z "$APP_KEY" ] && [ ! -s "$KEY_FILE" ]; then
 
     draw_box() {
       local text="$1"
@@ -18,40 +36,43 @@ if [[ -z "$APP_KEY" ]]; then
       echo "$border"
     }
 
-    export APP_KEY=base64:$(openssl rand -base64 32)
+    export APP_KEY="$(php artisan key:generate --show)"
+
+    echo -e "\n > Oops! The required APP_KEY configuration is missing! Generated app key and saved in $KEY_FILE"
+
+    echo "$APP_KEY" > "$KEY_FILE"
+
     draw_box $APP_KEY
-fi
-
-for dir in storage/framework/cache storage/framework/sessions storage/framework/views; do
-    if [ ! -d "$dir" ]; then
-        echo -e "\n > $dir is missing. Creating scaffold for storage directory... "
-        mkdir -p storage/framework/{cache,sessions,views}
-        chmod -R 775 storage
-        chown -R www-data:www-data storage
-    fi
-done
-
-if [ ! -L "public/storage" ]; then
-    echo -e "\n > Creating symbolic link for app public storage... "
-    
-    /usr/local/bin/php /var/www/app/artisan storage:link
+else
+    echo -e "\n > APP_KEY is OK... "
 fi
 
 echo -e "\n====================== Running migrations...  ====================== "
-run_migrations() {
-    /usr/local/bin/php /var/www/app/artisan migrate --force
-}
-RETRIES=10
+
+# Wait 60 seconds for database to be ready
+RETRIES=12 
 DELAY=5
+run_migrations() {
+    sleep $DELAY
+    # php artisan migrate --force
+    output=$(php artisan migrate --force 2>/dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "$output"
+        return 0
+    else
+        return 1
+    fi
+}
 until run_migrations; do
   RETRIES=$((RETRIES-1))
-  if [ $RETRIES -le 0 ]; then
-    echo -e "\n > Database is not ready after $RETRIES attempts. Exiting... "
+  if [[ $RETRIES -le 0 ]]; then
+    echo -e "\n > Database is not ready after one minute. Exiting... \n"
     exit 1
   fi
-  echo -e "\n > Waiting for database to be ready... retrying in $DELAY seconds. "
-  sleep $DELAY
+  echo -e "\n > Waiting for database to be ready... retrying in $DELAY seconds. \n"
 done
 
 echo -e "\n====================== Spinning up Supervisor daemon...  ====================== \n"
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+
+exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+

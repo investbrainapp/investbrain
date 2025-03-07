@@ -52,10 +52,6 @@ Adjust the `environment` properties in the compose file to your preferences.
 
 **Importantly**, you need to set the `APP_KEY` value.  If you're unsure, Investbrain will generate an `APP_KEY` for you on first run, but it will not persist. You must _manually_ update your environment configuration with this generated value!
 
-Alternatively, create a .env file in the same directory as your compose file, then reference the .env file using the `env_file` property. 
-
-> Want to know what other configuration options are available? You can reference the [.env.example](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file in this respository for available environment  configurations. 
-
 **3. Run `docker compose up`**
 
 It might take a few minutes to pull the Docker images. But assuming everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
@@ -215,6 +211,14 @@ docker exec -it investbrain-app tail -f storage/logs/laravel.log
 ```
 
 ### Common issues
+
+<details>
+
+**<summary>Application styling is broken and images are too big</summary>**
+
+If you're serving Investbrain from a DNS name (e.g. example.com), it's likely that you haven't updated the `ASSET_URL` environment yet. The URL provided there will be used to generate absolute URLs for images, JS, and CSS assets on the front end of the application.
+
+</details>
 
 <details>
 
