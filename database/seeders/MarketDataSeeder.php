@@ -60,7 +60,7 @@ class MarketDataSeeder extends Seeder
                         }
                     } catch (\Throwable $e) {
 
-                        throw new \Exception('Error: '.$e->getMessage());
+                        throw new \Exception('Error: '.substr($e->getMessage(), 0, 250));
                     }
                 }
             }
