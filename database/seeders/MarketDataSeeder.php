@@ -60,7 +60,7 @@ class MarketDataSeeder extends Seeder
                         }
                     } catch (\Throwable $e) {
 
-                        throw new \Exception('Error: '.substr($e->getMessage(), 0, 500));
+                        throw new \Exception('Error: '.$e->getMessage());
                     }
                 }
             }
@@ -73,7 +73,7 @@ class MarketDataSeeder extends Seeder
             // Close the CSV file
             fclose($handle);
 
-            echo "Imported $rowCount market data items successfully!\n";
+            echo "\n  > Imported $rowCount market data items successfully!";
 
         } else {
 
