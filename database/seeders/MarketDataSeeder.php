@@ -12,6 +12,8 @@ class MarketDataSeeder extends Seeder
 {
     use WithoutModelEvents;
 
+    public array $rows = [];
+
     /**
      * Run the database seeds.
      */
@@ -26,7 +28,6 @@ class MarketDataSeeder extends Seeder
         if (($handle = fopen($csvFilePath, 'r')) !== false) {
 
             $header = null;
-            $rows = [];
             $rowCount = 0;
 
             while (($row = fgetcsv($handle, 0, ',')) !== false) {
@@ -38,36 +39,33 @@ class MarketDataSeeder extends Seeder
 
                 } else {
 
-                    try {
-                        $data = array_combine($header, $row);
+                    $data = array_combine($header, $row);
 
-                        $rows[] = [
-                            'symbol' => $data['symbol'],
-                            'name' => $data['name'],
-                            'meta_data' => json_encode([
-                                'country' => $data['country'],
-                                'first_trade_year' => $data['first_trade_year'],
-                                'sector' => $data['sector'],
-                                'industry' => $data['industry'],
-                            ]),
-                        ];
+                    $this->rows[] = [
+                        'symbol' => $data['symbol'],
+                        'name' => $data['name'],
+                        'meta_data' => json_encode([
+                            'country' => $data['country'],
+                            'first_trade_year' => $data['first_trade_year'],
+                            'sector' => $data['sector'],
+                            'industry' => $data['industry'],
+                        ]),
+                    ];
 
-                        $rowCount++;
+                    $rowCount++;
 
-                        if ($rowCount % $chunkSize == 0) {
-                            DB::table('market_data')->insertOrIgnore($rows);
-                            $rows = [];
-                        }
-                    } catch (\Throwable $e) {
+                    if ($rowCount % $chunkSize == 0) {
 
-                        throw new \Exception('Error: '.$e->getMessage());
+                        $this->bulkInsert($this->rows);
                     }
                 }
             }
 
             // final clean up
-            if (! empty($rows)) {
-                DB::table('market_data')->insertOrIgnore($rows);
+            if (! empty($this->rows)) {
+                echo 'did '.$rowCount.' already. doing '.count($this->rows).' more';
+                $this->bulkInsert($this->rows);
+
             }
 
             // Close the CSV file
@@ -78,6 +76,19 @@ class MarketDataSeeder extends Seeder
         } else {
 
             echo "Failed to open the CSV.\n";
+        }
+    }
+
+    public function bulkInsert(array $rows)
+    {
+        try {
+
+            DB::table('market_data')->insertOrIgnore($rows);
+            $this->rows = [];
+
+        } catch (\Throwable $e) {
+
+            throw new \Exception('Error: '.$e->getMessage());
         }
     }
 }
