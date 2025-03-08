@@ -63,9 +63,8 @@ class MarketDataSeeder extends Seeder
 
             // final clean up
             if (! empty($this->rows)) {
-                echo 'did '.$rowCount.' already. doing '.count($this->rows).' more';
-                $this->bulkInsert($this->rows);
 
+                $this->bulkInsert($this->rows);
             }
 
             // Close the CSV file

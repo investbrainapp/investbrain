@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Models\MarketData;
 use App\Models\Portfolio;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,7 +19,7 @@ class CreateHoldingsTable extends Migration
         Schema::create('holdings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
-            $table->foreignIdFor(MarketData::class, 'symbol');
+            $table->string('symbol', 15);
             $table->float('quantity', 12, 4);
             $table->float('average_cost_basis', 12, 4)->default(0);
             $table->float('total_cost_basis', 12, 4)->default(0);
@@ -28,6 +27,8 @@ class CreateHoldingsTable extends Migration
             $table->float('dividends_earned', 12, 4)->default(0);
             $table->timestamp('splits_synced_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('symbol')->references('symbol')->on('market_data');
         });
     }
 
