@@ -148,7 +148,7 @@ class Holding extends Model
     {
         return $query->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
             ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100, 0) AS market_gain_percent');
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / NULLIF(holdings.average_cost_basis, 0)) * 100, 0) AS market_gain_percent');
     }
 
     public function scopePortfolio($query, $portfolio)
