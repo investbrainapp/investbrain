@@ -100,7 +100,25 @@ class Holding extends Model
                     ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
                     ->whereRaw("transactions.symbol = '$this->symbol'");
             })
-            ->having('total_received', '>', 0);
+            ->havingRaw("SUM(
+                (CASE 
+                    WHEN transaction_type = 'BUY'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.date <= dividends.date
+                THEN transactions.quantity 
+                ELSE 0 
+                END)
+                - 
+                (CASE 
+                    WHEN transaction_type = 'SELL'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.date <= dividends.date
+                THEN transactions.quantity 
+                ELSE 0 
+                END)
+            ) * dividends.dividend_amount > 0");
     }
 
     /**
