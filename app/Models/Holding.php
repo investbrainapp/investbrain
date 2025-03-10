@@ -210,10 +210,10 @@ class Holding extends Model
         $query = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,
-        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `total_cost_basis`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS `total_sale_price`')
+        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS qty_purchases')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS qty_sales')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis')
+            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS total_sale_price')
             ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
@@ -304,7 +304,7 @@ class Holding extends Model
                 DB::raw("
                 ROUND(
                 COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS `owned`
+                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS owned
             "),
                 DB::raw("
                COALESCE(CASE
@@ -319,7 +319,7 @@ class Holding extends Model
                     END)
                 END, 0) AS cost_basis
             "),
-                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS `realized_gains`"),
+                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS realized_gains"),
             ])
             ->leftJoin('transactions', function ($join) {
                 $join->on(DB::raw('DATE(transactions.date)'), '<=', 'date_series.date')
