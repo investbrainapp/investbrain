@@ -18,7 +18,7 @@ class CreateDividendsTable extends Migration
         Schema::create('dividends', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->date('date');
-            $table->string('symbol', 15);
+            $table->string('symbol', 25);
             $table->float('dividend_amount', 12, 4);
             $table->timestamps();
 

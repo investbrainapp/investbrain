@@ -265,12 +265,41 @@ class Holding extends Model
             $end_date = now();
         }
 
+        // MySQL default interval
         $date_interval = 'DATE_ADD(date, INTERVAL 1 DAY)';
 
+        // Use SQLite interval grammar
         if (config('database.default') === 'sqlite') {
 
             $date_interval = "date(date, '+1 day')";
-        } else {
+        }
+
+        // Default CTE time series query (for MySQL and SQLite)
+        $timeSeriesQuery = DB::table(DB::raw("(
+            WITH RECURSIVE date_series AS (
+                SELECT '{$start_date->format('Y-m-d')}' AS date
+                UNION ALL
+                SELECT $date_interval
+                FROM date_series
+                WHERE date < '{$end_date->format('Y-m-d')}'
+            )
+            SELECT date_series.date
+            FROM date_series
+        ) as date_series"));
+
+        // PGSql time series query
+        if (config('database.default') === 'pgsql') {
+
+            $timeSeriesQuery = DB::table(DB::raw("
+                generate_series(
+                    date '{$start_date->format('Y-m-d')}', 
+                    date '{$end_date->format('Y-m-d')}', 
+                    interval '1 day'
+                ) as date_series"));
+        }
+
+        // Set MySQL-like query CTE max iterations
+        if (config('database.default') === 'mysql') {
 
             // MySQL default
             $max_recursion_var_name = 'cte_max_recursion_depth';
@@ -287,38 +316,28 @@ class Holding extends Model
             DB::statement("SET $max_recursion_var_name=1000000;");
         }
 
-        return DB::table(DB::raw("(
-                WITH RECURSIVE date_series AS (
-                    SELECT '{$start_date->format('Y-m-d')}' AS date
-                    UNION ALL
-                    SELECT $date_interval
-                    FROM date_series
-                    WHERE date < '{$end_date->format('Y-m-d')}'
-                )
-                SELECT date_series.date
-                FROM date_series
-            ) as date_series")
-        )
+        // Extracted query for counting QTY owned
+        $quantityQuery = "ROUND(CAST(COALESCE(
+            SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END) 
+            - SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END),
+            0
+        ) AS numeric), 3)";
+
+        return $timeSeriesQuery
             ->select([
                 'date_series.date',
                 DB::raw("
-                ROUND(
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS owned
-            "),
+                    {$quantityQuery} AS owned
+                "),
                 DB::raw("
-               COALESCE(CASE
-                    WHEN (
-                        ROUND(
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3)
-                    ) = 0 THEN 0
-                    ELSE SUM(CASE
-                        WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis
-                        ELSE 0
-                    END)
-                END, 0) AS cost_basis
-            "),
+                    CASE
+                        WHEN ({$quantityQuery}) = 0 THEN 0
+                        ELSE SUM(CASE
+                            WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis
+                            ELSE 0
+                        END)
+                    END AS cost_basis
+                "),
                 DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS realized_gains"),
             ])
             ->leftJoin('transactions', function ($join) {

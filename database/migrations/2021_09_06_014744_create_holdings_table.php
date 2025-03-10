@@ -19,7 +19,7 @@ class CreateHoldingsTable extends Migration
         Schema::create('holdings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
-            $table->string('symbol', 15)->when(config('database.default') != 'sqlite', fn ($ctx) => $ctx->fulltext());
+            $table->string('symbol', 25)->when(config('database.default') != 'sqlite', fn ($ctx) => $ctx->fulltext());
             $table->float('quantity', 12, 4);
             $table->float('average_cost_basis', 12, 4)->default(0);
             $table->float('total_cost_basis', 12, 4)->default(0);
