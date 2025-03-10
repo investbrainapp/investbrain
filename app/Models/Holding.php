@@ -221,9 +221,8 @@ class Holding extends Model
         $average_cost_basis = (
             $query->qty_purchases > 0
             && $total_quantity > 0
-        )
-                                    ? $query->total_cost_basis / $query->qty_purchases
-                                    : 0;
+        ) ? $query->total_cost_basis / $query->qty_purchases
+        : 0;
 
         // update holding
         $this->fill([
@@ -267,6 +266,7 @@ class Holding extends Model
 
         // MySQL default interval
         $date_interval = 'DATE_ADD(date, INTERVAL 1 DAY)';
+        $castNumberType = 'decimal';
 
         // Use SQLite interval grammar
         if (config('database.default') === 'sqlite') {
@@ -296,6 +296,8 @@ class Holding extends Model
                     date '{$end_date->format('Y-m-d')}', 
                     interval '1 day'
                 ) as date_series"));
+
+            $castNumberType = 'numeric';
         }
 
         // Set MySQL-like query CTE max iterations
@@ -321,7 +323,7 @@ class Holding extends Model
             SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END) 
             - SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END),
             0
-        ) AS numeric), 3)";
+        ) AS {$castNumberType}), 3)";
 
         return $timeSeriesQuery
             ->select([
