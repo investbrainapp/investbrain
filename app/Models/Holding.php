@@ -210,10 +210,10 @@ class Holding extends Model
         $query = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,
-        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS qty_purchases')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS qty_sales')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS total_sale_price')
+        ])->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) AS qty_purchases")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sales")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price) ELSE 0 END) AS total_sale_price")
             ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
