@@ -27,8 +27,6 @@ class CreateTransactionsTable extends Migration
             $table->boolean('split')->default(false);
             $table->date('date');
             $table->timestamps();
-
-            $table->foreign('symbol')->references('symbol')->on('market_data');
         });
     }
 

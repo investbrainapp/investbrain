@@ -19,7 +19,7 @@ class CreateMarketDataTable extends Migration
     {
         Schema::create('market_data', function (Blueprint $table) {
             $table->string('symbol', 15)->primary();
-            $table->string('name')->fulltext()->nullable();
+            $table->string('name')->nullable()->when(config('database.default') != 'sqlite', fn ($ctx) => $ctx->fulltext());
             $table->float('market_value', 12, 4)->nullable();
             $table->float('fifty_two_week_low', 12, 4)->nullable();
             $table->float('fifty_two_week_high', 12, 4)->nullable();
