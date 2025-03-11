@@ -20,7 +20,7 @@ class CurrencyDataTest extends TestCase
             '--force' => true,
         ]);
 
-        $this->assertEquals(19, Currency::count('currency'));
+        $this->assertEquals(22, Currency::count('currency'));
     }
 
     public function test_can_convert_currency_to_base()

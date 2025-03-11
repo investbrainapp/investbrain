@@ -39,5 +39,7 @@ class CurrencySeeder extends Seeder
             ['currency' => 'CHF', 'label' => 'Swiss Franc', 'rate' => 0, 'created_at' => now()],
             ['currency' => 'USD', 'label' => 'United States Dollar', 'rate' => 1, 'created_at' => now()],
         ]);
+
+        Currency::refreshCurrencyData();
     }
 }
