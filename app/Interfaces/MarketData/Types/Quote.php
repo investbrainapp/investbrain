@@ -9,9 +9,11 @@ use Illuminate\Support\Carbon;
 
 class Quote extends MarketDataType
 {
-    public function setName(string $name): self
+    public function setName($name): self
     {
-        $this->items['name'] = (string) $name;
+        if (! empty($name)) {
+            $this->items['name'] = (string) $name;
+        }
 
         return $this;
     }

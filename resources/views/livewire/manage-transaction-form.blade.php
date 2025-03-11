@@ -1,33 +1,38 @@
 <?php
 
-use App\Models\Transaction;
 use App\Models\Portfolio;
-use App\Rules\SymbolValidationRule;
+use App\Models\Transaction;
 use App\Rules\QuantityValidationRule;
-use Illuminate\Support\Collection;
-use Livewire\Attributes\{Computed};
+use App\Rules\SymbolValidationRule;
+use App\Traits\WithTrimStrings;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
-use Illuminate\Validation\Rule;
-use App\Traits\WithTrimStrings;
 
-new class extends Component {
+new class extends Component
+{
     use Toast;
     use WithTrimStrings;
 
     // props
     public ?Portfolio $portfolio;
+
     public ?Transaction $transaction;
 
-    public ?String $portfolio_id;
-    public String $symbol;
-    public String $transaction_type;
-    public String $date;
-    public Float $quantity;
-    public ?Float $cost_basis;
-    public ?Float $sale_price;
+    public ?string $portfolio_id;
 
-    public Bool $confirmingTransactionDeletion = false;
+    public string $symbol;
+
+    public string $transaction_type;
+
+    public string $date;
+
+    public float $quantity;
+
+    public ?float $cost_basis;
+
+    public ?float $sale_price;
+
+    public bool $confirmingTransactionDeletion = false;
 
     // methods
     public function rules()
@@ -36,19 +41,19 @@ new class extends Component {
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => 'required|string|in:BUY,SELL',
             'portfolio_id' => 'required|exists:portfolios,id',
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:' . now()->format('Y-m-d')],
+            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->format('Y-m-d')],
             'quantity' => [
-                'required', 
-                'numeric', 
-                'min:0', 
-                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date)
+                'required',
+                'numeric',
+                'min:0',
+                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date),
             ],
             'cost_basis' => 'exclude_if:transaction_type,SELL|min:0|numeric',
             'sale_price' => 'exclude_if:transaction_type,BUY|min:0|numeric',
         ];
     }
 
-    public function mount() 
+    public function mount()
     {
         if (isset($this->transaction)) {
 
@@ -59,7 +64,7 @@ new class extends Component {
             $this->quantity = $this->transaction->quantity;
             $this->cost_basis = $this->transaction->cost_basis;
             $this->sale_price = $this->transaction->sale_price;
-            
+
         } else {
             $this->transaction_type = 'BUY';
             $this->portfolio_id = isset($this->portfolio) ? $this->portfolio->id : '';
@@ -70,9 +75,8 @@ new class extends Component {
     public function update()
     {
         $this->authorize('fullAccess', $this->portfolio);
-        
+
         $this->transaction->update($this->validate());
-        // $this->transaction->owner_id = auth()->user()->id;
         $this->transaction->save();
 
         $this->success(__('Transaction updated'));
@@ -83,7 +87,7 @@ new class extends Component {
 
     public function save()
     {
-        if (!isset($this->portfolio)) {
+        if (! isset($this->portfolio)) {
             $this->portfolio = Portfolio::find($this->portfolio_id);
         }
 
@@ -106,6 +110,11 @@ new class extends Component {
         $this->transaction->delete();
 
         $this->success(__('Transaction deleted'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $this->symbol]));
+    }
+
+    public function updatedSymbol($value)
+    {
+        $this->symbol = strtoupper($value);
     }
 }; ?>
 

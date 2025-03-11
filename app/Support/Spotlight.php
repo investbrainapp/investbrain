@@ -19,7 +19,7 @@ class Spotlight
         }
 
         $portfolios = $request->user()->portfolios()
-            ->where('title', 'LIKE', '%'.$request->input('search').'%')
+            ->whereFullText('title', $request->input('search'))
             ->limit(5)
             ->get();
         $portfolios->each(function ($portfolio) use ($results) {
@@ -35,8 +35,8 @@ class Spotlight
         $holdings = $request->user()->holdings()
             ->where('holdings.quantity', '>', 0)
             ->where(function ($query) use ($request) {
-                return $query->where('holdings.symbol', 'LIKE', '%'.$request->input('search').'%')
-                    ->orWhere('market_data.name', 'LIKE', '%'.$request->input('search').'%');
+                return $query->whereFullText('holdings.symbol', $request->input('search'))
+                    ->orWhereFullText('market_data.name', $request->input('search'));
             })
             ->limit(5)
             ->get();

@@ -3,16 +3,16 @@
 use App\Models\Holding;
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // props
     public Holding $holding;
 
     protected $listeners = [
         'transaction-updated' => '$refresh',
-        'transaction-saved' => '$refresh'
+        'transaction-saved' => '$refresh',
     ];
-    
+
     // methods
 
 }; ?>

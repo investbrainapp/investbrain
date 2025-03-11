@@ -101,7 +101,7 @@ class Split extends Model
             ->where([
                 'splits.symbol' => $symbol,
             ])
-            ->whereDate('splits.date', '>', DB::raw('IFNULL(holdings.splits_synced_at, "0000-00-00")'))
+            ->whereDate('splits.date', '>', DB::raw("COALESCE(holdings.splits_synced_at, '1901-01-01')"))
             ->where('holdings.quantity', '>', 0)
             ->join('holdings', 'splits.symbol', 'holdings.symbol')
             ->orderBy('splits.date', 'ASC')
@@ -115,8 +115,8 @@ class Split extends Model
                 'portfolio_id' => $split->portfolio_id,
             ])
                 ->whereDate('transactions.date', '<', $split->date->format('Y-m-d'))
-                ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) -
-                            SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS qty_owned')
+                ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) -
+                            SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_owned")
                 ->value('qty_owned');
 
             if ($qty_owned > 0) {
