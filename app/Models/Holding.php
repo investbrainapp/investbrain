@@ -32,6 +32,12 @@ class Holding extends Model
     protected $casts = [
         'splits_synced_at' => 'datetime',
         'first_transaction_date' => 'datetime',
+        'average_cost_basis' => 'float',
+        'total_cost_basis' => 'float',
+        'total_gain_dollars' => 'float',
+        'realized_gain_dollars' => 'float',
+        'dividends_earned' => 'float',
+        'splits_synced_at' => 'float',
         'reinvest_dividends' => 'boolean',
     ];
 
