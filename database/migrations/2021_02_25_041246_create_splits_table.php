@@ -21,8 +21,6 @@ class CreateSplitsTable extends Migration
             $table->string('symbol', 25);
             $table->float('split_amount', 12, 4);
             $table->timestamps();
-
-            $table->foreign('symbol')->references('symbol')->on('market_data');
         });
     }
 
