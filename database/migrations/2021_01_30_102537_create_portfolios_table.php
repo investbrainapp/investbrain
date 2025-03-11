@@ -17,7 +17,7 @@ return new class extends Migration
     {
         Schema::create('portfolios', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('title');
+            $table->string('title')->when(config('database.default') != 'sqlite', fn ($ctx) => $ctx->fulltext());
             $table->text('notes')->nullable();
             $table->boolean('wishlist')->default(false);
             $table->timestamps();

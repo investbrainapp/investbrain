@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Dividend extends Model
@@ -114,22 +115,28 @@ class Dividend extends Model
     public static function syncHoldings(string $symbol): void
     {
         // group by holdings
-        $dividends = self::select(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
-            ->selectRaw('
-                            (COALESCE(CASE WHEN transactions.transaction_type = "BUY" 
-                                AND date(transactions.date) <= date(dividends.date) 
-                                THEN transactions.quantity ELSE 0 END, 0)
-                            - COALESCE(CASE WHEN transactions.transaction_type = "SELL" 
-                                AND date(transactions.date) <= date(dividends.date) 
-                                THEN transactions.quantity ELSE 0 END, 0))
-                            * dividends.dividend_amount
-                                AS total_received
-                        ')
-            ->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
+        $subQuery = self::select([
+            'holdings.portfolio_id',
+            'dividends.date',
+            'dividends.symbol',
+            'dividends.dividend_amount',
+        ])->selectRaw("
+            (COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' 
+                AND date(transactions.date) <= date(dividends.date) 
+                THEN transactions.quantity ELSE 0 END), 0)
+            - COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' 
+                AND date(transactions.date) <= date(dividends.date) 
+                THEN transactions.quantity ELSE 0 END), 0))
+            * dividends.dividend_amount
+            AS total_received
+        ")->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
             ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
             ->where('dividends.symbol', $symbol)
-            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
-            ->havingRaw('total_received > 0')
+            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount');
+
+        $dividends = DB::table(DB::raw("({$subQuery->toSql()}) as sub"))
+            ->mergeBindings($subQuery->getQuery())
+            ->where('total_received', '>', 0)
             ->get();
 
         // iterate through holdings and update

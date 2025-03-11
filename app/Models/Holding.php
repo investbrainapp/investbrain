@@ -92,7 +92,25 @@ class Holding extends Model
                     ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
                     ->whereRaw("transactions.symbol = '$this->symbol'");
             })
-            ->having('total_received', '>', 0);
+            ->havingRaw("SUM(
+                (CASE 
+                    WHEN transaction_type = 'BUY'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.date <= dividends.date
+                THEN transactions.quantity 
+                ELSE 0 
+                END)
+                - 
+                (CASE 
+                    WHEN transaction_type = 'SELL'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.date <= dividends.date
+                THEN transactions.quantity 
+                ELSE 0 
+                END)
+            ) * dividends.dividend_amount > 0");
     }
 
     /**
@@ -140,7 +158,7 @@ class Holding extends Model
     {
         return $query->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
             ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100, 0) AS market_gain_percent');
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / NULLIF(holdings.average_cost_basis, 0)) * 100, 0) AS market_gain_percent');
     }
 
     public function scopePortfolio($query, $portfolio)
@@ -184,10 +202,10 @@ class Holding extends Model
         $query = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,
-        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `total_cost_basis`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS `total_sale_price`')
+        ])->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) AS qty_purchases")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sales")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price) ELSE 0 END) AS total_sale_price")
             ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
@@ -195,9 +213,8 @@ class Holding extends Model
         $average_cost_basis = (
             $query->qty_purchases > 0
             && $total_quantity > 0
-        )
-                                    ? $query->total_cost_basis / $query->qty_purchases
-                                    : 0;
+        ) ? $query->total_cost_basis / $query->qty_purchases
+        : 0;
 
         // update holding
         $this->fill([
@@ -239,12 +256,44 @@ class Holding extends Model
             $end_date = now();
         }
 
+        // MySQL default interval
         $date_interval = 'DATE_ADD(date, INTERVAL 1 DAY)';
+        $castNumberType = 'decimal';
 
+        // Use SQLite interval grammar
         if (config('database.default') === 'sqlite') {
 
             $date_interval = "date(date, '+1 day')";
-        } else {
+        }
+
+        // Default CTE time series query (for MySQL and SQLite)
+        $timeSeriesQuery = DB::table(DB::raw("(
+            WITH RECURSIVE date_series AS (
+                SELECT '{$start_date->format('Y-m-d')}' AS date
+                UNION ALL
+                SELECT $date_interval
+                FROM date_series
+                WHERE date < '{$end_date->format('Y-m-d')}'
+            )
+            SELECT date_series.date
+            FROM date_series
+        ) as date_series"));
+
+        // PGSql time series query
+        if (config('database.default') === 'pgsql') {
+
+            $timeSeriesQuery = DB::table(DB::raw("
+                generate_series(
+                    date '{$start_date->format('Y-m-d')}', 
+                    date '{$end_date->format('Y-m-d')}', 
+                    interval '1 day'
+                ) as date_series"));
+
+            $castNumberType = 'numeric';
+        }
+
+        // Set MySQL-like query CTE max iterations
+        if (config('database.default') === 'mysql') {
 
             // MySQL default
             $max_recursion_var_name = 'cte_max_recursion_depth';
@@ -261,39 +310,29 @@ class Holding extends Model
             DB::statement("SET $max_recursion_var_name=1000000;");
         }
 
-        return DB::table(DB::raw("(
-                WITH RECURSIVE date_series AS (
-                    SELECT '{$start_date->format('Y-m-d')}' AS date
-                    UNION ALL
-                    SELECT $date_interval
-                    FROM date_series
-                    WHERE date < '{$end_date->format('Y-m-d')}'
-                )
-                SELECT date_series.date
-                FROM date_series
-            ) as date_series")
-        )
+        // Extracted query for counting QTY owned
+        $quantityQuery = "ROUND(CAST(COALESCE(
+            SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END) 
+            - SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END),
+            0
+        ) AS {$castNumberType}), 3)";
+
+        return $timeSeriesQuery
             ->select([
                 'date_series.date',
                 DB::raw("
-                ROUND(
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS `owned`
-            "),
+                    {$quantityQuery} AS owned
+                "),
                 DB::raw("
-               COALESCE(CASE
-                    WHEN (
-                        ROUND(
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3)
-                    ) = 0 THEN 0
-                    ELSE SUM(CASE
-                        WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis
-                        ELSE 0
-                    END)
-                END, 0) AS cost_basis
-            "),
-                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS `realized_gains`"),
+                    CASE
+                        WHEN ({$quantityQuery}) = 0 THEN 0
+                        ELSE SUM(CASE
+                            WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis
+                            ELSE 0
+                        END)
+                    END AS cost_basis
+                "),
+                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS realized_gains"),
             ])
             ->leftJoin('transactions', function ($join) {
                 $join->on(DB::raw('DATE(transactions.date)'), '<=', 'date_series.date')

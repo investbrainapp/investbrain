@@ -211,6 +211,11 @@ class Portfolio extends Model
         if (! empty($total_performance)) {
             DB::transaction(function () use ($total_performance) {
 
+                // delete old history
+                $firstDate = array_keys($total_performance)[0];
+                $this->daily_change()->where('date', '<', $firstDate)->delete();
+
+                // upsert new history
                 $this->daily_change()->upsert(
                     $total_performance,
                     ['date', 'portfolio_id'],

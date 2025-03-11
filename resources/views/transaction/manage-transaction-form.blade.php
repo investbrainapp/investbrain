@@ -134,6 +134,11 @@ new class extends Component
 
         $this->success(__('Transaction deleted'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $this->symbol]));
     }
+
+    public function updatedSymbol($value)
+    {
+        $this->symbol = strtoupper($value);
+    }
 }; ?>
 
 <div class="" x-data="{ transaction_type: @entangle('transaction_type') }">
