@@ -53,48 +53,11 @@ class Currency extends Model
     }
 
     /**
-     * Convert from base currency to provided currency
-     */
-    public static function fromBaseCurrency(?float $value, string $to)
-    {
-        if ($to != config('investbrain.base_currency')) {
-            $value = Currency::convert($value, config('investbrain.base_currency'), $to);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Convert from provided to base currency
-     */
-    public static function toBaseCurrency(?float $value, string $from)
-    {
-        if ($from != config('investbrain.base_currency')) {
-            $value = Currency::convert($value, $from);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Convert from base to user's preferred currency
-     */
-    public static function toDisplayCurrency(?float $value)
-    {
-        //
-        if (auth()->user()->getCurrency() != config('investbrain.base_currency')) {
-            $value = Currency::convert($value, config('investbrain.base_currency'), auth()->user()->getCurrency());
-        }
-
-        return $value;
-    }
-
-    /**
      * Converts between supported currencies
      *
      * @param  string|null  $to  (defaults to base currency)
      */
-    public static function convert(?float $value, string $from, ?string $to = null): float
+    public static function convert(?float $value, string $from, ?string $to = null, mixed $date = null): float
     {
         if (empty($value)) {
             return 0;
@@ -105,7 +68,14 @@ class Currency extends Model
             $to = config('investbrain.base_currency');
         }
 
-        // get rates from cache
+        // Needs historic conversion
+        if (! is_null($date) && ! Carbon::parse($date)->isToday()) {
+            $rate = self::historicRate($from, $to, $date);
+
+            return (float) $value * $rate;
+        }
+
+        // Get rates from cache
         [$from, $to] = [
             cache()->remember($from.'_rate', 10, function () use ($from) {
                 return self::where('currency', $from)->select('rate')->firstOrFail();
@@ -121,10 +91,10 @@ class Currency extends Model
         // get value in base currency
         $base_currency_value = $value * $rate_to_base;
 
-        return $base_currency_value * $to->rate;
+        return (float) $base_currency_value * $to->rate;
     }
 
-    public static function historicRate(string $from, ?string $to, string|\DateTime $date): float
+    public static function historicRate(string $from, ?string $to, mixed $date = null): float
     {
         // Assume converting to base
         if (empty($to)) {
@@ -137,14 +107,18 @@ class Currency extends Model
         }
 
         // If we don't need historic, let's use current rate
-        if (Carbon::parse($date)->isToday()) {
+        if (is_null($date) || Carbon::parse($date)->isToday()) {
             return self::convert(1, $from, $to);
         }
 
-        $rate = Frankfurter::setBaseCurrency($from)->setSymbols($to)->historical($date);
-        $rate = Arr::get($rate, "rates.{$to}");
+        // Make sure we have a Carbon date
+        $date = Carbon::parse($date);
 
-        return $rate;
+        return (float) cache()->remember("{$from}_{$to}_rate_{$date->toDateString()}", 10, function () use ($from, $to, $date) {
+            $rate = Frankfurter::setBaseCurrency($from)->setSymbols($to)->historical($date);
+
+            return Arr::get($rate, "rates.{$to}");
+        });
     }
 
     public static function timeSeriesRates(string $from, ?string $to, string|\DateTime $start, mixed $end = null): array

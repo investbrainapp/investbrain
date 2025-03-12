@@ -29,8 +29,12 @@ return new class extends Migration
          * Add currency column to market_data table
          */
         Schema::table('market_data', function (Blueprint $table) {
+            $table->float('market_value_base', 12, 4)->nullable()->after('market_value');
             $table->string('currency', 3)->default(config('investbrain.base_currency'))->after('market_value');
         });
+        DB::table('market_data')->update([
+            'market_value_base' => DB::raw('market_value'),
+        ]);
 
         /**
          * Add _base columns to transactions table
@@ -44,7 +48,7 @@ return new class extends Migration
             'sale_price_base' => DB::raw('sale_price'),
         ]);
         Schema::table('transactions', function (Blueprint $table) {
-            $table->float('cost_basis_base', 12, 4)->nullable(false)->after('sale_price')->change();
+            $table->float('cost_basis_base', 12, 4)->nullable(false)->change();
         });
 
         /**

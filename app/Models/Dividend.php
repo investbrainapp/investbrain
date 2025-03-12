@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
 use App\Traits\HasMarketData;
+use App\Traits\WithBaseCurrency;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +22,7 @@ class Dividend extends Model
     use HasFactory;
     use HasMarketData;
     use HasUuids;
+    use WithBaseCurrency;
 
     protected $fillable = [
         'symbol',
@@ -33,19 +36,8 @@ class Dividend extends Model
         'date' => 'datetime',
         'last_dividend_update' => 'datetime',
         'dividend_amount' => 'float',
+        'dividend_amount_base' => BaseCurrency::class,
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($dividend) {
-
-            $rate_to_base = Currency::historicRate($dividend->market_data->currency, config('investbrain.base_currency'), $dividend->date);
-
-            $dividend->dividend_amount_base = $dividend->dividend_amount * $rate_to_base;
-        });
-    }
 
     public function holdings(): HasMany
     {

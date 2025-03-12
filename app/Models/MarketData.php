@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Casts\LocalizedCurrency;
+use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\WithBaseCurrency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MarketData extends Model
 {
     use HasFactory;
+    use WithBaseCurrency;
 
     protected $primaryKey = 'symbol';
 
@@ -37,15 +39,16 @@ class MarketData extends Model
     ];
 
     protected $casts = [
-        'market_value' => LocalizedCurrency::class,
-        'fifty_two_week_high' => LocalizedCurrency::class,
-        'fifty_two_week_low' => LocalizedCurrency::class,
+        'market_value' => 'float',
+        'market_value_base' => BaseCurrency::class,
+        'fifty_two_week_high' => 'float',
+        'fifty_two_week_low' => 'float',
         'forward_pe' => 'float',
         'trailing_pe' => 'float',
-        'market_cap' => LocalizedCurrency::class,
-        'book_value' => LocalizedCurrency::class,
+        'market_cap' => 'integer',
+        'book_value' => 'float',
         'last_dividend_date' => 'datetime',
-        'last_dividend_amount' => LocalizedCurrency::class,
+        'last_dividend_amount' => 'float',
         'dividend_yield' => 'float',
         'meta_data' => 'json',
     ];

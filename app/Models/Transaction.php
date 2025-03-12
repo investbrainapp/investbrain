@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\BaseCurrency;
 use App\Traits\HasMarketData;
+use App\Traits\WithBaseCurrency;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -18,6 +20,7 @@ class Transaction extends Model
     use HasFactory;
     use HasMarketData;
     use HasUuids;
+    use WithBaseCurrency;
 
     protected $fillable = [
         'symbol',
@@ -40,8 +43,8 @@ class Transaction extends Model
         'quantity' => 'float',
         'cost_basis' => 'float',
         'sale_price' => 'float',
-        'cost_basis_base' => 'float',
-        'sale_price_base' => 'float',
+        'cost_basis_base' => BaseCurrency::class,
+        'sale_price_base' => BaseCurrency::class,
     ];
 
     protected static function boot()
@@ -50,18 +53,10 @@ class Transaction extends Model
 
         static::saving(function ($transaction) {
 
-            $transaction->loadMarketData();
-
-            $rate_to_base = Currency::historicRate($transaction->market_data->currency, config('investbrain.base_currency'), $transaction->date);
-
             if ($transaction->transaction_type == 'SELL') {
 
                 $transaction->ensureCostBasisIsAddedToSale();
-
-                $transaction->sale_price_base = $transaction->sale_price * $rate_to_base;
             }
-
-            $transaction->cost_basis_base = $transaction->cost_basis * $rate_to_base;
         });
 
         static::saved(function ($transaction) {

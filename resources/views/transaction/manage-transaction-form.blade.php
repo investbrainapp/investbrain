@@ -123,7 +123,7 @@ new class extends Component
 
         $this->dispatch('transaction-saved');
 
-        $this->success(__('Transaction created'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $this->symbol]));
+        $this->success(__('Transaction created'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $transaction->symbol]));
     }
 
     public function delete()
@@ -133,11 +133,6 @@ new class extends Component
         $this->transaction->delete();
 
         $this->success(__('Transaction deleted'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $this->symbol]));
-    }
-
-    public function updatedSymbol($value)
-    {
-        $this->symbol = strtoupper($value);
     }
 }; ?>
 
@@ -175,6 +170,7 @@ new class extends Component
                 type="number"
                 step="any"
             >
+                @if (!$disable_currency)
                 <x-slot:prepend>
                     <x-select 
                         icon="o-banknotes"
@@ -184,9 +180,9 @@ new class extends Component
                         option-label="currency"
                         wire:model="currency"
                         id="currency"
-                        :disabled="$disable_currency"
                     />
                 </x-slot:prepend>
+                @endif
             </x-input>
         @else
             <x-input 
@@ -196,6 +192,7 @@ new class extends Component
                 type="number"
                 step="any"
             >
+                @if (!$disable_currency)
                 <x-slot:prepend>
                     <x-select 
                         icon="o-banknotes"
@@ -205,9 +202,9 @@ new class extends Component
                         option-label="currency"
                         wire:model="currency"
                         id="currency"
-                        :disabled="$disable_currency"
                     />
                 </x-slot:prepend>
+                @endif
             </x-input>
         @endif
 

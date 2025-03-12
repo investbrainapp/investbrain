@@ -8,7 +8,7 @@ use App\Models\Currency;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
-class LocalizedCurrency implements CastsAttributes
+class BaseCurrency implements CastsAttributes
 {
     /**
      * Cast the given value to user's display currency
@@ -34,6 +34,11 @@ class LocalizedCurrency implements CastsAttributes
             $model->loadMarketData();
         }
 
-        return Currency::toBaseCurrency($value, $model?->currency ?? $model->market_data?->currency);
+        return Currency::convert(
+            $value,
+            $model?->currency ?? $model->market_data?->currency,
+            config('investbrain.base_currency'),
+            $model?->date
+        );
     }
 }

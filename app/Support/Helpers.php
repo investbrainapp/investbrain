@@ -5,16 +5,18 @@ declare(strict_types=1);
 use App\Models\Currency;
 use Illuminate\Support\Number;
 
-/**
- * Converts from base currency to user's preferred currency
- * */
 if (! function_exists('currency')) {
 
-    function currency($value, $to = null): string
+    /**
+     * By default, will convert from app's base currency to user's preferred display currency
+     * */
+    function currency($value, $from = null, $to = null, $date = null): string
     {
+        $from = $from ?? config('investbrain.base_currency');
+        $to = $to ?? auth()->user()->getCurrency();
 
-        $value = Currency::convert($value, $to ?? auth()->user()->getCurrency());
+        $value = Currency::convert($value, $from, $to, $date);
 
-        return Number::currency($value);
+        return Number::currency($value, $to);
     }
 }
