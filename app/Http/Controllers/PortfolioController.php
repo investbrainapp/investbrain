@@ -40,6 +40,9 @@ class PortfolioController extends Controller
             }
         );
 
+        // dd($portfolio->toArray());
+        // dd($metrics->toArray());
+
         $formattedHoldings = $portfolio->getFormattedHoldings();
 
         return view('portfolio.show', compact(['portfolio', 'metrics', 'formattedHoldings']));

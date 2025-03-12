@@ -32,7 +32,20 @@ class Dividend extends Model
     protected $casts = [
         'date' => 'datetime',
         'last_dividend_update' => 'datetime',
+        'dividend_amount' => 'float',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($dividend) {
+
+            $rate_to_base = Currency::historicRate($dividend->market_data->currency, config('investbrain.base_currency'), $dividend->date);
+
+            $dividend->dividend_amount_base = $dividend->dividend_amount * $rate_to_base;
+        });
+    }
 
     public function holdings(): HasMany
     {

@@ -8,6 +8,7 @@ use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Investbrain\Frankfurter\Frankfurter;
 
 class Currency extends Model
@@ -99,7 +100,7 @@ class Currency extends Model
             return 0;
         }
 
-        // get to rate
+        // Assume converting to base
         if (empty($to)) {
             $to = config('investbrain.base_currency');
         }
@@ -125,13 +126,19 @@ class Currency extends Model
 
     public static function historicRate(string $from, ?string $to, string|\DateTime $date): float
     {
-        // get to rate
+        // Assume converting to base
         if (empty($to)) {
             $to = config('investbrain.base_currency');
         }
 
+        // No conversion required
         if ($from === $to) {
             return 1;
+        }
+
+        // If we don't need historic, let's use current rate
+        if (Carbon::parse($date)->isToday()) {
+            return self::convert(1, $from, $to);
         }
 
         $rate = Frankfurter::setBaseCurrency($from)->setSymbols($to)->historical($date);

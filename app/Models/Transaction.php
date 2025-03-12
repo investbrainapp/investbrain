@@ -37,6 +37,11 @@ class Transaction extends Model
         'date' => 'datetime',
         'split' => 'boolean',
         'reinvested_dividend' => 'boolean',
+        'quantity' => 'float',
+        'cost_basis' => 'float',
+        'sale_price' => 'float',
+        'cost_basis_base' => 'float',
+        'sale_price_base' => 'float',
     ];
 
     protected static function boot()

@@ -29,6 +29,7 @@ class DashboardController extends Controller
                      ->first();
             }
         );
+        // dd($metrics->toArray());
 
         return view('dashboard', compact('user', 'metrics'));
     }

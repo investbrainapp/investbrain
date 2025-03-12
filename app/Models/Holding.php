@@ -30,15 +30,22 @@ class Holding extends Model
     ];
 
     protected $casts = [
+        'reinvest_dividends' => 'boolean',
         'splits_synced_at' => 'datetime',
         'first_transaction_date' => 'datetime',
+        'quantity' => 'float',
         'average_cost_basis' => 'float',
         'total_cost_basis' => 'float',
-        'total_gain_dollars' => 'float',
         'realized_gain_dollars' => 'float',
         'dividends_earned' => 'float',
-        'splits_synced_at' => 'float',
-        'reinvest_dividends' => 'boolean',
+        'total_gain_dollars' => 'float',
+        'market_gain_dollars' => 'float',
+        'total_market_value' => 'float',
+        'total_dividends_earned' => 'float',
+        'market_data_market_value' => 'float',
+        'market_data_fifty_two_week_low' => 'float',
+        'market_data_fifty_two_week_high' => 'float',
+        'market_gain_percent' => 'float',
     ];
 
     /**
