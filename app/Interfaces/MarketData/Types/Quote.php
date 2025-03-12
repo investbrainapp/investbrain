@@ -110,6 +110,7 @@ class Quote extends MarketDataType
 
     public function setMarketCap($cap): self
     {
+        // return $this;
         $this->items['market_cap'] = (int) $cap;
 
         return $this;

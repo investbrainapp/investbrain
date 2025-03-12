@@ -20,6 +20,7 @@ class CurrencyDataTest extends TestCase
             '--force' => true,
         ]);
 
+        $this->assertEquals(3, Currency::where('is_alias', true)->count('currency'));
         $this->assertEquals(22, Currency::count('currency'));
     }
 
