@@ -26,7 +26,7 @@ return new class extends Migration
         });
 
         /**
-         * Add currency column to market_data table
+         * Add _base and currency column to market_data table
          */
         Schema::table('market_data', function (Blueprint $table) {
             $table->float('market_value_base', 12, 4)->nullable()->after('market_value');

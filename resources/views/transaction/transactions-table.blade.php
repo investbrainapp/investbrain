@@ -4,6 +4,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
+use App\Models\Currency;
 
 new class extends Component
 {
@@ -95,19 +96,19 @@ new class extends Component
             />
         @endscope
         @scope('cell_cost_basis', $row)
-            {{ currency($row->cost_basis ?? 0) }}
+            {{ Number::currency($row->cost_basis ?? 0, $row->market_data->currency) }}
         @endscope
         @scope('cell_total_cost_basis', $row)
-            {{ currency($row->total_cost_basis ?? 0) }}
+            {{ Number::currency($row->total_cost_basis ?? 0, $row->market_data->currency) }}
         @endscope
         @scope('cell_gain_dollars', $row)
-            {{ currency($row->gain_dollars ?? 0) }}
+            {{ Number::currency($row->gain_dollars ?? 0, $row->market_data->currency) }}
         @endscope
         @scope('cell_market_data_market_value', $row)
-            {{ currency($row->market_data_market_value ?? 0) }}
+            {{ Number::currency($row->market_data_market_value ?? 0, $row->market_data->currency) }}
         @endscope
         @scope('cell_total_market_value', $row)
-            {{ currency($row->total_market_value ?? 0) }}
+            {{ Number::currency($row->total_market_value ?? 0, $row->market_data->currency) }}
         @endscope
     </x-table>
 

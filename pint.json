@@ -1,6 +1,9 @@
 {
     "preset": "laravel",
     "rules": {
-        "declare_strict_types": true
+        "declare_strict_types": true,
+        "notName": [
+            "*.blade.php"
+        ]
     }
 }

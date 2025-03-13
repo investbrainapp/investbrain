@@ -23,7 +23,7 @@ new class extends Component
         
         <x-gain-loss-arrow-badge 
             :cost-basis="$holding->average_cost_basis"
-            :market-value="$holding->market_data->market_value"
+            :market-value="$holding->market_data->market_value_base"
         />
     </div>
 

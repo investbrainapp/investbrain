@@ -93,11 +93,12 @@ new class extends Component
                 />
                 {{ $transaction->symbol }} 
                 ({{ $transaction->quantity }} 
-                @ {{ Number::currencySymbol(
+                @ {{ Number::currency(
+                    $transaction->transaction_type == 'BUY' 
+                        ? $transaction->cost_basis
+                        : $transaction->sale_price,
                     $transaction->market_data->currency
-                ) }}{{ $transaction->transaction_type == 'BUY' 
-                    ? $transaction->cost_basis
-                    : $transaction->sale_price }})
+                ) }})
 
                 <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>

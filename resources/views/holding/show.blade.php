@@ -1,3 +1,5 @@
+@use('App\Models\Currency')
+
 <x-app-layout>
     <div x-data>  
 
@@ -69,7 +71,7 @@
 
                 <p>
                     <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    {{ Number::currencyForHumans($holding->market_data?->market_cap ?? 0, $holding->market_data->currency) }}
+                    {{ Currency::forHumans($holding->market_data?->market_cap ?? 0, $holding->market_data->currency) }}
                 </p>
 
                 <p>

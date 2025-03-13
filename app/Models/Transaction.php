@@ -179,8 +179,8 @@ class Transaction extends Model
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,
             'quantity' => $this->quantity,
-            'average_cost_basis' => $this->cost_basis,
-            'total_cost_basis' => $this->quantity * $this->cost_basis,
+            'average_cost_basis' => $this->cost_basis_base,
+            'total_cost_basis' => $this->quantity * $this->cost_basis_base,
             'splits_synced_at' => now(),
         ])->syncTransactionsAndDividends();
     }

@@ -3,6 +3,7 @@
 use App\Models\Portfolio;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
+use App\Models\Currency; 
 
 new class extends Component
 {
@@ -63,16 +64,17 @@ new class extends Component
     @row-click="$wire.goToHolding($event.detail)"
 >
     @scope('cell_average_cost_basis', $row)
-        {{ currency($row->average_cost_basis ?? 0) }}
+        {{ Number::currency($row->average_cost_basis ?? 0, $row->market_data->currency) }}
+    
     @endscope
     @scope('cell_total_cost_basis', $row)
-        {{ currency($row->total_cost_basis ?? 0) }}
+        {{ Number::currency($row->total_cost_basis ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_realized_gain_dollars', $row)
-        {{ currency($row->realized_gain_dollars ?? 0) }}
+        {{ Number::currency($row->realized_gain_dollars ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_market_gain_dollars', $row)
-        {{ currency($row->market_gain_dollars ?? 0) }}
+        {{ Number::currency($row->market_gain_dollars ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_market_gain_percent', $row)
         <x-gain-loss-arrow-badge 
@@ -81,19 +83,19 @@ new class extends Component
         />
     @endscope
     @scope('cell_market_data_market_value', $row)
-        {{ currency($row->market_data_market_value ?? 0) }}
+        {{ Number::currency($row->market_data_market_value ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_market_data_fifty_two_week_low', $row)
-        {{ currency($row->market_data_fifty_two_week_low ?? 0) }}
+        {{ Number::currency($row->market_data_fifty_two_week_low ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_market_data_fifty_two_week_high', $row)
-        {{ currency($row->market_data_fifty_two_week_high ?? 0) }}
+        {{ Number::currency($row->market_data_fifty_two_week_high ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_total_market_value', $row)
-        {{ currency($row->total_market_value ?? 0) }}
+        {{ Number::currency($row->total_market_value ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_dividends_earned', $row)
-        {{ currency($row->dividends_earned ?? 0) }}
+        {{ Number::currency($row->dividends_earned ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_market_data_updated_at', $row)
         {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}

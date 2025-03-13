@@ -66,7 +66,7 @@ class Holding extends Model
     public function dividends()
     {
         return $this->hasMany(Dividend::class, 'symbol', 'symbol')
-            ->select(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount'])
+            ->select(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount', 'dividends.dividend_amount_base'])
             ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'BUY'
                         AND transactions.symbol = dividends.symbol
@@ -94,10 +94,10 @@ class Holding extends Model
                         AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END)
-                    * dividends.dividend_amount
+                    * dividends.dividend_amount_base
                 ) AS total_received")
             ->join('transactions', 'transactions.symbol', 'dividends.symbol')
-            ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount'])
+            ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount', 'dividends.dividend_amount_base'])
             ->orderBy('dividends.date', 'DESC')
             ->where('dividends.date', '>=', function ($query) {
                 $query->selectRaw('min(transactions.date)')
@@ -123,7 +123,7 @@ class Holding extends Model
                 THEN transactions.quantity 
                 ELSE 0 
                 END)
-            ) * dividends.dividend_amount > 0");
+            ) * dividends.dividend_amount_base > 0");
     }
 
     /**
@@ -217,11 +217,11 @@ class Holding extends Model
             'symbol' => $this->symbol,
         ])->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) AS qty_purchases")
             ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sales")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price) ELSE 0 END) AS total_sale_price")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis_base) ELSE 0 END) AS total_cost_basis")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price_base) ELSE 0 END) AS total_sale_price")
             ->first();
 
-        $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
+        $total_quantity = round($query->qty_purchases - $query->qty_sales, 4);
 
         $average_cost_basis = (
             $query->qty_purchases > 0

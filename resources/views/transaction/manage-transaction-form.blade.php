@@ -170,19 +170,10 @@ new class extends Component
                 type="number"
                 step="any"
             >
-                @if (!$disable_currency)
-                <x-slot:prepend>
-                    <x-select 
-                        icon="o-banknotes"
-                        class="rounded-e-none bg-base-200"
-                        :options="$currencies"
-                        option-value="currency"
-                        option-label="currency"
-                        wire:model="currency"
-                        id="currency"
-                    />
-                </x-slot:prepend>
-                @endif
+                <x-slot:prefix>
+                    {{ Number::currencySymbol($currency) }}
+                </x-slot:prefix>
+
             </x-input>
         @else
             <x-input 
@@ -192,19 +183,11 @@ new class extends Component
                 type="number"
                 step="any"
             >
-                @if (!$disable_currency)
-                <x-slot:prepend>
-                    <x-select 
-                        icon="o-banknotes"
-                        class="rounded-e-none bg-base-200"
-                        :options="$currencies"
-                        option-value="currency"
-                        option-label="currency"
-                        wire:model="currency"
-                        id="currency"
-                    />
-                </x-slot:prepend>
-                @endif
+                <x-slot:prefix>
+                    {{-- todo: should populate currency based on selected symbol --}}
+                    {{ Number::currencySymbol($currency) }}
+                </x-slot:prefix>
+             
             </x-input>
         @endif
 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Number;
 use Investbrain\Frankfurter\Frankfurter;
 
 class Currency extends Model
@@ -50,6 +51,23 @@ class Currency extends Model
         return $query->where(function ($query) {
             return $query->whereNull('is_alias')->orWhere('is_alias', false);
         });
+    }
+
+    public static function toDisplay(float $value): string
+    {
+        $from = config('investbrain.base_currency');
+        $to = auth()->user()->getCurrency();
+
+        $value = Currency::convert($value, $from, $to);
+
+        return Number::currency($value, $to);
+    }
+
+    public static function forHumans(int|float $number, ?string $currency = null, ?string $locale = null): string
+    {
+        $symbol = Number::currencySymbol($currency, $locale);
+
+        return $symbol.Number::forHumans($number);
     }
 
     /**

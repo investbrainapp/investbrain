@@ -42,13 +42,6 @@ class AppServiceProvider extends ServiceProvider
             });
         });
 
-        Number::macro('currencyForHumans', function (int|float $number, ?string $currency = null, ?string $locale = null) {
-
-            $symbol = Number::currencySymbol($currency, $locale);
-
-            return $symbol.Number::forHumans($number);
-        });
-
         Number::macro('currencySymbol', function (?string $currency = null, ?string $locale = null) {
 
             $currency = $currency ?? Number::defaultCurrency();
