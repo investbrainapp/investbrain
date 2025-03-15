@@ -70,8 +70,8 @@ return new class extends Migration
          */
         Schema::table('holdings', function (Blueprint $table) {
             $table->float('cost_basis_rate', 12, 4)->default(1)->after('dividends_earned');
-            $table->float('sale_price_rate', 12, 4)->default(1)->after('cost_basis_rate');
-            $table->float('dividends_rate', 12, 4)->default(1)->after('sale_price_rate');
+            $table->float('realized_gain_rate', 12, 4)->default(1)->after('cost_basis_rate');
+            $table->float('dividends_rate', 12, 4)->default(1)->after('realized_gain_rate');
         });
 
         /**
