@@ -222,6 +222,11 @@ class Holding extends Model
 
     public function syncTransactionsAndDividends()
     {
+
+
+        // sum for each trans
+        // sale price base / sale price
+
         // pull existing transaction data
         $query = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
@@ -235,7 +240,7 @@ class Holding extends Model
                         SUM(CASE WHEN transaction_type = 'SELL' THEN sale_price ELSE 0 END) AS numeric),
                         4) AS sale_price_rate")
             ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis_base) ELSE 0 END) AS total_cost_basis")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price_base) - (quantity * cost_basis_base) ELSE 0 END) AS realized_gain_dollars")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price) - (quantity * cost_basis) ELSE 0 END) AS realized_gain_dollars")
             ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 4);
@@ -245,14 +250,14 @@ class Holding extends Model
             && $total_quantity > 0
         ) ? $query->total_cost_basis / $query->qty_purchases
         : 0;
-// dump($query->toArray());
+dump($query->toArray());
         // update holding
         $this->fill([
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
             'cost_basis_rate' => $query->cost_basis_rate,
-            'realized_gain_dollars' => $query->realized_gain_dollars,
+            'realized_gain_dollars' => $query->realized_gain_dollars * $query->sale_price_rate,
             'sale_price_rate' => $query->sale_price_rate ?? 1,
             'dividends_earned' => $this->dividends->sum('total_received'),
             'dividends_rate' => $this->dividends->average('dividends_rate') ?? 1,
