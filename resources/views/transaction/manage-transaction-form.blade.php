@@ -54,7 +54,7 @@ new class extends Component
             'quantity' => [
                 'required',
                 'numeric',
-                'min:0',
+                'gt:0',
                 new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date),
             ],
             'currency' => ['required', 'exists:currencies,currency'],

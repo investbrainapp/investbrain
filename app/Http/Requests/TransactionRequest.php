@@ -34,7 +34,7 @@ class TransactionRequest extends FormRequest
             'quantity' => [
                 'required',
                 'numeric',
-                'min:0',
+                'gt:0',
                 new QuantityValidationRule(
                     $this->input('portfolio'),
                     $this->requestOrModelValue('symbol', 'transaction'),

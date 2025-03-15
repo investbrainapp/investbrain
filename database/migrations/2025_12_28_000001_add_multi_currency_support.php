@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Models\Currency;
+use Illuminate\Support\Facades\DB;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\MarketDataSeeder;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -65,6 +66,15 @@ return new class extends Migration
         });
 
         /**
+         * Add rate column to holdings table
+         */
+        Schema::table('holdings', function (Blueprint $table) {
+            $table->float('cost_basis_rate', 12, 4)->default(1)->after('dividends_earned');
+            $table->float('sale_price_rate', 12, 4)->default(1)->after('cost_basis_rate');
+            $table->float('dividends_rate', 12, 4)->default(1)->after('sale_price_rate');
+        });
+
+        /**
          * Creates currencies table
          */
         Schema::create('currencies', function (Blueprint $table) {
@@ -75,12 +85,14 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+            '--force' => true,
+        ]);
+
         if (config('app.env') != 'testing') {
 
-            Artisan::call('db:seed', [
-                '--class' => CurrencySeeder::class,
-                '--force' => true,
-            ]);
+            Currency::refreshCurrencyData();
 
             Artisan::call('db:seed', [
                 '--class' => MarketDataSeeder::class,

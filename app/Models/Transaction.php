@@ -55,6 +55,7 @@ class Transaction extends Model
 
             if ($transaction->transaction_type == 'SELL') {
 
+                // cost basis is required for sales to calculate realized gains
                 $transaction->ensureCostBasisIsAddedToSale();
             }
         });

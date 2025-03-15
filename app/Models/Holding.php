@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Portfolio;
+use App\Casts\BaseCurrency;
+use App\Models\Transaction;
+use Illuminate\Support\Arr;
 use App\Traits\HasMarketData;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 
 class Holding extends Model
 {
@@ -27,6 +30,9 @@ class Holding extends Model
         'dividends_earned',
         'splits_synced_at',
         'reinvest_dividends',
+        'cost_basis_rate',
+        'sale_price_rate',
+        'dividends_rate',
     ];
 
     protected $casts = [
@@ -34,10 +40,10 @@ class Holding extends Model
         'splits_synced_at' => 'datetime',
         'first_transaction_date' => 'datetime',
         'quantity' => 'float',
-        'average_cost_basis' => 'float',
-        'total_cost_basis' => 'float',
-        'realized_gain_dollars' => 'float',
-        'dividends_earned' => 'float',
+        'average_cost_basis' => BaseCurrency::class.':cost_basis_rate',
+        'total_cost_basis' => BaseCurrency::class.':cost_basis_rate',
+        'realized_gain_dollars' => BaseCurrency::class.':sale_price_rate',
+        'dividends_earned' => BaseCurrency::class.':dividends_rate',
         'total_gain_dollars' => 'float',
         'market_gain_dollars' => 'float',
         'total_market_value' => 'float',
@@ -96,6 +102,11 @@ class Holding extends Model
                         THEN transactions.quantity ELSE 0 END)
                     * dividends.dividend_amount_base
                 ) AS total_received")
+            ->selectRaw("CASE 
+                WHEN SUM(dividends.dividend_amount) = 0 
+                THEN NULL 
+                ELSE SUM(dividends.dividend_amount_base) / SUM(dividends.dividend_amount) 
+                END AS dividends_rate")
             ->join('transactions', 'transactions.symbol', 'dividends.symbol')
             ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount', 'dividends.dividend_amount_base'])
             ->orderBy('dividends.date', 'DESC')
@@ -217,8 +228,14 @@ class Holding extends Model
             'symbol' => $this->symbol,
         ])->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) AS qty_purchases")
             ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sales")
+            ->selectRaw("ROUND(CAST(SUM(CASE WHEN transaction_type = 'BUY' THEN cost_basis_base ELSE 0 END) / 
+                        SUM(CASE WHEN transaction_type = 'BUY' THEN cost_basis ELSE 0 END) AS numeric),
+                        4) AS cost_basis_rate")
+            ->selectRaw("ROUND(CAST(SUM(CASE WHEN transaction_type = 'SELL' THEN sale_price_base ELSE 0 END) / 
+                        SUM(CASE WHEN transaction_type = 'SELL' THEN sale_price ELSE 0 END) AS numeric),
+                        4) AS sale_price_rate")
             ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis_base) ELSE 0 END) AS total_cost_basis")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price_base) ELSE 0 END) AS total_sale_price")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (quantity * sale_price_base) - (quantity * cost_basis_base) ELSE 0 END) AS realized_gain_dollars")
             ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 4);
@@ -228,16 +245,17 @@ class Holding extends Model
             && $total_quantity > 0
         ) ? $query->total_cost_basis / $query->qty_purchases
         : 0;
-
+// dump($query->toArray());
         // update holding
         $this->fill([
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->qty_purchases > 0 && $query->total_sale_price > 0
-                    ? $query->total_sale_price - ($query->qty_sales * ($query->total_cost_basis / $query->qty_purchases))
-                    : 0,
+            'cost_basis_rate' => $query->cost_basis_rate,
+            'realized_gain_dollars' => $query->realized_gain_dollars,
+            'sale_price_rate' => $query->sale_price_rate ?? 1,
             'dividends_earned' => $this->dividends->sum('total_received'),
+            'dividends_rate' => $this->dividends->average('dividends_rate') ?? 1,
         ]);
 
         $this->save();
