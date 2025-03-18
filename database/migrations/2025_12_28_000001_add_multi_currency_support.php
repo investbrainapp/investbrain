@@ -22,8 +22,10 @@ return new class extends Migration
          * Add options column to users table
          */
         Schema::table('users', function (Blueprint $table) {
-            // todo: need to create default settings!
-            $table->json('options')->nullable()->after('profile_photo_path');
+            $table->json('options')->default([
+                'locale' => config('app.locale', 'en'),
+                'display_currency' => config('investbrain.base_currency', 'USD'),
+            ])->after('profile_photo_path');
         });
 
         /**
@@ -43,6 +45,7 @@ return new class extends Migration
         Schema::table('transactions', function (Blueprint $table) {
             $table->float('cost_basis_base', 12, 4)->nullable()->after('sale_price');
             $table->float('sale_price_base', 12, 4)->nullable()->after('cost_basis_base');
+            // $table->json('current_rates')->default([])->after('sale_price_base');
         });
         DB::table('transactions')->update([
             'cost_basis_base' => DB::raw('cost_basis'),
@@ -51,6 +54,15 @@ return new class extends Migration
         Schema::table('transactions', function (Blueprint $table) {
             $table->float('cost_basis_base', 12, 4)->nullable(false)->change();
         });
+
+        // /**
+        //  * Add rate column to holdings table
+        //  */
+        // Schema::table('holdings', function (Blueprint $table) {
+        //     $table->json('cost_basis_avg_rates')->default([])->after('dividends_earned');
+        //     $table->json('realized_gain_avg_rates')->default([])->after('cost_basis_avg_rates');
+        //     $table->json('dividends_avg_rates')->default([])->after('realized_gain_avg_rates');
+        // });
 
         /**
          * Add _base columns to dividends table
@@ -63,15 +75,6 @@ return new class extends Migration
         ]);
         Schema::table('dividends', function (Blueprint $table) {
             $table->float('dividend_amount_base', 12, 4)->nullable(false)->change();
-        });
-
-        /**
-         * Add rate column to holdings table
-         */
-        Schema::table('holdings', function (Blueprint $table) {
-            $table->float('cost_basis_rate', 12, 4)->default(1)->after('dividends_earned');
-            $table->float('realized_gain_rate', 12, 4)->default(1)->after('cost_basis_rate');
-            $table->float('dividends_rate', 12, 4)->default(1)->after('realized_gain_rate');
         });
 
         /**
@@ -117,6 +120,16 @@ return new class extends Migration
         Schema::table('transactions', function (Blueprint $table) {
             $table->dropColumn('cost_basis_base');
             $table->dropColumn('sale_price_base');
+            // $table->dropColumn('current_rates');
+        });
+
+        Schema::table('holdings', function (Blueprint $table) {
+            $table->dropColumn('cost_basis_rate');
+            $table->dropColumn('realized_gain_rate');
+            $table->dropColumn('dividends_rate');
+            // $table->dropColumn('cost_basis_avg_rates');
+            // $table->dropColumn('realized_gain_avg_rates');
+            // $table->dropColumn('dividends_avg_rates');
         });
 
         Schema::table('dividends', function (Blueprint $table) {
