@@ -25,7 +25,6 @@ class CreateHoldingsTable extends Migration
             $table->float('total_cost_basis', 12, 4)->default(0);
             $table->float('realized_gain_dollars', 12, 4)->default(0);
             $table->float('dividends_earned', 12, 4)->default(0);
-            $table->boolean('reinvest_dividends')->default(false);
             $table->timestamp('splits_synced_at')->nullable();
             $table->timestamps();
         });
