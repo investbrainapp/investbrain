@@ -73,7 +73,7 @@ class Split extends Model
         if ($split_data->isNotEmpty()) {
 
             // insert records
-            (new self)->insert($split_data->map(function ($split) {
+            (new self)->insertOrIgnore($split_data->map(function ($split) {
 
                 return [...$split, ...['id' => Str::uuid()->toString()]];
             })->toArray());

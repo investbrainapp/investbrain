@@ -68,7 +68,7 @@ class Dividend extends Model
         // nope, refresh forward looking only
         if ($dividends_meta->total_dividends) {
 
-            $start_date = $dividends_meta->last_dividend_update->addHours(24);
+            $start_date = $dividends_meta->last_dividend_update;
         }
 
         // skip refresh if there's already recent data
@@ -90,7 +90,7 @@ class Dividend extends Model
             }
 
             // insert records
-            (new self)->insert($dividend_data->toArray());
+            (new self)->insertOrIgnore($dividend_data->toArray());
 
             // sync to holdings
             self::syncHoldings($symbol);
