@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\Currency;
+use App\Models\CurrencyRate;
 use Illuminate\Support\Facades\DB;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\MarketDataSeeder;
@@ -22,10 +22,10 @@ return new class extends Migration
          * Add options column to users table
          */
         Schema::table('users', function (Blueprint $table) {
-            $table->json('options')->default([
+            $table->json('options')->default(json_encode([
                 'locale' => config('app.locale', 'en'),
                 'display_currency' => config('investbrain.base_currency', 'USD'),
-            ])->after('profile_photo_path');
+            ]))->after('profile_photo_path');
         });
 
         /**
@@ -43,9 +43,9 @@ return new class extends Migration
          * Add _base columns to transactions table
          */
         Schema::table('transactions', function (Blueprint $table) {
+            // todo: make transacitons have a currency selector
             $table->float('cost_basis_base', 12, 4)->nullable()->after('sale_price');
             $table->float('sale_price_base', 12, 4)->nullable()->after('cost_basis_base');
-            // $table->json('current_rates')->default([])->after('sale_price_base');
         });
         DB::table('transactions')->update([
             'cost_basis_base' => DB::raw('cost_basis'),
@@ -54,15 +54,6 @@ return new class extends Migration
         Schema::table('transactions', function (Blueprint $table) {
             $table->float('cost_basis_base', 12, 4)->nullable(false)->change();
         });
-
-        // /**
-        //  * Add rate column to holdings table
-        //  */
-        // Schema::table('holdings', function (Blueprint $table) {
-        //     $table->json('cost_basis_avg_rates')->default([])->after('dividends_earned');
-        //     $table->json('realized_gain_avg_rates')->default([])->after('cost_basis_avg_rates');
-        //     $table->json('dividends_avg_rates')->default([])->after('realized_gain_avg_rates');
-        // });
 
         /**
          * Add _base columns to dividends table
@@ -78,13 +69,30 @@ return new class extends Migration
         });
 
         /**
+         * Add _base columns to holdings table
+         */
+        Schema::table('holdings', function (Blueprint $table) {
+            $table->float('total_cost_basis_base', 12, 4)->nullable()->after('dividends_earned');
+            $table->float('realized_gain_base', 12, 4)->nullable()->after('total_cost_basis_base');
+            $table->float('dividends_earned_base', 12, 4)->nullable()->after('realized_gain_base');
+        });
+        DB::table('holdings')->update([
+            'total_cost_basis_base' => DB::raw('total_cost_basis'),
+            'realized_gain_base' => DB::raw('realized_gain_dollars'),
+            'dividends_earned_base' => DB::raw('dividends_earned'),
+        ]);
+        Schema::table('holdings', function (Blueprint $table) {
+            $table->float('total_cost_basis_base', 12, 4)->nullable(false)->change();
+            $table->float('realized_gain_base', 12, 4)->nullable(false)->change();
+            $table->float('dividends_earned_base', 12, 4)->nullable(false)->change();
+        });
+
+        /**
          * Creates currencies table
          */
         Schema::create('currencies', function (Blueprint $table) {
             $table->string('currency', 3)->primary(); // ISO 4217
             $table->string('label');
-            $table->float('rate', 12, 4);
-            $table->boolean('is_alias')->nullable();
             $table->timestamps();
         });
 
@@ -93,9 +101,21 @@ return new class extends Migration
             '--force' => true,
         ]);
 
+        /**
+         * Creates currency rates table
+         */
+        Schema::create('currency_rates', function (Blueprint $table) {
+            $table->date('date');
+            $table->string('currency', 3); 
+            $table->float('rate', 12, 4);
+            $table->timestamps();
+
+            $table->primary(['date', 'currency']);
+        });
+
         if (config('app.env') != 'testing') {
 
-            Currency::refreshCurrencyData();
+            CurrencyRate::refreshCurrencyData();
 
             Artisan::call('db:seed', [
                 '--class' => MarketDataSeeder::class,
@@ -115,27 +135,26 @@ return new class extends Migration
 
         Schema::table('market_data', function (Blueprint $table) {
             $table->dropColumn('currency');
+            $table->dropColumn('market_value_base');
         });
 
         Schema::table('transactions', function (Blueprint $table) {
             $table->dropColumn('cost_basis_base');
             $table->dropColumn('sale_price_base');
-            // $table->dropColumn('current_rates');
-        });
-
-        Schema::table('holdings', function (Blueprint $table) {
-            $table->dropColumn('cost_basis_rate');
-            $table->dropColumn('realized_gain_rate');
-            $table->dropColumn('dividends_rate');
-            // $table->dropColumn('cost_basis_avg_rates');
-            // $table->dropColumn('realized_gain_avg_rates');
-            // $table->dropColumn('dividends_avg_rates');
         });
 
         Schema::table('dividends', function (Blueprint $table) {
             $table->dropColumn('dividend_amount_base');
         });
 
+        Schema::table('holdings', function (Blueprint $table) {
+            $table->dropColumn('total_cost_basis_base');
+            $table->dropColumn('realized_gain_base');
+            $table->dropColumn('dividends_earned_base');
+        });
+
         Schema::dropIfExists('currencies');
+
+        Schema::dropIfExists('currency_rates');
     }
 };

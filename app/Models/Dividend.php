@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Casts\BaseCurrency;
-use App\Interfaces\MarketData\MarketDataInterface;
-use App\Traits\HasMarketData;
-use App\Traits\WithBaseCurrency;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\CurrencyRate;
+use App\Traits\HasMarketData;
+use Illuminate\Support\Carbon;
+use App\Traits\WithBaseCurrency;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use App\Interfaces\MarketData\MarketDataInterface;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Dividend extends Model
 {
@@ -92,12 +93,12 @@ class Dividend extends Model
             $market_data = MarketData::getMarketData($symbol);
 
             // get historic conversion rates
-            $rate_to_base = Currency::timeSeriesRates($market_data->currency, config('investbrain.base_currency'), $start_date, $end_date);
+            $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
 
             // create mass insert
             foreach ($dividend_data as $index => $dividend) {
 
-                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->format('Y-m-d'), 1);
+                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
 
                 $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
             }
@@ -134,10 +135,19 @@ class Dividend extends Model
                 THEN transactions.quantity ELSE 0 END), 0))
             * dividends.dividend_amount
             AS total_received
+        ")->selectRaw("
+            (COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' 
+                AND date(transactions.date) <= date(dividends.date) 
+                THEN transactions.quantity ELSE 0 END), 0)
+            - COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' 
+                AND date(transactions.date) <= date(dividends.date) 
+                THEN transactions.quantity ELSE 0 END), 0))
+            * dividends.dividend_amount_base
+            AS total_received_base
         ")->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
             ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
             ->where('dividends.symbol', $symbol)
-            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount');
+            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'dividends.dividend_amount_base');
 
         $dividends = DB::table(DB::raw("({$subQuery->toSql()}) as sub"))
             ->mergeBindings($subQuery->getQuery())
@@ -151,6 +161,8 @@ class Dividend extends Model
                 $holding->update([
                     'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
                         ->sum('total_received'),
+                    'dividends_earned_base' => $dividends->where('portfolio_id', $holding->portfolio_id)
+                        ->sum('total_received_base'),
                 ]);
             });
     }

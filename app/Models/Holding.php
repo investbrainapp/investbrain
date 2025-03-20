@@ -30,9 +30,9 @@ class Holding extends Model
         'dividends_earned',
         'splits_synced_at',
         'reinvest_dividends',
-        'cost_basis_rate',
-        'realized_gain_rate',
-        'dividends_rate',
+        'total_cost_basis_base',
+        'realized_gain_base',
+        'dividends_earned_base',
     ];
 
     protected $casts = [
@@ -40,10 +40,13 @@ class Holding extends Model
         'splits_synced_at' => 'datetime',
         'first_transaction_date' => 'datetime',
         'quantity' => 'float',
-        'average_cost_basis' => BaseCurrency::class.':cost_basis_rate',
-        'total_cost_basis' => BaseCurrency::class.':cost_basis_rate',
-        'realized_gain_dollars' => BaseCurrency::class.':realized_gain_rate',
-        'dividends_earned' => BaseCurrency::class.':dividends_rate',
+        'average_cost_basis' => 'float',
+        'total_cost_basis' => 'float',
+        'realized_gain_dollars' => 'float',
+        'dividends_earned' => 'float',
+        'total_cost_basis_base' => 'float',
+        'realized_gain_base' => 'float',
+        'dividends_earned_base' => 'float',
         'total_gain_dollars' => 'float',
         'market_gain_dollars' => 'float',
         'total_market_value' => 'float',
@@ -100,13 +103,21 @@ class Holding extends Model
                         AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END)
-                    * dividends.dividend_amount_base
+                    * dividends.dividend_amount
                 ) AS total_received")
-            ->selectRaw("CASE 
-                WHEN SUM(dividends.dividend_amount) = 0 
-                THEN NULL 
-                ELSE SUM(dividends.dividend_amount_base) / SUM(dividends.dividend_amount) 
-                END AS dividends_rate")
+            ->selectRaw("SUM(
+                (CASE WHEN transaction_type = 'BUY'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND date(transactions.date) <= date(dividends.date)
+                    THEN transactions.quantity ELSE 0 END
+                - CASE WHEN transaction_type = 'SELL'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND date(transactions.date) <= date(dividends.date)
+                    THEN transactions.quantity ELSE 0 END)
+                * dividends.dividend_amount_base
+            ) AS total_received_base")
             ->join('transactions', 'transactions.symbol', 'dividends.symbol')
             ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount', 'dividends.dividend_amount_base'])
             ->orderBy('dividends.date', 'DESC')
@@ -225,17 +236,25 @@ class Holding extends Model
         // pull existing transaction data
         $query = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
-            'symbol' => $this->symbol,
+            'transactions.symbol' => $this->symbol,
         ])->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) AS qty_purchases")
             ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sales")
-            ->selectRaw("ROUND(CAST(SUM(CASE WHEN transaction_type = 'BUY' THEN cost_basis_base ELSE 0 END) / 
-                        SUM(CASE WHEN transaction_type = 'BUY' THEN cost_basis ELSE 0 END) AS numeric),
-                        4) AS cost_basis_rate")
-            ->selectRaw("ROUND(CAST(SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price_base - cost_basis_base) ELSE 0 END) / 
-                        SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price - cost_basis) ELSE 0 END) AS numeric),
-                        5) AS realized_gain_rate")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price_base - cost_basis_base) * quantity ELSE 0 END) AS realized_gain_dollars")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis_base) ELSE 0 END) AS total_cost_basis")
+            // ->join('market_data', 'market_data.symbol', 'transactions.symbol')
+            // ->leftJoin('currency_rates as cr', function ($join) {
+            //     $join->on('cr.date', '=', 'transactions.date')
+            //          ->on('cr.currency', '=', 'market_data.currency');
+            // })
+            // ->selectRaw("AVG(
+            //     CASE WHEN transactions.transaction_type = 'BUY' THEN COALESCE(cr.rate, 1) END
+            // ) AS realized_gain_rate")
+            ->selectRaw("SUM(
+                CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.cost_basis_base END
+            ) AS total_cost_basis_base")
+            ->selectRaw("SUM(
+                CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.sale_price_base - transactions.cost_basis_base END
+            ) AS realized_gain_base")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price - cost_basis) * quantity ELSE 0 END) AS realized_gain_dollars")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis")
             ->first();
 
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 4);
@@ -251,11 +270,11 @@ class Holding extends Model
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'cost_basis_rate' => $query->cost_basis_rate,
             'realized_gain_dollars' => $query->realized_gain_dollars,
-            'realized_gain_rate' => $query->realized_gain_rate,
             'dividends_earned' => $this->dividends->sum('total_received'),
-            'dividends_rate' => $this->dividends->average('dividends_rate') ?? 1,
+            'total_cost_basis_base' => $query->total_cost_basis_base ?? 0,
+            'realized_gain_base' => $query->realized_gain_base ?? 0,
+            'dividends_earned_base' => $this->dividends->sum('total_received_base') ?? 0,
         ]);
 
         $this->save();
@@ -300,11 +319,11 @@ class Holding extends Model
         // Default CTE time series query (for MySQL and SQLite)
         $timeSeriesQuery = DB::table(DB::raw("(
             WITH RECURSIVE date_series AS (
-                SELECT '{$start_date->format('Y-m-d')}' AS date
+                SELECT '{$start_date->toDateString()}' AS date
                 UNION ALL
                 SELECT $date_interval
                 FROM date_series
-                WHERE date < '{$end_date->format('Y-m-d')}'
+                WHERE date < '{$end_date->toDateString()}'
             )
             SELECT date_series.date
             FROM date_series
@@ -315,8 +334,8 @@ class Holding extends Model
 
             $timeSeriesQuery = DB::table(DB::raw("
                 generate_series(
-                    date '{$start_date->format('Y-m-d')}', 
-                    date '{$end_date->format('Y-m-d')}', 
+                    date '{$start_date->toDateString()}', 
+                    date '{$end_date->toDateString()}', 
                     interval '1 day'
                 ) as date_series"));
 
@@ -380,7 +399,7 @@ class Holding extends Model
     {
         $formattedTransactions = '';
         foreach ($this->transactions->sortByDesc('date') as $transaction) {
-            $formattedTransactions .= ' * '.$transaction->date->format('Y-m-d')
+            $formattedTransactions .= ' * '.$transaction->date->toDateString()
                                     .' '.$transaction->transaction_type
                                     .' '.$transaction->quantity
                                     .' @ '.$transaction->cost_basis

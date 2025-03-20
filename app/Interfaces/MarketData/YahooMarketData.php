@@ -94,7 +94,7 @@ class YahooMarketData implements MarketDataInterface
         return collect($this->client->getHistoricalQuoteData($symbol, ApiClient::INTERVAL_1_DAY, $startDate, $endDate))
             ->mapWithKeys(function ($history) use ($symbol) {
 
-                $date = $history->getDate()->format('Y-m-d');
+                $date = $history->getDate()->toDateString();
 
                 return [$date => new Ohlc([
                     'symbol' => $symbol,

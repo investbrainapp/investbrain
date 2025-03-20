@@ -140,7 +140,7 @@ class AlphaVantageMarketData implements MarketDataInterface
             })
             ->mapWithKeys(function ($history, $date) use ($symbol) {
 
-                $date = Carbon::parse($date)->format('Y-m-d');
+                $date = Carbon::parse($date)->toDateString();
 
                 return [$date => new Ohlc([
                     'symbol' => $symbol,

@@ -79,7 +79,7 @@ class FakeMarketData implements MarketDataInterface
 
         for ($i = 0; $i < $numDays; $i++) {
 
-            $date = now()->subDays($i)->format('Y-m-d');
+            $date = now()->subDays($i)->toDateString();
 
             $series[$date] = new Ohlc([
                 'symbol' => $symbol,

@@ -164,7 +164,7 @@ class Portfolio extends Model
 
             $daily_performance = $holding->dailyPerformance($holding->first_transaction_date, now());
             $dividends = $holding->dividends->keyBy(function ($dividend, $key) {
-                return $dividend['date']->format('Y-m-d');
+                return $dividend['date']->toDateString();
             });
             $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
 
@@ -172,7 +172,7 @@ class Portfolio extends Model
             $holding_performance = [];
 
             foreach ($period as $date) {
-                $date = $date->format('Y-m-d');
+                $date = $date->toDateString();
 
                 $close = $this->getMostRecentCloseData($all_history, $date);
 
@@ -239,7 +239,7 @@ class Portfolio extends Model
 
             $i++;
 
-            $date = Carbon::parse($date)->subDay()->format('Y-m-d');
+            $date = Carbon::parse($date)->subDay()->toDateString();
 
             return $this->getMostRecentCloseData($history, $date, $i);
         }

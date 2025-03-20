@@ -176,7 +176,7 @@
                         
                         {$formattedHoldings}
 
-                        This data is current as of today's date: " . now()->format('Y-m-d') . ". Based on the current market data, quantity owned, and average cost basis, you can determine the performance of any holding.
+                        This data is current as of today's date: " . now()->toDateString() . ". Based on the current market data, quantity owned, and average cost basis, you can determine the performance of any holding.
 
                         Below is the question from the investor. Considering these facts, provide a concise response to the following question (give a direct response). Limit your response to no more than 75 words and consider using a common decision framework. Use github style markdown for any formatting:"
             ])

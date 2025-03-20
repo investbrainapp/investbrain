@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Currency;
+use App\Models\CurrencyRate;
 use Illuminate\Console\Command;
 
 class RefreshCurrencyData extends Command
@@ -42,6 +42,6 @@ class RefreshCurrencyData extends Command
     public function handle()
     {
 
-        Currency::refreshCurrencyData($this->option('force') ?? false);
+        CurrencyRate::refreshCurrencyData($this->option('force') ?? false);
     }
 }

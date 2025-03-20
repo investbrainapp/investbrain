@@ -55,7 +55,7 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                     'realized_gains' => $dailyChange['realized_gains'],
                     'annotation' => $dailyChange['annotation'],
                     'portfolio_id' => $dailyChange['portfolio_id'],
-                    'date' => Carbon::parse($dailyChange['date'])->format('Y-m-d'),
+                    'date' => Carbon::parse($dailyChange['date'])->toDateString(),
                 ];
             });
 

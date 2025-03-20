@@ -41,28 +41,28 @@ class TransactionFactory extends Factory
     public function yearsAgo(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => $this->faker->dateTimeBetween('-5 years', '-3 years')->format('Y-m-d'),
+            'date' => $this->faker->dateTimeBetween('-5 years', '-3 years')->toDateString(),
         ]);
     }
 
     public function lastYear(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => now()->subYear()->format('Y-m-d'),
+            'date' => now()->subYear()->toDateString(),
         ]);
     }
 
     public function lastMonth(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => now()->subMonth()->format('Y-m-d'),
+            'date' => now()->subMonth()->toDateString(),
         ]);
     }
 
     public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => $this->faker->dateTimeBetween('-2 weeks', 'now')->format('Y-m-d'),
+            'date' => $this->faker->dateTimeBetween('-2 weeks', 'now')->toDateString(),
         ]);
     }
 

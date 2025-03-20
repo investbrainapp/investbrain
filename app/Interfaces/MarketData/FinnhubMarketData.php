@@ -75,7 +75,7 @@ class FinnhubMarketData implements MarketDataInterface
 
     public function dividends($symbol, $startDate, $endDate): Collection
     {
-        $dividends = $this->client->stockDividends($symbol, $startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
+        $dividends = $this->client->stockDividends($symbol, $startDate->toDateString(), $endDate->toDateString());
 
         return collect($dividends)->map(function ($dividend) use ($symbol) {
 
@@ -90,7 +90,7 @@ class FinnhubMarketData implements MarketDataInterface
     public function splits($symbol, $startDate, $endDate): Collection
     {
 
-        $splits = $this->client->stockSplits($symbol, $startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
+        $splits = $this->client->stockSplits($symbol, $startDate->toDateString(), $endDate->toDateString());
 
         return collect($splits)->map(function ($split) use ($symbol) {
 
@@ -111,7 +111,7 @@ class FinnhubMarketData implements MarketDataInterface
         $closes = Arr::get($history, 'c', []);
 
         return collect($timestamps)->mapWithKeys(function ($timestamp, $index) use ($symbol, $closes) {
-            $date = Carbon::createFromTimestamp($timestamp)->format('Y-m-d');
+            $date = Carbon::createFromTimestamp($timestamp)->toDateString();
 
             return [$date => new Ohlc([
                 'symbol' => $symbol,

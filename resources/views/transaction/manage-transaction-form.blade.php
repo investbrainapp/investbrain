@@ -50,7 +50,7 @@ new class extends Component
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => 'required|string|in:BUY,SELL',
             'portfolio_id' => 'required|exists:portfolios,id',
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->format('Y-m-d')],
+            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->toDateString()],
             'quantity' => [
                 'required',
                 'numeric',
@@ -76,7 +76,7 @@ new class extends Component
             $this->symbol = $this->transaction->symbol;
             $this->transaction_type = $this->transaction->transaction_type;
             $this->portfolio_id = $this->transaction->portfolio_id;
-            $this->date = $this->transaction->date->format('Y-m-d');
+            $this->date = $this->transaction->date->toDateString();
             $this->quantity = $this->transaction->quantity;
             $this->cost_basis = $this->transaction->cost_basis;
             $this->sale_price = $this->transaction->sale_price;
@@ -91,7 +91,7 @@ new class extends Component
 
             $this->transaction_type = 'BUY';
             $this->portfolio_id = isset($this->portfolio) ? $this->portfolio->id : '';
-            $this->date = now()->format('Y-m-d');
+            $this->date = now()->toDateString();
         }
     }
 
