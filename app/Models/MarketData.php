@@ -26,6 +26,7 @@ class MarketData extends Model
         'name',
         'currency',
         'market_value',
+        'market_value_base',
         'fifty_two_week_high',
         'fifty_two_week_low',
         'forward_pe',

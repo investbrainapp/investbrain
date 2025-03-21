@@ -19,16 +19,14 @@ class LocalizationMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $locale = auth()->user()?->getLocale() ?? config('app.locale');
-        $language = Str::before($locale, '_');
-        $currency = auth()->user()?->getCurrency() ?? config('investbrain.base_currency');
+        $locale = auth()->user()?->getLocale();
 
         config(['app.locale' => $locale]);
-        app('translator')->setLocale($language);
+        app('translator')->setLocale(Str::before($locale, '_'));
         app('events')->dispatch(new LocaleUpdated($locale));
-        Number::useLocale($locale);
 
-        Number::useCurrency($currency);
+        Number::useLocale($locale);
+        Number::useCurrency(auth()->user()->getCurrency());
 
         return $next($request);
     }

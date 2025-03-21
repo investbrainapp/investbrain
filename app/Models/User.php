@@ -96,6 +96,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $available_locales = Arr::pluck(config('app.available_locales'), 'locale');
 
-        return Arr::get($this->options, 'locale') ?? request()->getPreferredLanguage($available_locales);
+        return Arr::get($this->options, 'locale') ?? request()->getPreferredLanguage($available_locales) ?? config('app.locale');
     }
 }

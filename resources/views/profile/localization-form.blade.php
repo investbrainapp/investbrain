@@ -28,7 +28,7 @@ new class extends Component
 
     public function mount()
     {
-        $this->currencies = Currency::withoutAliases()->get();
+        $this->currencies = Currency::get();
         $this->display_currency = auth()->user()->getCurrency();
         $this->locale = auth()->user()->getLocale();
         $this->user = auth()->user();
