@@ -69,25 +69,33 @@
 
             <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
 
+                @if(!empty($holding->market_data->market_cap))
                 <p>
                     <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    {{ Currency::forHumans($holding->market_data?->market_cap ?? 0, $holding->market_data->currency) }}
+                    {{ Currency::forHumans($holding->market_data->market_cap, $holding->market_data->currency) }}
                 </p>
+                @endif
 
+                @if(!empty($holding->market_data->forward_pe))
                 <p>
                     <span class="font-bold">{{ __('Forward PE') }}: </span>
                     {{ $holding->market_data->forward_pe }} 
                 </p>
+                @endif
 
+                @if(!empty($holding->market_data->trailing_pe))
                 <p>
                     <span class="font-bold">{{ __('Trailing PE') }}: </span>
                     {{ $holding->market_data->trailing_pe }} 
                 </p>
+                @endif
 
-                <p>
-                    <span class="font-bold">{{ __('Book Value') }}: </span>
-                    {{ Number::currency($holding->market_data->book_value??0, $holding->market_data->currency) }} 
-                </p>
+                @if(!empty($holding->market_data->book_value))
+                    <p>
+                        <span class="font-bold">{{ __('Book Value') }}: </span>
+                        {{ Number::currency($holding->market_data->book_value, $holding->market_data->currency) }} 
+                    </p>
+                @endif
 
                 <p>
                     <span class="font-bold">{{ __('52 week') }}: </span>
@@ -95,18 +103,22 @@
                     <x-fifty-two-week-range :market-data="$holding->market_data" />
                 </p>
 
+                @if(!empty($holding->market_data->dividend_yield))
                 <p>
                     <span class="font-bold">{{ __('Dividend Yield') }}: </span>
                     {{ Number::percentage(
-                        $holding->market_data->dividend_yield ?? 0, 
+                        $holding->market_data->dividend_yield, 
                         $holding->market_data->dividend_yield < 1 ? 2 : 0
                     ) }} 
                 </p>
+                @endif
 
+                @if(!empty($holding->market_data->last_dividend_date))
                 <p>
                     <span class="font-bold">{{ __('Last Dividend Paid') }}: </span>
-                    {{ $holding->market_data?->last_dividend_date?->format('F d, Y') ?? '' }} 
+                    {{ $holding->market_data->last_dividend_date->format('F d, Y') }} 
                 </p>
+                @endif
                 
             </x-ib-card>
 
