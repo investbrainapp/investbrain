@@ -21,9 +21,9 @@ class HoldingController extends Controller
                 $query->where('transactions.symbol', $symbol);
             },
         ])
-            ->symbol($symbol)
-            ->portfolio($portfolio->id)
-            ->firstOrFail();
+        ->symbol($symbol)
+        ->portfolio($portfolio->id)
+        ->firstOrFail();
 
         $formattedTransactions = $holding->getFormattedTransactions();
 
