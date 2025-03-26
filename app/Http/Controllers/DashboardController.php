@@ -25,8 +25,7 @@ class DashboardController extends Controller
                  Holding::query()
                      ->myHoldings()
                      ->withoutWishlists()
-                     ->withPortfolioMetrics()
-                     ->first();
+                     ->getPortfolioMetrics();
             }
         );
         // dd($metrics->toArray());

@@ -45,16 +45,6 @@ class Currency extends Model
         ];
     }
 
-    public static function toDisplay(float $value): string
-    {
-        $from = config('investbrain.base_currency');
-        $to = auth()->user()->getCurrency();
-
-        $value = Currency::convert($value, $from, $to);
-
-        return Number::currency($value, $to);
-    }
-
     public static function forHumans(int|float $number, ?string $currency = null, ?string $locale = null): string
     {
         $symbol = Number::currencySymbol($currency, $locale);

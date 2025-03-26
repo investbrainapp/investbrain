@@ -39,4 +39,4 @@ Schedule::command(SyncHoldingData::class)->yearly();
 /**
  * Refreshes currency exchange data several times daily
  */
-Schedule::command(RefreshCurrencyData::class)->daily()->everySixHours();
+Schedule::command(RefreshCurrencyData::class)->hourly();

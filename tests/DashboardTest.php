@@ -54,8 +54,7 @@ class DashboardTest extends TestCase
 
         $metrics = Holding::query()
             ->myHoldings()
-            ->withPortfolioMetrics()
-            ->first();
+            ->getPortfolioMetrics();
 
         $this->assertEqualsWithDelta(
             $transaction->sale_price - $transaction->cost_basis,

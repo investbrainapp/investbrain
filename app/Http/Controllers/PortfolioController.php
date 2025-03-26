@@ -35,13 +35,9 @@ class PortfolioController extends Controller
             function () use ($portfolio) {
                 return Holding::query()
                     ->portfolio($portfolio->id)
-                    ->withPortfolioMetrics()
-                    ->first();
+                    ->getPortfolioMetrics();
             }
         );
-
-        // dd($portfolio->toArray());
-        // dd($metrics->toArray());
 
         $formattedHoldings = $portfolio->getFormattedHoldings();
 

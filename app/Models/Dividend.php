@@ -135,15 +135,6 @@ class Dividend extends Model
                 THEN transactions.quantity ELSE 0 END), 0))
             * dividends.dividend_amount
             AS total_received
-        ")->selectRaw("
-            (COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' 
-                AND date(transactions.date) <= date(dividends.date) 
-                THEN transactions.quantity ELSE 0 END), 0)
-            - COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' 
-                AND date(transactions.date) <= date(dividends.date) 
-                THEN transactions.quantity ELSE 0 END), 0))
-            * dividends.dividend_amount_base
-            AS total_received_base
         ")->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
             ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
             ->where('dividends.symbol', $symbol)
@@ -160,9 +151,7 @@ class Dividend extends Model
             ->each(function ($holding) use ($dividends) {
                 $holding->update([
                     'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
-                        ->sum('total_received'),
-                    'dividends_earned_base' => $dividends->where('portfolio_id', $holding->portfolio_id)
-                        ->sum('total_received_base'),
+                        ->sum('total_received')
                 ]);
             });
     }

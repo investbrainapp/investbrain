@@ -69,25 +69,6 @@ return new class extends Migration
         });
 
         /**
-         * Add _base columns to holdings table
-         */
-        Schema::table('holdings', function (Blueprint $table) {
-            $table->float('total_cost_basis_base', 12, 4)->nullable()->after('dividends_earned');
-            $table->float('realized_gain_base', 12, 4)->nullable()->after('total_cost_basis_base');
-            $table->float('dividends_earned_base', 12, 4)->nullable()->after('realized_gain_base');
-        });
-        DB::table('holdings')->update([
-            'total_cost_basis_base' => DB::raw('total_cost_basis'),
-            'realized_gain_base' => DB::raw('realized_gain_dollars'),
-            'dividends_earned_base' => DB::raw('dividends_earned'),
-        ]);
-        Schema::table('holdings', function (Blueprint $table) {
-            $table->float('total_cost_basis_base', 12, 4)->nullable(false)->change();
-            $table->float('realized_gain_base', 12, 4)->nullable(false)->change();
-            $table->float('dividends_earned_base', 12, 4)->nullable(false)->change();
-        });
-
-        /**
          * Creates currencies table
          */
         Schema::create('currencies', function (Blueprint $table) {
@@ -145,12 +126,6 @@ return new class extends Migration
 
         Schema::table('dividends', function (Blueprint $table) {
             $table->dropColumn('dividend_amount_base');
-        });
-
-        Schema::table('holdings', function (Blueprint $table) {
-            $table->dropColumn('total_cost_basis_base');
-            $table->dropColumn('realized_gain_base');
-            $table->dropColumn('dividends_earned_base');
         });
 
         Schema::dropIfExists('currencies');
