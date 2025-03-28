@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Mockery;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
-use Illuminate\Support\Carbon;
 use Database\Seeders\CurrencySeeder;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 
 class CurrencyDataTest extends TestCase
 {
@@ -52,7 +50,7 @@ class CurrencyDataTest extends TestCase
 
         CurrencyRate::create(['currency' => 'USD', 'date' => now(), 'rate' => 1]);
         CurrencyRate::create(['currency' => 'EUR', 'date' => now(), 'rate' => .96]);
-        
+
         $converted = Currency::convert(1, 'USD', 'EUR');
 
         $this->assertEquals(0.96, $converted);
