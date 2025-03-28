@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 use App\Models\CurrencyRate;
-use Illuminate\Support\Facades\DB;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\MarketDataSeeder;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -43,7 +43,6 @@ return new class extends Migration
          * Add _base columns to transactions table
          */
         Schema::table('transactions', function (Blueprint $table) {
-            // todo: make transacitons have a currency selector
             $table->float('cost_basis_base', 12, 4)->nullable()->after('sale_price');
             $table->float('sale_price_base', 12, 4)->nullable()->after('cost_basis_base');
         });
@@ -82,7 +81,7 @@ return new class extends Migration
          */
         Schema::create('currency_rates', function (Blueprint $table) {
             $table->date('date');
-            $table->string('currency', 3); 
+            $table->string('currency', 3);
             $table->float('rate', 12, 4);
             $table->timestamps();
 

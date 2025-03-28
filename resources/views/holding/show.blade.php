@@ -174,7 +174,7 @@
             </x-ib-card>
 
             @if(config('services.ai_chat_enabled'))
-            {{-- // TODO: add to system prompt:
+            {{-- // todo: add to system prompt:
                     // Additionally, here is some recent news about {$this->holding->symbol}:
                     // And their latest SEC filings: --}}
             @livewire('ai-chat-window', [

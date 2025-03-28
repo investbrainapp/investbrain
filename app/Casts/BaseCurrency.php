@@ -24,7 +24,6 @@ class BaseCurrency implements CastsAttributes
         //     return (float) $value * (1 / $attributes[$this->rate_to_base]);
         // }
 
-        // todo: use database to convert
         return (float) $value;
     }
 
