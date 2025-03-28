@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\ConvertToMarketDataCurrency;
+use App\Actions\CopyToBaseCurrency;
+use App\Actions\EnsureCostBasisAddedToSale;
 use App\Casts\BaseCurrency;
 use App\Traits\HasMarketData;
-use App\Traits\WithBaseCurrency;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -14,19 +16,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Pipeline;
 
 class Transaction extends Model
 {
     use HasFactory;
     use HasMarketData;
     use HasUuids;
-    use WithBaseCurrency;
 
     protected $fillable = [
         'symbol',
         'date',
         'portfolio_id',
         'transaction_type',
+        'currency',
         'quantity',
         'cost_basis',
         'sale_price',
@@ -53,11 +56,13 @@ class Transaction extends Model
 
         static::saving(function ($transaction) {
 
-            if ($transaction->transaction_type == 'SELL') {
-
-                // cost basis is required for sales to calculate realized gains
-                $transaction->ensureCostBasisIsAddedToSale();
-            }
+            $transaction = Pipeline::send($transaction)
+                ->through([
+                    CopyToBaseCurrency::class,
+                    EnsureCostBasisAddedToSale::class,
+                    ConvertToMarketDataCurrency::class,
+                ])
+                ->then(fn (Transaction $transaction) => $transaction);
         });
 
         static::saved(function ($transaction) {
@@ -137,23 +142,6 @@ class Transaction extends Model
                 $query->where('id', auth()->id());
             });
         });
-    }
-
-    /**
-     * Writes average cost basis to a sale transaction
-     */
-    public function ensureCostBasisIsAddedToSale(): Transaction
-    {
-        $average_cost_basis = Transaction::where([
-            'portfolio_id' => $this->portfolio_id,
-            'symbol' => $this->symbol,
-            'transaction_type' => 'BUY',
-        ])->whereDate('date', '<=', $this->date)
-            ->average('cost_basis');
-
-        $this->cost_basis = $average_cost_basis ?? 0;
-
-        return $this;
     }
 
     /**

@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\CopyToBaseCurrency;
 use App\Casts\BaseCurrency;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use App\Models\CurrencyRate;
-use App\Traits\HasMarketData;
-use Illuminate\Support\Carbon;
-use App\Traits\WithBaseCurrency;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Pipeline;
+use Illuminate\Support\Str;
 
 class Dividend extends Model
 {
     use HasFactory;
     use HasMarketData;
     use HasUuids;
-    use WithBaseCurrency;
 
     protected $fillable = [
         'symbol',
@@ -39,6 +38,20 @@ class Dividend extends Model
         'dividend_amount' => 'float',
         'dividend_amount_base' => BaseCurrency::class,
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($dividend) {
+
+            $dividend = Pipeline::send($dividend)
+                ->through([
+                    CopyToBaseCurrency::class,
+                ])
+                ->then(fn (Dividend $dividend) => $dividend);
+        });
+    }
 
     public function holdings(): HasMany
     {
@@ -151,7 +164,7 @@ class Dividend extends Model
             ->each(function ($holding) use ($dividends) {
                 $holding->update([
                     'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
-                        ->sum('total_received')
+                        ->sum('total_received'),
                 ]);
             });
     }

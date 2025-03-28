@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\CopyToBaseCurrency;
 use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
-use App\Traits\WithBaseCurrency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Pipeline;
 
 class MarketData extends Model
 {
     use HasFactory;
-    use WithBaseCurrency;
 
     protected $primaryKey = 'symbol';
 
@@ -53,6 +53,20 @@ class MarketData extends Model
         'dividend_yield' => 'float',
         'meta_data' => 'json',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($market_data) {
+
+            $market_data = Pipeline::send($market_data)
+                ->through([
+                    CopyToBaseCurrency::class,
+                ])
+                ->then(fn (MarketData $market_data) => $market_data);
+        });
+    }
 
     public function holdings()
     {

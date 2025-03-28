@@ -192,6 +192,8 @@ class Portfolio extends Model
                 }
             }
 
+            // todo: get first and last date for currency data
+
             foreach ($holding_performance as $date => $performance) {
                 if (Arr::get($total_performance, $date) == null) {
 

@@ -39,8 +39,6 @@ new class extends Component
 
     public Collection $currencies;
 
-    public bool $disable_currency = false;
-
     public string $currency;
 
     // methods
@@ -65,13 +63,12 @@ new class extends Component
 
     public function mount()
     {
-        $this->currencies = Currency::get();
+        $this->currencies = Currency::list();
         $this->currency = auth()->user()->getCurrency();
 
         if (isset($this->transaction)) {
 
             $this->currency = $this->transaction->market_data->currency;
-            $this->disable_currency = true;
 
             $this->symbol = $this->transaction->symbol;
             $this->transaction_type = $this->transaction->transaction_type;
@@ -86,7 +83,6 @@ new class extends Component
             if (isset($this->symbol)) {
 
                 $this->currency = MarketData::getMarketData($this->symbol)?->currency;
-                $this->disable_currency = true;
             }
 
             $this->transaction_type = 'BUY';
@@ -170,10 +166,18 @@ new class extends Component
                 type="number"
                 step="any"
             >
-                <x-slot:prefix>
-                    {{ Number::currencySymbol($currency) }}
-                </x-slot:prefix>
-
+                <x-slot:prepend>
+                    
+                    <x-select 
+                        class="rounded-e-none border-e-0 bg-base-200"
+                        icon="o-banknotes"
+                        :options="$currencies"
+                        option-value="currency"
+                        option-label="currency"
+                        wire:model="currency"
+                        id="currency"
+                    />
+                </x-slot:prepend>
             </x-input>
         @else
             <x-input 
@@ -183,10 +187,18 @@ new class extends Component
                 type="number"
                 step="any"
             >
-                <x-slot:prefix>
-                    {{-- todo: should populate currency based on selected symbol --}}
-                    {{ Number::currencySymbol($currency) }}
-                </x-slot:prefix>
+                <x-slot:prepend>
+
+                    <x-select 
+                        class="rounded-e-none border-e-0 bg-base-200"
+                        icon="o-banknotes"
+                        :options="$currencies"
+                        option-value="currency"
+                        option-label="currency"
+                        wire:model="currency"
+                        id="currency"
+                    />
+                </x-slot:prepend>
              
             </x-input>
         @endif

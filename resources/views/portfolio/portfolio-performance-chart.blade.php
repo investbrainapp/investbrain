@@ -35,6 +35,7 @@ new class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
+        // todo: need to convert from base to display here
         $dailyChangeQuery = DailyChange::myDailyChanges()->selectRaw('
                     date, 
                     SUM(total_market_value) as total_market_value, 

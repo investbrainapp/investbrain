@@ -44,6 +44,8 @@ class CaptureDailyChange extends Command
 
             $this->line('Capturing daily change for '.$portfolio->title);
 
+            // todo: need to convert from holding currency to base here
+
             $total_cost_basis = $portfolio->holdings->sum('total_cost_basis');
 
             $total_dividends = $portfolio->holdings->sum('dividends_earned');

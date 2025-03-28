@@ -10,10 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseCurrency implements CastsAttributes
 {
-    public function __construct(
-        public ?string $rate_to_base = null
-    ) { }
-
     /**
      * Cast the given value to user's display currency
      *
@@ -21,7 +17,7 @@ class BaseCurrency implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        
+
         // // if we have a rate, let's use it to reverse the currency conversion
         // if (!empty($this->rate_to_base) && array_key_exists($this->rate_to_base, $attributes) && $attributes[$this->rate_to_base] != 0) {
 
@@ -41,7 +37,7 @@ class BaseCurrency implements CastsAttributes
     {
         // // if we have a rate, that means we already converted. so we should skip converting again
         // if (!empty($this->rate_to_base) && array_key_exists($this->rate_to_base, $attributes)) {
-            
+
         //     return $value;
         // }
 

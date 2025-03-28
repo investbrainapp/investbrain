@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\CarbonPeriod;
-use Illuminate\Support\Arr;
-use App\Models\CurrencyRate;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Number;
 use Illuminate\Database\Eloquent\Model;
-use Investbrain\Frankfurter\Frankfurter;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Number;
 
 class Currency extends Model
 {
@@ -29,7 +24,6 @@ class Currency extends Model
     protected $fillable = [
         'currency',
         'label',
-        'is_alias',
     ];
 
     /**
@@ -41,7 +35,7 @@ class Currency extends Model
     {
         return [
             'created_at' => 'datetime',
-            'updated_at' => 'datetime'
+            'updated_at' => 'datetime',
         ];
     }
 
@@ -50,6 +44,23 @@ class Currency extends Model
         $symbol = Number::currencySymbol($currency, $locale);
 
         return $symbol.Number::forHumans($number);
+    }
+
+    /**
+     * Returns a list of supported currencies
+     *
+     * @param  bool|null  $withAliases  Whether to include aliases in list of currencies
+     */
+    public static function list(?bool $withAliases = true): Collection
+    {
+        $aliases = $withAliases ? collect(config('investbrain.currency_aliases'))->map(function ($value, $currency) {
+            return [
+                'currency' => $currency,
+                'label' => $value['label'],
+            ];
+        })->values() : [];
+
+        return self::get()->map->only(['currency', 'label'])->merge($aliases);
     }
 
     /**
