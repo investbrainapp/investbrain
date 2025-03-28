@@ -47,9 +47,11 @@ new class extends Component
 
         $this->user->save();
 
+        cache()->tags(['metrics-'.$this->user->id])->flush();
+
         $this->dispatch('saved');
 
-        $this->js('window.location.reload();');
+        //$this->js('window.location.reload();');
     }
 }; ?>
 <x-forms.form-section submit="updateProfileInformation">

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Number;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Events\LocaleUpdated;
 
 class LocalizationMiddleware
 {
@@ -19,15 +20,18 @@ class LocalizationMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $locale = auth()->user()?->getLocale();
+        if (Auth::check()) {
 
-        config(['app.locale' => $locale]);
-        app('translator')->setLocale(Str::before($locale, '_'));
-        app('events')->dispatch(new LocaleUpdated($locale));
+            $locale = auth()->user()->getLocale();
 
-        Number::useLocale($locale);
-        Number::useCurrency(auth()->user()->getCurrency());
+            config(['app.locale' => $locale]);
+            app('translator')->setLocale(Str::before($locale, '_'));
+            app('events')->dispatch(new LocaleUpdated($locale));
 
+            Number::useLocale($locale);
+            Number::useCurrency(auth()->user()->getCurrency());
+        }
+        
         return $next($request);
     }
 }

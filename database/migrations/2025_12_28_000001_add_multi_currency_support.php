@@ -77,11 +77,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Artisan::call('db:seed', [
-            '--class' => CurrencySeeder::class,
-            '--force' => true,
-        ]);
-
         /**
          * Creates currency rates table
          */
@@ -95,6 +90,13 @@ return new class extends Migration
         });
 
         if (config('app.env') != 'testing') {
+
+            Artisan::call('db:seed', [
+                '--class' => CurrencySeeder::class,
+                '--force' => true,
+            ]);
+
+            // todo: get currency data for existing transaction and dividend dates
 
             CurrencyRate::refreshCurrencyData();
 

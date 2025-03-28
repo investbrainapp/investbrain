@@ -29,7 +29,7 @@ class PortfolioController extends Controller
         $portfolio->load(['transactions', 'holdings']);
 
         // get portfolio metrics
-        $metrics = cache()->remember(
+        $metrics = cache()->tags(['metrics-'.$request->user()->id])->remember(
             'portfolio-metrics-'.$portfolio->id,
             60,
             function () use ($portfolio) {

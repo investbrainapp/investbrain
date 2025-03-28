@@ -31,9 +31,6 @@ class Holding extends Model
         'dividends_earned',
         'splits_synced_at',
         'reinvest_dividends',
-        'total_cost_basis_base',
-        'realized_gain_base',
-        'dividends_earned_base',
     ];
 
     protected $casts = [
@@ -246,7 +243,7 @@ class Holding extends Model
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->realized_gain_dollars,
+            'realized_gain_dollars' => $query->realized_gain_dollars ?? 0,
             'dividends_earned' => $this->dividends->sum('total_received'),
         ]);
 

@@ -38,6 +38,7 @@ class CurrencyRate extends Model
     protected function casts(): array
     {
         return [
+            'rate' => 'float',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
@@ -66,11 +67,9 @@ class CurrencyRate extends Model
         $date = Carbon::parse($date);
 
         // Get or create historic rate
-        return (float) self::where([
-                'date' => $date->toDateString(), 
-                'currency' => $currency
-            ])
-            ->select('rate')
+        return (float) self::select('rate')
+            ->whereDate('date', $date->toDateString())
+            ->where(['currency' => $currency])
             ->firstOr(function () use ($currency, $date) {
 
                 [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
@@ -85,7 +84,6 @@ class CurrencyRate extends Model
                     'rate' => $rate * $adjustment
                 ]);
             })->rate;
-        
     }
 
     public static function timeSeriesRates(string $currency, string|\DateTime $start, mixed $end = null): array
