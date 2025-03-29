@@ -58,23 +58,16 @@ class DividendsTest extends TestCase
         $this->assertEqualsWithDelta(4.95, $dividendsReinvested * $market_data->market_value, 0.01);
     }
 
-    public function test_do_not_duplicate_recent_dividends(): void
+    public function test_cannot_insert_duplicate_dividends(): void
     {
-        $this->actingAs($user = User::factory()->create());
-
-        $portfolio = Portfolio::factory()->create();
-        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
-
-        $holding = Holding::query()->portfolio($portfolio->id)->symbol('ACME')->first();
-
-        Dividend::create([
-            'symbol' => 'ACME',
-            'date' => now()->subDay(2),
-            'dividend_amount' => .01,
-        ]);
-
+        // first insert
         Dividend::refreshDividendData('ACME');
 
-        $this->assertCount(1, $holding->dividends);
+        // try to duplicate
+        Dividend::refreshDividendData('ACME');
+
+        $dividend_count = Dividend::count();
+
+        $this->assertEquals(3, $dividend_count);
     }
 }
