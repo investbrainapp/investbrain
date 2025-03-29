@@ -96,7 +96,9 @@ class CurrencyRate extends Model
 
                 CurrencyRate::insertOrIgnore($updates);
 
-                return CurrencyRate::make(Arr::first($updates, fn ($update) => $update['currency'] == $currency) ?? ['rate' => 1]);
+                $temp = CurrencyRate::make();
+
+                return $temp->fill(Arr::first($updates, fn ($update) => $update['currency'] == $currency) ?? ['rate' => 1]);
             });
 
         return (float) $rate->rate * $adjustment;
