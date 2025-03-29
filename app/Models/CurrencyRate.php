@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Currency;
 use Carbon\CarbonPeriod;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Investbrain\Frankfurter\Frankfurter;
 
 class CurrencyRate extends Model
@@ -49,6 +48,9 @@ class CurrencyRate extends Model
         return (float) self::historic($currency);
     }
 
+    /**
+     * Get historic rate for symbol
+     */
     public static function historic(string $currency, mixed $date = null): float
     {
         // No need to convert
@@ -66,29 +68,47 @@ class CurrencyRate extends Model
         // Make sure we have a Carbon date
         $date = Carbon::parse($date);
 
+        // Handle aliases
+        [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
+
         // Get or create historic rate
-        return (float) self::select('rate')
+        $rate = self::select('rate')
             ->whereDate('date', $date->toDateString())
             ->where(['currency' => $currency])
-            ->firstOr(function () use ($currency, $date) {
+            ->firstOr(function () use ($date, $currency) {
 
-                [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
+                $currencies = Currency::all()->pluck('currency')->toArray();
 
-                // grab rate from API
-                $rate = Arr::get(Frankfurter::setSymbols($currency)->historical($date), "rates.{$currency}");
+                $rates = Frankfurter::setSymbols($currencies)->historical($date);
 
-                // persist to database
-                return self::create([
-                    'currency' => $currency,
-                    'date' => $date->toDateString(),
-                    'rate' => $rate * $adjustment
-                ]);
-            })->rate;
+                $date = Arr::get($rates, 'date');
+
+                $updates = Arr::map(Arr::get($rates, 'rates', []), function ($rate, $curr) use ($date) {
+
+                    return [
+                        'currency' => $curr,
+                        'date' => $date,
+                        'rate' => $rate,
+                        'updated_at' => now()->toDateTimeString(),
+                        'created_at' => now()->toDateTimeString(),
+                    ];
+                });
+
+                CurrencyRate::insertOrIgnore($updates);
+
+                return CurrencyRate::make(Arr::first($updates, fn ($update) => $update['currency'] == $currency));
+            });
+
+        return (float) $rate->rate * $adjustment;
     }
 
+    /**
+     * Get rates for range of dates
+     *
+     * @return array<string, float>
+     */
     public static function timeSeriesRates(string $currency, string|\DateTime $start, mixed $end = null): array
     {
-
         // No need to send network request - just generate 1s
         if ($currency === config('investbrain.base_currency')) {
             $period = CarbonPeriod::create($start, $end);
@@ -103,40 +123,58 @@ class CurrencyRate extends Model
 
         [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
 
-        $rates = Frankfurter::setSymbols($currency)->timeSeries($start, $end);
-        $rates = Arr::get($rates, 'rates', []);
-        $rates = Arr::map($rates, fn ($value) => $value[$currency] * $adjustment);
+        $currencies = Currency::all()->pluck('currency')->toArray();
+        $rates = Frankfurter::setSymbols($currencies)->timeSeries($start, $end);
 
-        return $rates;
+        $rates = Arr::get($rates, 'rates', []);
+
+        $updates = [];
+
+        // loop through each date
+        foreach ($rates as $date => $currencies) {
+
+            // loop through each rate
+            foreach ($currencies as $curr => $rate) {
+
+                // add to updates
+                $updates[] = [
+                    'currency' => $curr,
+                    'date' => $date,
+                    'rate' => $rate,
+                    'updated_at' => now()->toDateTimeString(),
+                    'created_at' => now()->toDateTimeString(),
+                ];
+            }
+        }
+
+        CurrencyRate::insertOrIgnore($updates);
+
+        $result = CurrencyRate::whereBetween('date', [$start, $end ?? now()])
+            ->where('currency', $currency)
+            ->get()
+            ->mapWithKeys(fn ($rate) => [
+                $rate->date => $rate->rate * $adjustment,
+            ]);
+
+        return $result->toArray();
     }
 
     public static function refreshCurrencyData($force = false): void
     {
-        $currencies = Currency::get()->keyBy('currency');
+        $currencies = Currency::all()->pluck('currency')->toArray();
 
         $rates = Frankfurter::setBaseCurrency(config('investbrain.base_currency'))
-            ->setSymbols(array_keys($currencies->all()))
+            ->setSymbols($currencies)
             ->latest();
 
         $updates = [];
         foreach (Arr::get($rates, 'rates', []) as $currency => $rate) {
 
-            // create currency aliases
-            collect(config('investbrain.currency_aliases', []))
-                ->where('alias_of', $currency)
-                ->each(function ($value, $alias) use ($rate, &$updates) {
-                    $updates[] = [
-                        'date' => now()->toDateString(),
-                        'currency' => $alias,
-                        'rate' => $rate * $value['adjustment'],
-                    ];
-                });
-
             // update currency
             $updates[] = [
                 'date' => now()->toDateString(),
                 'currency' => $currency,
-                'rate' => $rate
+                'rate' => $rate,
             ];
         }
 
@@ -147,7 +185,7 @@ class CurrencyRate extends Model
 
     protected static function getCurrencyAliasAdjustments($currency)
     {
-        $adjustment = null;
+        $adjustment = 1;
 
         if (array_key_exists($currency, config('investbrain.currency_aliases', []))) {
 
@@ -157,6 +195,6 @@ class CurrencyRate extends Model
             $currency = $config['alias_of'];
         }
 
-        return [$currency, $adjustment ?? 1];
+        return [$currency, $adjustment];
     }
 }
