@@ -32,7 +32,7 @@ class ConvertToMarketDataCurrency
             }
         }
 
-        // currency cannot be saved to the database
+        // currency cannot be saved to the database - we already know market_data.currency anyway
         unset($model->currency);
 
         return $next($model);

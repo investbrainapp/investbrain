@@ -58,9 +58,9 @@ class Transaction extends Model
 
             $transaction = Pipeline::send($transaction)
                 ->through([
-                    CopyToBaseCurrency::class,
-                    EnsureCostBasisAddedToSale::class,
                     ConvertToMarketDataCurrency::class,
+                    EnsureCostBasisAddedToSale::class,
+                    CopyToBaseCurrency::class,
                 ])
                 ->then(fn (Transaction $transaction) => $transaction);
         });

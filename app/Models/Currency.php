@@ -58,9 +58,9 @@ class Currency extends Model
                 'currency' => $currency,
                 'label' => $value['label'],
             ];
-        })->values() : [];
+        })->values() : collect();
 
-        return self::get()->map->only(['currency', 'label'])->merge($aliases);
+        return $aliases->merge(self::get()->map->only(['currency', 'label']));
     }
 
     /**
