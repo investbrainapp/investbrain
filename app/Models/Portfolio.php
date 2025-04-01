@@ -179,6 +179,8 @@ class Portfolio extends Model
                 $total_market_value = $daily_performance->get($date)->owned * $close;
                 $dividends_earned += $daily_performance->get($date)->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
+                // todo: need to handle base currency here
+
                 if (Carbon::parse($date)->isWeekday()) {
                     $holding_performance[$date] = [
                         'date' => $date,

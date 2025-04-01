@@ -94,6 +94,7 @@ class CurrencyRate extends Model
                     ];
                 });
 
+                // todo: queue this
                 CurrencyRate::insertOrIgnore($updates);
 
                 $temp = CurrencyRate::make();
@@ -149,14 +150,22 @@ class CurrencyRate extends Model
             }
         }
 
+        // todo: queue this
         CurrencyRate::insertOrIgnore($updates);
 
-        $result = CurrencyRate::whereBetween('date', [$start, $end ?? now()])
+        return collect($updates)
             ->where('currency', $currency)
-            ->get()
             ->mapWithKeys(fn ($rate) => [
                 $rate->date => $rate->rate * $adjustment,
-            ]);
+            ])
+            ->toArray();
+
+        // $result = CurrencyRate::whereBetween('date', [$start, $end ?? now()])
+        //     ->where('currency', $currency)
+        //     ->get()
+        //     ->mapWithKeys(fn ($rate) => [
+        //         $rate->date => $rate->rate * $adjustment,
+        //     ]);
 
         return $result->toArray();
     }

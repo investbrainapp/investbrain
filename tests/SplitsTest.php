@@ -31,7 +31,7 @@ class SplitsTest extends TestCase
 
         $transactions = Transaction::query()->symbol('ACME')->portfolio($portfolio->id)->get();
 
-        $this->assertCount(2, $transactions);
+        $this->assertCount(2, $transactions); // todo: intermittently failing
     }
 
     public function test_splits_do_not_create_new_transaction_if_already_synced(): void

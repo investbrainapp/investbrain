@@ -21,11 +21,10 @@ class DashboardController extends Controller
             'dashboard-metrics-'.$user->id,
             10,
             function () {
-                return
-                 Holding::query()
-                     ->myHoldings()
-                     ->withoutWishlists()
-                     ->getPortfolioMetrics();
+                return Holding::query()
+                    ->myHoldings()
+                    ->withoutWishlists()
+                    ->getPortfolioMetrics();
             }
         );
 
