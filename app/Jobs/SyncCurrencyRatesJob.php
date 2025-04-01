@@ -26,11 +26,9 @@ class SyncCurrencyRatesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $date = Transaction::query()
-            ->selectRaw('min(date)')
-            ->first();
+        $min_date = Transaction::min('date');
 
-        collect(CarbonPeriod::create($date->min, now()))
+        collect(CarbonPeriod::create($min_date, now()))
             ->chunk($this->chunk_size)
             ->map(function ($chunk) {
                 return collect([
@@ -39,6 +37,7 @@ class SyncCurrencyRatesJob implements ShouldQueue
                 ]);
             })
             ->each(function ($chunk) {
+
                 CurrencyRate::timeSeriesRates(
                     'ZZZ', // use fake currency to force
                     $chunk->get('min'),
