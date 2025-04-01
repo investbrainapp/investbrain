@@ -29,4 +29,15 @@ trait HasMarketData
             $this->setRelation('market_data', MarketData::getMarketData($this->attributes['symbol']));
         }
     }
+
+    public function scopeNotBaseCurrency($query): void
+    {
+        $query->with('market_data')
+            ->whereRelation(
+                'market_data',
+                'currency',
+                '!=',
+                config('investbrain.base_currency')
+            );
+    }
 }

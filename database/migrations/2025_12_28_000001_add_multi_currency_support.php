@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Jobs\SyncCurrencyRatesJob;
 use App\Models\CurrencyRate;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\MarketDataSeeder;
@@ -95,7 +96,7 @@ return new class extends Migration
                 '--force' => true,
             ]);
 
-            // todo: get currency data for existing transaction and dividend dates
+            dispatch(SyncCurrencyRatesJob::class);
 
             CurrencyRate::refreshCurrencyData();
 
