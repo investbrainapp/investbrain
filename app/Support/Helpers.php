@@ -12,6 +12,6 @@ declare(strict_types=1);
 //     function formatMoney(int|float $amount) {
 //         $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
 
-//         return $formatter->formatCurrency((float) $amount, 'USD');
+//         return $formatter->formatCurrency((float) $amount, 'CAD');
 //     }
 // }
