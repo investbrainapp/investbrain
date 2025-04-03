@@ -149,7 +149,7 @@ new class extends Component
                 label="{{ __('Sale Price') }}" 
                 wire:model.number="sale_price" 
                 required 
-                prefix="USD" 
+                prefix="CAD" 
                 type="number"
                 step="any"
             />
@@ -159,7 +159,7 @@ new class extends Component
                 label="{{ __('Cost Basis') }}" 
                 wire:model.number="cost_basis" 
                 required 
-                prefix="USD" 
+                prefix="CAD" 
                 type="number"
                 step="any"
             />
