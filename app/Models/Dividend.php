@@ -110,8 +110,9 @@ class Dividend extends Model
 
             // create mass insert
             foreach ($dividend_data as $index => $dividend) {
+                $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
 
-                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
+                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * $rate_to_base_date;
 
                 $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
             }

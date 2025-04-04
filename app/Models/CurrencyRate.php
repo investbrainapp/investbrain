@@ -133,6 +133,8 @@ class CurrencyRate extends Model
 
         $updates = [];
 
+        // todo: need to fill in weekend rates
+
         // loop through each date
         foreach ($rates as $date => $currencies) {
 
@@ -156,7 +158,7 @@ class CurrencyRate extends Model
         return collect($updates)
             ->where('currency', $currency)
             ->mapWithKeys(fn ($rate) => [
-                $rate->date => $rate->rate * $adjustment,
+                $rate['date'] => $rate['rate'] * $adjustment,
             ])
             ->toArray();
 
@@ -167,7 +169,7 @@ class CurrencyRate extends Model
         //         $rate->date => $rate->rate * $adjustment,
         //     ]);
 
-        return $result->toArray();
+        // return $result->toArray();
     }
 
     public static function refreshCurrencyData($force = false): void

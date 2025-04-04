@@ -35,16 +35,21 @@ new class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        // todo: need to convert from base to display here
-        $dailyChangeQuery = DailyChange::myDailyChanges()->selectRaw('
-                    date, 
-                    SUM(total_market_value) as total_market_value, 
-                    SUM(total_cost_basis) as total_cost_basis, 
-                    SUM(total_gain) as total_gain 
-                    /*  ,
-                        SUM(realized_gains) as realized_gains,
-                        SUM(total_dividends_earned) as total_dividends_earned 
-                    */
+        $currency = auth()->user()->getCurrency();
+
+        $dailyChangeQuery = DailyChange::query()
+            ->myDailyChanges()
+            ->leftjoin('currency_rates AS cr', function ($join) use ($currency) {
+                $join->on('daily_change.date', '=', 'cr.date')
+                    ->where('cr.currency', '=', $currency);
+            })
+            ->selectRaw('
+                    daily_change.date, 
+                    SUM(daily_change.total_market_value * COALESCE(cr.rate, 1)) as total_market_value,
+                    SUM(daily_change.total_cost_basis * COALESCE(cr.rate, 1)) as total_cost_basis,
+                    SUM(daily_change.total_gain * COALESCE(cr.rate, 1)) as total_gain
+                    -- , SUM(realized_gains) as realized_gains
+                    -- , SUM(total_dividends_earned) as total_dividends_earned 
                 ');
 
         if (isset($this->portfolio)) {
@@ -60,12 +65,12 @@ new class extends Component
 
         if ($filterMethod['method']) {
 
-            $dailyChangeQuery->whereDate('date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
+            $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
         $dailyChange = $dailyChangeQuery
-            ->orderBy('date')
-            ->groupBy('date')
+            ->orderBy('daily_change.date')
+            ->groupBy('daily_change.date')
             ->get();
 
         return [

@@ -8,6 +8,7 @@ use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Scheb\YahooFinanceApi\ApiClient;
 use Scheb\YahooFinanceApi\ApiClientFactory as YahooFinance;
@@ -94,7 +95,7 @@ class YahooMarketData implements MarketDataInterface
         return collect($this->client->getHistoricalQuoteData($symbol, ApiClient::INTERVAL_1_DAY, $startDate, $endDate))
             ->mapWithKeys(function ($history) use ($symbol) {
 
-                $date = $history->getDate()->toDateString();
+                $date = Carbon::parse($history->getDate())->toDateString();
 
                 return [$date => new Ohlc([
                     'symbol' => $symbol,

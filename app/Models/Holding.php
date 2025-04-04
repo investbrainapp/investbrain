@@ -283,12 +283,10 @@ class Holding extends Model
                     })
                     ->select(['transactions.symbol', 'transactions.portfolio_id'])
                     ->selectRaw(
-                        "SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price_base - cost_basis_base) * quantity * COALESCE(cr.rate,1) ELSE 0 END) AS realized_gain_dollars"
+                        "SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price_base - cost_basis_base) * quantity * COALESCE(cr.rate, 1) ELSE 0 END) AS realized_gain_dollars"
                     )
                     ->selectRaw(
-                        "SUM(
-                  (CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis_base) * COALESCE(cr.rate,1) ELSE 0 END) - (CASE WHEN transaction_type = 'SELL' THEN (quantity * cost_basis_base) * COALESCE(cr.rate,1) ELSE 0 END)
-                  ) AS total_cost_basis"
+                        "SUM((CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis_base) WHEN transaction_type = 'SELL' THEN -(cost_basis_base * quantity) ELSE 0 END) * COALESCE(cr.rate, 1)) AS total_cost_basis"
                     )
                     ->selectRaw('COUNT(transactions.id) AS num_transactions')
                     ->groupBy(['transactions.symbol', 'transactions.portfolio_id']),
@@ -370,6 +368,11 @@ class Holding extends Model
         return $purchases - $sales;
     }
 
+    /**
+     * Method that enables calculating daily performance for a given holding
+     *
+     * @return void
+     */
     public function dailyPerformance(
         ?\Illuminate\Support\Carbon $start_date = null,
         ?\Illuminate\Support\Carbon $end_date = null,
@@ -452,12 +455,12 @@ class Holding extends Model
                     CASE
                         WHEN ({$quantityQuery}) = 0 THEN 0
                         ELSE SUM(CASE
-                            WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis
+                            WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis_base
                             ELSE 0
                         END)
                     END AS cost_basis
                 "),
-                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS realized_gains"),
+                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price_base - cost_basis_base) * quantity) ELSE 0 END), 0) AS realized_gains"),
             ])
             ->leftJoin('transactions', function ($join) {
                 $join->on(DB::raw('DATE(transactions.date)'), '<=', 'date_series.date')
