@@ -105,8 +105,6 @@ class Portfolio extends Model
     {
         $currency = auth()->user()?->getCurrency() ?? config('investbrain.base_currency');
 
-        $portfolio_ids = Arr::wrap($portfolios ?? $this->id);
-
         $dividendSub = DB::table('holdings')
             ->join('dividends', 'dividends.symbol', '=', 'holdings.symbol')
             ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
@@ -194,9 +192,8 @@ class Portfolio extends Model
             ])
             ->orderBy('tx1.date', 'DESC');
 
-        $dailyChangeQuery = DB::table('daily_change')
+        return DailyChange::query()
             ->select(['daily_change.portfolio_id', 'daily_change.date'])
-            // ->whereIn('daily_change.portfolio_id', $portfolio_ids)
             ->leftJoinSub($totalCostBasisSub, 'cost_basis_display', function ($join) {
                 $join->on('daily_change.date', '>=', 'cost_basis_display.date')
                     ->whereColumn('daily_change.portfolio_id', '=', 'cost_basis_display.portfolio_id');
@@ -237,9 +234,7 @@ class Portfolio extends Model
                 'daily_change.total_market_value',
                 'daily_change.portfolio_id',
             ])
-            ->orderBy('daily_change.date', 'DESC');
-
-        return $dailyChangeQuery;
+            ->orderBy('daily_change.date');
     }
 
     public function setOwnerIdAttribute($value)
@@ -296,9 +291,10 @@ class Portfolio extends Model
 
             $period = CarbonPeriod::create(
                 $holding->first_transaction_date,
-                now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day')))
-                    ? now()->subDay()
-                    : now()
+                now()
+                // ->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day')))
+                //     ? now()->subDay()
+                //     : now()
             );
 
             $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));
@@ -322,6 +318,9 @@ class Portfolio extends Model
                 $dividends_earned += $daily_performance->get($date)->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
                 if (Carbon::parse($date)->isWeekday()) {
+                    if ($date == '2025-04-04') {
+                        dump(1 / Arr::get($currency_rates, $date, 1));
+                    }
                     $holding_performance[$date] = [
                         'date' => $date,
                         'portfolio_id' => $this->id,

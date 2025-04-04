@@ -103,7 +103,7 @@
                     formatter: (value, { series, seriesIndex, dataPointIndex, w }) => {
                         const firstDataPoint = this.data.series[seriesIndex].data[0][1]
                         const percentageChange = ((value - firstDataPoint) / firstDataPoint) * 100;
-                        return `$${parseFloat(value.toFixed(2))} (${percentageChange.toFixed(2)}%)`;
+                        return `${parseFloat(value.toFixed(2))} (${percentageChange.toFixed(2)}%)`;
                     }
                 },
             }

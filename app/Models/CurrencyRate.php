@@ -156,20 +156,12 @@ class CurrencyRate extends Model
         CurrencyRate::insertOrIgnore($updates);
 
         return collect($updates)
+            ->whereBetween('date', [$start, $end ?? now()])
             ->where('currency', $currency)
             ->mapWithKeys(fn ($rate) => [
                 $rate['date'] => $rate['rate'] * $adjustment,
             ])
             ->toArray();
-
-        // $result = CurrencyRate::whereBetween('date', [$start, $end ?? now()])
-        //     ->where('currency', $currency)
-        //     ->get()
-        //     ->mapWithKeys(fn ($rate) => [
-        //         $rate->date => $rate->rate * $adjustment,
-        //     ]);
-
-        // return $result->toArray();
     }
 
     public static function refreshCurrencyData($force = false): void

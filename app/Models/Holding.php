@@ -247,38 +247,23 @@ class Holding extends Model
             'transactions_display.num_transactions',
             'dividends_display.total_dividends_earned',
         ])
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                $join->on('cr.date', '=', DB::raw("CAST('".now()->toDateString()."' AS date)"))
+                    ->on('cr.currency', '=', DB::raw("'{$currency}'"));
+            })
+            ->leftJoin('market_data', function ($join) {
+                $join->on('market_data.symbol', '=', 'holdings.symbol');
+            })
             ->selectRaw(
-                'holdings.quantity * market_data_display.market_value AS total_market_value'
+                'holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1) AS total_market_value'
             )
             ->selectRaw(
-                '(holdings.quantity * market_data_display.market_value) - transactions_display.total_cost_basis AS total_gain_dollars'
-            )
-            ->leftJoinSub(
-                DB::table('market_data')
-                    ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                        $join
-                            ->on(
-                                'cr.date',
-                                '=',
-                                DB::raw("CAST('".now()->toDateString()."' AS date)")
-                            )
-                            ->on('cr.currency', '=', DB::raw("'{$currency}'"));
-                    })
-                    ->select(['market_data.symbol'])
-                    ->selectRaw(
-                        'SUM(market_data.market_value_base * COALESCE(cr.rate, 1)) AS market_value'
-                    )
-                    ->groupBy(['market_data.symbol']),
-                'market_data_display',
-                function ($join) {
-                    $join->on('holdings.symbol', '=', 'market_data_display.symbol');
-                }
+                '(holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1)) - transactions_display.total_cost_basis AS total_gain_dollars'
             )
             ->leftJoinSub(
                 DB::table('transactions')
                     ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                        $join
-                            ->on('cr.date', '=', 'transactions.date')
+                        $join->on('cr.date', '=', 'transactions.date')
                             ->on('cr.currency', '=', DB::raw("'{$currency}'"));
                     })
                     ->select(['transactions.symbol', 'transactions.portfolio_id'])
@@ -292,21 +277,18 @@ class Holding extends Model
                     ->groupBy(['transactions.symbol', 'transactions.portfolio_id']),
                 'transactions_display',
                 function ($join) {
-                    $join
-                        ->on('holdings.symbol', '=', 'transactions_display.symbol')
+                    $join->on('holdings.symbol', '=', 'transactions_display.symbol')
                         ->on('holdings.portfolio_id', '=', 'transactions_display.portfolio_id');
                 }
             )
             ->leftJoinSub(
                 DB::table('dividends')
                     ->join('transactions as tx', function ($join) {
-                        $join
-                            ->on('tx.symbol', '=', 'dividends.symbol')
+                        $join->on('tx.symbol', '=', 'dividends.symbol')
                             ->on('tx.date', '<=', 'dividends.date');
                     })
                     ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                        $join
-                            ->on('cr.date', '=', 'dividends.date')
+                        $join->on('cr.date', '=', 'dividends.date')
                             ->on('cr.currency', '=', DB::raw("'{$currency}'"));
                     })
                     ->select(['dividends.symbol'])

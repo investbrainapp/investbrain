@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\DailyChange;
 use App\Models\Portfolio;
 use Livewire\Volt\Component;
 
@@ -35,22 +34,7 @@ new class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $currency = auth()->user()->getCurrency();
-
-        $dailyChangeQuery = DailyChange::query()
-            ->myDailyChanges()
-            ->leftjoin('currency_rates AS cr', function ($join) use ($currency) {
-                $join->on('daily_change.date', '=', 'cr.date')
-                    ->where('cr.currency', '=', $currency);
-            })
-            ->selectRaw('
-                    daily_change.date, 
-                    SUM(daily_change.total_market_value * COALESCE(cr.rate, 1)) as total_market_value,
-                    SUM(daily_change.total_cost_basis * COALESCE(cr.rate, 1)) as total_cost_basis,
-                    SUM(daily_change.total_gain * COALESCE(cr.rate, 1)) as total_gain
-                    -- , SUM(realized_gains) as realized_gains
-                    -- , SUM(total_dividends_earned) as total_dividends_earned 
-                ');
+        $dailyChangeQuery = Portfolio::dailyPerformance()->myDailyChanges();
 
         if (isset($this->portfolio)) {
 
@@ -68,10 +52,22 @@ new class extends Component
             $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
-        $dailyChange = $dailyChangeQuery
-            ->orderBy('daily_change.date')
-            ->groupBy('daily_change.date')
-            ->get();
+        $dailyChange = $dailyChangeQuery->get();
+
+        $dailyChange = $dailyChange
+            ->sortBy('date')
+            ->groupBy('date')
+            ->map(function ($group) {
+                return (object) [
+                    'date' => $group->first()->date->toDateString(),
+                    'total_market_value' => $group->sum('total_market_value'),
+                    'total_cost_basis' => $group->sum('total_cost_basis'),
+                    'total_gain' => $group->sum('total_gain'),
+                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
+                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
+                ];
+            })
+            ->values();
 
         return [
             'series' => [
