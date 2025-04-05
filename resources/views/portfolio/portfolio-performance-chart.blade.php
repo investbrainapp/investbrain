@@ -34,7 +34,7 @@ new class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $dailyChangeQuery = Portfolio::dailyPerformance()->myDailyChanges();
+        $dailyChangeQuery = Portfolio::dailyPerformance();
 
         if (isset($this->portfolio)) {
 
@@ -44,7 +44,7 @@ new class extends Component
         } else {
 
             // dashboard
-            $dailyChangeQuery->withoutWishlists();
+            $dailyChangeQuery->myDailyChanges()->withoutWishlists();
         }
 
         if ($filterMethod['method']) {

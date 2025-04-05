@@ -271,8 +271,23 @@ class Holding extends Model
                         "SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price_base - cost_basis_base) * quantity * COALESCE(cr.rate, 1) ELSE 0 END) AS realized_gain_dollars"
                     )
                     ->selectRaw(
-                        "SUM((CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis_base) WHEN transaction_type = 'SELL' THEN -(cost_basis_base * quantity) ELSE 0 END) * COALESCE(cr.rate, 1)) AS total_cost_basis"
-                    )
+                        "SUM(
+                            CASE
+                            WHEN transaction_type = 'BUY'
+                                THEN transactions.cost_basis_base
+                            ELSE (
+                                SELECT
+                                    AVG(-buy.cost_basis_base)
+                                FROM transactions as buy
+                                WHERE buy.symbol = transactions.symbol
+                                    AND buy.portfolio_id = transactions.portfolio_id
+                                    AND buy.transaction_type = 'BUY'
+                                    AND buy.date <= transactions.date
+                            ) END
+                            * quantity
+                            * COALESCE(cr.rate, 1)
+                        )
+                        AS total_cost_basis")
                     ->selectRaw('COUNT(transactions.id) AS num_transactions')
                     ->groupBy(['transactions.symbol', 'transactions.portfolio_id']),
                 'transactions_display',

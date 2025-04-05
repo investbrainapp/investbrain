@@ -295,12 +295,13 @@ class Portfolio extends Model
                 // ->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day')))
                 //     ? now()->subDay()
                 //     : now()
+                // todo: dont forget about me :)
             );
 
             $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));
 
             $daily_performance = $holding->dailyPerformance($holding->first_transaction_date, now());
-            $dividends = $holding->dividends->keyBy(function ($dividend, $key) {
+            $dividends = $holding->dividends->keyBy(function ($dividend) {
                 return $dividend['date']->toDateString();
             });
             $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
@@ -318,9 +319,7 @@ class Portfolio extends Model
                 $dividends_earned += $daily_performance->get($date)->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
                 if (Carbon::parse($date)->isWeekday()) {
-                    if ($date == '2025-04-04') {
-                        dump(1 / Arr::get($currency_rates, $date, 1));
-                    }
+
                     $holding_performance[$date] = [
                         'date' => $date,
                         'portfolio_id' => $this->id,
