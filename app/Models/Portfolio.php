@@ -189,8 +189,7 @@ class Portfolio extends Model
                 'tx1.quantity',
                 'cr.rate',
                 'tx1.sale_price_base',
-            ])
-            ->orderBy('tx1.date', 'DESC');
+            ]);
 
         return DailyChange::query()
             ->select(['daily_change.portfolio_id', 'daily_change.date'])
@@ -291,11 +290,9 @@ class Portfolio extends Model
 
             $period = CarbonPeriod::create(
                 $holding->first_transaction_date,
-                now()
-                // ->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day')))
-                //     ? now()->subDay()
-                //     : now()
-                // todo: dont forget about me :)
+                now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day')))
+                    ? now()->subDay()
+                    : now()
             );
 
             $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));

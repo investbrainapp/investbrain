@@ -247,6 +247,17 @@ class Holding extends Model
             'transactions_display.num_transactions',
             'dividends_display.total_dividends_earned',
         ])
+            ->groupBy([
+                'holdings.symbol',
+                'holdings.quantity',
+                'holdings.portfolio_id',
+                'cr.rate',
+                'transactions_display.total_cost_basis',
+                'transactions_display.realized_gain_dollars',
+                'transactions_display.num_transactions',
+                'dividends_display.total_dividends_earned',
+                'market_data.market_value_base',
+            ])
             ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
                 $join->on('cr.date', '=', DB::raw("CAST('".now()->toDateString()."' AS date)"))
                     ->on('cr.currency', '=', DB::raw("'{$currency}'"));
@@ -257,38 +268,83 @@ class Holding extends Model
             ->selectRaw(
                 'holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1) AS total_market_value'
             )
-            ->selectRaw(
-                '(holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1)) - transactions_display.total_cost_basis AS total_gain_dollars'
-            )
+            ->selectRaw('(
+                holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1)
+                ) - transactions_display.total_cost_basis as total_gain_dollars')
             ->leftJoinSub(
                 DB::table('transactions')
                     ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                        $join->on('cr.date', '=', 'transactions.date')
-                            ->on('cr.currency', '=', DB::raw("'{$currency}'"));
+                        $join
+                            ->on('cr.date', '=', 'transactions.date')
+                            ->where('cr.currency', '=', $currency);
                     })
                     ->select(['transactions.symbol', 'transactions.portfolio_id'])
+                    ->leftJoinSub(
+                        DB::table('transactions')
+                            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                                $join
+                                    ->on('cr.date', '=', 'transactions.date')
+                                    ->where('cr.currency', '=', $currency);
+                            })
+                            ->select([
+                                'transactions.symbol',
+                                'transactions.portfolio_id',
+                                'transactions.quantity',
+                                'transactions.date',
+                            ])
+                            ->selectRaw(
+                                "(CASE
+                                        WHEN transactions.transaction_type = 'BUY'
+                                            THEN COALESCE(cr.rate, 1)
+                                        ELSE (
+                                            SELECT
+                                                SUM(COALESCE(cr2.rate, 1) * buy.cost_basis_base)
+                                                / SUM(buy.cost_basis_base)
+                                            FROM transactions as buy
+                                            LEFT JOIN currency_rates as cr2
+                                                ON cr2.date = buy.date
+                                                AND cr2.currency = '{$currency}'
+                                            WHERE buy.symbol = transactions.symbol
+                                                AND buy.portfolio_id = transactions.portfolio_id
+                                                AND buy.transaction_type = 'BUY'
+                                                AND buy.date <= transactions.date
+                                        ) END)
+                                        AS rate"
+                            )
+                            ->selectRaw(
+                                "(CASE
+                                        WHEN transactions.transaction_type = 'BUY'
+                                            THEN AVG(transactions.cost_basis_base)
+                                        ELSE (
+                                            SELECT
+                                                AVG(-buy.cost_basis_base)
+                                            FROM transactions as buy
+                                            WHERE buy.symbol = transactions.symbol
+                                                AND buy.portfolio_id = transactions.portfolio_id
+                                                AND buy.transaction_type = 'BUY'
+                                                AND buy.date <= transactions.date
+                                        ) END)
+                                        AS cost_basis_base"
+                            )
+                            ->groupBy([
+                                'transactions.symbol',
+                                'transactions.date',
+                                'transactions.portfolio_id',
+                                'transactions.transaction_type',
+                                'transactions.quantity',
+                                'cr.rate',
+                            ]), 'cost_basis_display', function ($join) {
+                                $join->on('transactions.symbol', '=', 'cost_basis_display.symbol')
+                                    ->on('transactions.portfolio_id', '=', 'cost_basis_display.portfolio_id')
+                                    ->on('transactions.date', '=', 'cost_basis_display.date');
+                            })
                     ->selectRaw(
-                        "SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price_base - cost_basis_base) * quantity * COALESCE(cr.rate, 1) ELSE 0 END) AS realized_gain_dollars"
+                        "SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN (transactions.sale_price_base - transactions.cost_basis_base) * transactions.quantity * COALESCE(cr.rate, 1) ELSE 0 END) AS realized_gain_dollars"
                     )
                     ->selectRaw(
-                        "SUM(
-                            CASE
-                            WHEN transaction_type = 'BUY'
-                                THEN transactions.cost_basis_base
-                            ELSE (
-                                SELECT
-                                    AVG(-buy.cost_basis_base)
-                                FROM transactions as buy
-                                WHERE buy.symbol = transactions.symbol
-                                    AND buy.portfolio_id = transactions.portfolio_id
-                                    AND buy.transaction_type = 'BUY'
-                                    AND buy.date <= transactions.date
-                            ) END
-                            * quantity
-                            * COALESCE(cr.rate, 1)
-                        )
-                        AS total_cost_basis")
-                    ->selectRaw('COUNT(transactions.id) AS num_transactions')
+                        'SUM(cost_basis_display.cost_basis_base * cost_basis_display.quantity * cost_basis_display.rate) AS total_cost_basis'
+                    )
+                    ->selectRaw('COUNT(transactions.date) AS num_transactions')
                     ->groupBy(['transactions.symbol', 'transactions.portfolio_id']),
                 'transactions_display',
                 function ($join) {
