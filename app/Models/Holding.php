@@ -274,8 +274,7 @@ class Holding extends Model
             ->leftJoinSub(
                 DB::table('transactions')
                     ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                        $join
-                            ->on('cr.date', '=', 'transactions.date')
+                        $join->on('cr.date', '=', 'transactions.date')
                             ->where('cr.currency', '=', $currency);
                     })
                     ->select(['transactions.symbol', 'transactions.portfolio_id'])
