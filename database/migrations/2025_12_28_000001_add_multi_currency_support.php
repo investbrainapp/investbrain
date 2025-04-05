@@ -105,6 +105,16 @@ return new class extends Migration
                 '--force' => true,
             ]);
         }
+
+        /**
+         * Cleanup daily change table
+         */
+        Schema::table('daily_change', function (Blueprint $table) {
+            $table->dropColumn('total_cost_basis');
+            $table->dropColumn('total_gain');
+            $table->dropColumn('total_dividends_earned');
+            $table->dropColumn('realized_gains');
+        });
     }
 
     /**

@@ -22,10 +22,6 @@ class DailyChange extends Model
         'portfolio_id',
         'date',
         'total_market_value',
-        'total_cost_basis',
-        'total_gain',
-        'total_dividends_earned',
-        'realized_gains',
         'notes',
     ];
 
@@ -34,10 +30,6 @@ class DailyChange extends Model
     protected $casts = [
         'date' => 'datetime',
         'total_market_value' => 'float',
-        'total_cost_basis' => 'float',
-        'total_gain' => 'float',
-        'total_dividends_earned' => 'float',
-        'realized_gains' => 'float',
     ];
 
     public function scopePortfolio($query, $portfolio)
