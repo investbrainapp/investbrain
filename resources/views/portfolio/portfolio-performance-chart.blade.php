@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DailyChange;
 use App\Models\Portfolio;
 use Livewire\Volt\Component;
 
@@ -34,7 +35,7 @@ new class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $dailyChangeQuery = Portfolio::dailyPerformance();
+        $dailyChangeQuery = DailyChange::withDailyPerformance();
 
         if (isset($this->portfolio)) {
 

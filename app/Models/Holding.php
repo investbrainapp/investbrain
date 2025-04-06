@@ -244,7 +244,6 @@ class Holding extends Model
             'holdings.portfolio_id',
             'transactions_display.total_cost_basis',
             'transactions_display.realized_gain_dollars',
-            'transactions_display.num_transactions',
             'dividends_display.total_dividends_earned',
         ])
             ->groupBy([
@@ -254,7 +253,6 @@ class Holding extends Model
                 'cr.rate',
                 'transactions_display.total_cost_basis',
                 'transactions_display.realized_gain_dollars',
-                'transactions_display.num_transactions',
                 'dividends_display.total_dividends_earned',
                 'market_data.market_value_base',
             ])
@@ -343,7 +341,6 @@ class Holding extends Model
                     ->selectRaw(
                         'SUM(cost_basis_display.cost_basis_base * cost_basis_display.quantity * cost_basis_display.rate) AS total_cost_basis'
                     )
-                    ->selectRaw('COUNT(transactions.date) AS num_transactions')
                     ->groupBy(['transactions.symbol', 'transactions.portfolio_id']),
                 'transactions_display',
                 function ($join) {
@@ -519,7 +516,6 @@ class Holding extends Model
                     ->where('transactions.symbol', '=', $this->symbol)
                     ->where('transactions.portfolio_id', '=', $this->portfolio_id);
             })
-            // todo: use market data
             ->groupBy('date_series.date')
             ->orderBy('date_series.date')
             ->get()

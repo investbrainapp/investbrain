@@ -8,7 +8,7 @@ use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 
 class FakeMarketData implements MarketDataInterface
@@ -75,11 +75,14 @@ class FakeMarketData implements MarketDataInterface
 
     public function history(string $symbol, $startDate, $endDate): Collection
     {
-        $numDays = Carbon::parse($startDate)->diffInDays($endDate, true);
 
-        for ($i = 0; $i < $numDays; $i++) {
+        $days = CarbonPeriod::create($startDate, $endDate)->filter('isWeekday');
 
-            $date = now()->subDays($i)->toDateString();
+        $countOfDays = $days->count();
+
+        foreach ($days as $index => $date) {
+
+            $date = $date->toDateString();
 
             $series[$date] = new Ohlc([
                 'symbol' => $symbol,
@@ -87,7 +90,9 @@ class FakeMarketData implements MarketDataInterface
                 'open' => rand(150, 400),
                 'high' => rand(150, 400),
                 'low' => rand(150, 400),
-                'close' => rand(150, 400),
+                'close' => $index == $countOfDays - 1
+                    ? 230.19 // most recent close should match current market value
+                    : rand(150, 400),
             ]);
         }
 
