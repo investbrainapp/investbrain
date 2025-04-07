@@ -58,7 +58,6 @@ class DailyChangeTest extends TestCase
             $daily_change->first()->total_market_value,
             0.01
         );
-
     }
 
     public function test_can_sync_daily_change_history(): void
