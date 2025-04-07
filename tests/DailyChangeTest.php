@@ -142,7 +142,6 @@ class DailyChangeTest extends TestCase
 
         $daily_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            // todo: should this be the same day of a transaction?
             ->whereDate('daily_change.date', '=', $sale_transaction->date->copy()->nextWeekday())
             ->first();
 

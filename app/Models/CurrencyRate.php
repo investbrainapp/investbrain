@@ -112,9 +112,10 @@ class CurrencyRate extends Model
      */
     public static function timeSeriesRates(string $currency, string|\DateTime $start, mixed $end = null): array
     {
+        $period = CarbonPeriod::create($start, $end);
+
         // No need to send network request - just generate 1s
         if ($currency === config('investbrain.base_currency')) {
-            $period = CarbonPeriod::create($start, $end);
 
             $dateRange = [];
             foreach ($period as $date) {
@@ -133,13 +134,29 @@ class CurrencyRate extends Model
 
         $updates = [];
 
-        // todo: need to fill in weekend rates
-
         // loop through each date
-        foreach ($rates as $date => $currencies) {
+        foreach ($period as $date) {
+
+            $lookupDate = $date->toDateString();
+
+            // get rates or find closest valid rate (handles missing weekend rates)
+            while (! isset($rates[$lookupDate])) {
+                $lookupDate = Carbon::parse($lookupDate)->subDay();
+
+                // prevent runaway infinite loops
+                if ($lookupDate->lessThan($date->copy()->subWeek())) {
+
+                    throw new \Exception('Error getting time series exchange rates.');
+                }
+
+                $lookupDate = $lookupDate->toDateString();
+            }
+
+            // make date a string
+            $date = $date->toDateString();
 
             // loop through each rate
-            foreach ($currencies as $curr => $rate) {
+            foreach ($rates[$lookupDate] as $curr => $rate) {
 
                 // add to updates
                 $updates[] = [

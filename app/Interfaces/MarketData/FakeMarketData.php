@@ -67,7 +67,7 @@ class FakeMarketData implements MarketDataInterface
         return collect([
             new Split([
                 'symbol' => $symbol,
-                'date' => now()->subMonths(36),
+                'date' => now()->subMonths(12),
                 'split_amount' => 10,
             ]),
         ]);
