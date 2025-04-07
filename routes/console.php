@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\Schedule;
 
 /**
  * This scheduled job refreshes market data from your selected data provider
- * Update the cadence with the MARKET_DATA_REFRESH key in your env file
+ * Note: Update the cadence with the MARKET_DATA_REFRESH key in your env file (default: 30 minutes)
  */
 Schedule::command(RefreshMarketData::class)->weekdays()->everyMinute();
 
 /**
  * This scheduled job records daily changes to your portfolios every weekday
+ * Note: Update the time of day with the DAILY_CHANGE_TIME key in your env file (default: 23:00)
  */
 Schedule::command(CaptureDailyChange::class)->dailyAt(config('investbrain.daily_change_time_of_day'))->weekdays();
 
@@ -39,4 +40,4 @@ Schedule::command(SyncHoldingData::class)->yearly();
 /**
  * Refreshes currency exchange data several times daily
  */
-Schedule::command(RefreshCurrencyData::class)->hourly();
+Schedule::command(RefreshCurrencyData::class)->daily();

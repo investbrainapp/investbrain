@@ -183,8 +183,19 @@ class CurrencyRate extends Model
             ];
         }
 
-        if (! empty($updates)) {
+        // nothing to update
+        if (empty($updates)) {
+            return;
+        }
+
+        if ($force) {
+
+            // force overwrite existing rates
             CurrencyRate::upsert($updates, ['currency', 'date'], ['rate']);
+        } else {
+
+            // only insert new rates
+            CurrencyRate::insertOrIgnore($updates);
         }
     }
 

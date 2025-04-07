@@ -78,9 +78,9 @@ class DailyChange extends Model
                 ((CASE WHEN tx.transaction_type = 'BUY'
                     THEN tx.quantity ELSE 0 END)
                 - (CASE WHEN tx.transaction_type = 'SELL'
-                    THEN tx.quantity ELSE 0 END)) 
+                    THEN tx.quantity ELSE 0 END))
                 * SUM(
-                    dividends.dividend_amount_base 
+                    dividends.dividend_amount_base
                     * COALESCE(cr.rate, 1)
                 )
                 AS total_dividends_earned")
@@ -103,17 +103,17 @@ class DailyChange extends Model
                     THEN COALESCE(cr.rate, 1)
                 ELSE (
                     SELECT
-                        SUM(COALESCE(cr2.rate, 1) * buy.cost_basis_base) 
+                        SUM(COALESCE(cr2.rate, 1) * buy.cost_basis_base)
                         / SUM(buy.cost_basis_base)
                     FROM transactions as buy
-                    LEFT JOIN currency_rates as cr2 
-                        ON cr2.date = buy.date 
+                    LEFT JOIN currency_rates as cr2
+                        ON cr2.date = buy.date
                         AND cr2.currency = '{$currency}'
                     WHERE buy.symbol = tx1.symbol
                         AND buy.portfolio_id = tx1.portfolio_id
                         AND buy.transaction_type = 'BUY'
                         AND buy.date <= tx1.date
-                ) END) 
+                ) END)
                 AS rate")
             ->selectRaw(
                 "(CASE
@@ -131,11 +131,11 @@ class DailyChange extends Model
                 AS cost_basis_base")
             ->selectRaw(
                 "(CASE
-                WHEN tx1.transaction_type = 'SELL' 
-                    THEN tx1.sale_price_base - tx1.cost_basis_base 
-                ELSE 0 END) 
-                * tx1.quantity 
-                * COALESCE(cr.rate,1) 
+                WHEN tx1.transaction_type = 'SELL'
+                    THEN tx1.sale_price_base - tx1.cost_basis_base
+                ELSE 0 END)
+                * tx1.quantity
+                * COALESCE(cr.rate, 1)
                 AS realized_gain_dollars")
             ->groupBy([
                 'tx1.portfolio_id',
@@ -160,15 +160,15 @@ class DailyChange extends Model
             })
             ->selectRaw('
                 SUM(
-                    cost_basis_display.cost_basis_base 
-                    * cost_basis_display.quantity 
+                    cost_basis_display.cost_basis_base
+                    * cost_basis_display.quantity
                     * cost_basis_display.rate
                 ) as total_cost_basis')
             ->selectRaw('(
                 daily_change.total_market_value * COALESCE(cr.rate, 1)
                 ) - SUM(
-                    cost_basis_display.cost_basis_base 
-                    * cost_basis_display.quantity 
+                    cost_basis_display.cost_basis_base
+                    * cost_basis_display.quantity
                     * cost_basis_display.rate
                 ) as total_gain')
             ->selectRaw('(

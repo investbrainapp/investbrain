@@ -94,7 +94,7 @@
             }
 
             this.data.yaxis.labels.formatter = function (value) {
-              return `$${value}`
+              return `{{ Number::currencySymbol(auth()->user()->getCurrency()) }}${value}`
             }
 
             this.data.tooltip = {

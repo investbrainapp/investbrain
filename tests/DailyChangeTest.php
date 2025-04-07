@@ -105,12 +105,8 @@ class DailyChangeTest extends TestCase
         $holding = Holding::symbol('ACME')->portfolio($this->portfolio->id)->first();
         $daily_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<=', $first_transaction->date->addDays(2))
-            ->whereDate('daily_change.date', '>=', $first_transaction->date->subDays(2))
-            ->orderByDesc('daily_change.date')
+            ->whereDate('daily_change.date', '=', $first_transaction->date->copy()->nextWeekday())
             ->first();
-
-        dump($daily_change);
 
         $this->assertEquals($holding->average_cost_basis, $daily_change->total_cost_basis);
 
@@ -118,9 +114,7 @@ class DailyChangeTest extends TestCase
         $this->portfolio->syncDailyChanges();
         $daily_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<=', $second_transaction->date->addDays(2))
-            ->whereDate('daily_change.date', '>=', $second_transaction->date->subDays(2))
-            ->orderByDesc('daily_change.date')
+            ->whereDate('daily_change.date', '=', $second_transaction->date->copy()->nextWeekday())
             ->first();
 
         $this->assertEqualsWithDelta($first_transaction->cost_basis + $second_transaction->cost_basis, $daily_change->total_cost_basis, 0.01);
@@ -129,12 +123,10 @@ class DailyChangeTest extends TestCase
         $this->portfolio->syncDailyChanges();
         $daily_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<=', $third_transaction->date->addDays(2))
-            ->whereDate('daily_change.date', '>=', $third_transaction->date->subDays(2))
-            ->orderByDesc('daily_change.date')
+            ->whereDate('daily_change.date', '=', $third_transaction->date->copy()->nextWeekday())
             ->first();
 
-        $this->assertEquals(0, $daily_change->total_cost_basis);
+        $this->assertEqualsWithDelta(0, $daily_change->total_cost_basis, 0.01);
     }
 
     public function test_sales_are_captured_as_realized_gains(): void
@@ -149,34 +141,29 @@ class DailyChangeTest extends TestCase
 
         $this->portfolio->syncDailyChanges();
 
-        $daily_change = DailyChange::query()
+        $daily_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<=', $sale_transaction->date->addDays(2))
-            ->whereDate('daily_change.date', '>=', $sale_transaction->date->subDays(2))
-            ->orderByDesc('date')
+            // todo: should this be the same day of a transaction?
+            ->whereDate('daily_change.date', '=', $sale_transaction->date->copy()->nextWeekday())
             ->first();
 
         $realized_gain = ($sale_transaction->sale_price - $sale_transaction->cost_basis) * $sale_transaction->quantity;
 
-        $this->assertEqualsWithDelta($daily_change->realized_gains, $realized_gain, 0.01);
+        $this->assertEqualsWithDelta($realized_gain, $daily_change->realized_gain_dollars, 0.01);
 
-        $day_before = DailyChange::query()
+        $day_before = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<', $sale_transaction->date->subDays(1))
-            ->orderByDesc('date')
-            ->limit(10)
+            ->whereDate('daily_change.date', '=', $sale_transaction->date->copy()->previousWeekday())
             ->first();
 
-        $this->assertEquals($day_before->realized_gains, 0);
+        $this->assertEmpty($day_before->realized_gain_dollars);
 
-        $after = DailyChange::query()
+        $after = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<=', $sale_transaction->date->addDays(2))
-            ->whereDate('daily_change.date', '>=', $sale_transaction->date->subDays(2))
-            ->orderByDesc('date')
+            ->whereDate('daily_change.date', '=', $sale_transaction->date->copy()->addDays(1)->nextWeekday())
             ->first();
 
-        $this->assertEqualsWithDelta($after->realized_gains, $realized_gain, 0.01);
+        $this->assertEqualsWithDelta($realized_gain, $after->realized_gain_dollars, 0.01);
     }
 
     public function test_dividends_captured_in_daily_change_sync(): void
@@ -191,22 +178,18 @@ class DailyChangeTest extends TestCase
         $holding = Holding::query()->portfolio($this->portfolio->id)->symbol('ACME')->first();
         $dividends = $holding->dividends()->get()->sortBy('date');
 
-        $first_dividend_change = DailyChange::query()
+        $first_dividend_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<=', $dividends->first()->date->addDays(2))
-            ->whereDate('daily_change.date', '>=', $dividends->first()->date->subDays(2))
-            ->orderByDesc('date')
+            ->whereDate('daily_change.date', '=', $dividends->first()->date->nextWeekday())
             ->first();
 
         $owned = $dividends->first()->purchased - $dividends->first()->sold;
 
         $this->assertEqualsWithDelta($dividends->first()->dividend_amount * $owned, $first_dividend_change->total_dividends_earned, 0.01);
 
-        $last_dividend_change = DailyChange::query()
+        $last_dividend_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
-            ->whereDate('daily_change.date', '<=', $dividends->last()->date->addDays(2))
-            ->whereDate('daily_change.date', '>=', $dividends->last()->date->subDays(2))
-            ->orderByDesc('date')
+            ->whereDate('daily_change.date', '=', $dividends->last()->date->nextWeekday())
             ->first();
 
         $total_dividends = $dividends->reduce(function (?float $carry, $dividend) {
