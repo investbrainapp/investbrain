@@ -238,6 +238,9 @@ class Holding extends Model
     public function scopeWithPortfolioMetrics($query, $currency = null): mixed
     {
         $currency = $currency ?? auth()->user()->getCurrency();
+        $todaysDate = (config('database.default') === 'sqlite')
+            ? "'".now()->toDateString()."'"
+            : "CAST('".now()->toDateString()."' AS date)";
 
         return $query->select([
             'holdings.symbol',
@@ -256,8 +259,8 @@ class Holding extends Model
                 'dividends_display.total_dividends_earned',
                 'market_data.market_value_base',
             ])
-            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                $join->on('cr.date', '=', DB::raw("CAST('".now()->toDateString()."' AS date)"))
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency, $todaysDate) {
+                $join->on('cr.date', '=', DB::raw($todaysDate))
                     ->on('cr.currency', '=', DB::raw("'{$currency}'"));
             })
             ->leftJoin('market_data', function ($join) {

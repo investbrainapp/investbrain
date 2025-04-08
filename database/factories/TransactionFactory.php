@@ -101,6 +101,13 @@ class TransactionFactory extends Factory
         ]);
     }
 
+    public function salePrice($sale_price): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'sale_price' => $sale_price,
+        ]);
+    }
+
     public function buy(): static
     {
         return $this->state(fn (array $attributes) => [

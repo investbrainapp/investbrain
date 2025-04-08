@@ -64,8 +64,7 @@
         ])
 
         <div class="grid sm:grid-cols-5 gap-5">
-            {{-- {{ dd($metrics) }} --}}
-            
+
             <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
                 <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Market Gain/Loss') }}</div>
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_gain_dollars', 0)) }} </div>

@@ -9,7 +9,7 @@ use App\Interfaces\MarketData\Types\Quote;
 use App\Jobs\SyncCurrencyRatesJob;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
-use App\Models\MarketData;
+use App\Models\Holding;
 use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
@@ -226,38 +226,22 @@ class MultiCurrencyTest extends TestCase
         );
     }
 
-    // todo:
     public function test_can_buy_in_different_currency()
     {
 
         $this->actingAs($user = User::factory()->create());
 
-        $portfolio = Portfolio::factory()->create();
         $date = now()->subYear();
         $cost_basis = 100; // in ZZZ currency
         $rate = .78; // ZZZ to USD (base and currency ACME is traded in)
 
-        // $market_data = [
-        //     'name' => 'ACME Company Ltd',
-        //     'symbol' => 'ACME',
-        //     'currency' => 'ZZZ',
-        //     'market_value' => 230.19,
-        // ];
-        // $quoteMock = Mockery::mock(FakeMarketData::class);
-        // $quoteMock->shouldReceive('quote')
-        //     ->andReturn(new Quote($market_data));
+        CurrencyRate::create([
+            'currency' => 'ZZZ',
+            'date' => $date,
+            'rate' => $rate,
+        ]);
 
-        // MarketData::create([$market_data]);
-
-        $exchangeMock = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
-        $exchangeMock->shouldReceive('historical')
-            ->andReturn([
-                'date' => $date->toDateString(),
-                'rates' => [
-                    'ZZZ' => $rate,
-                ],
-            ]);
-
+        $portfolio = Portfolio::factory()->create();
         $transaction = Transaction::factory()
             ->buy()
             ->date($date)
@@ -267,47 +251,120 @@ class MultiCurrencyTest extends TestCase
             ->symbol('ACME')
             ->create();
 
-        $this->assertEquals($cost_basis * $rate, $transaction->cost_basis);
-
+        $this->assertEquals($cost_basis * (1 / $rate), $transaction->cost_basis);
     }
 
-    // public function test_can_sell_in_different_currency()
-    // {
+    public function test_can_sell_in_different_currency()
+    {
 
-    //     $this->actingAs($user = User::factory()->create());
+        $this->actingAs($user = User::factory()->create());
 
-    //     $portfolio = Portfolio::factory()->create();
-    //     $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+        $date = now()->subMonth();
+        $sale_price = 100; // in ZZZ currency
+        $rate = .78; // ZZZ to USD (base and currency ACME is traded in)
 
-    //     //
-    // }
+        CurrencyRate::create([
+            'currency' => 'ZZZ',
+            'date' => $date,
+            'rate' => $rate,
+        ]);
 
-    // // todo:
-    // public function test_holdings_calculations_from_multiple_currencies()
-    // {
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+        $sell_transaction = Transaction::factory()
+            ->sell()
+            ->date($date)
+            ->salePrice($sale_price)
+            ->currency('ZZZ')
+            ->portfolio($portfolio->id)
+            ->symbol('ACME')
+            ->create();
 
-    //     $this->actingAs($user = User::factory()->create());
+        $this->assertEquals($sale_price * (1 / $rate), $sell_transaction->sale_price);
+    }
 
-    //     $portfolio = Portfolio::factory()->create();
-    //     $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+    // todo:
+    public function test_holdings_calculations_from_multiple_currencies()
+    {
 
-    //     //
-    // }
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        // create some local currency transaction history
+        Transaction::factory(5)->buy()->costBasis(110)->date(now()->subWeeks(5))->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->sell()->salePrice(219.99)->date(now()->subDays(5))->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        // mock foreign quotes
+        $fakeMock = Mockery::mock(FakeMarketData::class);
+        $fakeMock->shouldReceive('quote')
+            ->andReturn(new Quote([
+                'name' => 'British Company Ltd',
+                'symbol' => 'BAR',
+                'currency' => 'GBP',
+                'market_value' => 230.19,
+            ]));
+        $this->app->instance(FakeMarketData::class, $fakeMock);
+
+        // add currency rates
+        CurrencyRate::insert([[
+            'currency' => 'GBP',
+            'rate' => .79,
+            'date' => now()->subWeeks(5),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .81,
+            'date' => now()->subDays(5),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .89,
+            'date' => now()->subYear(),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .92,
+            'date' => now()->subMonth(),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .85,
+            'date' => now()->subDay(),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .85,
+            'date' => now(),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .85,
+            'date' => now()->addDay(),
+        ]]);
+
+        // create some foreign currency transaction history
+        Transaction::factory(10)->buy()->costBasis(100)->currency('GBP')->date(now()->subYear())->portfolio($portfolio->id)->symbol('BAR')->create();
+        Transaction::factory(5)->sell()->salePrice(150)->currency('GBP')->date(now()->subMonth())->portfolio($portfolio->id)->symbol('BAR')->create();
+
+        $metrics = Holding::query()
+            ->portfolio($portfolio->id)
+            ->getPortfolioMetrics();
+
+        $this->assertEqualsWithDelta(1001.79, $metrics->get('total_cost_basis'), 0.01);
+        $this->assertEqualsWithDelta(381.73, $metrics->get('realized_gain_dollars'), 0.01);
+        // $this->assertEqualsWithDelta(2274.82, $metrics->get('total_market_value'), 0.01); // still need to test market value
+
+        // switch user display currency
+        $user->options = array_merge($user->options ?? [], [
+            'display_currency' => 'GBP',
+        ]);
+        $user->save();
+
+        $metrics = Holding::query()
+            ->portfolio($portfolio->id)
+            ->getPortfolioMetrics();
+
+        $this->assertEqualsWithDelta(847.6, $metrics->get('total_cost_basis'), 0.01);
+        $this->assertEqualsWithDelta(339.1, $metrics->get('realized_gain_dollars'), 0.01);
+    }
 
     // // todo:
     // public function test_portfolio_daily_change_from_multiple_currencies()
-    // {
-
-    //     $this->actingAs($user = User::factory()->create());
-
-    //     $portfolio = Portfolio::factory()->create();
-    //     $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
-
-    //     //
-    // }
-
-    // // todo:
-    // public function test_can_change_display_currency()
     // {
 
     //     $this->actingAs($user = User::factory()->create());
