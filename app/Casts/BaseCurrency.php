@@ -18,12 +18,6 @@ class BaseCurrency implements CastsAttributes
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
 
-        // // if we have a rate, let's use it to reverse the currency conversion
-        // if (!empty($this->rate_to_base) && array_key_exists($this->rate_to_base, $attributes) && $attributes[$this->rate_to_base] != 0) {
-
-        //     return (float) $value * (1 / $attributes[$this->rate_to_base]);
-        // }
-
         return (float) $value;
     }
 
@@ -34,11 +28,6 @@ class BaseCurrency implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        // // if we have a rate, that means we already converted. so we should skip converting again
-        // if (!empty($this->rate_to_base) && array_key_exists($this->rate_to_base, $attributes)) {
-
-        //     return $value;
-        // }
 
         // for market data and transactions the `currency` attribute is available...
         // but for dividends and other types, need to make sure `market_data` is loaded

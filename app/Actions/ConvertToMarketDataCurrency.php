@@ -11,6 +11,11 @@ class ConvertToMarketDataCurrency
 {
     public function __invoke(Model $model, callable $next)
     {
+        if (is_null($model?->market_data)) {
+
+            $model->loadMarketData();
+        }
+
         if (! is_null($model->currency) && $model->currency !== $model->market_data->currency) {
 
             // convert to market data currency

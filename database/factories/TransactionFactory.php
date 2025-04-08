@@ -66,6 +66,13 @@ class TransactionFactory extends Factory
         ]);
     }
 
+    public function date($date): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => $date,
+        ]);
+    }
+
     public function symbol($symbol): static
     {
         return $this->state(fn (array $attributes) => [
@@ -77,6 +84,20 @@ class TransactionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'portfolio_id' => $portfolio_id,
+        ]);
+    }
+
+    public function currency($currency): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'currency' => $currency,
+        ]);
+    }
+
+    public function costBasis($cost_basis): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'cost_basis' => $cost_basis,
         ]);
     }
 

@@ -7,13 +7,14 @@ namespace App\Models;
 use App\Actions\CopyToBaseCurrency;
 use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\WithBaseCurrency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Pipeline;
 
 class MarketData extends Model
 {
-    use HasFactory;
+    use HasFactory, WithBaseCurrency;
 
     protected $primaryKey = 'symbol';
 
