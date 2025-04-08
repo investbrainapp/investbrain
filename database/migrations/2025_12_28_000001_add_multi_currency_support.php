@@ -96,7 +96,7 @@ return new class extends Migration
                 '--force' => true,
             ]);
 
-            dispatch(SyncCurrencyRatesJob::class);
+            dispatch(new SyncCurrencyRatesJob);
 
             CurrencyRate::refreshCurrencyData();
 

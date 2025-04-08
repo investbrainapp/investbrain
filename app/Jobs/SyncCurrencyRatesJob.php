@@ -19,7 +19,7 @@ class SyncCurrencyRatesJob implements ShouldQueue
      */
     public $tries = 3;
 
-    protected int $chunk_size = 250;
+    public int $chunk_size = 250;
 
     /**
      * Execute the job.
@@ -31,6 +31,8 @@ class SyncCurrencyRatesJob implements ShouldQueue
         collect(CarbonPeriod::create($min_date, now()))
             ->chunk($this->chunk_size)
             ->map(function ($chunk) {
+
+                // get chunks for min and max dates
                 return collect([
                     'min' => $chunk->min()->toDateString(),
                     'max' => $chunk->max()->toDateString(),
@@ -38,8 +40,9 @@ class SyncCurrencyRatesJob implements ShouldQueue
             })
             ->each(function ($chunk) {
 
+                // sync in chunks
                 CurrencyRate::timeSeriesRates(
-                    'ZZZ', // use fake currency to force
+                    '', // use fake currency to force
                     $chunk->get('min'),
                     $chunk->get('max')
                 );

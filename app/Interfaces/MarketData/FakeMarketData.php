@@ -9,6 +9,7 @@ use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class FakeMarketData implements MarketDataInterface
@@ -75,6 +76,9 @@ class FakeMarketData implements MarketDataInterface
 
     public function history(string $symbol, $startDate, $endDate): Collection
     {
+        $endDate = now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day')))
+            ? now()->subDay()
+            : now();
 
         $days = CarbonPeriod::create($startDate, $endDate)->filter('isWeekday');
 

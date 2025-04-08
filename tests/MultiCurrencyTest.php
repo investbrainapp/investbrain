@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Jobs\SyncCurrencyRatesJob;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
+use App\Models\Portfolio;
+use App\Models\Transaction;
+use App\Models\User;
+use Carbon\CarbonPeriod;
 use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Investbrain\Frankfurter\Frankfurter;
 
 class MultiCurrencyTest extends TestCase
 {
@@ -56,19 +62,117 @@ class MultiCurrencyTest extends TestCase
         $this->assertEquals(0.96, $converted);
     }
 
-    // todo: test historic rates
+    public function test_can_sync_currency_rates_during_migration()
+    {
 
-    // todo: test time series rates
+        $this->actingAs($user = User::factory()->create());
 
-    // todo: handle aliases for historic
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
 
-    // todo: handle aliases for time series rates
+        $chunk_size = (new SyncCurrencyRatesJob)->chunk_size;
+        $expected_num_calls = count(collect(CarbonPeriod::create($transaction->date, now()))->chunk($chunk_size));
 
-    // todo: test buy and sell in different currency than market data currency
+        Frankfurter::shouldReceive('setSymbols')
+            ->andReturn(new \Investbrain\Frankfurter\FrankfurterClient)
+            ->times($expected_num_calls);
 
-    // todo: test portfolio with multiple currencies
+        dispatch(new SyncCurrencyRatesJob);
+    }
 
-    // todo: test show holdings in display currency
+    // todo:
+    public function test_can_get_historic_exchange_rates()
+    {
 
-    // todo: test can change display currency
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
+
+    // todo:
+    public function test_can_get_time_series_rates()
+    {
+
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
+
+    // todo:
+    public function test_can_handle_aliases_for_historic_rates()
+    {
+
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
+
+    // todo:
+    public function test_can_handle_aliases_for_time_series_rates()
+    {
+
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
+
+    // todo:
+    public function test_can_buy_and_sell_in_different_currencies()
+    {
+
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
+
+    // todo:
+    public function test_holdings_calculations_from_multiple_currencies()
+    {
+
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
+
+    // todo:
+    public function test_portfolio_daily_change_from_multiple_currencies()
+    {
+
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
+
+    // todo:
+    public function test_can_change_display_currency()
+    {
+
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        //
+    }
 }
