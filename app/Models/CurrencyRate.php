@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Jobs\BatchInsertNewCurrencyRatesJob;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -95,8 +96,7 @@ class CurrencyRate extends Model
                     ];
                 });
 
-                // todo: queue this
-                CurrencyRate::insertOrIgnore($updates);
+                BatchInsertNewCurrencyRatesJob::dispatch($updates);
 
                 return new CurrencyRate(Arr::first($updates, fn ($update) => $update['currency'] == $currency) ?? ['rate' => 1]);
             });
@@ -111,6 +111,8 @@ class CurrencyRate extends Model
      */
     public static function timeSeriesRates(string $currency, string|\DateTime $start, mixed $end = null): array
     {
+        $end = $end ?? now();
+
         $period = CarbonPeriod::create($start, $end);
 
         // No need to send network request - just generate 1s
@@ -134,7 +136,10 @@ class CurrencyRate extends Model
         $updates = [];
 
         // loop through each date
+
         foreach ($period as $date) {
+
+            $skip = false;
 
             $lookupDate = $date->toDateString();
 
@@ -145,10 +150,15 @@ class CurrencyRate extends Model
                 // prevent runaway infinite loops
                 if ($lookupDate->lessThan($date->copy()->subWeek())) {
 
-                    throw new \Exception('Error getting time series exchange rates.');
+                    $skip = true;
+                    break;
                 }
 
                 $lookupDate = $lookupDate->toDateString();
+            }
+
+            if ($skip) {
+                continue;
             }
 
             // make date a string
@@ -168,8 +178,7 @@ class CurrencyRate extends Model
             }
         }
 
-        // todo: queue this
-        CurrencyRate::insertOrIgnore($updates);
+        BatchInsertNewCurrencyRatesJob::dispatch($updates);
 
         return collect($updates)
             ->whereBetween('date', [$start, $end ?? now()])

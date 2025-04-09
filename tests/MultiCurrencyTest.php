@@ -35,6 +35,63 @@ class MultiCurrencyTest extends TestCase
         $this->assertEquals(19, Currency::count('currency'));
     }
 
+    public function test_perists_rates_that_after_historic_lookup()
+    {
+        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
+
+        Frankfurter::shouldReceive('setSymbols')
+            ->andReturn($mockClient);
+
+        $response = [
+            'AAA' => rand(10, 150) / 1000,
+            'BBB' => rand(10, 150) / 1000,
+            'ZZZ' => rand(10, 150) / 1000,
+        ];
+
+        $mockClient->shouldReceive('historical')
+            ->andReturn([
+                'date' => now()->toDateString(),
+                'rates' => $response,
+            ]);
+
+        CurrencyRate::historic('ZZZ', now()->toDateString());
+
+        $count = CurrencyRate::count('date');
+
+        $this->assertEquals(3, $count);
+    }
+
+    public function test_perists_rates_that_after_time_series_lookup()
+    {
+
+        $startDate = now()->subYear();
+        $response = [];
+        $period = CarbonPeriod::create($startDate, now());
+
+        foreach ($period->copy() as $date) {
+            $response[$date->toDateString()] = [
+                'AAA' => rand(10, 150) / 1000,
+                'BBB' => rand(10, 150) / 1000,
+                'ZZZ' => rand(10, 150) / 1000,
+            ];
+        }
+
+        Frankfurter::expects('setSymbols')
+            ->andReturnSelf();
+        Frankfurter::expects('timeSeries')
+            ->andReturn([
+                'start_date' => $startDate->toDateString(),
+                'end_date' => now()->toDateString(),
+                'rates' => $response,
+            ]);
+
+        CurrencyRate::timeSeriesRates('ZZZ', $startDate);
+
+        $count = CurrencyRate::count('date');
+
+        $this->assertEquals(1098, $count);
+    }
+
     public function test_can_convert_currency_to_base()
     {
         CurrencyRate::create(['currency' => 'INR', 'date' => now(), 'rate' => 85]);
@@ -78,11 +135,27 @@ class MultiCurrencyTest extends TestCase
         $chunk_size = (new SyncCurrencyRatesJob)->chunk_size;
         $expected_num_calls = count(collect(CarbonPeriod::create($transaction->date, now()))->chunk($chunk_size));
 
-        Frankfurter::shouldReceive('setSymbols')
-            ->andReturn(new \Investbrain\Frankfurter\FrankfurterClient)
+        Frankfurter::expects('setSymbols')
+            ->andReturnSelf()
+            ->times($expected_num_calls);
+        Frankfurter::expects('timeSeries')
+            ->andReturn(['rates' => [
+                now()->subDays(3)->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+                now()->subDays(2)->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+                now()->subDays(1)->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+                now()->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+            ]])
             ->times($expected_num_calls);
 
-        dispatch(new SyncCurrencyRatesJob);
+        SyncCurrencyRatesJob::dispatch();
     }
 
     public function test_can_get_historic_exchange_rates()
@@ -118,11 +191,6 @@ class MultiCurrencyTest extends TestCase
     public function test_can_get_time_series_rates()
     {
 
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
-
-        Frankfurter::shouldReceive('setSymbols')
-            ->andReturn($mockClient);
-
         $start = now()->subWeeks(2);
         $end = now();
 
@@ -138,7 +206,9 @@ class MultiCurrencyTest extends TestCase
             ];
         });
 
-        $mockClient->shouldReceive('timeSeries')
+        Frankfurter::expects('setSymbols')
+            ->andReturnSelf();
+        Frankfurter::expects('timeSeries')
             ->andReturn(['rates' => $results]);
 
         $result = CurrencyRate::timeSeriesRates('ZZZ', $start, $end);
@@ -186,11 +256,6 @@ class MultiCurrencyTest extends TestCase
     public function test_can_handle_aliases_for_time_series_rates()
     {
 
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
-
-        Frankfurter::shouldReceive('setSymbols')
-            ->andReturn($mockClient);
-
         $start = now()->subWeeks(2);
         $end = now();
         $adjustment = 100;
@@ -216,7 +281,9 @@ class MultiCurrencyTest extends TestCase
             ];
         });
 
-        $mockClient->shouldReceive('timeSeries')
+        Frankfurter::expects('setSymbols')
+            ->andReturnSelf();
+        Frankfurter::expects('timeSeries')
             ->andReturn(['rates' => $results]);
 
         $result = CurrencyRate::timeSeriesRates('ZZZ', $start, $end);

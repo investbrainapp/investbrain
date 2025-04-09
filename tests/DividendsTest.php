@@ -69,5 +69,10 @@ class DividendsTest extends TestCase
         $dividend_count = Dividend::count();
 
         $this->assertEquals(3, $dividend_count);
+
+        // todo: fails intermittently
+        // FAILED  Tests\DividendsTest > cannot insert duplicate dividends
+        // Failed asserting that 6 matches expected 3.
+
     }
 }
