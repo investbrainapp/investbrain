@@ -38,6 +38,6 @@ Schedule::command(RefreshSplitData::class)->weekly();
 Schedule::command(SyncHoldingData::class)->yearly();
 
 /**
- * Refreshes currency exchange data several times daily
+ * Refreshes currency exchange data daily
  */
 Schedule::command(RefreshCurrencyData::class)->daily();

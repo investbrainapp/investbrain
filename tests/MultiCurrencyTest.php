@@ -216,6 +216,34 @@ class MultiCurrencyTest extends TestCase
         $this->assertEquals(count($period) - 1, count($result));
     }
 
+    public function test_time_series_rate_calls_are_chunked()
+    {
+
+        $start = now()->subYears(5);
+        $end = now();
+
+        $results = [];
+
+        $period = CarbonPeriod::create($start, $end);
+
+        collect($period->copy()->filter('isWeekday'))->each(function ($date) use (&$results) {
+            $date = $date->toDateString();
+
+            $results[$date] = [
+                'ZZZ' => random_int(10, 150) / 1000,
+            ];
+        });
+
+        Frankfurter::expects('setSymbols')
+            ->andReturnSelf()
+            ->times(4); // will be called 3.65 times
+        Frankfurter::expects('timeSeries')
+            ->andReturn(['rates' => $results])
+            ->times(4);
+
+        CurrencyRate::timeSeriesRates('ZZZ', $start, $end);
+    }
+
     public function test_can_handle_aliases_for_historic_rates()
     {
         $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);

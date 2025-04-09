@@ -129,14 +129,18 @@ class CurrencyRate extends Model
         [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
 
         $currencies = Currency::all()->pluck('currency')->toArray();
-        $rates = Frankfurter::setSymbols($currencies)->timeSeries($start, $end);
 
-        $rates = Arr::get($rates, 'rates', []);
+        // call api in chunks
+        $rates = [];
+        foreach (collect($period)->chunk(500) as $chunk) {
 
-        $updates = [];
+            $chunkRates = Frankfurter::setSymbols($currencies)->timeSeries($chunk->min(), $chunk->max());
+
+            $rates = array_merge($rates, Arr::get($chunkRates, 'rates', []));
+        }
 
         // loop through each date
-
+        $updates = [];
         foreach ($period as $date) {
 
             $skip = false;

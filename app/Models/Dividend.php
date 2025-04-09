@@ -33,8 +33,8 @@ class Dividend extends Model
     protected $hidden = [];
 
     protected $casts = [
-        'date' => 'datetime',
-        'last_dividend_update' => 'datetime',
+        'date' => 'date',
+        'last_dividend_update' => 'date',
         'dividend_amount' => 'float',
         'dividend_amount_base' => BaseCurrency::class,
     ];
