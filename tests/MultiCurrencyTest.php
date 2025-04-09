@@ -236,7 +236,7 @@ class MultiCurrencyTest extends TestCase
 
         Frankfurter::expects('setSymbols')
             ->andReturnSelf()
-            ->times(4); // will be called 3.65 times
+            ->times(4);
         Frankfurter::expects('timeSeries')
             ->andReturn(['rates' => $results])
             ->times(4);
