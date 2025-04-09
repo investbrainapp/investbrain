@@ -9,6 +9,7 @@ use App\Interfaces\MarketData\Types\Quote;
 use App\Jobs\SyncCurrencyRatesJob;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
+use App\Models\DailyChange;
 use App\Models\Holding;
 use App\Models\Portfolio;
 use App\Models\Transaction;
@@ -283,17 +284,22 @@ class MultiCurrencyTest extends TestCase
         $this->assertEquals($sale_price * (1 / $rate), $sell_transaction->sale_price);
     }
 
-    // todo:
-    public function test_holdings_calculations_from_multiple_currencies()
+    public function test_holdings_calculations_for_multiple_currencies()
     {
+
+        $fiveWeeksAgo = now()->subWeeks(5)->toDateString();
+        $fiveDaysAgo = now()->subDays(5)->toDateString();
+        $yearAgo = now()->subYear()->toDateString();
+        $monthAgo = now()->subMonth()->toDateString();
+        $today = now()->toDateString();
 
         $this->actingAs($user = User::factory()->create());
 
         $portfolio = Portfolio::factory()->create();
 
         // create some local currency transaction history
-        Transaction::factory(5)->buy()->costBasis(110)->date(now()->subWeeks(5))->portfolio($portfolio->id)->symbol('ACME')->create();
-        Transaction::factory()->sell()->salePrice(219.99)->date(now()->subDays(5))->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory(5)->buy()->costBasis(110)->date($fiveWeeksAgo)->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->sell()->salePrice(219.99)->date($fiveDaysAgo)->portfolio($portfolio->id)->symbol('ACME')->create();
 
         // mock foreign quotes
         $fakeMock = Mockery::mock(FakeMarketData::class);
@@ -302,44 +308,45 @@ class MultiCurrencyTest extends TestCase
                 'name' => 'British Company Ltd',
                 'symbol' => 'BAR',
                 'currency' => 'GBP',
-                'market_value' => 230.19,
+                'market_value' => 109.99,
             ]));
         $this->app->instance(FakeMarketData::class, $fakeMock);
 
         // add currency rates
-        CurrencyRate::insert([[
+        $rates = collect([[
             'currency' => 'GBP',
             'rate' => .79,
-            'date' => now()->subWeeks(5),
+            'date' => $fiveWeeksAgo,
         ], [
             'currency' => 'GBP',
             'rate' => .81,
-            'date' => now()->subDays(5),
+            'date' => $fiveDaysAgo,
         ], [
             'currency' => 'GBP',
             'rate' => .89,
-            'date' => now()->subYear(),
+            'date' => $yearAgo,
         ], [
             'currency' => 'GBP',
             'rate' => .92,
-            'date' => now()->subMonth(),
+            'date' => $monthAgo,
         ], [
             'currency' => 'GBP',
             'rate' => .85,
-            'date' => now()->subDay(),
+            'date' => now()->subDay()->toDateString(),
         ], [
             'currency' => 'GBP',
             'rate' => .85,
-            'date' => now(),
+            'date' => $today,
         ], [
             'currency' => 'GBP',
             'rate' => .85,
-            'date' => now()->addDay(),
+            'date' => now()->addDay()->toDateString(),
         ]]);
+        $rates->each(fn ($rate) => CurrencyRate::create($rate));
 
         // create some foreign currency transaction history
-        Transaction::factory(10)->buy()->costBasis(100)->currency('GBP')->date(now()->subYear())->portfolio($portfolio->id)->symbol('BAR')->create();
-        Transaction::factory(5)->sell()->salePrice(150)->currency('GBP')->date(now()->subMonth())->portfolio($portfolio->id)->symbol('BAR')->create();
+        Transaction::factory(10)->buy()->costBasis(100)->currency('GBP')->date($yearAgo)->portfolio($portfolio->id)->symbol('BAR')->create();
+        Transaction::factory(5)->sell()->salePrice(150)->currency('GBP')->date($monthAgo)->portfolio($portfolio->id)->symbol('BAR')->create();
 
         $metrics = Holding::query()
             ->portfolio($portfolio->id)
@@ -347,7 +354,7 @@ class MultiCurrencyTest extends TestCase
 
         $this->assertEqualsWithDelta(1001.79, $metrics->get('total_cost_basis'), 0.01);
         $this->assertEqualsWithDelta(381.73, $metrics->get('realized_gain_dollars'), 0.01);
-        // $this->assertEqualsWithDelta(2274.82, $metrics->get('total_market_value'), 0.01); // still need to test market value
+        $this->assertEqualsWithDelta(1567.76, $metrics->get('total_market_value'), 0.01);
 
         // switch user display currency
         $user->options = array_merge($user->options ?? [], [
@@ -361,17 +368,75 @@ class MultiCurrencyTest extends TestCase
 
         $this->assertEqualsWithDelta(847.6, $metrics->get('total_cost_basis'), 0.01);
         $this->assertEqualsWithDelta(339.1, $metrics->get('realized_gain_dollars'), 0.01);
+        $this->assertEqualsWithDelta(1332.59, $metrics->get('total_market_value'), 0.01);
     }
 
-    // // todo:
-    // public function test_portfolio_daily_change_from_multiple_currencies()
-    // {
+    public function test_portfolio_daily_change_from_multiple_currencies()
+    {
 
-    //     $this->actingAs($user = User::factory()->create());
+        $this->actingAs($user = User::factory()->create());
 
-    //     $portfolio = Portfolio::factory()->create();
-    //     $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory(5)->buy()->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory(5)->buy()->lastMonth()->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->sell()->recent()->portfolio($portfolio->id)->symbol('ACME')->create();
 
-    //     //
-    // }
+        $portfolio->syncDailyChanges();
+
+        $dailyChange = DailyChange::withDailyPerformance()
+            ->portfolio($portfolio->id)
+            ->get()
+            ->sortBy('date')
+            ->groupBy('date')
+            ->map(function ($group) {
+                return (object) [
+                    'date' => $group->first()->date->toDateString(),
+                    'total_market_value' => $group->sum('total_market_value'),
+                    'total_cost_basis' => $group->sum('total_cost_basis'),
+                    'total_gain' => $group->sum('total_gain'),
+                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
+                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
+                ];
+            });
+
+        $metrics = Holding::query()
+            ->portfolio($portfolio->id)
+            ->getPortfolioMetrics();
+
+        $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
+
+        // switch user display currency
+        $user->options = array_merge($user->options ?? [], [
+            'display_currency' => 'GBP',
+        ]);
+        $user->save();
+
+        $dailyChange = DailyChange::withDailyPerformance()
+            ->portfolio($portfolio->id)
+            ->get()
+            ->sortBy('date')
+            ->groupBy('date')
+            ->map(function ($group) {
+                return (object) [
+                    'date' => $group->first()->date->toDateString(),
+                    'total_market_value' => $group->sum('total_market_value'),
+                    'total_cost_basis' => $group->sum('total_cost_basis'),
+                    'total_gain' => $group->sum('total_gain'),
+                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
+                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
+                ];
+            });
+
+        $metrics = Holding::query()
+            ->portfolio($portfolio->id)
+            ->getPortfolioMetrics();
+
+        $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
+    }
 }
