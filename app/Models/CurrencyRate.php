@@ -38,6 +38,7 @@ class CurrencyRate extends Model
     {
         return [
             'rate' => 'float',
+            'date' => 'date',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];

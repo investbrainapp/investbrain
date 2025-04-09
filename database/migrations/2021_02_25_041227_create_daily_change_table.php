@@ -20,10 +20,6 @@ class CreateDailyChangeTable extends Migration
             $table->date('date');
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
             $table->float('total_market_value', 12, 4)->nullable();
-            $table->float('total_cost_basis', 12, 4)->nullable();
-            $table->float('total_gain', 12, 4)->nullable();
-            $table->float('total_dividends_earned', 12, 4)->nullable();
-            $table->float('realized_gains', 12, 4)->nullable();
             $table->text('annotation')->nullable();
 
             $table->primary(['date', 'portfolio_id']);

@@ -62,7 +62,7 @@ class TransactionFactory extends Factory
     public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => now()->subWeeks($this->faker->numberBetween(0, 2))->toDateString(),
+            'date' => now()->subDays($this->faker->numberBetween(3, 14))->toDateString(),
         ]);
     }
 

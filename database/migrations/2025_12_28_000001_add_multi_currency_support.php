@@ -109,12 +109,26 @@ return new class extends Migration
         /**
          * Cleanup daily change table
          */
-        Schema::table('daily_change', function (Blueprint $table) {
-            $table->dropColumn('total_cost_basis');
-            $table->dropColumn('total_gain');
-            $table->dropColumn('total_dividends_earned');
-            $table->dropColumn('realized_gains');
-        });
+        if (Schema::hasColumn('daily_change', 'total_cost_basis')) {
+            Schema::table('daily_change', function (Blueprint $table) {
+                $table->dropColumn('total_cost_basis');
+            });
+        }
+        if (Schema::hasColumn('daily_change', 'total_gain')) {
+            Schema::table('daily_change', function (Blueprint $table) {
+                $table->dropColumn('total_gain');
+            });
+        }
+        if (Schema::hasColumn('daily_change', 'total_dividends_earned')) {
+            Schema::table('daily_change', function (Blueprint $table) {
+                $table->dropColumn('total_dividends_earned');
+            });
+        }
+        if (Schema::hasColumn('daily_change', 'realized_gains')) {
+            Schema::table('daily_change', function (Blueprint $table) {
+                $table->dropColumn('realized_gains');
+            });
+        }
     }
 
     /**

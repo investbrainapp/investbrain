@@ -175,12 +175,16 @@ class Holding extends Model
     {
         return $query->withAggregate('market_data', 'name')
             ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'market_value_base')
             ->withAggregate('market_data', 'fifty_two_week_low')
             ->withAggregate('market_data', 'fifty_two_week_high')
             ->withAggregate('market_data', 'updated_at')
             ->join('market_data', 'holdings.symbol', 'market_data.symbol');
     }
 
+    /**
+     * Calculate performance for holding in its local currency
+     */
     public function scopeWithPerformance($query)
     {
         return $query->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
@@ -238,9 +242,6 @@ class Holding extends Model
     public function scopeWithPortfolioMetrics($query, $currency = null): mixed
     {
         $currency = $currency ?? auth()->user()->getCurrency();
-        $todaysDate = (config('database.default') === 'sqlite')
-            ? "'".now()->toDateString()."'"
-            : "CAST('".now()->toDateString()."' AS date)";
 
         return $query->select([
             'holdings.symbol',
@@ -259,9 +260,16 @@ class Holding extends Model
                 'dividends_display.total_dividends_earned',
                 'market_data.market_value_base',
             ])
-            ->leftJoin('currency_rates as cr', function ($join) use ($currency, $todaysDate) {
-                $join->on('cr.date', '=', DB::raw($todaysDate))
-                    ->on('cr.currency', '=', DB::raw("'{$currency}'"));
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                $join->where('cr.currency', '=', $currency);
+
+                if (config('database.default') === 'sqlite') {
+
+                    $join->whereRaw("strftime('%Y-%m-%d', cr.date) = ?", [now()->toDateString()]);
+                } else {
+
+                    $join->on('cr.date', '=', DB::raw("'".now()->toDateString()."'"));
+                }
             })
             ->leftJoin('market_data', function ($join) {
                 $join->on('market_data.symbol', '=', 'holdings.symbol');
@@ -359,7 +367,7 @@ class Holding extends Model
                     })
                     ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
                         $join->on('cr.date', '=', 'dividends.date')
-                            ->on('cr.currency', '=', DB::raw("'{$currency}'"));
+                            ->where('cr.currency', '=', $currency);
                     })
                     ->select(['dividends.symbol'])
                     ->selectRaw(
