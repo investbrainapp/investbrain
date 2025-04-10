@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\CopyToBaseCurrency;
+use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Pipeline;
 
 class MarketData extends Model
 {
@@ -21,7 +24,9 @@ class MarketData extends Model
     protected $fillable = [
         'symbol',
         'name',
+        'currency',
         'market_value',
+        'market_value_base',
         'fifty_two_week_high',
         'fifty_two_week_low',
         'forward_pe',
@@ -29,20 +34,39 @@ class MarketData extends Model
         'market_cap',
         'book_value',
         'last_dividend_date',
+        'last_dividend_amount',
         'dividend_yield',
+        'meta_data',
     ];
 
     protected $casts = [
-        'last_dividend_date' => 'datetime',
         'market_value' => 'float',
+        'market_value_base' => BaseCurrency::class,
         'fifty_two_week_high' => 'float',
         'fifty_two_week_low' => 'float',
         'forward_pe' => 'float',
         'trailing_pe' => 'float',
-        'market_cap' => 'float',
+        'market_cap' => 'integer',
         'book_value' => 'float',
+        'last_dividend_date' => 'datetime',
+        'last_dividend_amount' => 'float',
         'dividend_yield' => 'float',
+        'meta_data' => 'json',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($market_data) {
+
+            $market_data = Pipeline::send($market_data)
+                ->through([
+                    CopyToBaseCurrency::class,
+                ])
+                ->then(fn (MarketData $market_data) => $market_data);
+        });
+    }
 
     public function holdings()
     {
@@ -54,7 +78,7 @@ class MarketData extends Model
         return $query->where('symbol', $symbol);
     }
 
-    public static function getMarketData($symbol, $force = false)
+    public static function getMarketData($symbol, $force = false): self
     {
         $market_data = self::firstOrNew([
             'symbol' => $symbol,

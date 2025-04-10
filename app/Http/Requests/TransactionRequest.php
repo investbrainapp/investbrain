@@ -30,11 +30,11 @@ class TransactionRequest extends FormRequest
             'portfolio_id' => ['required', 'exists:portfolios,id'],
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => ['required', 'string', 'in:BUY,SELL'],
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->format('Y-m-d')],
+            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->toDateString()],
             'quantity' => [
                 'required',
                 'numeric',
-                'min:0',
+                'gt:0',
                 new QuantityValidationRule(
                     $this->input('portfolio'),
                     $this->requestOrModelValue('symbol', 'transaction'),

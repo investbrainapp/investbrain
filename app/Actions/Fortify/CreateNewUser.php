@@ -9,7 +9,6 @@ use App\Traits\WithTrimStrings;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
-use Laravel\Jetstream\Jetstream;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -32,13 +31,22 @@ class CreateNewUser implements CreatesNewUsers
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
-            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+            'terms' => config('investbrain.self_hosted') ? '' : ['accepted', 'required'],
         ])->validate();
 
-        return User::create([
+        $user = User::make([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);
+
+        // ensure first user is flagged as an admin
+        if (User::count() === 0) {
+            $user->admin = true;
+        }
+
+        $user->save();
+
+        return $user;
     }
 }

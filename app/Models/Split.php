@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Split extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -29,12 +32,12 @@ class Split extends Model
         'last_date' => 'datetime',
     ];
 
-    public function holdings()
+    public function holdings(): HasMany
     {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }
@@ -114,7 +117,7 @@ class Split extends Model
                 'symbol' => $split->symbol,
                 'portfolio_id' => $split->portfolio_id,
             ])
-                ->whereDate('transactions.date', '<', $split->date->format('Y-m-d'))
+                ->whereDate('transactions.date', '<', $split->date->toDateString())
                 ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) -
                             SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_owned")
                 ->value('qty_owned');

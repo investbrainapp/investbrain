@@ -11,6 +11,7 @@
         "ext-zip": "*",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
+        "investbrainapp/frankfurter-client": "dev-main",
         "laravel/framework": "^11.35",
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
@@ -45,6 +46,11 @@
             "type": "vcs",
             "no-api": true,
             "url": "https://github.com/investbrainapp/finnhub-php"
+        },
+        {
+            "type": "path",
+            "no-api": true,
+            "url": "packages/investbrainapp/frankfurter-client"
         }
     ],
     "autoload": {

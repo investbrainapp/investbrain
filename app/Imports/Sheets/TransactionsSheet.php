@@ -60,7 +60,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                     'sale_price' => $transaction['sale_price'],
                     'split' => boolval($transaction['split']) ? 1 : 0,
                     'reinvested_dividend' => boolval($transaction['reinvested_dividend']) ? 1 : 0,
-                    'date' => Carbon::parse($transaction['date'])->format('Y-m-d'),
+                    'date' => Carbon::parse($transaction['date'])->toDateString(),
                 ];
             });
 

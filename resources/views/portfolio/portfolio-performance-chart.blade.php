@@ -35,16 +35,7 @@ new class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $dailyChangeQuery = DailyChange::myDailyChanges()->selectRaw('
-                    date, 
-                    SUM(total_market_value) as total_market_value, 
-                    SUM(total_cost_basis) as total_cost_basis, 
-                    SUM(total_gain) as total_gain 
-                    /*  ,
-                        SUM(realized_gains) as realized_gains,
-                        SUM(total_dividends_earned) as total_dividends_earned 
-                    */
-                ');
+        $dailyChangeQuery = DailyChange::withDailyPerformance();
 
         if (isset($this->portfolio)) {
 
@@ -54,18 +45,30 @@ new class extends Component
         } else {
 
             // dashboard
-            $dailyChangeQuery->withoutWishlists();
+            $dailyChangeQuery->myDailyChanges()->withoutWishlists();
         }
 
         if ($filterMethod['method']) {
 
-            $dailyChangeQuery->whereDate('date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
+            $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
-        $dailyChange = $dailyChangeQuery
-            ->orderBy('date')
+        $dailyChange = $dailyChangeQuery->get();
+
+        $dailyChange = $dailyChange
+            ->sortBy('date')
             ->groupBy('date')
-            ->get();
+            ->map(function ($group) {
+                return (object) [
+                    'date' => $group->first()->date->toDateString(),
+                    'total_market_value' => $group->sum('total_market_value'),
+                    'total_cost_basis' => $group->sum('total_cost_basis'),
+                    'total_gain' => $group->sum('total_gain'),
+                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
+                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
+                ];
+            })
+            ->values();
 
         return [
             'series' => [

@@ -21,7 +21,7 @@ class Ohlc extends MarketDataType
         return $this->items['symbol'] ?? '';
     }
 
-    public function setOpen($open): self
+    public function setOpen(int|float $open): self
     {
         $this->items['open'] = (float) $open;
 
@@ -33,7 +33,7 @@ class Ohlc extends MarketDataType
         return $this->items['open'] ?? 0.0;
     }
 
-    public function setHigh($high): self
+    public function setHigh(int|float $high): self
     {
         $this->items['high'] = (float) $high;
 
@@ -45,7 +45,7 @@ class Ohlc extends MarketDataType
         return $this->items['high'] ?? 0.0;
     }
 
-    public function setLow($low): self
+    public function setLow(int|float $low): self
     {
         $this->items['low'] = (float) $low;
 
@@ -57,7 +57,7 @@ class Ohlc extends MarketDataType
         return $this->items['low'] ?? 0.0;
     }
 
-    public function setClose($close): self
+    public function setClose(int|float $close): self
     {
         $this->items['close'] = (float) $close;
 

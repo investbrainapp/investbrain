@@ -4,17 +4,24 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\CopyToBaseCurrency;
+use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\Str;
 
 class Dividend extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -26,21 +33,32 @@ class Dividend extends Model
     protected $hidden = [];
 
     protected $casts = [
-        'date' => 'datetime',
-        'last_dividend_update' => 'datetime',
+        'date' => 'date',
+        'last_dividend_update' => 'date',
+        'dividend_amount' => 'float',
+        'dividend_amount_base' => BaseCurrency::class,
     ];
 
-    public function marketData()
+    protected static function boot()
     {
-        return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
+        parent::boot();
+
+        static::saving(function ($dividend) {
+
+            $dividend = Pipeline::send($dividend)
+                ->through([
+                    CopyToBaseCurrency::class,
+                ])
+                ->then(fn (Dividend $dividend) => $dividend);
+        });
     }
 
-    public function holdings()
+    public function holdings(): HasMany
     {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }
@@ -84,8 +102,18 @@ class Dividend extends Model
 
         // ah, we found some dividends...
         if ($dividend_data->isNotEmpty()) {
+
+            $market_data = MarketData::getMarketData($symbol);
+
+            // get historic conversion rates
+            $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
+
             // create mass insert
             foreach ($dividend_data as $index => $dividend) {
+                $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
+
+                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * $rate_to_base_date;
+
                 $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
             }
 
@@ -94,9 +122,6 @@ class Dividend extends Model
 
             // sync to holdings
             self::syncHoldings($symbol);
-
-            // get market data
-            $market_data = MarketData::firstOrNew(['symbol' => $symbol]);
 
             // re-invest dividends
             self::reinvestDividends($dividend_data, $market_data);
@@ -127,7 +152,7 @@ class Dividend extends Model
         ")->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
             ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
             ->where('dividends.symbol', $symbol)
-            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount');
+            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'dividends.dividend_amount_base');
 
         $dividends = DB::table(DB::raw("({$subQuery->toSql()}) as sub"))
             ->mergeBindings($subQuery->getQuery())

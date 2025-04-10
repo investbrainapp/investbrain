@@ -1,3 +1,5 @@
+@use('App\Models\Currency')
+
 <x-app-layout>
     <div x-data>  
 
@@ -67,48 +69,56 @@
 
             <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
 
+                @if(!empty($holding->market_data->market_cap))
                 <p>
                     <span class="font-bold">{{ __('Market Cap') }}: </span>
-                    ${{ Number::forHumans($holding->market_data->market_cap ?? 0) }} 
+                    {{ Currency::forHumans($holding->market_data->market_cap, $holding->market_data->currency) }}
                 </p>
+                @endif
 
+                @if(!empty($holding->market_data->forward_pe))
                 <p>
                     <span class="font-bold">{{ __('Forward PE') }}: </span>
                     {{ $holding->market_data->forward_pe }} 
                 </p>
+                @endif
 
+                @if(!empty($holding->market_data->trailing_pe))
                 <p>
                     <span class="font-bold">{{ __('Trailing PE') }}: </span>
                     {{ $holding->market_data->trailing_pe }} 
                 </p>
+                @endif
 
-                <p>
-                    <span class="font-bold">{{ __('Book Value') }}: </span>
-                    {{ $holding->market_data->book_value }} 
-                </p>
+                @if(!empty($holding->market_data->book_value))
+                    <p>
+                        <span class="font-bold">{{ __('Book Value') }}: </span>
+                        {{ Number::currency($holding->market_data->book_value, $holding->market_data->currency) }} 
+                    </p>
+                @endif
 
                 <p>
                     <span class="font-bold">{{ __('52 week') }}: </span>
 
-                    <x-fifty-two-week-range 
-                        :low="$holding->market_data->fifty_two_week_low" 
-                        :high="$holding->market_data->fifty_two_week_high" 
-                        :current="$holding->market_data->market_value"
-                    />
+                    <x-fifty-two-week-range :market-data="$holding->market_data" />
                 </p>
 
+                @if(!empty($holding->market_data->dividend_yield))
                 <p>
                     <span class="font-bold">{{ __('Dividend Yield') }}: </span>
                     {{ Number::percentage(
-                        $holding->market_data->dividend_yield ?? 0, 
+                        $holding->market_data->dividend_yield, 
                         $holding->market_data->dividend_yield < 1 ? 2 : 0
                     ) }} 
                 </p>
+                @endif
 
+                @if(!empty($holding->market_data->last_dividend_date))
                 <p>
                     <span class="font-bold">{{ __('Last Dividend Paid') }}: </span>
-                    {{ $holding->market_data?->last_dividend_date?->format('F d, Y') ?? '' }} 
+                    {{ $holding->market_data->last_dividend_date->format('F d, Y') }} 
                 </p>
+                @endif
                 
             </x-ib-card>
 
@@ -164,7 +174,7 @@
             </x-ib-card>
 
             @if(config('services.ai_chat_enabled'))
-            {{-- // TODO: add to system prompt:
+            {{-- // todo: add to system prompt:
                     // Additionally, here is some recent news about {$this->holding->symbol}:
                     // And their latest SEC filings: --}}
             @livewire('ai-chat-window', [
@@ -209,7 +219,7 @@
                          * 52 week high: {$holding->market_data->fifty_two_week_high}
                          * Dividend yield: {$holding->market_data->dividend_yield}
                         
-                        This data is current as of today's date: " . now()->format('Y-m-d') . ". Based on this current market data, quantity owned, and average cost basis, you should determine if the {$holding->symbol} holding is making or losing money.
+                        This data is current as of today's date: " . now()->toDateString() . ". Based on this current market data, quantity owned, and average cost basis, you should determine if the {$holding->symbol} holding is making or losing money.
 
                         Below is the question from the investor. Considering these facts, provide a concise response to the following question (give a direct response). Limit your response to no more than 75 words and consider using a common decision framework. Use github style markdown for any formatting:"
             ])
