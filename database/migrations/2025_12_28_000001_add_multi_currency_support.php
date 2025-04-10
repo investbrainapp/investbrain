@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Jobs\SyncCurrencyRatesJob;
 use App\Models\CurrencyRate;
+use App\Models\Transaction;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\MarketDataSeeder;
 use Illuminate\Database\Migrations\Migration;
@@ -96,7 +96,10 @@ return new class extends Migration
                 '--force' => true,
             ]);
 
-            SyncCurrencyRatesJob::dispatch();
+            CurrencyRate::timeSeriesRates(
+                '', // use fake currency to force
+                Transaction::min('date')
+            );
 
             CurrencyRate::refreshCurrencyData();
 

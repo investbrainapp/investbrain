@@ -6,7 +6,6 @@ namespace Tests;
 
 use App\Interfaces\MarketData\FakeMarketData;
 use App\Interfaces\MarketData\Types\Quote;
-use App\Jobs\SyncCurrencyRatesJob;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
 use App\Models\DailyChange;
@@ -132,8 +131,7 @@ class MultiCurrencyTest extends TestCase
         $portfolio = Portfolio::factory()->create();
         $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
 
-        $chunk_size = (new SyncCurrencyRatesJob)->chunk_size;
-        $expected_num_calls = count(collect(CarbonPeriod::create($transaction->date, now()))->chunk($chunk_size));
+        $expected_num_calls = count(collect(CarbonPeriod::create($transaction->date, now()))->chunk(500));
 
         Frankfurter::expects('setSymbols')
             ->andReturnSelf()
@@ -155,7 +153,24 @@ class MultiCurrencyTest extends TestCase
             ]])
             ->times($expected_num_calls);
 
-        SyncCurrencyRatesJob::dispatch();
+        CurrencyRate::timeSeriesRates(
+            '', // use fake currency to force
+            Transaction::min('date')
+        );
+    }
+
+    public function test_nothing_to_sync_during_migration_on_new_install()
+    {
+
+        Frankfurter::expects('setSymbols')
+            ->times(0);
+        Frankfurter::expects('timeSeries')
+            ->times(0);
+
+        CurrencyRate::timeSeriesRates(
+            '', // use fake currency to force
+            Transaction::min('date')
+        );
     }
 
     public function test_can_get_historic_exchange_rates()

@@ -96,6 +96,7 @@ class CurrencyRate extends Model
                     ];
                 });
 
+                // persist
                 BatchInsertNewCurrencyRatesJob::dispatch($updates);
 
                 return new CurrencyRate(Arr::first($updates, fn ($update) => $update['currency'] == $currency) ?? ['rate' => 1]);
@@ -109,8 +110,12 @@ class CurrencyRate extends Model
      *
      * @return array<string, float>
      */
-    public static function timeSeriesRates(string $currency, string|\DateTime $start, mixed $end = null): array
+    public static function timeSeriesRates(string $currency, mixed $start = null, mixed $end = null): array
     {
+        if (empty($start)) {
+            return [];
+        }
+
         $end = $end ?? now();
 
         $period = CarbonPeriod::create($start, $end);
@@ -182,6 +187,7 @@ class CurrencyRate extends Model
             }
         }
 
+        // persist
         BatchInsertNewCurrencyRatesJob::dispatch($updates);
 
         return collect($updates)
