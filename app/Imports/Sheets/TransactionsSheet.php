@@ -6,6 +6,8 @@ namespace App\Imports\Sheets;
 
 use App\Imports\ValidatesPortfolioAccess;
 use App\Models\BackupImport;
+use App\Models\Currency;
+use App\Models\CurrencyRate;
 use App\Models\Holding;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
@@ -43,12 +45,34 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
     public function collection(Collection $transactions)
     {
 
-        $transactions->chunk($this->batchSize())->each(function ($chunk) {
+        // if has any transactions not in base currency, need to sync timeseries conversion rates
+        if ($transactions->where('currency', '!=', config('investbrain.base_currency'))->isNotEmpty()) {
+
+            $first_transaction_date = $transactions->min('date');
+            CurrencyRate::timeSeriesRates('', $first_transaction_date);
+        }
+
+        // chunk transactions
+        $transactions->chunk($this->batchSize())->each(function ($chunk) use ($transactions) {
 
             $this->validatePortfolioAccess($chunk);
 
             // have to cast to native values
             $chunk = $chunk->map(function ($transaction) {
+
+                $date = Carbon::parse($transaction['date'])->toDateString();
+
+                // if transaction not in base currency, need to convert
+                if (
+                    $transaction->currency == config('investbrain.base_currency')
+                    || empty($transaction->currency)
+                ) {
+                    $cost_basis_base = $transaction['cost_basis'] ?? 0;
+                    $sale_price_base = $transaction['sale_price'];
+                } else {
+                    $cost_basis_base = Currency::convert($transaction['cost_basis'], $transaction->currency, date: $date);
+                    $sale_price_base = Currency::convert($transaction['sale_price'], $transaction->currency, date: $date);
+                }
 
                 return [
                     'id' => $transaction['transaction_id'] ?? Str::uuid()->toString(),
@@ -58,9 +82,11 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                     'quantity' => $transaction['quantity'],
                     'cost_basis' => $transaction['cost_basis'] ?? 0,
                     'sale_price' => $transaction['sale_price'],
+                    'cost_basis_base' => $cost_basis_base,
+                    'sale_price_base' => $sale_price_base,
                     'split' => boolval($transaction['split']) ? 1 : 0,
                     'reinvested_dividend' => boolval($transaction['reinvested_dividend']) ? 1 : 0,
-                    'date' => Carbon::parse($transaction['date'])->toDateString(),
+                    'date' => $date,
                 ];
             });
 
@@ -81,9 +107,9 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                 ]
             );
 
-            // stub out related holdings
+            // get unique symbol/portfolio id combination and stub out related holdings
             $chunk->unique(fn ($item) => $item['symbol'].$item['portfolio_id'])
-                ->each(function ($holding) {
+                ->each(function ($holding) use ($transactions) {
 
                     Holding::firstOrCreate([
                         'symbol' => $holding['symbol'],
@@ -92,6 +118,10 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                         'quantity' => 0,
                         'average_cost_basis' => 0,
                         'splits_synced_at' => now(),
+                        'reinvest_dividends' => $transactions
+                            ->where('symbol', $holding['symbol'])
+                            ->where('portfolio', $holding['portfolio_id'])
+                            ->where('reinvested_dividend', 1)->isNotEmpty() ? true : false, // todo: re-invested dividends is set on holdings
                     ]);
                 });
         });

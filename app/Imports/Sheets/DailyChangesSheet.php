@@ -38,6 +38,7 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
         ];
     }
 
+    // todo: only update annotation
     public function collection(Collection $dailyChanges)
     {
         $dailyChanges->chunk($this->batchSize())->each(function ($chunk) {

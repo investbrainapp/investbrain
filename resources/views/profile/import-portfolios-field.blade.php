@@ -89,13 +89,13 @@ new class extends Component
 
     <x-slot name="description">
         {{ __('Upload or recover your Investbrain portfolio and holdings.') }} 
+        <span class="text-xs text-secondary"><a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></span>
     </x-slot>
 
     <x-slot:form>
         
         <div class="col-span-6 sm:col-span-4">
             <x-file wire:model="file" label="{{ __('Select a file') }}" hint="" accept=".xlsx" required />
-            <p class="mt-4 text-xs text-secondary leading-tight"><a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></p>
         </div>
 
         <x-dialog-modal wire:model.live="importStatusDialog" persistent>
