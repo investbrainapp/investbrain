@@ -46,11 +46,6 @@
             "type": "vcs",
             "no-api": true,
             "url": "https://github.com/investbrainapp/finnhub-php"
-        },
-        {
-            "type": "path",
-            "no-api": true,
-            "url": "packages/investbrainapp/frankfurter-client"
         }
     ],
     "autoload": {
