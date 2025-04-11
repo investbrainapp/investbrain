@@ -18,6 +18,7 @@ class TransactionController extends ApiController
 
         $filters->setQuery(Transaction::query());
         $filters->setScopes(['myTransactions']);
+        $filters->setEagerRelations(['market_data']);
         $filters->setSearchableColumns(['symbol']);
 
         return TransactionResource::collection($filters->paginated());

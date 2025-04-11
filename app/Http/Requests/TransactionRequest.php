@@ -42,6 +42,7 @@ class TransactionRequest extends FormRequest
                     $this->requestOrModelValue('date', 'transaction')
                 ),
             ],
+            'currency' => ['required', 'exists:currencies,currency'],
             'cost_basis' => ['exclude_if:transaction_type,SELL', 'min:0', 'numeric'],
             'sale_price' => ['exclude_if:transaction_type,BUY', 'min:0', 'numeric'],
         ];
@@ -50,6 +51,7 @@ class TransactionRequest extends FormRequest
             $rules['portfolio_id'][0] = 'sometimes';
             $rules['symbol'][0] = 'sometimes';
             $rules['transaction_type'][0] = 'sometimes';
+            $rules['currency'][0] = 'sometimes';
             $rules['date'][0] = 'sometimes';
             $rules['quantity'][0] = 'sometimes';
 
