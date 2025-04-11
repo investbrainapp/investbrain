@@ -198,4 +198,52 @@ class DailyChangeTest extends TestCase
 
         $this->assertEqualsWithDelta($total_dividends, $last_dividend_change->total_dividends_earned, 0.01);
     }
+
+    public function test_daily_changes_synced_into_past_for_older_transactions(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        // 1. test daily change will fill to the date of first transaction
+        $first_transaction = Transaction::factory(5)->buy()->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $portfolio->syncDailyChanges();
+
+        $first_date = DailyChange::min('date');
+
+        $this->assertEquals($first_transaction->min('date')->toDateString(), $first_date);
+
+        // 2. test daily change will fill when new transaction pre-dates earliest daily change
+        config()->set('app.env', 'local');
+        $this->withoutDefer();
+
+        $second_transaction = Transaction::create([
+            'symbol' => 'AAPL',
+            'portfolio_id' => $portfolio->id,
+            'date' => now()->subYears(3),
+            'quantity' => 1,
+            'cost_basis' => 39.89,
+            'transaction_type' => 'BUY',
+        ]);
+
+        $second_date = DailyChange::min('date');
+
+        $this->assertEquals($second_transaction->date->toDateString(), $second_date);
+
+        // 3. test daily change will fill when new transaction is between earliest daily change and earliest transaction
+        $third_transaction = Transaction::create([
+            'symbol' => 'AAPL',
+            'portfolio_id' => $portfolio->id,
+            'date' => now()->subYears(1),
+            'quantity' => 1,
+            'cost_basis' => 39.89,
+            'transaction_type' => 'BUY',
+        ]);
+
+        $daily_change_day_after = DailyChange::withDailyPerformance()->whereDate('daily_change.date', $third_transaction->date->addDay())->first();
+        $daily_change_day_before = DailyChange::withDailyPerformance()->whereDate('daily_change.date', $third_transaction->date->subDay())->first();
+
+        $this->assertEquals(39.89, $daily_change_day_after->total_cost_basis - $daily_change_day_before->total_cost_basis);
+    }
 }
