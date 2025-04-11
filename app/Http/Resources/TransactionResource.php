@@ -22,6 +22,7 @@ class TransactionResource extends JsonResource
             'portfolio_id' => $this->portfolio_id,
             'transaction_type' => $this->transaction_type,
             'quantity' => $this->quantity,
+            'currency' => $this->market_data->currency,
             'cost_basis' => $this->cost_basis,
             'sale_price' => $this->sale_price,
             'split' => $this->split,

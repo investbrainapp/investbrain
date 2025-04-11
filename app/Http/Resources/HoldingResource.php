@@ -21,6 +21,7 @@ class HoldingResource extends JsonResource
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,
             'quantity' => $this->quantity,
+            'currency' => $this->market_data->currency,
             'reinvest_dividends' => $this->reinvest_dividends,
             'average_cost_basis' => $this->average_cost_basis,
             'total_cost_basis' => $this->total_cost_basis,
