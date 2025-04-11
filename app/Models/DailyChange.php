@@ -149,7 +149,7 @@ class DailyChange extends Model
             ]);
 
         return $query
-            ->select(['daily_change.portfolio_id', 'daily_change.date'])
+            ->select(['daily_change.date', 'daily_change.portfolio_id'])
             ->leftJoinSub($totalCostBasisSub, 'cost_basis_display', function ($join) {
                 $join->on('daily_change.date', '>=', 'cost_basis_display.date')
                     ->whereColumn('daily_change.portfolio_id', '=', 'cost_basis_display.portfolio_id');

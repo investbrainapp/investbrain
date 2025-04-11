@@ -34,7 +34,7 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
      */
     public function collection()
     {
-        return $this->empty ? collect() : DailyChange::myDailyChanges()->get();
+        return $this->empty ? collect() : DailyChange::myDailyChanges()->withDailyPerformance()->get();
     }
 
     public function title(): string
