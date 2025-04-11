@@ -98,4 +98,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return Arr::get($this->options, 'locale') ?? request()->getPreferredLanguage($available_locales) ?? config('app.locale');
     }
+
+    public function setOption(mixed $key, string $value): self
+    {
+
+        $options = is_array($key) ? $key : [$key => $value];
+
+        $this->user->options = array_merge($this->user->options ?? [], $options);
+
+        return $this;
+    }
 }

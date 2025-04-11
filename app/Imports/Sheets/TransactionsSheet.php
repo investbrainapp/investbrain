@@ -35,7 +35,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             BeforeSheet::class => function (BeforeSheet $event) {
                 DB::commit();
                 $this->backupImport->update([
-                    'message' => __('Importing transactions...'),
+                    'message' => __('Preparing to import transactions...'),
                 ]);
                 DB::beginTransaction();
             },
@@ -48,12 +48,17 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
         // if has any transactions not in base currency, need to sync timeseries conversion rates
         if ($transactions->where('currency', '!=', config('investbrain.base_currency'))->isNotEmpty()) {
 
-            $first_transaction_date = $transactions->min('date');
-            CurrencyRate::timeSeriesRates('', $first_transaction_date);
+            CurrencyRate::timeSeriesRates('', $transactions->min('date'));
         }
 
+        $totalBatches = count($transactions) / $this->batchSize();
+
         // chunk transactions
-        $transactions->chunk($this->batchSize())->each(function ($chunk) use ($transactions) {
+        $transactions->chunk($this->batchSize())->each(function ($chunk, $index) use ($totalBatches) {
+
+            $this->backupImport->update([
+                'message' => __('Importing transactions (Batch :currentBatch of :totalBatches)...', ['currentBatch' => $index + 1, 'totalBatches' => $totalBatches]),
+            ]);
 
             $this->validatePortfolioAccess($chunk);
 
@@ -63,15 +68,12 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                 $date = Carbon::parse($transaction['date'])->toDateString();
 
                 // if transaction not in base currency, need to convert
-                if (
-                    $transaction->currency == config('investbrain.base_currency')
-                    || empty($transaction->currency)
-                ) {
+                if ($transaction['currency'] == config('investbrain.base_currency')) {
                     $cost_basis_base = $transaction['cost_basis'] ?? 0;
                     $sale_price_base = $transaction['sale_price'];
                 } else {
-                    $cost_basis_base = Currency::convert($transaction['cost_basis'], $transaction->currency, date: $date);
-                    $sale_price_base = Currency::convert($transaction['sale_price'], $transaction->currency, date: $date);
+                    $cost_basis_base = Currency::convert($transaction['cost_basis'], $transaction['currency'], date: $date);
+                    $sale_price_base = Currency::convert($transaction['sale_price'], $transaction['currency'], date: $date);
                 }
 
                 return [
@@ -109,7 +111,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
 
             // get unique symbol/portfolio id combination and stub out related holdings
             $chunk->unique(fn ($item) => $item['symbol'].$item['portfolio_id'])
-                ->each(function ($holding) use ($transactions) {
+                ->each(function ($holding) {
 
                     Holding::firstOrCreate([
                         'symbol' => $holding['symbol'],
@@ -118,10 +120,6 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                         'quantity' => 0,
                         'average_cost_basis' => 0,
                         'splits_synced_at' => now(),
-                        'reinvest_dividends' => $transactions
-                            ->where('symbol', $holding['symbol'])
-                            ->where('portfolio', $holding['portfolio_id'])
-                            ->where('reinvested_dividend', 1)->isNotEmpty() ? true : false, // todo: re-invested dividends is set on holdings
                     ]);
                 });
         });
@@ -142,6 +140,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             'transaction_type' => ['required', 'in:BUY,SELL'],
             'date' => ['required', 'date'],
             'quantity' => ['required', 'min:0', 'numeric'],
+            'currency' => ['required', 'string'],
             'split' => ['sometimes', 'nullable', 'boolean'],
             'reinvested_dividend' => ['sometimes', 'nullable', 'boolean'],
             'cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],
