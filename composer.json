@@ -45,6 +45,11 @@
         {
             "type": "vcs",
             "no-api": true,
+            "url": "https://github.com/investbrainapp/frankfurter-client"
+        },
+        {
+            "type": "vcs",
+            "no-api": true,
             "url": "https://github.com/investbrainapp/finnhub-php"
         }
     ],
