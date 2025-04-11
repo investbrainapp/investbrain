@@ -6,6 +6,8 @@ namespace App\Imports\Sheets;
 
 use App\Imports\ValidatesPortfolioAccess;
 use App\Models\BackupImport;
+use App\Models\Currency;
+use App\Models\CurrencyRate;
 use App\Models\Holding;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
@@ -33,7 +35,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             BeforeSheet::class => function (BeforeSheet $event) {
                 DB::commit();
                 $this->backupImport->update([
-                    'message' => __('Importing transactions...'),
+                    'message' => __('Preparing to import transactions...'),
                 ]);
                 DB::beginTransaction();
             },
@@ -43,12 +45,36 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
     public function collection(Collection $transactions)
     {
 
-        $transactions->chunk($this->batchSize())->each(function ($chunk) {
+        // if has any transactions not in base currency, need to sync timeseries conversion rates
+        if ($transactions->where('currency', '!=', config('investbrain.base_currency'))->isNotEmpty()) {
+
+            CurrencyRate::timeSeriesRates('', $transactions->min('date'));
+        }
+
+        $totalBatches = count($transactions) / $this->batchSize();
+
+        // chunk transactions
+        $transactions->chunk($this->batchSize())->each(function ($chunk, $index) use ($totalBatches) {
+
+            $this->backupImport->update([
+                'message' => __('Importing transactions (Batch :currentBatch of :totalBatches)...', ['currentBatch' => $index + 1, 'totalBatches' => $totalBatches]),
+            ]);
 
             $this->validatePortfolioAccess($chunk);
 
             // have to cast to native values
             $chunk = $chunk->map(function ($transaction) {
+
+                $date = Carbon::parse($transaction['date'])->toDateString();
+
+                // if transaction not in base currency, need to convert
+                if ($transaction['currency'] == config('investbrain.base_currency')) {
+                    $cost_basis_base = $transaction['cost_basis'] ?? 0;
+                    $sale_price_base = $transaction['sale_price'];
+                } else {
+                    $cost_basis_base = Currency::convert($transaction['cost_basis'], $transaction['currency'], date: $date);
+                    $sale_price_base = Currency::convert($transaction['sale_price'], $transaction['currency'], date: $date);
+                }
 
                 return [
                     'id' => $transaction['transaction_id'] ?? Str::uuid()->toString(),
@@ -58,9 +84,11 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                     'quantity' => $transaction['quantity'],
                     'cost_basis' => $transaction['cost_basis'] ?? 0,
                     'sale_price' => $transaction['sale_price'],
+                    'cost_basis_base' => $cost_basis_base,
+                    'sale_price_base' => $sale_price_base,
                     'split' => boolval($transaction['split']) ? 1 : 0,
                     'reinvested_dividend' => boolval($transaction['reinvested_dividend']) ? 1 : 0,
-                    'date' => Carbon::parse($transaction['date'])->toDateString(),
+                    'date' => $date,
                 ];
             });
 
@@ -81,7 +109,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                 ]
             );
 
-            // stub out related holdings
+            // get unique symbol/portfolio id combination and stub out related holdings
             $chunk->unique(fn ($item) => $item['symbol'].$item['portfolio_id'])
                 ->each(function ($holding) {
 
@@ -112,6 +140,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             'transaction_type' => ['required', 'in:BUY,SELL'],
             'date' => ['required', 'date'],
             'quantity' => ['required', 'min:0', 'numeric'],
+            'currency' => ['required', 'string'],
             'split' => ['sometimes', 'nullable', 'boolean'],
             'reinvested_dividend' => ['sometimes', 'nullable', 'boolean'],
             'cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],

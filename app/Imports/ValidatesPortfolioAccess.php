@@ -11,13 +11,13 @@ trait ValidatesPortfolioAccess
     public function validatePortfolioAccess($collection)
     {
 
-        $uniquePortfolios = $collection->unique('portfolio_id')->pluck('portfolio_id');
-        $countPortfoliosWithAccess = Portfolio::fullAccess($this->backupImport->user_id)
-            ->whereIn('id', $uniquePortfolios)
+        $importingPortfolios = $collection->unique('portfolio_id')->pluck('portfolio_id');
+        $portfoliosWithAccess = Portfolio::fullAccess($this->backupImport->user_id)
+            ->whereIn('id', $importingPortfolios)
             ->count();
 
         if (
-            $countPortfoliosWithAccess < $uniquePortfolios->count()
+            $importingPortfolios->count() > $portfoliosWithAccess
         ) {
             throw new \Exception(__('You do not have access to that portfolio.'));
         }

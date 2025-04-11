@@ -40,7 +40,7 @@ new class extends Component
 
         $this->validate();
 
-        $this->user->options = array_merge($this->user->options ?? [], [
+        $this->user->setOption([
             'locale' => $this->locale,
             'display_currency' => $this->display_currency,
         ]);
@@ -51,7 +51,7 @@ new class extends Component
 
         $this->dispatch('saved');
 
-        //$this->js('window.location.reload();');
+        // $this->js('window.location.reload();');
     }
 }; ?>
 <x-forms.form-section submit="updateProfileInformation">

@@ -6,6 +6,7 @@ namespace Tests;
 
 use App\Interfaces\MarketData\FakeMarketData;
 use App\Interfaces\MarketData\Types\Quote;
+use App\Models\BackupImport;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
 use App\Models\DailyChange;
@@ -548,5 +549,47 @@ class MultiCurrencyTest extends TestCase
         $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
         $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
+    }
+
+    public function test_multi_currency_import_calculates_correct_holding_data(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        Frankfurter::expects('setSymbols')
+            ->zeroOrMoreTimes()
+            ->andReturnSelf();
+        Frankfurter::expects('timeSeries')
+            ->zeroOrMoreTimes()
+            ->andReturn(['rates' => [
+                now()->subDays(3)->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+                now()->subDays(2)->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+                now()->subDays(1)->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+                now()->toDateString() => [
+                    'ZZZ' => .01,
+                ],
+            ]]);
+        Frankfurter::expects('historical')
+            ->zeroOrMoreTimes()
+            ->andReturn([
+                'rates' => [
+                    'GBP' => .89,
+                ],
+            ]);
+
+        BackupImport::create([
+            'user_id' => auth()->user()->id,
+            'path' => __DIR__.'/0000_00_00_import_multi_curr_test.xlsx',
+        ]);
+
+        $this->assertContains('AAPL', $user->holdings->pluck('symbol'));
+        $this->assertContains('BP.L', $user->holdings->pluck('symbol'));
+        $this->assertEquals(17, $user->holdings->sum('quantity'));
+        $this->assertEqualsWithDelta(371.42, $user->holdings->sum('average_cost_basis'), 0.01);
     }
 }

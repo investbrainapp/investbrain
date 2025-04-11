@@ -367,8 +367,11 @@
     "Import starting...": "Iniciando la importación...",
     "Import is in progress...": "La importación está en progreso...",
     "Importing portfolios...": "Importando portafolios...",
-    "Importing transactions...": "Importando transacciones...",
-    "Importing daily changes...": "Importando cambios diarios...",
+    "Preparing to import transactions...": "Preparándose para importar transacciones...",
+    "Importing transactions (Batch :currentBatch of :totalBatches)...": "Importando transacciones (Lote :currentBatch de :totalBatches)...", 
+    "Preparing to import daily changes...": "Preparing to import cambios diarios...", 
+    "Importing daily changes (Batch :currentBatch of :totalBatches)...": "Importando cambios diarios (Lote :currentBatch de :totalBatches)...", 
+    "Importing configurations...": "Importando configuraciones...",
     "Import completed successfully!": "¡La importación se completó con éxito!",
     "Your import will continue in the background": "La importación continuará en segundo plano",
 

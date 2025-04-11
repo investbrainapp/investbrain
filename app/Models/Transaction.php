@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Actions\ConvertToMarketDataCurrency;
 use App\Actions\CopyToBaseCurrency;
 use App\Actions\EnsureCostBasisAddedToSale;
+use App\Actions\EnsureDailyChangeIsSynced;
 use App\Casts\BaseCurrency;
 use App\Traits\HasMarketData;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -69,6 +70,12 @@ class Transaction extends Model
 
             $transaction->syncToHolding();
 
+            $transaction = Pipeline::send($transaction)
+                ->through([
+                    EnsureDailyChangeIsSynced::class,
+                ])
+                ->then(fn (Transaction $transaction) => $transaction);
+
             cache()->forget('portfolio-metrics-'.$transaction->portfolio_id);
         });
 
@@ -104,6 +111,7 @@ class Transaction extends Model
     {
         return $query->withAggregate('market_data', 'name')
             ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'currency')
             ->withAggregate('market_data', 'fifty_two_week_low')
             ->withAggregate('market_data', 'fifty_two_week_high')
             ->withAggregate('market_data', 'updated_at')
