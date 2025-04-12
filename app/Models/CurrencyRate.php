@@ -248,7 +248,7 @@ class CurrencyRate extends Model
     public static function chunkInsert(array $updates): void
     {
 
-        $chunks = array_chunk($updates, 250);
+        $chunks = array_chunk($updates, 500);
 
         foreach ($chunks as $chunk) {
 
