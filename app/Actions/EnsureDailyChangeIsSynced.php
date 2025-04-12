@@ -21,7 +21,7 @@ class EnsureDailyChangeIsSynced
                 ! Cache::has($cacheKey)
                 && $model->date->lessThan(now())
                 && ($model->date->lessThan($model->portfolio->daily_change()->min('date') ?? now())
-                    || $model->date->lessThan($model->portfolio->transactions()->where('id', '!=', $model->id)->min('date') ?? now())
+                    || $model->date->lessThan($model->portfolio->transactions()->where('id', '!=', $model->id)->max('date') ?? now())
                 )
             ) {
                 defer(fn () => $model->portfolio->syncDailyChanges());
