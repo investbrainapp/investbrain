@@ -40,7 +40,7 @@ class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadi
 
             switch ($config['key']) {
                 case 'name':
-                    $this->backupImport->user->name = $config['value'];
+                    $this->backupImport->user->setAttribute('name', $config['value']);
                     $this->backupImport->user->save();
                     break;
 
