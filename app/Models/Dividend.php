@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\Str;
 
@@ -95,47 +94,56 @@ class Dividend extends Model
 
             return;
         }
+
+        dump('1. getting div data for '.$symbol);
         try {
+
             // get some data
             if ($dividend_data = collect() && $start_date && $end_date) {
                 $dividend_data = app(MarketDataInterface::class)->dividends($symbol, $start_date, $end_date);
             }
-
-            // ah, we found some dividends...
-            if ($dividend_data->isNotEmpty()) {
-
-                $market_data = MarketData::getMarketData($symbol);
-
-                // get historic conversion rates
-                $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
-
-                // create mass insert
-                foreach ($dividend_data as $index => $dividend) {
-                    $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
-
-                    $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * $rate_to_base_date;
-
-                    $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
-                }
-
-                // insert records
-                (new self)->insertOrIgnore($dividend_data->toArray());
-
-                // sync to holdings
-                self::syncHoldings($symbol);
-
-                // re-invest dividends
-                self::reinvestDividends($dividend_data, $market_data);
-
-                // sync last dividend amount to market data table
-                $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
-                $market_data->save();
-
-            }
-        } catch (\Exception $e) {
-            Log::info($e->getMessage());
-            dd($e);
+        } catch (\Throwable $e) {
+            dump('exception: '.$e->getMessage());
         }
+
+        dump('2. got div data for '.$symbol);
+
+        // ah, we found some dividends...
+        if ($dividend_data->isNotEmpty()) {
+
+            dump('3. getting mkt data for '.$symbol);
+
+            $market_data = MarketData::getMarketData($symbol);
+
+            // get historic conversion rates
+            $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
+
+            dump('4. got time series for '.$symbol);
+            // create mass insert
+            foreach ($dividend_data as $index => $dividend) {
+                $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
+
+                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * $rate_to_base_date;
+
+                $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
+            }
+
+            // insert records
+            (new self)->insertOrIgnore($dividend_data->toArray());
+
+            dump('5. inserted  for '.$symbol);
+            // sync to holdings
+            self::syncHoldings($symbol);
+
+            // re-invest dividends
+            self::reinvestDividends($dividend_data, $market_data);
+
+            // sync last dividend amount to market data table
+            $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
+            $market_data->save();
+
+        }
+
     }
 
     public static function syncHoldings(string $symbol): void
