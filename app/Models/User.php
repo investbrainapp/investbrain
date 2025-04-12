@@ -104,7 +104,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $options = is_array($key) ? $key : [$key => $value];
 
-        $this->user->options = array_merge($this->user->options ?? [], $options);
+        $this->options = array_merge($this->options ?? [], $options);
 
         return $this;
     }
