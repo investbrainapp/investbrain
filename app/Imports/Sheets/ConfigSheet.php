@@ -36,24 +36,22 @@ class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadi
 
     public function collection(Collection $configs)
     {
-        $user = auth()->user();
-
         foreach ($configs as $config) {
 
             switch ($config['key']) {
                 case 'name':
-                    $user->name = $config['value'];
-                    $user->save();
+                    $this->backupImport->user->name = $config['value'];
+                    $this->backupImport->user->save();
                     break;
 
                 case 'locale':
-                    $user->setOption('locale', $config['value']);
-                    $user->save();
+                    $this->backupImport->user->setOption('locale', $config['value']);
+                    $this->backupImport->user->save();
                     break;
 
                 case 'display_currency':
-                    $user->setOption('display_currency', $config['value']);
-                    $user->save();
+                    $this->backupImport->user->setOption('display_currency', $config['value']);
+                    $this->backupImport->user->save();
                     break;
 
                 case 'reinvest_dividends':
