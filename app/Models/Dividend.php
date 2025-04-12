@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\Str;
 
@@ -120,15 +121,20 @@ class Dividend extends Model
             // insert records
             (new self)->insertOrIgnore($dividend_data->toArray());
 
-            // sync to holdings
-            self::syncHoldings($symbol);
+            try {
+                // sync to holdings
+                self::syncHoldings($symbol);
 
-            // re-invest dividends
-            self::reinvestDividends($dividend_data, $market_data);
+                // re-invest dividends
+                self::reinvestDividends($dividend_data, $market_data);
 
-            // sync last dividend amount to market data table
-            $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
-            $market_data->save();
+                // sync last dividend amount to market data table
+                $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
+                $market_data->save();
+            } catch (\Exception $e) {
+                Log::info($e->getMessage());
+            }
+
         }
     }
 
