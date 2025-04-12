@@ -111,14 +111,18 @@ class Dividend extends Model
         // ah, we found some dividends...
         if ($dividend_data->isNotEmpty()) {
 
+            $dividend_data = $dividend_data->sortBy('date');
+
             dump('3. getting mkt data for '.$symbol);
 
             $market_data = MarketData::getMarketData($symbol);
 
-            // get historic conversion rates
-            $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
+            dump('4. got market data for '.$symbol);
 
-            dump('4. got time series for '.$symbol);
+            // get historic conversion rates
+            $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $dividend_data->first()->get('date'), $end_date);
+
+            dump('5. got time series for '.$symbol);
             // create mass insert
             foreach ($dividend_data as $index => $dividend) {
                 $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
@@ -131,7 +135,7 @@ class Dividend extends Model
             // insert records
             (new self)->insertOrIgnore($dividend_data->toArray());
 
-            dump('5. inserted  for '.$symbol);
+            dump('6. inserted  for '.$symbol);
             // sync to holdings
             self::syncHoldings($symbol);
 
