@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Jobs\BatchInsertNewCurrencyRatesJob;
+use App\Jobs\QueuedCurrencyRateInsertJob;
+use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -97,7 +98,7 @@ class CurrencyRate extends Model
                 });
 
                 // persist
-                BatchInsertNewCurrencyRatesJob::dispatch($updates);
+                self::chunkInsert($updates);
 
                 return new CurrencyRate(Arr::first($updates, fn ($update) => $update['currency'] == $currency) ?? ['rate' => 1]);
             });
@@ -148,38 +149,19 @@ class CurrencyRate extends Model
         $updates = [];
         foreach ($period as $date) {
 
-            $skip = false;
+            $lookupDate = self::getNearestPastDate($date, $rates);
 
-            $lookupDate = $date->toDateString();
-
-            // get rates or find closest valid rate (handles missing weekend rates)
-            while (! isset($rates[$lookupDate])) {
-                $lookupDate = Carbon::parse($lookupDate)->subDay();
-
-                // prevent runaway infinite loops
-                if ($lookupDate->lessThan($date->copy()->subWeek())) {
-
-                    $skip = true;
-                    break;
-                }
-
-                $lookupDate = $lookupDate->toDateString();
-            }
-
-            if ($skip) {
+            if (is_null($lookupDate)) {
                 continue;
             }
 
-            // make date a string
-            $date = $date->toDateString();
-
             // loop through each rate
-            foreach ($rates[$lookupDate] as $curr => $rate) {
+            foreach ($rates[$lookupDate->toDateString()] as $curr => $rate) {
 
                 // add to updates
                 $updates[] = [
                     'currency' => $curr,
-                    'date' => $date,
+                    'date' => $date->toDateString(),
                     'rate' => $rate,
                     'updated_at' => now()->toDateTimeString(),
                     'created_at' => now()->toDateTimeString(),
@@ -188,7 +170,7 @@ class CurrencyRate extends Model
         }
 
         // persist
-        BatchInsertNewCurrencyRatesJob::dispatch($updates);
+        self::chunkInsert($updates);
 
         return collect($updates)
             ->whereBetween('date', [$start, $end ?? now()])
@@ -197,6 +179,35 @@ class CurrencyRate extends Model
                 $rate['date'] => $rate['rate'] * $adjustment,
             ])
             ->toArray();
+    }
+
+    private static function getNearestPastDate(CarbonInterface $date, array $rates): ?CarbonInterface
+    {
+        $datesWithRates = array_keys($rates);
+        sort($datesWithRates);
+
+        // get rates or find closest valid rate (handles missing weekend rates)
+        while (! isset($rates[$date->toDateString()])) {
+
+            // is this the start of a range that falls on a weekend?
+            if ($date->lessThan($first_date = Carbon::parse($datesWithRates[0]))) {
+
+                $date = $first_date;
+                break;
+            }
+
+            // try the day before then
+            $date = Carbon::parse($date)->subDay();
+
+            // prevent runaway infinite loops
+            if ($date->lessThan($date->copy()->subWeek())) {
+
+                $date = null;
+                break;
+            }
+        }
+
+        return $date;
     }
 
     public static function refreshCurrencyData($force = false): void
@@ -231,6 +242,17 @@ class CurrencyRate extends Model
 
             // only insert new rates
             CurrencyRate::insertOrIgnore($updates);
+        }
+    }
+
+    public static function chunkInsert(array $updates): void
+    {
+
+        $chunks = array_chunk($updates, 250);
+
+        foreach ($chunks as $chunk) {
+
+            QueuedCurrencyRateInsertJob::dispatch($chunk);
         }
     }
 

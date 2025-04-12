@@ -8,7 +8,7 @@ use App\Models\CurrencyRate;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class BatchInsertNewCurrencyRatesJob implements ShouldQueue
+class QueuedCurrencyRateInsertJob implements ShouldQueue
 {
     use Queueable;
 
@@ -17,12 +17,10 @@ class BatchInsertNewCurrencyRatesJob implements ShouldQueue
      */
     public $tries = 3;
 
-    public int $chunk_size = 100;
-
     public function __construct(
-        protected array $updates
+        protected array $chunk
     ) {
-        $this->updates = $updates;
+        $this->chunk = $chunk;
     }
 
     /**
@@ -31,11 +29,6 @@ class BatchInsertNewCurrencyRatesJob implements ShouldQueue
     public function handle(): void
     {
 
-        $chunks = array_chunk($this->updates, $this->chunk_size);
-
-        foreach ($chunks as $chunk) {
-            CurrencyRate::insertOrIgnore($chunk);
-        }
-
+        CurrencyRate::insertOrIgnore($this->chunk);
     }
 }

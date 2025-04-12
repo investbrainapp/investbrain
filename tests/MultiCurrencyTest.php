@@ -17,6 +17,7 @@ use App\Models\User;
 use Carbon\CarbonPeriod;
 use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Investbrain\Frankfurter\Frankfurter;
 use Mockery;
@@ -210,10 +211,10 @@ class MultiCurrencyTest extends TestCase
         $start = now()->subWeeks(2);
         $end = now();
 
-        $results = [];
-
         $period = CarbonPeriod::create($start, $end);
 
+        // mock response from Frankfurter
+        $results = [];
         collect($period->copy()->filter('isWeekday'))->each(function ($date) use (&$results) {
             $date = $date->toDateString();
 
@@ -299,7 +300,6 @@ class MultiCurrencyTest extends TestCase
 
     public function test_can_handle_aliases_for_time_series_rates()
     {
-
         $start = now()->subWeeks(2);
         $end = now();
         $adjustment = 100;
@@ -333,8 +333,8 @@ class MultiCurrencyTest extends TestCase
         $result = CurrencyRate::timeSeriesRates('ZZZ', $start, $end);
 
         $this->assertEquals(
-            $results[$end->toDateString()]['YYY'] * $adjustment,
-            $result[$end->toDateString()]
+            Arr::last($results)['YYY'] * $adjustment,
+            Arr::last($result)
         );
     }
 

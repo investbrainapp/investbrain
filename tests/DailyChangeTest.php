@@ -241,9 +241,11 @@ class DailyChangeTest extends TestCase
             'transaction_type' => 'BUY',
         ]);
 
-        $daily_change_day_after = DailyChange::withDailyPerformance()->whereDate('daily_change.date', $third_transaction->date->addDay())->first();
-        $daily_change_day_before = DailyChange::withDailyPerformance()->whereDate('daily_change.date', $third_transaction->date->subDay())->first();
+        $daily_change_day_after = DailyChange::withDailyPerformance()->whereDate('daily_change.date', $third_transaction->date->nextWeekday())->first();
+        $daily_change_day_before = DailyChange::withDailyPerformance()->whereDate('daily_change.date', $third_transaction->date->previousWeekday())->first();
 
+        $this->assertNotNull($daily_change_day_after);
+        $this->assertNotNull($daily_change_day_before);
         $this->assertEquals(39.89, $daily_change_day_after->total_cost_basis - $daily_change_day_before->total_cost_basis);
     }
 }

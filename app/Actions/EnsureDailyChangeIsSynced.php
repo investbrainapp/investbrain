@@ -7,6 +7,8 @@ namespace App\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
+use function Illuminate\Support\defer;
+
 class EnsureDailyChangeIsSynced
 {
     public function __invoke(Model $model, callable $next)
