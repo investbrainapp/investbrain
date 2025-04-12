@@ -133,6 +133,7 @@ class Dividend extends Model
                 $market_data->save();
             } catch (\Exception $e) {
                 Log::info($e->getMessage());
+                dd($e);
             }
 
         }
