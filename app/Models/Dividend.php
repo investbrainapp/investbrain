@@ -95,21 +95,20 @@ class Dividend extends Model
 
             return;
         }
+        try {
+            // get some data
+            if ($dividend_data = collect() && $start_date && $end_date) {
+                $dividend_data = app(MarketDataInterface::class)->dividends($symbol, $start_date, $end_date);
+            }
 
-        // get some data
-        if ($dividend_data = collect() && $start_date && $end_date) {
-            $dividend_data = app(MarketDataInterface::class)->dividends($symbol, $start_date, $end_date);
-        }
+            // ah, we found some dividends...
+            if ($dividend_data->isNotEmpty()) {
 
-        // ah, we found some dividends...
-        if ($dividend_data->isNotEmpty()) {
+                $market_data = MarketData::getMarketData($symbol);
 
-            $market_data = MarketData::getMarketData($symbol);
+                // get historic conversion rates
+                $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
 
-            // get historic conversion rates
-            $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
-
-            try {
                 // create mass insert
                 foreach ($dividend_data as $index => $dividend) {
                     $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
@@ -131,11 +130,11 @@ class Dividend extends Model
                 // sync last dividend amount to market data table
                 $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
                 $market_data->save();
-            } catch (\Exception $e) {
-                Log::info($e->getMessage());
-                dd($e);
-            }
 
+            }
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
+            dd($e);
         }
     }
 
