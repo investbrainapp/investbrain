@@ -143,7 +143,7 @@ class CurrencyRate extends Model
 
         $currencies = Currency::all()->pluck('currency')->toArray();
 
-        dump('currencies'.$currencies);
+        dump('got currencies');
 
         // call api in chunks
         $rates = [];
