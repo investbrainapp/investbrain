@@ -10,6 +10,7 @@ use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Investbrain\Frankfurter\Frankfurter;
 
 class CurrencyRate extends Model
@@ -156,34 +157,33 @@ class CurrencyRate extends Model
             $rates = array_merge($rates, Arr::get($chunkRates, 'rates', []));
         }
 
-        dump('done with frankf');
+        dump('done with frankf', count($rates));
 
         // loop through each date
         $updates = [];
         foreach ($period as $date) {
 
-            try {
-                $lookupDate = self::getNearestPastDate($date, $rates);
+            $lookupDate = self::getNearestPastDate($date, $rates);
 
-                if (is_null($lookupDate)) {
-                    continue;
-                }
+            Log::warn($lookupDate, isset($rates[$lookupDate->toDateString()]));
 
-                // loop through each rate
-                foreach ($rates[$lookupDate->toDateString()] as $curr => $rate) {
-
-                    // add to updates
-                    $updates[] = [
-                        'currency' => $curr,
-                        'date' => $date->toDateString(),
-                        'rate' => $rate,
-                        'updated_at' => now()->toDateTimeString(),
-                        'created_at' => now()->toDateTimeString(),
-                    ];
-                }
-            } catch (\Throwable $e) {
-                dump($e->getMessage());
+            if (is_null($lookupDate)) {
+                continue;
             }
+
+            // loop through each rate
+            foreach ($rates[$lookupDate->toDateString()] as $curr => $rate) {
+
+                // add to updates
+                $updates[] = [
+                    'currency' => $curr,
+                    'date' => $date->toDateString(),
+                    'rate' => $rate,
+                    'updated_at' => now()->toDateTimeString(),
+                    'created_at' => now()->toDateTimeString(),
+                ];
+            }
+
         }
 
         dump('inserting');
