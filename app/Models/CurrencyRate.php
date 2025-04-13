@@ -10,7 +10,6 @@ use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Investbrain\Frankfurter\Frankfurter;
 
 class CurrencyRate extends Model
@@ -161,11 +160,12 @@ class CurrencyRate extends Model
 
         // loop through each date
         $updates = [];
+        $datesWithRates = array_keys($rates);
+        sort($datesWithRates);
+
         foreach ($period as $date) {
 
-            $lookupDate = self::getNearestPastDate($date, $rates);
-
-            Log::warning($lookupDate.' - '.isset($rates[$lookupDate->toDateString()]));
+            $lookupDate = self::getNearestPastDate($date, $datesWithRates);
 
             if (is_null($lookupDate)) {
                 continue;
@@ -204,14 +204,12 @@ class CurrencyRate extends Model
 
     private static function getNearestPastDate(CarbonInterface $date, array $rates): ?CarbonInterface
     {
-        $datesWithRates = array_keys($rates);
-        sort($datesWithRates);
 
         // get rates or find closest valid rate (handles missing weekend rates)
         while (! isset($rates[$date->toDateString()])) {
 
             // is this the start of a range that falls on a weekend?
-            if ($date->lessThan($first_date = Carbon::parse($datesWithRates[0]))) {
+            if ($date->lessThan($first_date = Carbon::parse($rates[0]))) {
 
                 $date = $first_date;
                 break;
