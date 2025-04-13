@@ -146,50 +146,45 @@ class CurrencyRate extends Model
         dump('got currencies');
 
         // call api in chunks
-        $rates = [];
         foreach (collect($period)->chunk(500) as $chunk) {
 
             dump('calling frankf time series');
 
             $chunkRates = Frankfurter::setSymbols($currencies)->timeSeries($chunk->min(), $chunk->max());
 
-            $rates = array_merge($rates, Arr::get($chunkRates, 'rates', []));
-        }
+            $rates = Arr::get($chunkRates, 'rates', []);
 
-        dump('done with frankf', count($rates));
+            // loop through each date
+            $updates = [];
 
-        // loop through each date
-        $updates = [];
-        $datesWithRates = array_keys($rates);
-        sort($datesWithRates);
+            foreach ($chunk as $date) {
 
-        foreach ($period as $date) {
+                $lookupDate = self::getNearestPastDate($date, $rates);
 
-            $lookupDate = self::getNearestPastDate($date, $datesWithRates);
+                if (is_null($lookupDate)) {
+                    continue;
+                }
 
-            if (is_null($lookupDate)) {
-                continue;
+                // loop through each rate
+                foreach ($rates[$lookupDate->toDateString()] as $curr => $rate) {
+
+                    // add to updates
+                    $updates[] = [
+                        'currency' => $curr,
+                        'date' => $date->toDateString(),
+                        'rate' => $rate,
+                        'updated_at' => now()->toDateTimeString(),
+                        'created_at' => now()->toDateTimeString(),
+                    ];
+                }
+
+                dump('inserting');
+
+                // persist
+                self::chunkInsert($updates);
+
             }
-
-            // loop through each rate
-            foreach ($rates[$lookupDate->toDateString()] as $curr => $rate) {
-
-                // add to updates
-                $updates[] = [
-                    'currency' => $curr,
-                    'date' => $date->toDateString(),
-                    'rate' => $rate,
-                    'updated_at' => now()->toDateTimeString(),
-                    'created_at' => now()->toDateTimeString(),
-                ];
-            }
-
         }
-
-        dump('inserting');
-
-        // persist
-        self::chunkInsert($updates);
 
         dump('done');
 
@@ -205,11 +200,14 @@ class CurrencyRate extends Model
     private static function getNearestPastDate(CarbonInterface $date, array $rates): ?CarbonInterface
     {
 
+        $datesWithRates = array_keys($rates);
+        sort($datesWithRates);
+
         // get rates or find closest valid rate (handles missing weekend rates)
         while (! isset($rates[$date->toDateString()])) {
 
             // is this the start of a range that falls on a weekend?
-            if ($date->lessThan($first_date = Carbon::parse($rates[0]))) {
+            if ($date->lessThan($first_date = Carbon::parse($datesWithRates[0]))) {
 
                 $date = $first_date;
                 break;
