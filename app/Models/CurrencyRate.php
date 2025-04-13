@@ -162,7 +162,6 @@ class CurrencyRate extends Model
         $updates = [];
         foreach ($period as $date) {
 
-            dump($date->toDateString());
             $lookupDate = self::getNearestPastDate($date, $rates);
 
             if (is_null($lookupDate)) {
@@ -216,6 +215,8 @@ class CurrencyRate extends Model
 
             // try the day before then
             $date = Carbon::parse($date)->subDay();
+
+            dump($date->toDateString());
 
             // prevent runaway infinite loops
             if ($date->lessThan($date->copy()->subWeek())) {
