@@ -165,7 +165,7 @@ class CurrencyRate extends Model
 
             $lookupDate = self::getNearestPastDate($date, $rates);
 
-            Log::warning($lookupDate, isset($rates[$lookupDate->toDateString()]));
+            Log::warning($lookupDate.' - '.isset($rates[$lookupDate->toDateString()]));
 
             if (is_null($lookupDate)) {
                 continue;
