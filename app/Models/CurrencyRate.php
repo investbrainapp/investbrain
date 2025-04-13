@@ -162,6 +162,7 @@ class CurrencyRate extends Model
         $updates = [];
         foreach ($period as $date) {
 
+            dump($date->toDateString());
             $lookupDate = self::getNearestPastDate($date, $rates);
 
             if (is_null($lookupDate)) {
