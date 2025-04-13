@@ -119,6 +119,8 @@ class Dividend extends Model
 
             dump('4. got market data for '.$symbol);
 
+            // todo: use this for start_date - $dividend_data->first()->get('date')
+
             // get historic conversion rates
             $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $dividend_data->first()->get('date'), $end_date);
 

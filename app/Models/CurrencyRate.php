@@ -119,31 +119,44 @@ class CurrencyRate extends Model
 
         $end = $end ?? now();
 
+        dump('Creating period');
+
         $period = CarbonPeriod::create($start, $end);
 
         // No need to send network request - just generate 1s
         if ($currency === config('investbrain.base_currency')) {
 
+            dump('same curr');
+
             $dateRange = [];
             foreach ($period as $date) {
+
                 $dateRange[$date->toDateString()] = 1;
             }
 
             return $dateRange;
         }
 
+        dump('diff curr');
+
         [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
 
         $currencies = Currency::all()->pluck('currency')->toArray();
+
+        dump('currencies'.$currencies);
 
         // call api in chunks
         $rates = [];
         foreach (collect($period)->chunk(500) as $chunk) {
 
+            dump('calling frankf time series');
+
             $chunkRates = Frankfurter::setSymbols($currencies)->timeSeries($chunk->min(), $chunk->max());
 
             $rates = array_merge($rates, Arr::get($chunkRates, 'rates', []));
         }
+
+        dump('done with frankf');
 
         // loop through each date
         $updates = [];
@@ -169,8 +182,12 @@ class CurrencyRate extends Model
             }
         }
 
+        dump('inserting');
+
         // persist
         self::chunkInsert($updates);
+
+        dump('done');
 
         return collect($updates)
             ->whereBetween('date', [$start, $end ?? now()])
