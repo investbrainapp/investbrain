@@ -121,6 +121,8 @@ class CurrencyRate extends Model
 
         $period = CarbonPeriod::create($start, $end);
 
+        dump($period);
+
         // No need to send network request - just generate 1s
         if ($currency === config('investbrain.base_currency')) {
 
@@ -138,7 +140,7 @@ class CurrencyRate extends Model
 
         // call api in chunks
         $rates = [];
-        foreach (collect($period)->chunk(500) as $chunk) {
+        foreach (collect($period)->chunk(750) as $chunk) {
 
             $chunkRates = Frankfurter::setSymbols($currencies)->timeSeries($chunk->min(), $chunk->max());
 
@@ -186,6 +188,11 @@ class CurrencyRate extends Model
 
     private static function getNearestPastDate(CarbonInterface $date, array $datesOnly, array $rates): ?CarbonInterface
     {
+
+        if (empty($datesOnly)) {
+            return null;
+        }
+
         $mutableDate = Carbon::parse($date);
         $weekAgo = $date->copy()->subWeek();
         $firstDate = Carbon::parse($datesOnly[0]);
@@ -196,19 +203,18 @@ class CurrencyRate extends Model
             // prevent runaway infinite loops
             if ($mutableDate->lessThan($weekAgo)) {
 
-                $mutableDate = null;
-                break;
+                return null;
             }
 
             // is this the start of a range that falls on a weekend?
             if ($mutableDate->lessThan($firstDate)) {
 
-                $mutableDate = $firstDate;
-                break;
+                return $firstDate;
             }
 
             // try the day before then
             $mutableDate = $mutableDate->subDay();
+            dump($mutableDate->toDateString(), $mutableDate->dayOfWeek());
         }
 
         return $mutableDate;

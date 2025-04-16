@@ -106,11 +106,11 @@ class Dividend extends Model
             $market_data = MarketData::getMarketData($symbol);
 
             $dividend_data
-                ->chunk(10)
-                ->each(function ($chunk) use ($market_data, $end_date) {
+                ->chunk(12)
+                ->each(function ($chunk) use ($market_data) {
 
                     // get historic conversion rates
-                    $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $chunk->first()->get('date'), $end_date);
+                    $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $chunk->min('date'), $chunk->max('date'));
 
                     // create mass insert
                     foreach ($chunk as $index => $dividend) {
