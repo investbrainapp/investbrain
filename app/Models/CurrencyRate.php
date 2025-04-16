@@ -186,11 +186,13 @@ class CurrencyRate extends Model
 
     private static function getNearestPastDate(CarbonInterface $date, array $datesOnly, array $rates): ?CarbonInterface
     {
+        $weekAgo = $date->copy()->subWeek();
+
         // get rates or find closest valid rate (handles missing weekend rates)
         while (! isset($rates[$date->toDateString()])) {
 
             // prevent runaway infinite loops
-            if ($date->lessThan($date->copy()->subWeek())) {
+            if ($date->lessThan($weekAgo)) {
 
                 $date = null;
                 break;
