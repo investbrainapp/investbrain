@@ -48,7 +48,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
         // if has any transactions not in base currency, need to sync timeseries conversion rates
         if ($transactions->where('currency', '!=', config('investbrain.base_currency'))->isNotEmpty()) {
 
-            CurrencyRate::timeSeriesRates('', $transactions->min('date'));
+            CurrencyRate::timeSeriesRates('', $transactions->min('date'), $transactions->max('date'));
         }
 
         $totalBatches = count($transactions) / $this->batchSize();
