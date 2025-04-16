@@ -121,8 +121,6 @@ class CurrencyRate extends Model
 
         $period = CarbonPeriod::create($start, $end);
 
-        dump($period);
-
         // No need to send network request - just generate 1s
         if ($currency === config('investbrain.base_currency')) {
 
@@ -214,7 +212,6 @@ class CurrencyRate extends Model
 
             // try the day before then
             $mutableDate = $mutableDate->subDay();
-            dump($mutableDate->toDateString(), $mutableDate->dayOfWeek());
         }
 
         return $mutableDate;
