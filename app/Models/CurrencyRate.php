@@ -145,6 +145,8 @@ class CurrencyRate extends Model
             $rates = array_merge($rates, Arr::get($chunkRates, 'rates', []));
         }
 
+        $rates = collect($rates)->sortKeys()->toArray();
+
         // loop through each date
         $updates = [];
         foreach ($period as $date) {
@@ -184,10 +186,16 @@ class CurrencyRate extends Model
     private static function getNearestPastDate(CarbonInterface $date, array $rates): ?CarbonInterface
     {
         $datesWithRates = array_keys($rates);
-        sort($datesWithRates);
 
         // get rates or find closest valid rate (handles missing weekend rates)
         while (! isset($rates[$date->toDateString()])) {
+
+            // prevent runaway infinite loops
+            if ($date->lessThan($date->copy()->subWeek())) {
+
+                $date = null;
+                break;
+            }
 
             // is this the start of a range that falls on a weekend?
             if ($date->lessThan($first_date = Carbon::parse($datesWithRates[0]))) {
@@ -198,13 +206,6 @@ class CurrencyRate extends Model
 
             // try the day before then
             $date = Carbon::parse($date)->subDay();
-
-            // prevent runaway infinite loops
-            if ($date->lessThan($date->copy()->subWeek())) {
-
-                $date = null;
-                break;
-            }
         }
 
         return $date;
