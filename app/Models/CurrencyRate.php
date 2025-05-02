@@ -144,7 +144,7 @@ class CurrencyRate extends Model
         }
 
         // get rates
-        $rates = Frankfurter::setSymbols($currencies)->timeSeries($period->min(), $period->max());
+        $rates = Frankfurter::setSymbols($currencies)->timeSeries($period->first(), $period->last());
 
         $rates = collect(Arr::get($rates, 'rates', []))->sortKeys()->toArray();
 
@@ -189,11 +189,13 @@ class CurrencyRate extends Model
     private static function getNearestPastDate(CarbonInterface $date, array $datesOnly, array $rates): ?CarbonInterface
     {
 
+        // if no dates, nothing to do...
         if (empty($datesOnly)) {
+
             return null;
         }
 
-        $mutableDate = Carbon::parse($date);
+        $mutableDate = $date->copy();
         $weekAgo = $date->copy()->subWeek();
         $firstDate = Carbon::parse($datesOnly[0]);
 
@@ -257,9 +259,7 @@ class CurrencyRate extends Model
     public static function chunkInsert(array $updates): void
     {
 
-        $chunks = array_chunk($updates, 800);
-
-        foreach ($chunks as $chunk) {
+        foreach (array_chunk($updates, 500) as $chunk) {
 
             QueuedCurrencyRateInsertJob::dispatch($chunk);
         }
