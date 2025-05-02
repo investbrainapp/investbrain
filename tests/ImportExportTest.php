@@ -84,7 +84,6 @@ class ImportExportTest extends TestCase
         ]);
 
         $holding = Holding::create([
-            'id' => '9cf8a662-7347-49fb-b9de-0cc1430a8d1f',
             'portfolio_id' => '9e792bb8-94e7-4ed3-b8cc-43b50d34c337',
             'symbol' => 'ACME',
             'quantity' => 0,

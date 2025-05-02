@@ -55,7 +55,6 @@ class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadi
                     break;
 
                 case 'reinvested_dividends':
-
                     if (json_validate($config['value'])) {
                         foreach (json_decode($config['value'], true) as $reinvest) {
                             Holding::myHoldings($this->backupImport->user->id)
@@ -66,7 +65,6 @@ class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadi
                                 ]);
                         }
                     }
-
                     break;
 
                 default:
