@@ -152,7 +152,12 @@ class Portfolio extends Model
 
         $total_performance = [];
 
-        $holdings->each(function ($holding) use (&$total_performance) {
+        // get unique currencies for holdings
+        foreach ($holdings->groupBy('market_data.currency')->keys() as $currency) {
+            $currency_rates[$currency] = CurrencyRate::timeSeriesRates($currency, $holdings->min('first_transaction_date'), now());
+        }
+
+        $holdings->each(function ($holding) use (&$total_performance, $currency_rates) {
 
             $period = CarbonPeriod::create(
                 $holding->first_transaction_date,
@@ -163,7 +168,6 @@ class Portfolio extends Model
 
             $daily_performance = $holding->dailyPerformance($holding->first_transaction_date, now());
             $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
-            $currency_rates = CurrencyRate::timeSeriesRates($holding->market_data->currency, $holding->first_transaction_date, now());
 
             $holding_performance = [];
 
@@ -179,7 +183,7 @@ class Portfolio extends Model
                     $holding_performance[$date] = [
                         'date' => $date,
                         'portfolio_id' => $this->id,
-                        'total_market_value' => $total_market_value * (1 / Arr::get($currency_rates, $date, 1)),
+                        'total_market_value' => $total_market_value * (1 / Arr::get($currency_rates[$holding->market_data->currency], $date, 1)),
                     ];
                 }
             }
