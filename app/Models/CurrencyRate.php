@@ -111,7 +111,7 @@ class CurrencyRate extends Model
      *
      * @return array<string, float>
      */
-    public static function timeSeriesRates(string $currency, mixed $start = null, mixed $end = null): array
+    public static function timeSeriesRates(string|array $currency, mixed $start = null, mixed $end = null): array
     {
         if (empty($start)) {
             return [];
@@ -134,18 +134,20 @@ class CurrencyRate extends Model
 
         [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
 
-        $currencies = Currency::all()->pluck('currency')->toArray();
+        if (! empty($currency)) {
 
-        // call api in chunks
-        $rates = [];
-        foreach (collect($period)->chunk(750) as $chunk) {
+            $currencies = Arr::wrap($currency);
 
-            $chunkRates = Frankfurter::setSymbols($currencies)->timeSeries($chunk->min(), $chunk->max());
+        } else {
 
-            $rates = array_merge($rates, Arr::get($chunkRates, 'rates', []));
+            $currencies = Currency::all()->pluck('currency')->toArray();
         }
 
-        $rates = collect($rates)->sortKeys()->toArray();
+        // get rates
+        $rates = Frankfurter::setSymbols($currencies)->timeSeries($period->min(), $period->max());
+
+        $rates = collect(Arr::get($rates, 'rates', []))->sortKeys()->toArray();
+
         $datesOnly = array_keys($rates);
 
         // loop through each date

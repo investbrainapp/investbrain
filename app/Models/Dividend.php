@@ -106,7 +106,7 @@ class Dividend extends Model
             $market_data = MarketData::getMarketData($symbol);
 
             $dividend_data
-                ->chunk(12)
+                ->chunk(10)
                 ->each(function ($chunk) use ($market_data) {
 
                     // get historic conversion rates
