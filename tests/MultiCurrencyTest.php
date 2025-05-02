@@ -133,11 +133,8 @@ class MultiCurrencyTest extends TestCase
         $portfolio = Portfolio::factory()->create();
         $transaction = Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
 
-        $expected_num_calls = count(collect(CarbonPeriod::create($transaction->date, now()))->chunk(500));
-
         Frankfurter::expects('setSymbols')
-            ->andReturnSelf()
-            ->times($expected_num_calls);
+            ->andReturnSelf();
         Frankfurter::expects('timeSeries')
             ->andReturn(['rates' => [
                 now()->subDays(3)->toDateString() => [
@@ -152,8 +149,7 @@ class MultiCurrencyTest extends TestCase
                 now()->toDateString() => [
                     'ZZZ' => .01,
                 ],
-            ]])
-            ->times($expected_num_calls);
+            ]]);
 
         CurrencyRate::timeSeriesRates(
             '', // use fake currency to force
@@ -252,11 +248,9 @@ class MultiCurrencyTest extends TestCase
         });
 
         Frankfurter::expects('setSymbols')
-            ->andReturnSelf()
-            ->times(4);
+            ->andReturnSelf();
         Frankfurter::expects('timeSeries')
-            ->andReturn(['rates' => $results])
-            ->times(4);
+            ->andReturn(['rates' => $results]);
 
         CurrencyRate::timeSeriesRates('ZZZ', $start, $end);
     }

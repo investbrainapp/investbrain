@@ -54,11 +54,17 @@ class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadi
                     $this->backupImport->user->save();
                     break;
 
-                case 'reinvest_dividends':
-
-                    Holding::myHoldings()->where('id', $config['value'])->update([
-                        'reinvest_dividends' => true,
-                    ]);
+                case 'reinvested_dividends':
+                    if (json_validate($config['value'])) {
+                        foreach (json_decode($config['value'], true) as $reinvest) {
+                            Holding::myHoldings($this->backupImport->user->id)
+                                ->where('portfolio_id', $reinvest['portfolio_id'])
+                                ->where('symbol', $reinvest['symbol'])
+                                ->update([
+                                    'reinvest_dividends' => true,
+                                ]);
+                        }
+                    }
                     break;
 
                 default:

@@ -111,7 +111,7 @@ class CurrencyRate extends Model
      *
      * @return array<string, float>
      */
-    public static function timeSeriesRates(string $currency, mixed $start = null, mixed $end = null): array
+    public static function timeSeriesRates(string|array $currency, mixed $start = null, mixed $end = null): array
     {
         if (empty($start)) {
             return [];
@@ -134,22 +134,27 @@ class CurrencyRate extends Model
 
         [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
 
-        $currencies = Currency::all()->pluck('currency')->toArray();
+        if (! empty($currency)) {
 
-        // call api in chunks
-        $rates = [];
-        foreach (collect($period)->chunk(500) as $chunk) {
+            $currencies = Arr::wrap($currency);
 
-            $chunkRates = Frankfurter::setSymbols($currencies)->timeSeries($chunk->min(), $chunk->max());
+        } else {
 
-            $rates = array_merge($rates, Arr::get($chunkRates, 'rates', []));
+            $currencies = Currency::all()->pluck('currency')->toArray();
         }
+
+        // get rates
+        $rates = Frankfurter::setSymbols($currencies)->timeSeries($period->first(), $period->last());
+
+        $rates = collect(Arr::get($rates, 'rates', []))->sortKeys()->toArray();
+
+        $datesOnly = array_keys($rates);
 
         // loop through each date
         $updates = [];
         foreach ($period as $date) {
 
-            $lookupDate = self::getNearestPastDate($date, $rates);
+            $lookupDate = self::getNearestPastDate($date, $datesOnly, $rates);
 
             if (is_null($lookupDate)) {
                 continue;
@@ -181,33 +186,39 @@ class CurrencyRate extends Model
             ->toArray();
     }
 
-    private static function getNearestPastDate(CarbonInterface $date, array $rates): ?CarbonInterface
+    private static function getNearestPastDate(CarbonInterface $date, array $datesOnly, array $rates): ?CarbonInterface
     {
-        $datesWithRates = array_keys($rates);
-        sort($datesWithRates);
+
+        // if no dates, nothing to do...
+        if (empty($datesOnly)) {
+
+            return null;
+        }
+
+        $mutableDate = $date->copy();
+        $weekAgo = $date->copy()->subWeek();
+        $firstDate = Carbon::parse($datesOnly[0]);
 
         // get rates or find closest valid rate (handles missing weekend rates)
-        while (! isset($rates[$date->toDateString()])) {
+        while (! isset($rates[$mutableDate->toDateString()])) {
+
+            // prevent runaway infinite loops
+            if ($mutableDate->lessThan($weekAgo)) {
+
+                return null;
+            }
 
             // is this the start of a range that falls on a weekend?
-            if ($date->lessThan($first_date = Carbon::parse($datesWithRates[0]))) {
+            if ($mutableDate->lessThan($firstDate)) {
 
-                $date = $first_date;
-                break;
+                return $firstDate;
             }
 
             // try the day before then
-            $date = Carbon::parse($date)->subDay();
-
-            // prevent runaway infinite loops
-            if ($date->lessThan($date->copy()->subWeek())) {
-
-                $date = null;
-                break;
-            }
+            $mutableDate = $mutableDate->subDay();
         }
 
-        return $date;
+        return $mutableDate;
     }
 
     public static function refreshCurrencyData($force = false): void
@@ -248,9 +259,7 @@ class CurrencyRate extends Model
     public static function chunkInsert(array $updates): void
     {
 
-        $chunks = array_chunk($updates, 500);
-
-        foreach ($chunks as $chunk) {
+        foreach (array_chunk($updates, 500) as $chunk) {
 
             QueuedCurrencyRateInsertJob::dispatch($chunk);
         }

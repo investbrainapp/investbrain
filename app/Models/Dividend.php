@@ -105,20 +105,25 @@ class Dividend extends Model
 
             $market_data = MarketData::getMarketData($symbol);
 
-            // get historic conversion rates
-            $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $start_date, $end_date);
+            $dividend_data
+                ->chunk(10)
+                ->each(function ($chunk) use ($market_data) {
 
-            // create mass insert
-            foreach ($dividend_data as $index => $dividend) {
-                $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
+                    // get historic conversion rates
+                    $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $chunk->min('date'), $chunk->max('date'));
 
-                $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * $rate_to_base_date;
+                    // create mass insert
+                    foreach ($chunk as $index => $dividend) {
+                        $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
 
-                $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
-            }
+                        $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * $rate_to_base_date;
 
-            // insert records
-            (new self)->insertOrIgnore($dividend_data->toArray());
+                        $chunk[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
+                    }
+
+                    // insert records
+                    (new self)->insertOrIgnore($chunk->toArray());
+                });
 
             // sync to holdings
             self::syncHoldings($symbol);
@@ -186,6 +191,7 @@ class Dividend extends Model
                         'date' => $dividend['date'],
                         'portfolio_id' => $holding->portfolio_id,
                         'symbol' => $holding->symbol,
+                        'currency' => $holding->market_data->currency,
                         'transaction_type' => 'BUY',
                         'reinvested_dividend' => true,
                         'cost_basis' => 0,
