@@ -47,12 +47,13 @@ class ConfigSheet implements FromCollection, WithHeadings, WithTitle
         ]);
 
         // reinvested holdings
-        Holding::myHoldings()->where('reinvest_dividends', true)->get()->each(function ($holding) use (&$configs) {
+        $reinvested_holdings = Holding::myHoldings()->where('reinvest_dividends', true)->get(['portfolio_id', 'symbol']);
+        if ($reinvested_holdings->isNotEmpty()) {
             $configs->push([
                 'key' => 'reinvested_dividends',
-                'value' => $holding->id,
+                'value' => $reinvested_holdings->toJson(),
             ]);
-        });
+        }
 
         return $configs;
     }
