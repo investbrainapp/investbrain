@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\CurrencyRate;
+use App\Models\Holding;
 use App\Models\Transaction;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\MarketDataSeeder;
@@ -97,7 +98,7 @@ return new class extends Migration
             ]);
 
             CurrencyRate::timeSeriesRates(
-                '', // use fake currency to force
+                Holding::all()->groupBy('market_data.currency')->keys()->toArray(),
                 Transaction::min('date')
             );
 
