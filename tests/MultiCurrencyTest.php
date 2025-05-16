@@ -225,8 +225,40 @@ class MultiCurrencyTest extends TestCase
             ->andReturn(['rates' => $results]);
 
         $result = CurrencyRate::timeSeriesRates('ZZZ', $start, $end);
-
         $this->assertEquals(count($period) - 1, count($result));
+
+        $result = CurrencyRate::all();
+        $this->assertEquals(count($period), count($result));
+    }
+
+    public function test_can_get_time_series_rates_with_null_currency()
+    {
+
+        $start = now()->subWeeks(2);
+        $end = now();
+
+        $period = CarbonPeriod::create($start, $end);
+
+        // mock response from Frankfurter
+        $results = [];
+        collect($period->copy()->filter('isWeekday'))->each(function ($date) use (&$results) {
+            $date = $date->toDateString();
+
+            $results[$date] = [
+                'FOO' => random_int(10, 150) / 1000,
+            ];
+        });
+
+        Frankfurter::expects('setSymbols')
+            ->andReturnSelf();
+        Frankfurter::expects('timeSeries')
+            ->andReturn(['rates' => $results]);
+
+        $result = CurrencyRate::timeSeriesRates(null, $start, $end);
+        $this->assertEquals(0, count($result));
+
+        $result = CurrencyRate::all();
+        $this->assertEquals(count($period), count($result));
     }
 
     public function test_time_series_rate_calls_are_chunked()

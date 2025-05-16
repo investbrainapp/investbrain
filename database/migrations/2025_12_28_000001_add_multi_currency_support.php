@@ -97,9 +97,14 @@ return new class extends Migration
                 '--force' => true,
             ]);
 
-            CurrencyRate::timeSeriesRates(
-                Holding::all()->groupBy('market_data.currency')->keys()->toArray(),
-                Transaction::min('date')
+            Holding::all()->groupBy('market_data.currency')->keys()->each(
+                fn ($currency) => dispatch(
+                    function () use ($currency) {
+                        CurrencyRate::timeSeriesRates(
+                            $currency,
+                            Transaction::min('date')
+                        );
+                    })
             );
 
             CurrencyRate::refreshCurrencyData();

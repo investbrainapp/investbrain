@@ -54,8 +54,7 @@ class MarketDataSeeder extends Seeder
                     $rowCount++;
 
                     if ($rowCount % $chunkSize == 0) {
-                        DB::table('market_data')->upsert($this->rows, ['symbol'], ['name', 'currency', 'meta_data']);
-                        $this->rows = [];
+                        $this->bulkInsert($this->rows);
                     }
                 }
             }
@@ -77,11 +76,14 @@ class MarketDataSeeder extends Seeder
         }
     }
 
-    public function bulkInsert(array $rows)
+    public function bulkInsert($rows)
     {
         try {
 
-            DB::table('market_data')->insertOrIgnore($rows);
+            dispatch(
+                fn () => DB::table('market_data')->upsert($rows, ['symbol'], ['name', 'currency', 'meta_data'])
+            );
+
             $this->rows = [];
 
         } catch (\Throwable $e) {

@@ -111,7 +111,7 @@ class CurrencyRate extends Model
      *
      * @return array<string, float>
      */
-    public static function timeSeriesRates(string|array $currency, mixed $start = null, mixed $end = null): array
+    public static function timeSeriesRates(?string $currency = null, mixed $start = null, mixed $end = null): array
     {
         if (empty($start)) {
             return [];
@@ -132,19 +132,18 @@ class CurrencyRate extends Model
             return $dateRange;
         }
 
-        [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
-
+        // handle currency alias
         if (! empty($currency)) {
 
-            $currencies = Arr::wrap($currency);
+            [$currency, $adjustment] = self::getCurrencyAliasAdjustments($currency);
 
         } else {
 
-            $currencies = Currency::all()->pluck('currency')->toArray();
+            $currency = Currency::all()->pluck('currency')->toArray();
         }
 
         // get rates
-        $rates = Frankfurter::setSymbols($currencies)->timeSeries($period->first(), $period->last());
+        $rates = Frankfurter::setSymbols($currency)->timeSeries($period->first(), $period->last());
 
         $rates = collect(Arr::get($rates, 'rates', []))->sortKeys()->toArray();
 
@@ -177,13 +176,18 @@ class CurrencyRate extends Model
         // persist
         self::chunkInsert($updates);
 
-        return collect($updates)
-            ->whereBetween('date', [$start, $end ?? now()])
-            ->where('currency', $currency)
-            ->mapWithKeys(fn ($rate) => [
-                $rate['date'] => $rate['rate'] * $adjustment,
-            ])
-            ->toArray();
+        if (is_string($currency)) {
+
+            return collect($updates)
+                ->whereBetween('date', [$start, $end ?? now()])
+                ->where('currency', $currency)
+                ->mapWithKeys(fn ($rate) => [
+                    $rate['date'] => $rate['rate'] * ($adjustment ?? 1),
+                ])
+                ->toArray();
+        }
+
+        return [];
     }
 
     private static function getNearestPastDate(CarbonInterface $date, array $datesOnly, array $rates): ?CarbonInterface
@@ -265,7 +269,7 @@ class CurrencyRate extends Model
         }
     }
 
-    protected static function getCurrencyAliasAdjustments($currency)
+    protected static function getCurrencyAliasAdjustments(string $currency)
     {
         $adjustment = 1;
 
