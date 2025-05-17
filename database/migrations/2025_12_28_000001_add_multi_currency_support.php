@@ -97,17 +97,17 @@ return new class extends Migration
                 '--force' => true,
             ]);
 
+            Artisan::call('db:seed', [
+                '--class' => MarketDataSeeder::class,
+                '--force' => true,
+            ]);
+
             CurrencyRate::timeSeriesRates(
                 Holding::all()->groupBy('market_data.currency')->keys()->toArray(),
                 Transaction::min('date')
             );
 
             CurrencyRate::refreshCurrencyData();
-
-            Artisan::call('db:seed', [
-                '--class' => MarketDataSeeder::class,
-                '--force' => true,
-            ]);
         }
 
         /**
