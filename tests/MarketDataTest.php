@@ -21,7 +21,7 @@ class MarketDataTest extends TestCase
             '--force' => true,
         ]);
 
-        $this->assertEquals(13186, MarketData::count('symbol'));
+        $this->assertEquals(13187, MarketData::count('symbol'));
     }
 
     public function test_can_get_quote_from_provider()
