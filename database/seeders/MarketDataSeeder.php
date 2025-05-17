@@ -12,8 +12,6 @@ class MarketDataSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    public array $rows = [];
-
     /**
      * Run the database seeds.
      */
@@ -44,7 +42,7 @@ class MarketDataSeeder extends Seeder
                     $meta_data = json_decode(base64_decode($data['meta_data']), true);
                     $meta_data['source'] = 'market_data_seeder';
 
-                    $this->rows[] = [
+                    $rows[] = [
                         'symbol' => $data['symbol'],
                         'name' => $data['name'],
                         'currency' => $data['currency'],
@@ -54,15 +52,17 @@ class MarketDataSeeder extends Seeder
                     $rowCount++;
 
                     if ($rowCount % $chunkSize == 0) {
-                        $this->bulkInsert($this->rows);
+                        $this->bulkInsert($rows);
+                        $rows = [];
                     }
                 }
             }
 
             // final clean up
-            if (! empty($this->rows)) {
+            if (! empty($rows)) {
 
-                $this->bulkInsert($this->rows);
+                $this->bulkInsert($rows);
+                $rows = [];
             }
 
             // Close the CSV file
@@ -76,19 +76,17 @@ class MarketDataSeeder extends Seeder
         }
     }
 
-    public function bulkInsert($rows)
+    private function bulkInsert($rows): void
     {
         try {
 
-            dispatch(
-                fn () => DB::table('market_data')->upsert($rows, ['symbol'], ['name', 'currency', 'meta_data'])
-            );
-
-            $this->rows = [];
+            DB::table('market_data')->upsert($rows, ['symbol'], ['name', 'currency', 'meta_data']);
 
         } catch (\Throwable $e) {
 
             throw new \Exception('Error: '.$e->getMessage());
         }
+
+        gc_collect_cycles();
     }
 }
