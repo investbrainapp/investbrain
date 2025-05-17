@@ -135,7 +135,8 @@ class CurrencyRate extends Model
         if (is_array($currency)) {
 
             foreach ($currency as $curr) {
-                dispatch(self::timeSeriesRates($curr, $start, $end));
+
+                dispatch(fn () => self::timeSeriesRates($curr, $start, $end));
             }
 
             return [];
