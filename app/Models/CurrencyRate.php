@@ -111,7 +111,7 @@ class CurrencyRate extends Model
      *
      * @return array<string, float>
      */
-    public static function timeSeriesRates(?string $currency = null, mixed $start = null, mixed $end = null): array
+    public static function timeSeriesRates(string|array|null $currency = null, mixed $start = null, mixed $end = null): array
     {
         if (empty($start)) {
             return [];
@@ -130,6 +130,15 @@ class CurrencyRate extends Model
             }
 
             return $dateRange;
+        }
+
+        if (is_array($currency)) {
+
+            foreach ($currency as $curr) {
+                dispatch(self::timeSeriesRates($curr, $start, $end));
+            }
+
+            return [];
         }
 
         // handle currency alias
