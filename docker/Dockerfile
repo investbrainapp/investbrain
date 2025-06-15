@@ -62,7 +62,7 @@ RUN apk add --no-cache \
         bash \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        gd pgsql zip pdo_mysql mysqli intl 
+        gd pgsql zip pdo_mysql pdo_pgsql mysqli intl 
 
 # Remove default nginx config
 RUN rm -rf /var/www/html \
