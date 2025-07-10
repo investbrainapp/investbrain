@@ -221,7 +221,7 @@ class DailyChangeTest extends TestCase
         $second_transaction = Transaction::create([
             'symbol' => 'AAPL',
             'portfolio_id' => $portfolio->id,
-            'date' => now()->subYears(3),
+            'date' => now()->subDays(1080), // 3 years
             'quantity' => 1,
             'cost_basis' => 39.89,
             'transaction_type' => 'BUY',
