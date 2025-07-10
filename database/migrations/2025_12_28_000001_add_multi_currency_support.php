@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\MarketDataSeeder;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +25,15 @@ return new class extends Migration
          * Add options column to users table
          */
         Schema::table('users', function (Blueprint $table) {
-            $table->json('options')->default(json_encode([
-                'locale' => config('app.locale', 'en'),
-                'display_currency' => config('investbrain.base_currency', 'USD'),
-            ]))->after('profile_photo_path');
+
+            $locale = config('app.locale', 'en');
+            $currency = config('investbrain.base_currency', 'USD');
+
+            $default = config('database.default') === 'mysql'
+                ? new Expression("(JSON_OBJECT('locale', '{$locale}', 'display_currency', '{$currency}'))")
+                : json_encode(['locale' => $locale, 'display_currency' => $currency]);
+
+            $table->json('options')->default($default)->after('profile_photo_path');
         });
 
         /**
