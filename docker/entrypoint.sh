@@ -3,7 +3,7 @@
 cd /var/app
 
 # Starting Investbrain
-echo "4paE4paWICAgICAgICDilpcg4paMICAgICDilpggIArilpAg4pab4paM4paM4paM4paI4paM4pab4paY4pac4paY4pab4paM4pab4paY4paA4paM4paM4pab4paMCuKWn+KWluKWjOKWjOKWmuKWmOKWmeKWluKWhOKWjOKWkOKWluKWmeKWjOKWjCDilojilozilozilozilowK" | base64 -d
+echo "CuKWhOKWliAgICAgICAg4paXIOKWjCAgICAg4paYICAK4paQIOKWm+KWjOKWjOKWjOKWiOKWjOKWm+KWmOKWnOKWmOKWm+KWjOKWm+KWmOKWgOKWjOKWjOKWm+KWjArilp/ilpbilozilozilprilpjilpnilpbiloTilozilpDilpbilpnilozilowg4paI4paM4paM4paM4paMCg==" | base64 -d
 
 echo -e "\n====================== Validating environment...  ====================== "
 
