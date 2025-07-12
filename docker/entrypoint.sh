@@ -73,7 +73,15 @@ done
 
 echo -e "\n====================== Cleaning up...  ====================== \n"
 
+# Clear caches
 echo $(php artisan cache:clear)
+echo $(php artisan view:clear)
+echo $(php artisan route:clear)
+echo $(php artisan event:clear)
+
+# Re-create caches
+echo $(php artisan route:cache)
+echo $(php artisan event:cache)
 
 echo -e "\n====================== Spinning up Supervisor daemon...  ====================== \n"
 
