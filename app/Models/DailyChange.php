@@ -99,8 +99,11 @@ class DailyChange extends Model
                 'tx1.quantity',
             ])
             ->selectRaw("(CASE
-                WHEN tx1.transaction_type = 'BUY'
-                    THEN COALESCE(cr.rate, 1)
+                WHEN 
+                    tx1.transaction_type = 'BUY' 
+                    OR SUM(tx1.cost_basis_base) = 0
+                THEN 
+                    COALESCE(cr.rate, 1)
                 ELSE (
                     SELECT
                         SUM(COALESCE(cr2.rate, 1) * buy.cost_basis_base)

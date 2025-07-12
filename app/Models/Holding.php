@@ -302,8 +302,11 @@ class Holding extends Model
                             ])
                             ->selectRaw(
                                 "(CASE
-                                        WHEN transactions.transaction_type = 'BUY'
-                                            THEN COALESCE(cr.rate, 1)
+                                        WHEN 
+                                            transactions.transaction_type = 'BUY'
+                                            OR SUM(transactions.cost_basis_base) = 0
+                                        THEN 
+                                            COALESCE(cr.rate, 1)
                                         ELSE (
                                             SELECT
                                                 SUM(COALESCE(cr2.rate, 1) * buy.cost_basis_base)
