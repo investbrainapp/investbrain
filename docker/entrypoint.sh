@@ -3,7 +3,7 @@
 cd /var/app
 
 # Starting Investbrain
-echo "CiAgKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICAqICBJSUkgICBOICAgTiAgViAgIFYgIEVFRUVFICBTU1NTICBUVFRUVCAgQkJCQkIgICBSUlJSICAgIEFBQUFBICBJSUkgICBOICAgTiAgKgogICogICBJICAgIE5OICBOICBWICAgViAgRSAgICAgIFMgICAgICAgVCAgICBCICAgIEIgIFIgICBSICAgQSAgIEEgICBJICAgIE5OICBOICAqCiAgKiAgIEkgICAgTiBOIE4gIFYgICBWICBFRUVFICAgU1NTUyAgICBUICAgIEJCQkJCICAgUlJSUiAgICBBQUFBQSAgIEkgICAgTiBOIE4gICoKICAqICAgSSAgICBOICBOTiAgViAgIFYgIEUgICAgICAgICAgUyAgIFQgICAgQiAgICBCICBSICBSICAgIEEgICBBICAgSSAgICBOICBOTiAgKgogICogIElJSSAgIE4gICBOICAgVlZWICAgRUVFRUUgIFNTU1MgICAgVCAgICBCQkJCQiAgIFIgICBSICAgQSAgIEEgIElJSSAgIE4gICBOICAqCiAgKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICA=" | base64 -d
+echo "4paE4paWICAgICAgICDilpcg4paMICAgICDilpggIArilpAg4pab4paM4paM4paM4paI4paM4pab4paY4pac4paY4pab4paM4pab4paY4paA4paM4paM4pab4paMCuKWn+KWluKWjOKWjOKWmuKWmOKWmeKWluKWhOKWjOKWkOKWluKWmeKWjOKWjCDilojilozilozilozilowK" | base64 -d
 
 echo -e "\n====================== Validating environment...  ====================== "
 
@@ -54,7 +54,6 @@ RETRIES=12
 DELAY=5
 run_migrations() {
     sleep $DELAY
-    # php artisan migrate --force
     output=$(php artisan migrate --force 2>/dev/null)
     if [[ $? -eq 0 ]]; then
         echo "$output"
@@ -72,7 +71,10 @@ until run_migrations; do
   echo -e "\n > Waiting for database to be ready... retrying in $DELAY seconds. \n"
 done
 
+echo -e "\n====================== Cleaning up...  ====================== \n"
+
+echo $(php artisan cache:clear)
+
 echo -e "\n====================== Spinning up Supervisor daemon...  ====================== \n"
 
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
-
