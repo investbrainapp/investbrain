@@ -153,6 +153,7 @@ class Portfolio extends Model
         $total_performance = [];
 
         // get unique currencies for holdings
+        $currency_rates = [];
         foreach ($holdings->groupBy('market_data.currency')->keys() as $currency) {
             $currency_rates[$currency] = CurrencyRate::timeSeriesRates($currency, $holdings->min('first_transaction_date'), now());
         }
