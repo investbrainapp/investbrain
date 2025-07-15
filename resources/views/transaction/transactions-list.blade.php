@@ -97,7 +97,7 @@ new class extends Component
                     $transaction->transaction_type == 'BUY' 
                         ? $transaction->cost_basis
                         : $transaction->sale_price,
-                    $transaction->market_data->currency
+                    $transaction->market_data?->currency
                 ) }})
 
                 <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
