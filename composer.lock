@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "42c893f20ccd0482c1c5a18aa3790acc",
+    "content-hash": "13310769a8c74dcffeb66fc87ab4e371",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -6104,28 +6104,30 @@
         },
         {
             "name": "scheb/yahoo-finance-api",
-            "version": "v4.12.0",
+            "version": "v5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scheb/yahoo-finance-api.git",
-                "reference": "08f47997d123389567e2c7fa7cafc94d4c4e2515"
+                "reference": "72561695bdccfb6318c985cf439254f646c3b127"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scheb/yahoo-finance-api/zipball/08f47997d123389567e2c7fa7cafc94d4c4e2515",
-                "reference": "08f47997d123389567e2c7fa7cafc94d4c4e2515",
+                "url": "https://api.github.com/repos/scheb/yahoo-finance-api/zipball/72561695bdccfb6318c985cf439254f646c3b127",
+                "reference": "72561695bdccfb6318c985cf439254f646c3b127",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "guzzlehttp/guzzle": "^6.0|^7.0",
-                "php": ">=7.1.3"
+                "guzzlehttp/guzzle": "^7",
+                "php": ">=8.1",
+                "psr/cache": "^2|^3"
             },
             "require-dev": {
                 "escapestudios/symfony2-coding-standard": "^3.9",
-                "phpunit/phpunit": "^7.5 || ^8 || ^9",
+                "phpunit/phpunit": "^10.5|^11|^12",
                 "squizlabs/php_codesniffer": "^3.5",
-                "vimeo/psalm": "^3.11|^4.0"
+                "symfony/cache": "^6|^7",
+                "vimeo/psalm": "^6.0"
             },
             "type": "library",
             "autoload": {
@@ -6153,9 +6155,9 @@
             ],
             "support": {
                 "issues": "https://github.com/scheb/yahoo-finance-api/issues",
-                "source": "https://github.com/scheb/yahoo-finance-api/tree/v4.12.0"
+                "source": "https://github.com/scheb/yahoo-finance-api/tree/v5.0.0"
             },
-            "time": "2025-03-27T15:44:16+00:00"
+            "time": "2025-07-05T20:58:45+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
