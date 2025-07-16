@@ -44,6 +44,9 @@ FROM php:8.3-fpm-alpine
 # Set the working directory
 WORKDIR /var/app
 
+ARG VERSION=dev
+ENV VERSION=$VERSION
+
 # Copy necessary files from the builder stage
 COPY --from=builder /var/app /var/app
 COPY --from=builder /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d

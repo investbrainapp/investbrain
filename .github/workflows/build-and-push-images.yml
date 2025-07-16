@@ -61,4 +61,6 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: ${{ steps.extract-version.outputs.tags }}
+          build-args: |
+            VERSION=${{ github.ref_name }}
 
