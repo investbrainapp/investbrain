@@ -323,19 +323,12 @@ class Holding extends Model
                                         AS rate"
                             )
                             ->selectRaw(
-                                "(CASE
-                                        WHEN transactions.transaction_type = 'BUY'
-                                            THEN AVG(transactions.cost_basis_base)
-                                        ELSE (
-                                            SELECT
-                                                AVG(-buy.cost_basis_base)
-                                            FROM transactions as buy
-                                            WHERE buy.symbol = transactions.symbol
-                                                AND buy.portfolio_id = transactions.portfolio_id
-                                                AND buy.transaction_type = 'BUY'
-                                                AND buy.date <= transactions.date
-                                        ) END)
-                                        AS cost_basis_base"
+                                "CASE
+                                    WHEN transactions.transaction_type = 'BUY'
+                                    THEN transactions.quantity
+                                    ELSE -transactions.quantity
+                                END
+                                AS remaining_quantity"
                             )
                             ->groupBy([
                                 'transactions.symbol',
@@ -353,7 +346,7 @@ class Holding extends Model
                         "SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN (transactions.sale_price_base - transactions.cost_basis_base) * transactions.quantity * COALESCE(cr.rate, 1) ELSE 0 END) AS realized_gain_dollars"
                     )
                     ->selectRaw(
-                        'SUM(cost_basis_display.cost_basis_base * cost_basis_display.quantity * cost_basis_display.rate) AS total_cost_basis'
+                        "SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.cost_basis_base * transactions.quantity * cost_basis_display.rate END) / SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity END) * SUM(cost_basis_display.remaining_quantity) AS total_cost_basis"
                     )
                     ->groupBy(['transactions.symbol', 'transactions.portfolio_id']),
                 'transactions_display',
