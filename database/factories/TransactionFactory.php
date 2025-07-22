@@ -59,6 +59,13 @@ class TransactionFactory extends Factory
         ]);
     }
 
+    public function today(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => now()->toDateString(),
+        ]);
+    }
+
     public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
