@@ -43,4 +43,20 @@ class HoldingsTest extends TestCase
         $holding = Holding::query()->getPortfolioMetrics();
         $this->assertEquals(0, $holding->get('total_cost_basis'));
     }
+
+    public function test_calculates_cost_bases_on_same_day_buy_sell_transaction(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory(2)->buy()->lastYear()->costBasis(100)->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory(2)->buy()->lastYear()->costBasis(300)->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        Transaction::factory()->sell()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->sell()->recent()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $holding = Holding::query()->getPortfolioMetrics();
+        $this->assertEquals(400, $holding->get('total_cost_basis'));
+    }
 }
