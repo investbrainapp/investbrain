@@ -572,6 +572,14 @@ class MultiCurrencyTest extends TestCase
             ->getPortfolioMetrics();
 
         $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01);
+        //   expected 2773.034 Failed asserting that 2816.46 matches .
+
+        // "total_cost_basis" => 1771.476
+        // "total_gain_dollars" => 300.234
+
+        // +"total_cost_basis": 1765.431
+        // +"total_gain": 306.279
+
         $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
         $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
