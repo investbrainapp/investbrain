@@ -274,7 +274,7 @@ class Holding extends Model
                 'holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1) AS total_market_value'
             )
             ->selectRaw(
-                'SUM(transactions_display.realized_gain_dollars) * COALESCE(cr.rate, 1) AS realized_gain_dollars'
+                'SUM(transactions_display.realized_gain_dollars) AS realized_gain_dollars'
             )
             ->selectRaw(
                 '(SUM(transactions_display.total_cost_basis) / SUM(transactions_display.total_purchases)) * holdings.quantity AS total_cost_basis'
