@@ -120,12 +120,18 @@ class DailyChange extends Model
                 ) END)
                 AS rate")
             ->selectRaw(
-                "CASE
+                "COALESCE(SUM(CASE
                     WHEN tx1.transaction_type = 'BUY'
-                    THEN tx1.quantity
-                    ELSE -tx1.quantity
-                END
-                AS remaining_quantity"
+                    THEN tx1.cost_basis_base * tx1.quantity
+                END), 0)
+                AS total_cost_basis_for_purchases"
+            )
+            ->selectRaw(
+                "COALESCE(SUM(CASE
+                    WHEN tx1.transaction_type = 'SELL'
+                    THEN tx1.cost_basis_base * tx1.quantity
+                END), 0)
+                AS total_cost_basis_for_sales"
             )
             ->selectRaw(
                 "(CASE
@@ -156,38 +162,14 @@ class DailyChange extends Model
                 $join->on('cr.date', '=', 'daily_change.date')
                     ->where('cr.currency', '=', $currency);
             })
-            ->selectRaw("
-                (SUM(
-                    CASE
-                    WHEN cost_basis_display.transaction_type = 'BUY'
-                    THEN cost_basis_display.cost_basis_base * cost_basis_display.quantity * cost_basis_display.rate
-                    END
-                )
-                / SUM(
-                    CASE
-                    WHEN cost_basis_display.transaction_type = 'BUY'
-                    THEN cost_basis_display.quantity
-                    END
-                ))
-                * SUM(cost_basis_display.remaining_quantity)
+            ->selectRaw('
+                SUM(cost_basis_display.rate * cost_basis_display.total_cost_basis_for_purchases) - SUM(cost_basis_display.rate * cost_basis_display.total_cost_basis_for_sales)
                 AS total_cost_basis
-                ")
-            ->selectRaw("(
+            ')
+            ->selectRaw('(
                 daily_change.total_market_value * COALESCE(cr.rate, 1)
-                ) - (SUM(
-                    CASE
-                    WHEN cost_basis_display.transaction_type = 'BUY'
-                    THEN cost_basis_display.cost_basis_base * cost_basis_display.quantity * cost_basis_display.rate
-                    END
-                )
-                / SUM(
-                    CASE
-                    WHEN cost_basis_display.transaction_type = 'BUY'
-                    THEN cost_basis_display.quantity
-                    END
-                ))
-                * SUM(cost_basis_display.remaining_quantity)
-                 as total_gain")
+                ) - (SUM(cost_basis_display.rate * cost_basis_display.total_cost_basis_for_purchases) - SUM(cost_basis_display.rate * cost_basis_display.total_cost_basis_for_sales))
+                 as total_gain')
             ->selectRaw('(
                 daily_change.total_market_value * COALESCE(cr.rate, 1)
                 ) as total_market_value')

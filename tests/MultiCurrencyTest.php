@@ -544,17 +544,22 @@ class MultiCurrencyTest extends TestCase
 
         $this->actingAs($user = User::factory()->create());
 
+        $monthAgo = now()->subMonth()->toDateString();
+        $fiveWeeksAgo = now()->subWeeks(5)->toDateString();
+        $fiveDaysAgo = now()->subDays(5)->toDateString();
+
         $portfolio = Portfolio::factory()->create();
-        Transaction::factory(5)->buy()->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
-        Transaction::factory(5)->buy()->lastMonth()->portfolio($portfolio->id)->symbol('ACME')->create();
-        Transaction::factory()->sell()->recent()->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory(5)->buy()->costBasis(100)->date($monthAgo)->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory(5)->buy()->costBasis(190)->date($fiveWeeksAgo)->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->sell()->date($fiveDaysAgo)->portfolio($portfolio->id)->symbol('ACME')->create();
 
         $portfolio->syncDailyChanges();
 
         $dailyChange = DailyChange::withDailyPerformance()
             ->portfolio($portfolio->id)
-            ->get()
-            ->sortBy('date')
+            ->get();
+
+        $dailyChange = $dailyChange->sortBy('date')
             ->groupBy('date')
             ->map(function ($group) {
                 return (object) [
@@ -572,17 +577,38 @@ class MultiCurrencyTest extends TestCase
             ->getPortfolioMetrics();
 
         $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01);
-        //   expected 2773.034 Failed asserting that 2816.46 matches .
-
-        // "total_cost_basis" => 1771.476
-        // "total_gain_dollars" => 300.234
-
-        // +"total_cost_basis": 1765.431
-        // +"total_gain": 306.279
-
         $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
+        $this->assertEqualsWithDelta(Holding::get()->sum('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
         $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
+
+        // add currency rates
+        $rates = collect([[
+            'currency' => 'GBP',
+            'rate' => .88,
+            'date' => $fiveWeeksAgo,
+        ], [
+            'currency' => 'GBP',
+            'rate' => .88,
+            'date' => $fiveDaysAgo,
+        ], [
+            'currency' => 'GBP',
+            'rate' => .88,
+            'date' => $monthAgo,
+        ], [
+            'currency' => 'GBP',
+            'rate' => .88,
+            'date' => now()->subDay()->toDateString(),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .88,
+            'date' => now()->toDateString(),
+        ], [
+            'currency' => 'GBP',
+            'rate' => .88,
+            'date' => now()->addDay()->toDateString(),
+        ]]);
+        $rates->each(fn ($rate) => CurrencyRate::create($rate));
 
         // switch user display currency
         $user->options = array_merge($user->options ?? [], [
@@ -592,10 +618,14 @@ class MultiCurrencyTest extends TestCase
 
         $dailyChange = DailyChange::withDailyPerformance()
             ->portfolio($portfolio->id)
-            ->get()
-            ->sortBy('date')
+            ->get();
+
+        dump($dailyChange->toArray());
+
+        $dailyChange = $dailyChange->sortBy('date')
             ->groupBy('date')
             ->map(function ($group) {
+
                 return (object) [
                     'date' => $group->first()->date->toDateString(),
                     'total_market_value' => $group->sum('total_market_value'),
@@ -610,10 +640,10 @@ class MultiCurrencyTest extends TestCase
             ->portfolio($portfolio->id)
             ->getPortfolioMetrics();
 
-        $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01); // TODO:
         $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
-        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01); // TODO:
     }
 
     public function test_multi_currency_import_calculates_correct_holding_data(): void
