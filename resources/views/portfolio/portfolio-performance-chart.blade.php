@@ -53,7 +53,13 @@ new class extends Component
             $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
-        $dailyChange = $dailyChangeQuery->getDailyPerformance();
+        $dailyChange = cache()->remember(
+            'graph-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
+            30,
+            function () use ($dailyChangeQuery) {
+                return $dailyChangeQuery->getDailyPerformance();
+            }
+        );
 
         return [
             'series' => [
@@ -85,6 +91,8 @@ new class extends Component
     public function changeScope($scope)
     {
         $this->scope = $scope;
+
+        cache()->forget('graph-'.isset($this->portfolio) ? $this->portfolio->id : request()->user()->id);
 
         $this->chartSeries = $this->generatePerformanceData();
     }
