@@ -119,12 +119,12 @@ class DailyChange extends Model
                         WHEN transactions.transaction_type = 'SELL' 
                         THEN transactions.sale_price_base - transactions.cost_basis_base
                         END
-                    ) * transactions.quantity * COALESCE(cr.rate, 1) AS realized_gain_loss"),
+                    ) * transactions.quantity * COALESCE(cr.rate, 1) AS realized_gain_dollars"),
                     'cb')
-                    ->selectRaw('SUM(cb.realized_gain_loss)')
+                    ->selectRaw('SUM(cb.realized_gain_dollars)')
                     ->whereColumn('cb.date', '<=', 'daily_change.date')
                     ->whereColumn('cb.portfolio_id', '=', 'daily_change.portfolio_id');
-            }, 'realized_gain_loss')
+            }, 'realized_gain_dollars')
             ->selectSub(function ($query) use ($dividendSub) {  // todo: maybe costbasis uses this model?
                 $query->fromSub($dividendSub, 'd')
                     ->selectRaw('SUM(d.total_dividends_earned)')
