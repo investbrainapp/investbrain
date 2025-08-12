@@ -206,13 +206,13 @@ class DailyChangeTest extends TestCase
         $portfolio = Portfolio::factory()->create();
 
         // 1. test daily change will fill to the date of first transaction
-        $first_transaction = Transaction::factory(5)->buy()->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $transactions = Transaction::factory(5)->buy()->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
 
         $portfolio->syncDailyChanges();
 
         $first_date = DailyChange::min('date');
 
-        $this->assertEquals($first_transaction->min('date')->toDateString(), $first_date);
+        $this->assertEquals($transactions->min('date')->next(Carbon::MONDAY)->startOfDay()->toDateString(), $first_date);
 
         // 2. test daily change will fill when new transaction pre-dates earliest daily change
         config()->set('app.env', 'local');
@@ -229,7 +229,7 @@ class DailyChangeTest extends TestCase
 
         $second_date = DailyChange::min('date');
 
-        $this->assertEquals($second_transaction->date->toDateString(), $second_date);
+        $this->assertEquals($second_transaction->date->next(Carbon::MONDAY)->toDateString(), $second_date);
 
         // 3. test daily change will fill when new transaction is between earliest daily change and earliest transaction
         $third_transaction = Transaction::create([

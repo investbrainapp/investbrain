@@ -559,8 +559,6 @@ class MultiCurrencyTest extends TestCase
             ->portfolio($portfolio->id)
             ->getDailyPerformance();
 
-        dump($dailyChange->toArray());
-
         $metrics = Holding::query()
             ->portfolio($portfolio->id)
             ->getPortfolioMetrics();
