@@ -22,9 +22,8 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
             'Portfolio ID',
             'Total Market Value',
             'Total Cost Basis',
-            'Total Gain',
-            'Total Dividends Earned',
             'Realized Gains',
+            'Total Dividends Earned',
             'Annotation',
         ];
     }

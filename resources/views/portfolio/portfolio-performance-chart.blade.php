@@ -53,22 +53,7 @@ new class extends Component
             $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
-        $dailyChange = $dailyChangeQuery->get();
-
-        $dailyChange = $dailyChange
-            ->sortBy('date')
-            ->groupBy('date')
-            ->map(function ($group) {
-                return (object) [
-                    'date' => $group->first()->date->toDateString(),
-                    'total_market_value' => $group->sum('total_market_value'),
-                    'total_cost_basis' => $group->sum('total_cost_basis'),
-                    'total_gain' => $group->sum('total_gain'),
-                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
-                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
-                ];
-            })
-            ->values();
+        $dailyChange = $dailyChangeQuery->getDailyPerformance();
 
         return [
             'series' => [

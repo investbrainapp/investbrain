@@ -557,20 +557,9 @@ class MultiCurrencyTest extends TestCase
 
         $dailyChange = DailyChange::withDailyPerformance()
             ->portfolio($portfolio->id)
-            ->get();
+            ->getDailyPerformance();
 
-        $dailyChange = $dailyChange->sortBy('date')
-            ->groupBy('date')
-            ->map(function ($group) {
-                return (object) [
-                    'date' => $group->first()->date->toDateString(),
-                    'total_market_value' => $group->sum('total_market_value'),
-                    'total_cost_basis' => $group->sum('total_cost_basis'),
-                    'total_gain' => $group->sum('total_gain'),
-                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
-                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
-                ];
-            });
+        dump($dailyChange->toArray());
 
         $metrics = Holding::query()
             ->portfolio($portfolio->id)
@@ -618,32 +607,16 @@ class MultiCurrencyTest extends TestCase
 
         $dailyChange = DailyChange::withDailyPerformance()
             ->portfolio($portfolio->id)
-            ->get();
-
-        dump($dailyChange->toArray());
-
-        $dailyChange = $dailyChange->sortBy('date')
-            ->groupBy('date')
-            ->map(function ($group) {
-
-                return (object) [
-                    'date' => $group->first()->date->toDateString(),
-                    'total_market_value' => $group->sum('total_market_value'),
-                    'total_cost_basis' => $group->sum('total_cost_basis'),
-                    'total_gain' => $group->sum('total_gain'),
-                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
-                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
-                ];
-            });
+            ->getDailyPerformance();
 
         $metrics = Holding::query()
             ->portfolio($portfolio->id)
             ->getPortfolioMetrics();
 
-        $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01); // TODO:
+        $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01);
         $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
-        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01); // TODO:
+        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
     }
 
     public function test_multi_currency_import_calculates_correct_holding_data(): void
