@@ -40,17 +40,17 @@ new class extends Component
         if (isset($this->portfolio)) {
 
             // portfolio
-            $dailyChangeQuery = $dailyChangeQuery->portfolio($this->portfolio->id);
+            $dailyChangeQuery->portfolio($this->portfolio->id);
 
         } else {
 
             // dashboard
-            $dailyChangeQuery = $dailyChangeQuery->myDailyChanges()->withoutWishlists();
+            $dailyChangeQuery->myDailyChanges()->withoutWishlists();
         }
 
         if ($filterMethod['method']) {
 
-            $dailyChangeQuery = $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
+            $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
         $dailyChange = cache()->remember(
