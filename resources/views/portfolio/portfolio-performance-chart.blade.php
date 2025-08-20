@@ -40,21 +40,21 @@ new class extends Component
         if (isset($this->portfolio)) {
 
             // portfolio
-            $dailyChangeQuery->portfolio($this->portfolio->id);
+            $dailyChangeQuery = $dailyChangeQuery->portfolio($this->portfolio->id);
 
         } else {
 
             // dashboard
-            $dailyChangeQuery->myDailyChanges()->withoutWishlists();
+            $dailyChangeQuery = $dailyChangeQuery->myDailyChanges()->withoutWishlists();
         }
 
         if ($filterMethod['method']) {
 
-            $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
+            $dailyChangeQuery = $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
         $dailyChange = cache()->remember(
-            'graph-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
+            'graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
             30,
             function () use ($dailyChangeQuery) {
                 return $dailyChangeQuery->getDailyPerformance();
