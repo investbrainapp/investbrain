@@ -402,7 +402,7 @@ class Holding extends Model
             )
             ->leftJoinSub($dividends_sub, 'dividends_display',
                 function ($join) {
-                    $join->on('holdings.symbol', '=', 'dividends_display.symbol');
+                    $join->on('holdings.symbol', '=', 'dividends_display.symbol'); // todo: this isnt limiting to port ids
                 }
             );
 
