@@ -63,7 +63,6 @@ class DailyChange extends Model
         $currency = auth()->user()?->getCurrency() ?? config('investbrain.base_currency');
 
         return $query
-    // Join currency rates to get the rate for each date
             ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
                 $join->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(daily_change.date)'))
                     ->where('cr.currency', '=', $currency);
@@ -100,27 +99,27 @@ class DailyChange extends Model
                         ->whereColumn('transactions.portfolio_id', 'daily_change.portfolio_id')
                         ->whereColumn('transactions.date', '<=', 'daily_change.date');
                 },
-                'total_dividends_earned' => function ($query) use ($currency) {
-                    $query->from('holdings')
-                        ->join('dividends', 'dividends.symbol', '=', 'holdings.symbol')
-                        ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                            $join->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(dividends.date)'))
-                                ->where('cr.currency', '=', $currency);
-                        })
-                        ->join('transactions as tx', function ($join) {
-                            $join->on('tx.symbol', '=', 'holdings.symbol')
-                                ->on('tx.portfolio_id', '=', 'holdings.portfolio_id')
-                                ->whereColumn('tx.date', '<=', 'dividends.date');
-                        })
-                        ->selectRaw('SUM(
-                    ((CASE WHEN tx.transaction_type = \'BUY\' THEN tx.quantity ELSE 0 END)
-                    - (CASE WHEN tx.transaction_type = \'SELL\' THEN tx.quantity ELSE 0 END))
-                    * dividends.dividend_amount_base
-                    * COALESCE(cr.rate, 1)
-                )')
-                        ->whereColumn('holdings.portfolio_id', 'daily_change.portfolio_id')
-                        ->whereColumn('dividends.date', '<=', 'daily_change.date');
-                },
+                // 'total_dividends_earned' => function ($query) use ($currency) {
+                //     $query->from('holdings')
+                //         ->join('dividends', 'dividends.symbol', '=', 'holdings.symbol')
+                //         ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                //             $join->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(dividends.date)'))
+                //                 ->where('cr.currency', '=', $currency);
+                //         })
+                //         ->join('transactions as tx', function ($join) {
+                //             $join->on('tx.symbol', '=', 'holdings.symbol')
+                //                 ->on('tx.portfolio_id', '=', 'holdings.portfolio_id')
+                //                 ->whereColumn('tx.date', '<=', 'dividends.date');
+                //         })
+                //         ->selectRaw('SUM(
+                //     ((CASE WHEN tx.transaction_type = \'BUY\' THEN tx.quantity ELSE 0 END)
+                //     - (CASE WHEN tx.transaction_type = \'SELL\' THEN tx.quantity ELSE 0 END))
+                //     * dividends.dividend_amount_base
+                //     * COALESCE(cr.rate, 1)
+                // )')
+                //         ->whereColumn('holdings.portfolio_id', 'daily_change.portfolio_id')
+                //         ->whereColumn('dividends.date', '<=', 'daily_change.date');
+                // },
             ])
             ->orderBy('daily_change.date');
     }
@@ -141,7 +140,7 @@ class DailyChange extends Model
                     'total_cost_basis' => $total_cost_basis,
                     'total_gain' => $total_market_gain,
                     'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
-                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
+                    // 'total_dividends_earned' => $group->sum('total_dividends_earned'),
                 ];
             })
             ->values();
