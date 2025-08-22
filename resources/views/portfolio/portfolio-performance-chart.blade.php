@@ -7,7 +7,7 @@ use Livewire\Volt\Component;
 new class extends Component
 {
     // props
-    public ?Portfolio $portfolio;
+    public ?Portfolio $portfolio = null;
 
     public string $name = 'portfolio';
 
@@ -55,7 +55,7 @@ new class extends Component
 
         $dailyChange = cache()->remember(
             'graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
-            30,
+            10,
             function () use ($dailyChangeQuery) {
                 return $dailyChangeQuery->getDailyPerformance();
             }
@@ -92,7 +92,7 @@ new class extends Component
     {
         $this->scope = $scope;
 
-        cache()->forget('graph-'.isset($this->portfolio) ? $this->portfolio->id : request()->user()->id);
+        cache()->forget('graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id));
 
         $this->chartSeries = $this->generatePerformanceData();
     }

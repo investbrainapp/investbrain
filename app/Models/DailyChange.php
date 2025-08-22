@@ -62,6 +62,30 @@ class DailyChange extends Model
     {
         $currency = auth()->user()?->getCurrency() ?? config('investbrain.base_currency');
 
+        $dividendSub = DB::table('holdings')
+            ->join('dividends', 'dividends.symbol', '=', 'holdings.symbol')
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                $join->on('cr.date', '=', 'dividends.date')
+                    ->where('cr.currency', '=', $currency);
+            })
+            ->join('transactions as tx', function ($join) {
+                $join->on('tx.symbol', '=', 'holdings.symbol')
+                    ->on('tx.portfolio_id', '=', 'holdings.portfolio_id')
+                    ->whereColumn('tx.date', '<=', 'dividends.date');
+            })
+            ->select(['holdings.portfolio_id', 'dividends.date'])
+            ->selectRaw("
+                ((CASE WHEN tx.transaction_type = 'BUY'
+                    THEN tx.quantity ELSE 0 END)
+                - (CASE WHEN tx.transaction_type = 'SELL'
+                    THEN tx.quantity ELSE 0 END))
+                * SUM(
+                    dividends.dividend_amount_base
+                    * COALESCE(cr.rate, 1)
+                )
+                AS total_dividends_earned")
+            ->groupBy(['holdings.portfolio_id', 'dividends.date', 'tx.transaction_type', 'tx.quantity']);
+
         $transactionTotals = DB::table('transactions')
             ->select(['transactions.portfolio_id', 'transactions.date'])
             ->selectRaw("
@@ -71,6 +95,16 @@ class DailyChange extends Model
                     * transactions.cost_basis_base 
                     * COALESCE(cr.rate, 1)
                 ) AS daily_cost_basis
+            ")
+            ->selectRaw("
+                SUM(
+                    (CASE 
+                        WHEN transactions.transaction_type = 'SELL' 
+                        THEN ( transactions.sale_price_base - transactions.cost_basis_base ) 
+                             * transactions.quantity
+                             * COALESCE(cr.rate, 1)
+                    END)
+                ) AS daily_realized_gains
             ")
             ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
                 $join
@@ -83,9 +117,20 @@ class DailyChange extends Model
             ->mergeBindings($transactionTotals)
             ->select(['portfolio_id', 'date'])
             ->selectRaw('SUM(daily_cost_basis) AS cumulative_cost_basis')
+            ->selectRaw('SUM(daily_realized_gains) AS cumulative_realized_gains')
             ->groupBy('portfolio_id', 'date');
 
         return $query
+            ->select(['daily_change.portfolio_id', 'daily_change.date'])
+            ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) AS total_market_value')
+            ->selectRaw('SUM(COALESCE(ccb.cumulative_cost_basis, 0)) AS total_cost_basis')
+            ->selectRaw('SUM(COALESCE(ccb.cumulative_realized_gains, 0)) AS realized_gain_dollars')
+            ->selectSub(function ($query) use ($dividendSub) {
+                $query->fromSub($dividendSub, 'd')
+                    ->selectRaw('SUM(d.total_dividends_earned)')
+                    ->whereColumn('d.date', '<=', 'daily_change.date')
+                    ->whereColumn('d.portfolio_id', '=', 'daily_change.portfolio_id');
+            }, 'total_dividends_earned')
             ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
                 $join
                     ->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(daily_change.date)'))
@@ -96,9 +141,6 @@ class DailyChange extends Model
                     ->on('ccb.portfolio_id', '=', 'daily_change.portfolio_id')
                     ->whereRaw('ccb.date <= daily_change.date');
             })
-            ->select(['daily_change.portfolio_id', 'daily_change.date'])
-            ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) AS total_market_value')
-            ->selectRaw('SUM(COALESCE(ccb.cumulative_cost_basis, 0)) AS total_cost_basis')
             ->groupBy(['daily_change.date', 'daily_change.portfolio_id', 'cr.rate'])
             ->orderBy('daily_change.date');
     }
@@ -119,7 +161,7 @@ class DailyChange extends Model
                     'total_cost_basis' => $total_cost_basis,
                     'total_gain' => $total_market_gain,
                     'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
-                    // 'total_dividends_earned' => $group->sum('total_dividends_earned'),
+                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
                 ];
             })
             ->values();

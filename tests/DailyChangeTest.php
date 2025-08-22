@@ -143,6 +143,7 @@ class DailyChangeTest extends TestCase
         $daily_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
             ->whereDate('daily_change.date', '=', $sale_transaction->date->copy()->nextWeekday())
+            ->getDailyPerformance()
             ->first();
 
         $realized_gain = ($sale_transaction->sale_price - $sale_transaction->cost_basis) * $sale_transaction->quantity;
