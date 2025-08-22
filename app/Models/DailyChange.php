@@ -146,7 +146,6 @@ class DailyChange extends Model
             })
             ->groupBy(['daily_change.date', 'daily_change.portfolio_id', 'cr.rate'])
             ->orderBy('daily_change.date');
-
     }
 
     public function scopeWithMultipleDailyPerformance($query)
