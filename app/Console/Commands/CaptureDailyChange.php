@@ -49,16 +49,9 @@ class CaptureDailyChange extends Command
                 ->portfolio($portfolio->id)
                 ->getPortfolioMetrics(config('investbrain.base_currency'));
 
-            $total_cost_basis = $metrics->get('total_cost_basis');
-            $total_market_value = $metrics->get('total_market_value');
-
             $portfolio->daily_change()->create([
                 'date' => now(),
-                'total_market_value' => $total_market_value,
-                'total_cost_basis' => $total_cost_basis,
-                'total_market_gain' => $total_market_value - $total_cost_basis,
-                'total_dividends_earned' => $metrics->get('total_dividends_earned'),
-                'realized_gains' => $metrics->get('realized_gain_dollars'),
+                'total_market_value' => $metrics->get('total_market_value'),
             ]);
         });
     }
