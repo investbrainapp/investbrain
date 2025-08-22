@@ -70,4 +70,23 @@ class DividendsTest extends TestCase
 
         $this->assertEquals(3, $dividend_count);
     }
+
+    public function test_dividend_earnings_are_not_shared_between_portfolios(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolioOne = Portfolio::factory()->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolioOne->id)->symbol('ACME')->create();
+
+        $portfolioTwo = Portfolio::factory()->create();
+        Transaction::factory(2)->buy()->sixMonthsAgo()->portfolio($portfolioTwo->id)->symbol('ACME')->create();
+
+        Dividend::refreshDividendData('ACME');
+
+        $holdingOne = Holding::query()->portfolio($portfolioOne->id)->symbol('ACME')->first();
+        $holdingTwo = Holding::query()->portfolio($portfolioTwo->id)->symbol('ACME')->first();
+
+        $this->assertEquals(4.95, $holdingOne->dividends_earned);
+        $this->assertEquals(8, $holdingTwo->dividends_earned);
+    }
 }

@@ -341,11 +341,11 @@ class Holding extends Model
                     ->on('cr.date', '=', 'dividends.date')
                     ->where('cr.currency', '=', $currency);
             })
-            ->select(['dividends.symbol'])
+            ->select(['dividends.symbol', 'tx.portfolio_id'])
             ->selectRaw(
                 "SUM(((CASE WHEN transaction_type = 'BUY' THEN tx.quantity ELSE 0 END) - (CASE WHEN transaction_type = 'SELL' THEN tx.quantity ELSE 0 END)) * dividends.dividend_amount_base * COALESCE(cr.rate, 1)) AS total_dividends_earned"
             )
-            ->groupBy(['dividends.symbol']);
+            ->groupBy(['dividends.symbol', 'tx.portfolio_id']);
 
         return $query->select([
             'holdings.symbol',
@@ -402,7 +402,8 @@ class Holding extends Model
             )
             ->leftJoinSub($dividends_sub, 'dividends_display',
                 function ($join) {
-                    $join->on('holdings.symbol', '=', 'dividends_display.symbol'); // todo: this isnt limiting to port ids
+                    $join->on('holdings.symbol', '=', 'dividends_display.symbol') // todo: this isnt limiting to port ids
+                        ->on('holdings.portfolio_id', '=', 'dividends_display.portfolio_id');
                 }
             );
 

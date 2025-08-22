@@ -59,6 +59,13 @@ class TransactionFactory extends Factory
         ]);
     }
 
+    public function sixMonthsAgo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => now()->subMonths(6)->toDateString(),
+        ]);
+    }
+
     public function today(): static
     {
         return $this->state(fn (array $attributes) => [
