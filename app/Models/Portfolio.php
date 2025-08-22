@@ -218,6 +218,9 @@ class Portfolio extends Model
                 );
             });
         }
+
+        cache()->forget('graph-YTD-'.$this->id);
+        cache()->forget('graph-YTD-'.request()->user()->id);
     }
 
     protected function getMostRecentCloseData($history, $date, $i = 0, $max_attempts = 5)

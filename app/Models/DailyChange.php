@@ -42,9 +42,9 @@ class DailyChange extends Model
         return $query->where('daily_change.portfolio_id', $portfolio);
     }
 
-    public function scopeMyDailyChanges()
+    public function scopeMyDailyChanges($query)
     {
-        return $this->whereHas('portfolio', function ($query) {
+        return $query->whereHas('portfolio', function ($query) {
             $query->whereHas('users', function ($query) {
                 return $query->where('id', auth()->id());
             });
