@@ -153,7 +153,7 @@ class DailyChange extends Model
     {
         return DB::table(DB::raw("({$query->toSql()}) AS daily_query"))
             ->addBinding($query->getQuery()->getBindings(), 'join')
-            ->select(['date'])
+            ->select('date')
             ->selectRaw('SUM(total_market_value) AS total_market_value')
             ->selectRaw('SUM(total_cost_basis) AS total_cost_basis')
             ->selectRaw('SUM(total_market_gain) AS total_market_gain')
