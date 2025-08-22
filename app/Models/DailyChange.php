@@ -62,65 +62,44 @@ class DailyChange extends Model
     {
         $currency = auth()->user()?->getCurrency() ?? config('investbrain.base_currency');
 
+        $transactionTotals = DB::table('transactions')
+            ->select(['transactions.portfolio_id', 'transactions.date'])
+            ->selectRaw("
+                SUM(
+                    (CASE WHEN transactions.transaction_type = 'BUY' THEN 1 ELSE -1 END) 
+                    * transactions.quantity 
+                    * transactions.cost_basis_base 
+                    * COALESCE(cr.rate, 1)
+                ) AS daily_cost_basis
+            ")
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                $join
+                    ->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(transactions.date)'))
+                    ->where('cr.currency', $currency);
+            })
+            ->groupBy('transactions.portfolio_id', 'transactions.date');
+
+        $cumulativeCostBasis = DB::table(DB::raw("({$transactionTotals->toSql()}) AS transaction_totals"))
+            ->mergeBindings($transactionTotals)
+            ->select(['portfolio_id', 'date'])
+            ->selectRaw('SUM(daily_cost_basis) AS cumulative_cost_basis')
+            ->groupBy('portfolio_id', 'date');
+
         return $query
             ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                $join->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(daily_change.date)'))
-                    ->where('cr.currency', '=', $currency);
+                $join
+                    ->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(daily_change.date)'))
+                    ->where('cr.currency', $currency);
             })
-            ->select([
-                'daily_change.date',
-                'daily_change.portfolio_id',
-                DB::raw('daily_change.total_market_value * COALESCE(cr.rate, 1) as total_market_value'),
-                'total_cost_basis' => function ($query) use ($currency) {
-                    $query->from('transactions')
-                        ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                            $join->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(transactions.date)'))
-                                ->where('cr.currency', '=', $currency);
-                        })
-                        ->selectRaw('SUM(
-                    (CASE WHEN transactions.transaction_type = \'BUY\' THEN 1 ELSE -1 END)
-                    * transactions.cost_basis_base * transactions.quantity * COALESCE(cr.rate, 1)
-                )')
-                        ->whereColumn('transactions.portfolio_id', 'daily_change.portfolio_id')
-                        ->whereColumn('transactions.date', '<=', 'daily_change.date');
-                },
-                'realized_gain_dollars' => function ($query) use ($currency) {
-                    $query->from('transactions')
-                        ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                            $join->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(transactions.date)'))
-                                ->where('cr.currency', '=', $currency);
-                        })
-                        ->selectRaw('SUM(
-                    (CASE WHEN transactions.transaction_type = \'SELL\' 
-                        THEN (transactions.sale_price_base - transactions.cost_basis_base) 
-                        ELSE 0 END)
-                    * transactions.quantity * COALESCE(cr.rate, 1)
-                )')
-                        ->whereColumn('transactions.portfolio_id', 'daily_change.portfolio_id')
-                        ->whereColumn('transactions.date', '<=', 'daily_change.date');
-                },
-                // 'total_dividends_earned' => function ($query) use ($currency) {
-                //     $query->from('holdings')
-                //         ->join('dividends', 'dividends.symbol', '=', 'holdings.symbol')
-                //         ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                //             $join->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(dividends.date)'))
-                //                 ->where('cr.currency', '=', $currency);
-                //         })
-                //         ->join('transactions as tx', function ($join) {
-                //             $join->on('tx.symbol', '=', 'holdings.symbol')
-                //                 ->on('tx.portfolio_id', '=', 'holdings.portfolio_id')
-                //                 ->whereColumn('tx.date', '<=', 'dividends.date');
-                //         })
-                //         ->selectRaw('SUM(
-                //     ((CASE WHEN tx.transaction_type = \'BUY\' THEN tx.quantity ELSE 0 END)
-                //     - (CASE WHEN tx.transaction_type = \'SELL\' THEN tx.quantity ELSE 0 END))
-                //     * dividends.dividend_amount_base
-                //     * COALESCE(cr.rate, 1)
-                // )')
-                //         ->whereColumn('holdings.portfolio_id', 'daily_change.portfolio_id')
-                //         ->whereColumn('dividends.date', '<=', 'daily_change.date');
-                // },
-            ])
+            ->leftJoinSub($cumulativeCostBasis, 'ccb', function ($join) {
+                $join
+                    ->on('ccb.portfolio_id', '=', 'daily_change.portfolio_id')
+                    ->whereRaw('ccb.date <= daily_change.date');
+            })
+            ->select(['daily_change.portfolio_id', 'daily_change.date'])
+            ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) AS total_market_value')
+            ->selectRaw('SUM(COALESCE(ccb.cumulative_cost_basis, 0)) AS total_cost_basis')
+            ->groupBy(['daily_change.date', 'daily_change.portfolio_id', 'cr.rate'])
             ->orderBy('daily_change.date');
     }
 
