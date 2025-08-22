@@ -39,7 +39,7 @@ class Holding extends Model
         'total_cost_basis' => 'float',
         'realized_gain_dollars' => 'float',
         'dividends_earned' => 'float',
-        'total_gain_dollars' => 'float',
+        'total_market_gain_dollars' => 'float',
         'market_gain_dollars' => 'float',
         'total_market_value' => 'float',
         'total_dividends_earned' => 'float',
@@ -228,7 +228,7 @@ class Holding extends Model
         return collect([
             'total_cost_basis' => $result->sum('total_cost_basis'),
             'total_market_value' => $result->sum('total_market_value'),
-            'total_gain_dollars' => $result->sum('total_gain_dollars'),
+            'total_market_gain_dollars' => $result->sum('total_market_gain_dollars'),
             'realized_gain_dollars' => $result->sum('realized_gain_dollars'),
             'total_dividends_earned' => $result->sum('total_dividends_earned'),
         ]);
@@ -391,7 +391,7 @@ class Holding extends Model
                 (holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1)) 
                 - (SUM(transactions_display.total_cost_basis) / SUM(transactions_display.total_purchases)) 
                 * holdings.quantity 
-                AS total_gain_dollars
+                AS total_market_gain_dollars
             ')
             ->leftJoinSub($cost_basis_sub, 'transactions_display',
                 function ($join) {

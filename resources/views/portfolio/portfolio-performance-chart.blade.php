@@ -57,7 +57,7 @@ new class extends Component
             'graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
             10,
             function () use ($dailyChangeQuery) {
-                return $dailyChangeQuery->getDailyPerformance();
+                return $dailyChangeQuery->withMultipleDailyPerformance()->get();
             }
         );
 
@@ -73,7 +73,7 @@ new class extends Component
                 ],
                 [
                     'name' => __('Market Gain'),
-                    'data' => $dailyChange->map(fn ($data) => [$data->date, $data->total_gain])->toArray(),
+                    'data' => $dailyChange->map(fn ($data) => [$data->date, $data->total_market_gain])->toArray(),
                 ],
 
                 // [

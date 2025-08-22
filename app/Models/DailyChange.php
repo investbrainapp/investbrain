@@ -32,7 +32,7 @@ class DailyChange extends Model
         'date' => 'datetime',
         'total_market_value' => 'float',
         'total_cost_basis' => 'float',
-        'total_gain' => 'float',
+        'total_market_gain' => 'float',
         'realized_gain_dollars' => 'float',
         'total_dividends_earned' => 'float',
     ];
@@ -124,6 +124,9 @@ class DailyChange extends Model
             ->select(['daily_change.portfolio_id', 'daily_change.date'])
             ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) AS total_market_value')
             ->selectRaw('SUM(COALESCE(ccb.cumulative_cost_basis, 0)) AS total_cost_basis')
+            ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) 
+                - SUM(COALESCE(ccb.cumulative_cost_basis, 0)) 
+                AS total_market_gain')
             ->selectRaw('SUM(COALESCE(ccb.cumulative_realized_gains, 0)) AS realized_gain_dollars')
             ->selectSub(function ($query) use ($dividendSub) {
                 $query->fromSub($dividendSub, 'd')
@@ -143,28 +146,20 @@ class DailyChange extends Model
             })
             ->groupBy(['daily_change.date', 'daily_change.portfolio_id', 'cr.rate'])
             ->orderBy('daily_change.date');
+
     }
 
-    public function scopeGetDailyPerformance($query)
+    public function scopeWithMultipleDailyPerformance($query)
     {
-        return $query->get()
-            ->groupBy('date')
-            ->map(function ($group) {
-
-                $total_market_value = $group->sum('total_market_value');
-                $total_cost_basis = $group->sum('total_cost_basis');
-                $total_market_gain = $total_market_value - $total_cost_basis;
-
-                return (object) [
-                    'date' => $group->first()->date->toDateString(),
-                    'total_market_value' => $total_market_value,
-                    'total_cost_basis' => $total_cost_basis,
-                    'total_gain' => $total_market_gain,
-                    'realized_gain_dollars' => $group->sum('realized_gain_dollars'),
-                    'total_dividends_earned' => $group->sum('total_dividends_earned'),
-                ];
-            })
-            ->values();
+        return DB::table(DB::raw("({$query->toSql()}) AS daily_query"))
+            ->addBinding($query->getQuery()->getBindings(), 'join')
+            ->select(['date'])
+            ->selectRaw('SUM(total_market_value) AS total_market_value')
+            ->selectRaw('SUM(total_cost_basis) AS total_cost_basis')
+            ->selectRaw('SUM(total_market_gain) AS total_market_gain')
+            ->selectRaw('SUM(realized_gain_dollars) AS realized_gain_dollars')
+            ->selectRaw('SUM(total_dividends_earned) AS total_dividends_earned')
+            ->groupBy('date');
     }
 
     public function portfolio()

@@ -56,7 +56,7 @@ class CaptureDailyChange extends Command
                 'date' => now(),
                 'total_market_value' => $total_market_value,
                 'total_cost_basis' => $total_cost_basis,
-                'total_gain' => $total_market_value - $total_cost_basis,
+                'total_market_gain' => $total_market_value - $total_cost_basis,
                 'total_dividends_earned' => $metrics->get('total_dividends_earned'),
                 'realized_gains' => $metrics->get('realized_gain_dollars'),
             ]);

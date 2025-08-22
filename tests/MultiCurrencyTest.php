@@ -557,7 +557,7 @@ class MultiCurrencyTest extends TestCase
 
         $dailyChange = DailyChange::withDailyPerformance()
             ->portfolio($portfolio->id)
-            ->getDailyPerformance();
+            ->get();
 
         $metrics = Holding::query()
             ->portfolio($portfolio->id)
@@ -567,7 +567,7 @@ class MultiCurrencyTest extends TestCase
         $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta(Holding::get()->sum('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
-        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_market_gain, 0.01);
 
         // add currency rates
         $rates = collect([[
@@ -605,7 +605,7 @@ class MultiCurrencyTest extends TestCase
 
         $dailyChange = DailyChange::withDailyPerformance()
             ->portfolio($portfolio->id)
-            ->getDailyPerformance();
+            ->get();
 
         $metrics = Holding::query()
             ->portfolio($portfolio->id)
@@ -614,7 +614,7 @@ class MultiCurrencyTest extends TestCase
         $this->assertEqualsWithDelta($metrics->get('total_market_value'), $dailyChange->last()->total_market_value, 0.01);
         $this->assertEqualsWithDelta($metrics->get('total_cost_basis'), $dailyChange->last()->total_cost_basis, 0.01);
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
-        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_gain, 0.01);
+        $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_market_gain, 0.01);
     }
 
     public function test_multi_currency_import_calculates_correct_holding_data(): void
