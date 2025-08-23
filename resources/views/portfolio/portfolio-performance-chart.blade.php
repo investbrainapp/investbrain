@@ -65,15 +65,15 @@ new class extends Component
             'series' => [
                 [
                     'name' => __('Market Value'),
-                    'data' => $dailyChange->map(fn ($data) => [$data->date, $data->total_market_value])->toArray(),
+                    'data' => $dailyChange->map(fn ($data) => [$data->date, round($data->total_market_value, 2)])->toArray(),
                 ],
                 [
                     'name' => __('Cost Basis'),
-                    'data' => $dailyChange->map(fn ($data) => [$data->date, $data->total_cost_basis])->toArray(),
+                    'data' => $dailyChange->map(fn ($data) => [$data->date, round($data->total_cost_basis, 2)])->toArray(),
                 ],
                 [
                     'name' => __('Market Gain'),
-                    'data' => $dailyChange->map(fn ($data) => [$data->date, $data->total_market_gain])->toArray(),
+                    'data' => $dailyChange->map(fn ($data) => [$data->date, round($data->total_market_gain, 2)])->toArray(),
                 ],
 
                 // [
