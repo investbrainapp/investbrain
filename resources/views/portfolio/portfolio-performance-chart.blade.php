@@ -61,28 +61,41 @@ new class extends Component
             }
         );
 
+        $marketValueData = [];
+        $costBasisData = [];
+        $marketGainData = [];
+
+        foreach ($dailyChange as $data) {
+            $date = $data->date;
+            $marketValueData[] = [$date, round($data->total_market_value, 2)];
+            $costBasisData[] = [$date, round($data->total_cost_basis, 2)];
+            $marketGainData[] = [$date, round($data->total_market_gain, 2)];
+            // $dividendSeries[] = [$date, round($data->total_dividends_earned, 2)];
+            // $realizedGainSeries[] = [$date, round($data->realized_gains, 2)];
+        }
+
         return [
             'series' => [
                 [
                     'name' => __('Market Value'),
-                    'data' => $dailyChange->map(fn ($data) => [$data->date, round($data->total_market_value, 2)])->toArray(),
+                    'data' => $marketValueData,
                 ],
                 [
                     'name' => __('Cost Basis'),
-                    'data' => $dailyChange->map(fn ($data) => [$data->date, round($data->total_cost_basis, 2)])->toArray(),
+                    'data' => $costBasisData,
                 ],
                 [
                     'name' => __('Market Gain'),
-                    'data' => $dailyChange->map(fn ($data) => [$data->date, round($data->total_market_gain, 2)])->toArray(),
+                    'data' => $marketGainData,
                 ],
 
                 // [
                 //     'name' => __('Dividends Earned'),
-                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
+                //     'data' => $dividendSeries
                 // ],
                 // [
                 //     'name' => __('Realized Gains'),
-                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->realized_gains])->toArray()
+                //     'data' => $realizedGainSeries
                 // ],
             ],
         ];
