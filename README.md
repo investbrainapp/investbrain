@@ -74,7 +74,7 @@ Always keep in mind the limitations of LLMs. When in doubt, consult a licensed i
 
 ## Market data providers
 
-Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), [Alpaca](https://alpaca.markets/), and [Alpha Vantage](https://www.alphavantage.co/support/). The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
+Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as [Yahoo Finance](https://finance.yahoo.com/), [Twelve Data](https://twelvedata.com), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), [Alpaca](https://alpaca.markets/), and [Alpha Vantage](https://www.alphavantage.co/support/). The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
 
 ### Configuration
 
@@ -138,9 +138,12 @@ There are several optional configurations available when installing using the re
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
 | APP_KEY | Must be set during install - encryption key for various security-related functions | `null` |
-| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, `alpaca`, or `finnhub`) | yahoo |
+| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `twelvedata`, `alphavantage`, `alpaca`, or `finnhub`) | yahoo |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
+| ALPACA_API_KEY | If using the Alpaca provider | `null` |
+| ALPACA_API_SECRET | If using the Alpaca provider | `null` |
+| TWELVEDATA_API_SECRET | If using the Twelve Data provider | `null` |
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
 | APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
 | AI_CHAT_ENABLED | Whether to enable AI chat features | `false` |
