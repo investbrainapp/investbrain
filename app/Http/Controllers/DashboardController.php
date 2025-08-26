@@ -17,16 +17,14 @@ class DashboardController extends Controller
         $user = $request->user()->load(['portfolios', 'holdings', 'transactions']);
 
         // get portfolio metrics
-        $metrics = cache()->remember(
+        $metrics = cache()->tags(['metrics-'.$user->id])->remember(
             'dashboard-metrics-'.$user->id,
             10,
             function () {
-                return
-                 Holding::query()
-                     ->myHoldings()
-                     ->withoutWishlists()
-                     ->withPortfolioMetrics()
-                     ->first();
+                return Holding::query()
+                    ->myHoldings()
+                    ->withoutWishlists()
+                    ->getPortfolioMetrics();
             }
         );
 

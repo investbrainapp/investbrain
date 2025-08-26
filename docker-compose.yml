@@ -10,12 +10,10 @@ services:
     ports:
       - 8000:80
     environment: # You can either use these properties OR an .env file. Do not use both!
-      APP_KEY: "" # Generate a key using `echo base64:$(openssl rand -base64 32)`
       APP_URL: "http://localhost:8000"
-      ASSET_URL: "http://localhost:8000"
-      DB_CONNECTION: mysql
-      DB_HOST: investbrain-mysql
-      DB_PORT: 3306
+      DB_CONNECTION: pgsql
+      DB_HOST: investbrain-pgsql
+      DB_PORT: 5432
       DB_DATABASE: investbrain
       DB_USERNAME: investbrain
       DB_PASSWORD: investbrain
@@ -25,9 +23,9 @@ services:
       REDIS_HOST: investbrain-redis
     volumes:
       - investbrain-storage:/var/app/storage # You can use a volume... 
-      # - /path/to/storage:/var/app/storage # ...or you can use a path on host
+      # - /path/to/storage:/var/app/storage:delegated # ...or you can use a path on host
     depends_on:
-      - mysql
+      - pgsql
       - redis
     networks:
       - investbrain-network
@@ -42,22 +40,22 @@ services:
       - investbrain-redis:/data
     networks:
       - investbrain-network
-  mysql:
-    image: mysql:8.0
-    container_name: investbrain-mysql
+  pgsql:
+    image: postgres:15-alpine
+    container_name: investbrain-pgsql
     restart: unless-stopped
+    ports:
+      - "5432:5432"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-investbrain}
-      MYSQL_USER: ${DB_USERNAME:-investbrain}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-investbrain}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-investbrain}
-    command: 
-      - --cte-max-recursion-depth=25000
+      POSTGRES_DB: ${DB_DATABASE:-investbrain}
+      POSTGRES_USER: ${DB_USERNAME:-investbrain}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-investbrain}
+    command: postgres -c log_min_messages=error
     volumes:
-      - investbrain-mysql:/var/lib/mysql
+      - investbrain-pgsql:/var/lib/postgresql/data
     networks:
       - investbrain-network
 volumes:
   investbrain-storage:
   investbrain-redis:
-  investbrain-mysql:
+  investbrain-pgsql:

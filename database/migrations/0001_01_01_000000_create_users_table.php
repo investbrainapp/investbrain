@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->string('profile_photo_path', 2048)->nullable();
+            $table->boolean('admin')->nullable();
             $table->timestamps();
         });
 
@@ -38,6 +39,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };

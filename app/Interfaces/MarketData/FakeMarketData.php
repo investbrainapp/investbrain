@@ -8,6 +8,7 @@ use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -25,6 +26,7 @@ class FakeMarketData implements MarketDataInterface
         return new Quote([
             'name' => 'ACME Company Ltd',
             'symbol' => $symbol,
+            'currency' => 'USD',
             'market_value' => 230.19,
             'fifty_two_week_high' => 512.90,
             'fifty_two_week_low' => 341.20,
@@ -34,6 +36,7 @@ class FakeMarketData implements MarketDataInterface
             'book_value' => 4.7,
             'last_dividend_date' => now()->subDays(45),
             'dividend_yield' => 0.033,
+            'meta_data' => [],
         ]);
     }
 
@@ -65,7 +68,7 @@ class FakeMarketData implements MarketDataInterface
         return collect([
             new Split([
                 'symbol' => $symbol,
-                'date' => now()->subMonths(36),
+                'date' => now()->subMonths(12),
                 'split_amount' => 10,
             ]),
         ]);
@@ -73,16 +76,27 @@ class FakeMarketData implements MarketDataInterface
 
     public function history(string $symbol, $startDate, $endDate): Collection
     {
-        $numDays = Carbon::parse($startDate)->diffInDays($endDate, true);
+        $endDate = now()->isBefore(Carbon::parse(config('investbrain.daily_change_time_of_day')))
+            ? now()->subDay()
+            : now();
 
-        for ($i = 0; $i < $numDays; $i++) {
+        $days = CarbonPeriod::create($startDate, $endDate)->filter('isWeekday');
 
-            $date = now()->subDays($i)->format('Y-m-d');
+        $countOfDays = $days->count();
+
+        foreach ($days as $index => $date) {
+
+            $date = $date->toDateString();
 
             $series[$date] = new Ohlc([
                 'symbol' => $symbol,
                 'date' => $date,
-                'close' => rand(150, 400),
+                'open' => rand(150, 400),
+                'high' => rand(150, 400),
+                'low' => rand(150, 400),
+                'close' => $index == $countOfDays - 1
+                    ? 230.19 // most recent close should match current market value
+                    : rand(150, 400),
             ]);
         }
 

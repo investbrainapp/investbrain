@@ -7,7 +7,6 @@ namespace App\Console\Commands;
 use App\Models\Holding;
 use App\Models\MarketData;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 
 class RefreshMarketData extends Command
 {
@@ -61,7 +60,7 @@ class RefreshMarketData extends Command
             try {
                 MarketData::getMarketData($holding->symbol, $force);
             } catch (\Throwable $e) {
-                Log::error('Could not refresh '.$holding->symbol.' ('.$e->getMessage().')');
+                $this->line('Could not refresh '.$holding->symbol.' ('.$e->getMessage().')');
             }
         }
     }

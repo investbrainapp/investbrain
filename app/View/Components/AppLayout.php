@@ -21,11 +21,11 @@ class AppLayout extends Component
 
                                 <x-partials.nav-bar />
 
-                                <x-main with-nav full-width>
+                                <x-partials.main with-nav full-width>
 
                                     <x-slot:sidebar drawer="main-drawer" class="bg-base-100 lg:bg-inherit">
-                            
-                                        <x-partials.side-bar />
+                                        
+                                        @livewire('partials.side-bar')
 
                                     </x-slot:sidebar>
 
@@ -34,7 +34,7 @@ class AppLayout extends Component
                                         {{ $slot }}
                                     </x-slot:content>
 
-                                </x-main>
+                                </x-partials.main>
                             
                                 @if(session('toast'))
                                     <script lang="text/javascript">

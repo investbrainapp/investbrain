@@ -2,29 +2,31 @@
 
 use App\Models\DailyChange;
 use App\Models\Portfolio;
-use Livewire\Attributes\{Title, Rule};
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // props
-    public ?Portfolio $portfolio;
-    public String $name = 'portfolio';
-    public String $scope = 'YTD';
-    public Array $scopeOptions = [
+    public ?Portfolio $portfolio = null;
+
+    public string $name = 'portfolio';
+
+    public string $scope = 'YTD';
+
+    public array $scopeOptions = [
         ['id' => '1M', 'name' => '1 month', 'method' => 'subMonths', 'args' => [1]],
         ['id' => '3M', 'name' => '3 months', 'method' => 'subMonths', 'args' => [3]],
         ['id' => 'YTD', 'name' => 'Year to date', 'method' => 'startOfYear', 'args' => []],
         ['id' => '1Y', 'name' => '1 year', 'method' => 'subYears', 'args' => [1]],
         ['id' => '3Y', 'name' => '3 years', 'method' => 'subYears', 'args' => [3]],
-        ['id' => 'ALL', 'name' => 'All time', 'method' => null]
+        ['id' => 'ALL', 'name' => 'All time', 'method' => null],
     ];
 
     // data
-    public Array $chartSeries;
+    public array $chartSeries;
 
     // methods
-    public function mount() 
+    public function mount()
     {
         $this->chartSeries = $this->generatePerformanceData();
     }
@@ -33,67 +35,77 @@ new class extends Component {
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $dailyChangeQuery = DailyChange::myDailyChanges();
+        $dailyChangeQuery = DailyChange::withDailyPerformance();
 
         if (isset($this->portfolio)) {
-            
+
+            // portfolio
             $dailyChangeQuery->portfolio($this->portfolio->id);
 
         } else {
-            
-            $dailyChangeQuery->selectRaw('
-                date, 
-                SUM(total_market_value) as total_market_value, 
-                SUM(total_cost_basis) as total_cost_basis, 
-                SUM(total_gain) as total_gain 
-                /*  ,
-                    SUM(realized_gains) as realized_gains,
-                    SUM(total_dividends_earned) as total_dividends_earned 
-                */
-            ')
-            ->withoutWishlists()
-            ->groupBy('date')
-            ->orderBy('date');
 
+            // dashboard
+            $dailyChangeQuery->myDailyChanges()->withoutWishlists();
         }
 
         if ($filterMethod['method']) {
-            
-            $dailyChangeQuery->whereDate('date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
+
+            $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
-        // dd($dailyChangeQuery->toSql());
-        $dailyChange = $dailyChangeQuery->get();
+
+        $dailyChange = cache()->remember(
+            'graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
+            10,
+            function () use ($dailyChangeQuery) {
+                return $dailyChangeQuery->withMultipleDailyPerformance()->get();
+            }
+        );
+
+        $marketValueData = [];
+        $costBasisData = [];
+        $marketGainData = [];
+
+        foreach ($dailyChange as $data) {
+            $date = $data->date;
+            $marketValueData[] = [$date, round($data->total_market_value, 2)];
+            $costBasisData[] = [$date, round($data->total_cost_basis, 2)];
+            $marketGainData[] = [$date, round($data->total_market_gain, 2)];
+            // $dividendSeries[] = [$date, round($data->total_dividends_earned, 2)];
+            // $realizedGainSeries[] = [$date, round($data->realized_gains, 2)];
+        }
 
         return [
             'series' => [
                 [
                     'name' => __('Market Value'),
-                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_market_value])->toArray(),
+                    'data' => $marketValueData,
                 ],
                 [
                     'name' => __('Cost Basis'),
-                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_cost_basis])->toArray(),
+                    'data' => $costBasisData,
                 ],
                 [
                     'name' => __('Market Gain'),
-                    'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_gain])->toArray()
+                    'data' => $marketGainData,
                 ],
-                
+
                 // [
                 //     'name' => __('Dividends Earned'),
-                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->total_dividends_earned])->toArray()
+                //     'data' => $dividendSeries
                 // ],
                 // [
                 //     'name' => __('Realized Gains'),
-                //     'data' => $dailyChange->map(fn($data) => [$data->date, $data->realized_gains])->toArray()
+                //     'data' => $realizedGainSeries
                 // ],
-            ]
+            ],
         ];
     }
 
     public function changeScope($scope)
     {
         $this->scope = $scope;
+
+        cache()->forget('graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id));
 
         $this->chartSeries = $this->generatePerformanceData();
     }
@@ -102,7 +114,6 @@ new class extends Component {
     {
         return collect($this->scopeOptions)->where('id', $scope)->first()['name'];
     }
-
 }; ?>
 
 <x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">

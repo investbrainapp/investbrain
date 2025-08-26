@@ -8,6 +8,7 @@ use App\Console\Commands\RefreshDividendData;
 use App\Console\Commands\RefreshMarketData;
 use App\Console\Commands\SyncDailyChange;
 use App\Console\Commands\SyncHoldingData;
+use App\Imports\Sheets\ConfigSheet;
 use App\Imports\Sheets\DailyChangesSheet;
 use App\Imports\Sheets\PortfoliosSheet;
 use App\Imports\Sheets\TransactionsSheet;
@@ -69,6 +70,7 @@ class BackupImport implements WithEvents, WithMultipleSheets
             'Portfolios' => new PortfoliosSheet($this->backupImportModel),
             'Transactions' => new TransactionsSheet($this->backupImportModel),
             'Daily Changes' => new DailyChangesSheet($this->backupImportModel),
+            'Config' => new ConfigSheet($this->backupImportModel),
         ];
     }
 }

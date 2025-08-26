@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\CopyToBaseCurrency;
+use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\Str;
 
 class Dividend extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -25,21 +33,32 @@ class Dividend extends Model
     protected $hidden = [];
 
     protected $casts = [
-        'date' => 'datetime',
-        'last_dividend_update' => 'datetime',
+        'date' => 'date',
+        'last_dividend_update' => 'date',
+        'dividend_amount' => 'float',
+        'dividend_amount_base' => BaseCurrency::class,
     ];
 
-    public function marketData()
+    protected static function boot()
     {
-        return $this->belongsTo(MarketData::class, 'symbol', 'symbol');
+        parent::boot();
+
+        static::saving(function ($dividend) {
+
+            $dividend = Pipeline::send($dividend)
+                ->through([
+                    CopyToBaseCurrency::class,
+                ])
+                ->then(fn (Dividend $dividend) => $dividend);
+        });
     }
 
-    public function holdings()
+    public function holdings(): HasMany
     {
         return $this->hasMany(Holding::class, 'symbol', 'symbol');
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'symbol', 'symbol');
     }
@@ -67,7 +86,7 @@ class Dividend extends Model
         // nope, refresh forward looking only
         if ($dividends_meta->total_dividends) {
 
-            $start_date = $dividends_meta->last_dividend_update->addHours(24);
+            $start_date = $dividends_meta->last_dividend_update;
         }
 
         // skip refresh if there's already recent data
@@ -83,19 +102,31 @@ class Dividend extends Model
 
         // ah, we found some dividends...
         if ($dividend_data->isNotEmpty()) {
-            // create mass insert
-            foreach ($dividend_data as $index => $dividend) {
-                $dividend_data[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
-            }
 
-            // insert records
-            (new self)->insert($dividend_data->toArray());
+            $market_data = MarketData::getMarketData($symbol);
+
+            $dividend_data
+                ->chunk(10)
+                ->each(function ($chunk) use ($market_data) {
+
+                    // get historic conversion rates
+                    $rate_to_base = CurrencyRate::timeSeriesRates($market_data->currency, $chunk->min('date'), $chunk->max('date'));
+
+                    // create mass insert
+                    foreach ($chunk as $index => $dividend) {
+                        $rate_to_base_date = 1 / Arr::get($rate_to_base, Carbon::parse(Arr::get($dividend, 'date'))->toDateString(), 1);
+
+                        $dividend['dividend_amount_base'] = $dividend['dividend_amount'] * $rate_to_base_date;
+
+                        $chunk[$index] = [...$dividend, ...['id' => Str::uuid()->toString(), 'updated_at' => now(), 'created_at' => now()]];
+                    }
+
+                    // insert records
+                    (new self)->insertOrIgnore($chunk->toArray());
+                });
 
             // sync to holdings
             self::syncHoldings($symbol);
-
-            // get market data
-            $market_data = MarketData::firstOrNew(['symbol' => $symbol]);
 
             // re-invest dividends
             self::reinvestDividends($dividend_data, $market_data);
@@ -109,22 +140,28 @@ class Dividend extends Model
     public static function syncHoldings(string $symbol): void
     {
         // group by holdings
-        $dividends = self::select(['holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount'])
-            ->selectRaw('
-                            (COALESCE(CASE WHEN transactions.transaction_type = "BUY" 
-                                AND date(transactions.date) <= date(dividends.date) 
-                                THEN transactions.quantity ELSE 0 END, 0)
-                            - COALESCE(CASE WHEN transactions.transaction_type = "SELL" 
-                                AND date(transactions.date) <= date(dividends.date) 
-                                THEN transactions.quantity ELSE 0 END, 0))
-                            * dividends.dividend_amount
-                                AS total_received
-                        ')
-            ->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
+        $subQuery = self::select([
+            'holdings.portfolio_id',
+            'dividends.date',
+            'dividends.symbol',
+            'dividends.dividend_amount',
+        ])->selectRaw("
+            (COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' 
+                AND date(transactions.date) <= date(dividends.date) 
+                THEN transactions.quantity ELSE 0 END), 0)
+            - COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' 
+                AND date(transactions.date) <= date(dividends.date) 
+                THEN transactions.quantity ELSE 0 END), 0))
+            * dividends.dividend_amount
+            AS total_received
+        ")->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
             ->join('holdings', 'transactions.portfolio_id', '=', 'holdings.portfolio_id')
             ->where('dividends.symbol', $symbol)
-            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'total_received')
-            ->havingRaw('total_received > 0')
+            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'dividends.dividend_amount_base');
+
+        $dividends = DB::table(DB::raw("({$subQuery->toSql()}) as sub"))
+            ->mergeBindings($subQuery->getQuery())
+            ->where('total_received', '>', 0)
             ->get();
 
         // iterate through holdings and update
@@ -154,6 +191,7 @@ class Dividend extends Model
                         'date' => $dividend['date'],
                         'portfolio_id' => $holding->portfolio_id,
                         'symbol' => $holding->symbol,
+                        'currency' => $holding->market_data->currency,
                         'transaction_type' => 'BUY',
                         'reinvested_dividend' => true,
                         'cost_basis' => 0,

@@ -21,7 +21,7 @@ class Split extends MarketDataType
         return $this->items['symbol'] ?? '';
     }
 
-    public function setSplitAmount($splitAmount): self
+    public function setSplitAmount(int|float $splitAmount): self
     {
         $this->items['split_amount'] = (float) $splitAmount;
 

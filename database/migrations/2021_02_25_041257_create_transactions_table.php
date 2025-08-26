@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Models\MarketData;
 use App\Models\Portfolio;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,7 +18,7 @@ class CreateTransactionsTable extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignIdFor(MarketData::class, 'symbol');
+            $table->string('symbol', 25);
             $table->foreignIdFor(Portfolio::class, 'portfolio_id')->constrained()->onDelete('cascade');
             $table->string('transaction_type', 15);
             $table->float('quantity', 12, 4);

@@ -8,6 +8,7 @@ use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Scheb\YahooFinanceApi\ApiClient;
 use Scheb\YahooFinanceApi\ApiClientFactory as YahooFinance;
@@ -34,9 +35,14 @@ class YahooMarketData implements MarketDataInterface
 
         $quote = $this->client->getQuote($symbol);
 
+        if (is_null($quote?->getRegularMarketPrice())) {
+            throw new \Exception('Could not find ticker on Yahoo');
+        }
+
         return new Quote([
             'name' => $quote?->getLongName() ?? $quote?->getShortName(),
             'symbol' => $symbol,
+            'currency' => $quote?->getCurrency(),
             'market_value' => $quote?->getRegularMarketPrice(),
             'fifty_two_week_high' => $quote?->getFiftyTwoWeekHigh(),
             'fifty_two_week_low' => $quote?->getFiftyTwoWeekLow(),
@@ -46,6 +52,11 @@ class YahooMarketData implements MarketDataInterface
             'book_value' => $quote?->getBookValue(),
             'last_dividend_date' => $quote?->getDividendDate(),
             'dividend_yield' => $quote?->getTrailingAnnualDividendYield() * 100,
+            'meta_data' => [
+                'exchange' => $quote?->getExchange(),
+                'asset_type' => $quote?->getQuoteType(),
+                'source' => 'yahoo',
+            ],
         ]);
     }
 
@@ -84,7 +95,7 @@ class YahooMarketData implements MarketDataInterface
         return collect($this->client->getHistoricalQuoteData($symbol, ApiClient::INTERVAL_1_DAY, $startDate, $endDate))
             ->mapWithKeys(function ($history) use ($symbol) {
 
-                $date = $history->getDate()->format('Y-m-d');
+                $date = Carbon::parse($history->getDate())->toDateString();
 
                 return [$date => new Ohlc([
                     'symbol' => $symbol,

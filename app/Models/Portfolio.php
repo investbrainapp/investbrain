@@ -136,6 +136,9 @@ class Portfolio extends Model
         }
     }
 
+    /**
+     * Writes daily change history for a portfolio to the database
+     */
     public function syncDailyChanges(): void
     {
         $holdings = $this->holdings()
@@ -147,11 +150,15 @@ class Portfolio extends Model
             ->groupBy(['holdings.symbol', 'holdings.portfolio_id'])
             ->get();
 
-        $dividends = Dividend::whereIn('symbol', $holdings->pluck('symbol'))->get();
-
         $total_performance = [];
 
-        $holdings->each(function ($holding) use (&$total_performance, $dividends) {
+        // get unique currencies for holdings
+        $currency_rates = [];
+        foreach ($holdings->groupBy('market_data.currency')->keys() as $currency) {
+            $currency_rates[$currency] = CurrencyRate::timeSeriesRates($currency, $holdings->min('first_transaction_date'), now());
+        }
+
+        $holdings->each(function ($holding) use (&$total_performance, $currency_rates) {
 
             $period = CarbonPeriod::create(
                 $holding->first_transaction_date,
@@ -160,34 +167,24 @@ class Portfolio extends Model
                     : now()
             );
 
-            $holding->setRelation('dividends', $dividends->where('symbol', $holding->symbol));
-
             $daily_performance = $holding->dailyPerformance($holding->first_transaction_date, now());
-            $dividends = $holding->dividends->keyBy(function ($dividend, $key) {
-                return $dividend['date']->format('Y-m-d');
-            });
             $all_history = app(MarketDataInterface::class)->history($holding->symbol, $holding->first_transaction_date, now());
 
-            $dividends_earned = 0;
             $holding_performance = [];
 
             foreach ($period as $date) {
-                $date = $date->format('Y-m-d');
+                $date = $date->toDateString();
 
                 $close = $this->getMostRecentCloseData($all_history, $date);
 
                 $total_market_value = $daily_performance->get($date)->owned * $close;
-                $dividends_earned += $daily_performance->get($date)->owned * ($dividends->get($date)?->dividend_amount ?? 0);
 
                 if (Carbon::parse($date)->isWeekday()) {
+
                     $holding_performance[$date] = [
                         'date' => $date,
                         'portfolio_id' => $this->id,
-                        'total_market_value' => $total_market_value,
-                        'total_cost_basis' => $daily_performance->get($date)->cost_basis,
-                        'total_gain' => $total_market_value - $daily_performance->get($date)->cost_basis,
-                        'realized_gains' => $daily_performance->get($date)->realized_gains,
-                        'total_dividends_earned' => $dividends_earned,
+                        'total_market_value' => $total_market_value * (1 / Arr::get($currency_rates[$holding->market_data->currency], $date, 1)),
                     ];
                 }
             }
@@ -200,10 +197,6 @@ class Portfolio extends Model
                 } else {
 
                     $total_performance[$date]['total_market_value'] += $performance['total_market_value'];
-                    $total_performance[$date]['total_cost_basis'] += $performance['total_cost_basis'];
-                    $total_performance[$date]['total_gain'] += $performance['total_gain'];
-                    $total_performance[$date]['realized_gains'] += $performance['realized_gains'];
-                    $total_performance[$date]['total_dividends_earned'] += $performance['total_dividends_earned'];
                 }
             }
         });
@@ -211,19 +204,23 @@ class Portfolio extends Model
         if (! empty($total_performance)) {
             DB::transaction(function () use ($total_performance) {
 
+                // delete old history
+                $firstDate = array_keys($total_performance)[0];
+                $this->daily_change()->where('date', '<', $firstDate)->delete();
+
+                // upsert new history
                 $this->daily_change()->upsert(
                     $total_performance,
                     ['date', 'portfolio_id'],
                     [
                         'total_market_value',
-                        'total_cost_basis',
-                        'total_gain',
-                        'realized_gains',
-                        'total_dividends_earned',
                     ]
                 );
             });
         }
+
+        cache()->forget('graph-YTD-'.$this->id);
+        cache()->forget('graph-YTD-'.request()->user()?->id);
     }
 
     protected function getMostRecentCloseData($history, $date, $i = 0, $max_attempts = 5)
@@ -234,7 +231,7 @@ class Portfolio extends Model
 
             $i++;
 
-            $date = Carbon::parse($date)->subDay()->format('Y-m-d');
+            $date = Carbon::parse($date)->subDay()->toDateString();
 
             return $this->getMostRecentCloseData($history, $date, $i);
         }

@@ -60,7 +60,6 @@ return [
     */
 
     'features' => [
-        ! env('SELF_HOSTED', true) ? Features::termsAndPrivacyPolicy() : null,
         Features::profilePhotos(),
         Features::api(),
         Features::accountDeletion(),
@@ -77,6 +76,6 @@ return [
     |
     */
 
-    'profile_photo_disk' => 'public',
+    'profile_photo_disk' => env('JETSTREAM_PROFILE_PHOTO_DISK', 'public'),
 
 ];

@@ -11,6 +11,7 @@
         "ext-zip": "*",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
+        "investbrainapp/frankfurter-client": "dev-main",
         "laravel/framework": "^11.35",
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
@@ -23,7 +24,7 @@
         "openai-php/client": "^0.10.3",
         "predis/predis": "^2.2",
         "robsontenorio/mary": "^1.35",
-        "scheb/yahoo-finance-api": "^4.11",
+        "scheb/yahoo-finance-api": "^5.0",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
         "tschucki/alphavantage-laravel": "^0.0"
     },
@@ -40,6 +41,11 @@
             "type": "vcs",
             "no-api": true,
             "url": "https://github.com/hackeresq/filter-models"
+        },
+        {
+            "type": "vcs",
+            "no-api": true,
+            "url": "https://github.com/investbrainapp/frankfurter-client"
         },
         {
             "type": "vcs",

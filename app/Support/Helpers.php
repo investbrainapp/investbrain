@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-// if (!function_exists('formatMoney')) {
-//     /**
-//      * Returns a formatted string for currency
-//      *
-//      * @param int|float $amount
-//      *
-//      * */
-//     function formatMoney(int|float $amount) {
-//         $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
+use App\Models\Currency;
 
-//         return $formatter->formatCurrency((float) $amount, 'USD');
-//     }
-// }
+if (! function_exists('currency')) {
+
+    // /**
+    //  * Returns an instance of the currency model
+    //  * */
+    // function currency(): Currency
+    // {
+    //     return new Currency;
+    // }
+}

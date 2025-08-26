@@ -1,15 +1,15 @@
 <?php
 
-use Livewire\WithFileUploads;
-use Livewire\Volt\Component;
-use Mary\Traits\Toast;
-use App\Models\BackupImport as BackupImportModel;
-use App\Imports\BackupImport;
 use App\Exports\BackupExport;
+use App\Models\BackupImport as BackupImportModel;
 use Livewire\Attributes\Rule;
+use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
+use Mary\Traits\Toast;
 
-new class extends Component {
+new class extends Component
+{
     use Toast;
     use WithFileUploads;
 
@@ -18,23 +18,26 @@ new class extends Component {
     public $file;
 
     public bool $importStatusDialog = false;
+
     public ?BackupImportModel $backupImport = null;
+
     public int $percent = 10;
 
     // methods
-    public function import() 
+    public function import()
     {
         $this->validate();
 
-        if (!RateLimiter::attempt('import:'.auth()->user()->id, $perMinute = 3, fn()=>null)) {
+        if (! RateLimiter::attempt('import:'.auth()->user()->id, $perMinute = 3, fn () => null)) {
 
             $this->error(__('Hang on! You\'re doing that too much.'));
+
             return;
         }
 
         $this->backupImport = BackupImportModel::create([
             'user_id' => auth()->user()->id,
-            'path' => $this->file->getPathname()
+            'path' => $this->file->getPathname(),
         ]);
 
         $this->importStatusDialog = true;
@@ -45,17 +48,17 @@ new class extends Component {
     {
         if (Str::contains($this->backupImport?->message, 'portfolios')) {
 
-            $this->percent = (1/2) * 100;
+            $this->percent = (1 / 2) * 100;
         }
 
         if (Str::contains($this->backupImport?->message, 'transactions')) {
 
-            $this->percent = (3/4) * 100;
+            $this->percent = (3 / 4) * 100;
         }
 
         if (Str::contains($this->backupImport?->message, 'daily changes')) {
 
-            $this->percent = (7/8) * 100;
+            $this->percent = (7 / 8) * 100;
         }
 
         if ($this->backupImport?->status == 'failed') {
@@ -75,9 +78,8 @@ new class extends Component {
 
     public function downloadTemplate()
     {
-        return Excel::download(new BackupExport(empty: true), now()->format('Y_m_d') . '_investbrain_template.xlsx');
+        return Excel::download(new BackupExport(empty: true), now()->format('Y_m_d').'_investbrain_template.xlsx');
     }
-    
 }; ?>
 
 <x-forms.form-section submit="import">
@@ -87,7 +89,7 @@ new class extends Component {
 
     <x-slot name="description">
         {{ __('Upload or recover your Investbrain portfolio and holdings.') }} 
-        <strong><a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></strong>
+        <span class="text-xs text-secondary"><a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></span>
     </x-slot>
 
     <x-slot:form>

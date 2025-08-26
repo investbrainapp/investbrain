@@ -1,4 +1,23 @@
+<?php
 
+use Livewire\Volt\Component;
+
+new class extends Component
+{
+    // props
+
+    /**
+     * The component's listeners.
+     *
+     * @var array
+     */
+    protected $listeners = [
+        'refresh-navigation-menu' => '$refresh',
+    ];
+
+    // methods
+
+}; ?>
 <div class="bg-base-100 border-base-300 border-b sticky top-0 z-10">
     <div class="flex justify-between items-center px-7 py-3 gap-4 mx-auto">
         <div class="flex flex-0 items-center">
@@ -7,7 +26,7 @@
                 <x-icon name="o-bars-3" class="cursor-pointer" />
             </label>
 
-            <div class="hidden md:block" style="height:3.1em">
+            <div class="hidden md:block" style="height:2.5em">
                 <x-application-logo  />
             </div>
 

@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\MarketDataSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 class CreateMarketDataTable extends Migration
@@ -18,8 +16,8 @@ class CreateMarketDataTable extends Migration
     public function up()
     {
         Schema::create('market_data', function (Blueprint $table) {
-            $table->string('symbol', 15)->primary();
-            $table->string('name')->nullable();
+            $table->string('symbol', 25)->primary();
+            $table->string('name')->nullable()->when(config('database.default') != 'sqlite', fn ($ctx) => $ctx->fulltext());
             $table->float('market_value', 12, 4)->nullable();
             $table->float('fifty_two_week_low', 12, 4)->nullable();
             $table->float('fifty_two_week_high', 12, 4)->nullable();
@@ -34,10 +32,6 @@ class CreateMarketDataTable extends Migration
             $table->timestamps();
         });
 
-        Artisan::call('db:seed', [
-            '--class' => MarketDataSeeder::class,
-            '--force' => true,
-        ]);
     }
 
     /**

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Rules;
 
 use App\Models\Portfolio;
-use Illuminate\Contracts\Validation\ValidationRule;
+use App\Models\Transaction;
 use Illuminate\Support\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class QuantityValidationRule implements ValidationRule
 {
@@ -20,12 +21,7 @@ class QuantityValidationRule implements ValidationRule
         protected ?string $symbol,
         protected ?string $transactionType,
         protected string|Carbon|null $date
-    ) {
-        $this->portfolio = $portfolio;
-        $this->symbol = $symbol;
-        $this->transactionType = $transactionType;
-        $this->date = $date;
-    }
+    ) { }
 
     /**
      * Validate the attribute.
@@ -39,21 +35,21 @@ class QuantityValidationRule implements ValidationRule
 
         if ($this->transactionType == 'SELL') {
 
-            $purchase_qty = $this->portfolio->transactions()
+            $purchase_qty = (float) $this->portfolio->transactions()
                 ->symbol($this->symbol)
                 ->buy()
-                ->beforeDate($this->date)
+                ->whereDate('date', '<', $this->date)
                 ->sum('quantity');
 
-            $sales_qty = $this->portfolio->transactions()
+            $sales_qty = (float) $this->portfolio->transactions()
                 ->symbol($this->symbol)
                 ->sell()
-                ->beforeDate($this->date)
+                ->whereDate('date', '<', $this->date)
                 ->sum('quantity');
 
             $maxQuantity = $purchase_qty - $sales_qty;
 
-            if (round($value, 3) > round($maxQuantity, 3)) {
+            if (round($value, 4) > round($maxQuantity, 4)) {
                 $fail(__('The quantity must not be greater than the available quantity.'));
             }
         }

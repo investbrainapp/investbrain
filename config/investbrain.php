@@ -19,4 +19,12 @@ return [
     'self_hosted' => env('SELF_HOSTED', true),
 
     'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00'),
+
+    'base_currency' => env('BASE_CURRENCY', 'USD'),
+
+    'currency_aliases' => [
+        'RMB' => ['alias_of' => 'CNY', 'label' => 'Chinese Yuan (Renminbi)', 'adjustment' => 1],
+        'GBX' => ['alias_of' => 'GBP', 'label' => 'British Sterling Pence', 'adjustment' => 100],
+        'ZAC' => ['alias_of' => 'ZAR', 'label' => 'South Africa Rand Cent', 'adjustment' => 100],
+    ],
 ];

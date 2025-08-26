@@ -22,9 +22,8 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
             'Portfolio ID',
             'Total Market Value',
             'Total Cost Basis',
-            'Total Gain',
-            'Total Dividends Earned',
             'Realized Gains',
+            'Total Dividends Earned',
             'Annotation',
         ];
     }
@@ -34,7 +33,7 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
      */
     public function collection()
     {
-        return $this->empty ? collect() : DailyChange::myDailyChanges()->get();
+        return $this->empty ? collect() : DailyChange::myDailyChanges()->withDailyPerformance()->get();
     }
 
     public function title(): string

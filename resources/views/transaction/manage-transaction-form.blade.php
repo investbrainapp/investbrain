@@ -1,33 +1,45 @@
 <?php
 
-use App\Models\Transaction;
+use App\Models\Currency;
+use App\Models\MarketData;
 use App\Models\Portfolio;
-use App\Rules\SymbolValidationRule;
+use App\Models\Transaction;
 use App\Rules\QuantityValidationRule;
+use App\Rules\SymbolValidationRule;
+use App\Traits\WithTrimStrings;
 use Illuminate\Support\Collection;
-use Livewire\Attributes\{Computed};
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
-use Illuminate\Validation\Rule;
-use App\Traits\WithTrimStrings;
 
-new class extends Component {
+new class extends Component
+{
     use Toast;
     use WithTrimStrings;
 
     // props
     public ?Portfolio $portfolio;
+
     public ?Transaction $transaction;
 
-    public ?String $portfolio_id;
-    public String $symbol;
-    public String $transaction_type;
-    public String $date;
-    public Float $quantity;
-    public ?Float $cost_basis;
-    public ?Float $sale_price;
+    public ?string $portfolio_id;
 
-    public Bool $confirmingTransactionDeletion = false;
+    public string $symbol;
+
+    public string $transaction_type;
+
+    public string $date;
+
+    public float $quantity;
+
+    public ?float $cost_basis;
+
+    public ?float $sale_price;
+
+    public bool $confirmingTransactionDeletion = false;
+
+    public Collection $currencies;
+
+    public string $currency;
 
     // methods
     public function rules()
@@ -36,43 +48,54 @@ new class extends Component {
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => 'required|string|in:BUY,SELL',
             'portfolio_id' => 'required|exists:portfolios,id',
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:' . now()->format('Y-m-d')],
+            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->toDateString()],
             'quantity' => [
-                'required', 
-                'numeric', 
-                'min:0', 
-                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date)
+                'required',
+                'numeric',
+                'gt:0',
+                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date),
             ],
+            'currency' => ['required', 'exists:currencies,currency'],
             'cost_basis' => 'exclude_if:transaction_type,SELL|min:0|numeric',
             'sale_price' => 'exclude_if:transaction_type,BUY|min:0|numeric',
         ];
     }
 
-    public function mount() 
+    public function mount()
     {
+        $this->currencies = Currency::list();
+        $this->currency = auth()->user()->getCurrency();
+
         if (isset($this->transaction)) {
+
+            $this->currency = $this->transaction->market_data->currency;
 
             $this->symbol = $this->transaction->symbol;
             $this->transaction_type = $this->transaction->transaction_type;
             $this->portfolio_id = $this->transaction->portfolio_id;
-            $this->date = $this->transaction->date->format('Y-m-d');
+            $this->date = $this->transaction->date->toDateString();
             $this->quantity = $this->transaction->quantity;
             $this->cost_basis = $this->transaction->cost_basis;
             $this->sale_price = $this->transaction->sale_price;
-            
+
         } else {
+
+            if (isset($this->symbol)) {
+
+                $this->currency = MarketData::getMarketData($this->symbol)?->currency;
+            }
+
             $this->transaction_type = 'BUY';
             $this->portfolio_id = isset($this->portfolio) ? $this->portfolio->id : '';
-            $this->date = now()->format('Y-m-d');
+            $this->date = now()->toDateString();
         }
     }
 
     public function update()
     {
         $this->authorize('fullAccess', $this->portfolio);
-        
+
         $this->transaction->update($this->validate());
-        // $this->transaction->owner_id = auth()->user()->id;
         $this->transaction->save();
 
         $this->success(__('Transaction updated'));
@@ -83,7 +106,7 @@ new class extends Component {
 
     public function save()
     {
-        if (!isset($this->portfolio)) {
+        if (! isset($this->portfolio)) {
             $this->portfolio = Portfolio::find($this->portfolio_id);
         }
 
@@ -96,7 +119,7 @@ new class extends Component {
 
         $this->dispatch('transaction-saved');
 
-        $this->success(__('Transaction created'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $this->symbol]));
+        $this->success(__('Transaction created'), redirectTo: route('holding.show', ['portfolio' => $this->portfolio->id, 'symbol' => $transaction->symbol]));
     }
 
     public function delete()
@@ -140,21 +163,44 @@ new class extends Component {
                 label="{{ __('Sale Price') }}" 
                 wire:model.number="sale_price" 
                 required 
-                prefix="USD" 
                 type="number"
                 step="any"
-            />
-            {{-- money --}}
+            >
+                <x-slot:prepend>
+                    
+                    <x-select 
+                        class="rounded-e-none border-e-0 bg-base-200"
+                        icon="o-banknotes"
+                        :options="$currencies"
+                        option-value="currency"
+                        option-label="currency"
+                        wire:model="currency"
+                        id="currency"
+                    />
+                </x-slot:prepend>
+            </x-input>
         @else
             <x-input 
                 label="{{ __('Cost Basis') }}" 
                 wire:model.number="cost_basis" 
                 required 
-                prefix="USD" 
                 type="number"
                 step="any"
-            />
-            {{-- money --}}
+            >
+                <x-slot:prepend>
+
+                    <x-select 
+                        class="rounded-e-none border-e-0 bg-base-200"
+                        icon="o-banknotes"
+                        :options="$currencies"
+                        option-value="currency"
+                        option-label="currency"
+                        wire:model="currency"
+                        id="currency"
+                    />
+                </x-slot:prepend>
+             
+            </x-input>
         @endif
 
         <x-slot:actions>

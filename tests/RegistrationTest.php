@@ -6,7 +6,6 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
-use Laravel\Jetstream\Jetstream;
 
 class RegistrationTest extends TestCase
 {
@@ -34,7 +33,7 @@ class RegistrationTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+            'terms' => true,
         ]);
 
         $this->assertAuthenticated();

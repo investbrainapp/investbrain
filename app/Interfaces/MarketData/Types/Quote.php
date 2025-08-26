@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Interfaces\MarketData\Types;
 
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 
 class Quote extends MarketDataType
 {
-    public function setName(string $name): self
+    public function setName($name): self
     {
-        $this->items['name'] = (string) $name;
+        if (! empty($name)) {
+            $this->items['name'] = (string) $name;
+        }
 
         return $this;
     }
@@ -33,7 +36,19 @@ class Quote extends MarketDataType
         return $this->items['symbol'] ?? '';
     }
 
-    public function setMarketValue($marketValue): self
+    public function setCurrency(string $currency): self
+    {
+        $this->items['currency'] = strtoupper((string) $currency);
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->items['currency'] ?? '';
+    }
+
+    public function setMarketValue(int|float $marketValue): self
     {
         $this->items['market_value'] = (float) $marketValue;
 
@@ -95,6 +110,7 @@ class Quote extends MarketDataType
 
     public function setMarketCap($cap): self
     {
+        // return $this;
         $this->items['market_cap'] = (int) $cap;
 
         return $this;
@@ -115,6 +131,18 @@ class Quote extends MarketDataType
     public function getBookValue(): float
     {
         return $this->items['book_value'] ?? 0.0;
+    }
+
+    public function setLastDividendAmount($value): self
+    {
+        $this->items['last_dividend_amount'] = (float) $value;
+
+        return $this;
+    }
+
+    public function getLastDividendAmount(): float
+    {
+        return $this->items['last_dividend_amount'] ?? 0.0;
     }
 
     public function setLastDividendDate(mixed $date): self
@@ -139,5 +167,29 @@ class Quote extends MarketDataType
     public function getDividendYield(): float
     {
         return $this->items['dividend_yield'] ?? 0.0;
+    }
+
+    public function setMetaData(array $meta_data): self
+    {
+        $defaults = [
+            'sector' => null,
+            'industry' => null,
+            'country' => null,
+            'exchange' => null,
+            'description' => null,
+            'asset_type' => null,
+            'first_trade_year' => null,
+            'source' => null,
+        ];
+
+        // merges the NEW values with highest priority over previous values and defaults
+        $this->items['meta_data'] = array_merge($defaults, $this->items['meta_data'] ?? [], Arr::skipEmptyValues($meta_data));
+
+        return $this;
+    }
+
+    public function getMetaData(): array
+    {
+        return $this->items['meta_data'];
     }
 }

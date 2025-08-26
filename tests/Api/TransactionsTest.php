@@ -7,7 +7,9 @@ namespace Tests\Api;
 use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
+use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 
 class TransactionsTest extends TestCase
@@ -69,6 +71,11 @@ class TransactionsTest extends TestCase
 
     public function test_can_create_transaction()
     {
+        Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+            '--force' => true,
+        ]);
+
         $this->actingAs($this->user);
 
         $data = [
@@ -76,6 +83,7 @@ class TransactionsTest extends TestCase
             'portfolio_id' => $this->portfolio->id,
             'transaction_type' => 'BUY',
             'quantity' => 10,
+            'currency' => 'USD',
             'date' => now()->toDateString(),
             'cost_basis' => 150,
         ];

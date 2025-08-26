@@ -41,28 +41,49 @@ class TransactionFactory extends Factory
     public function yearsAgo(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => $this->faker->dateTimeBetween('-5 years', '-3 years')->format('Y-m-d'),
+            'date' => now()->subYears($this->faker->numberBetween(3, 5))->toDateString(),
         ]);
     }
 
     public function lastYear(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => now()->subYear()->format('Y-m-d'),
+            'date' => now()->subYear()->toDateString(),
         ]);
     }
 
     public function lastMonth(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => now()->subMonth()->format('Y-m-d'),
+            'date' => now()->subMonth()->toDateString(),
+        ]);
+    }
+
+    public function sixMonthsAgo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => now()->subMonths(6)->toDateString(),
+        ]);
+    }
+
+    public function today(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => now()->toDateString(),
         ]);
     }
 
     public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => $this->faker->dateTimeBetween('-2 weeks', 'now')->format('Y-m-d'),
+            'date' => now()->subDays($this->faker->numberBetween(3, 14))->toDateString(),
+        ]);
+    }
+
+    public function date($date): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'date' => $date,
         ]);
     }
 
@@ -77,6 +98,27 @@ class TransactionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'portfolio_id' => $portfolio_id,
+        ]);
+    }
+
+    public function currency($currency): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'currency' => $currency,
+        ]);
+    }
+
+    public function costBasis($cost_basis): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'cost_basis' => $cost_basis,
+        ]);
+    }
+
+    public function salePrice($sale_price): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'sale_price' => $sale_price,
         ]);
     }
 

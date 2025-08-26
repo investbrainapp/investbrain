@@ -6,30 +6,38 @@ use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 
-new class extends Component {
-
-    use Toast; 
+new class extends Component
+{
+    use Toast;
 
     // props
     public Collection $transactions;
+
     public ?Portfolio $portfolio;
+
     public ?Transaction $editingTransaction;
-    public Bool $shouldGoToHolding = true;
-    public Bool $showPortfolio = false;
-    public Bool $paginate = true;
-    public Int $perPage = 5;
-    public Int $offset = 0;
+
+    public bool $shouldGoToHolding = true;
+
+    public bool $showPortfolio = false;
+
+    public bool $paginate = true;
+
+    public int $perPage = 5;
+
+    public int $offset = 0;
 
     protected $listeners = [
         'transaction-updated' => '$refresh',
-        'transaction-saved' => '$refresh'
+        'transaction-saved' => '$refresh',
     ];
 
     // methods
     public function showTransactionDialog($transactionId)
     {
-        if (!auth()->user()->can('fullAccess', $this->portfolio)) {
+        if (! auth()->user()->can('fullAccess', $this->portfolio)) {
             $this->error(__('You do not have permission to manage transactions for this portfolio'));
+
             return;
         }
 
@@ -46,7 +54,6 @@ new class extends Component {
     {
         $this->offset = $this->offset + $amount;
     }
-
 }; ?>
 
 <div class="">
@@ -86,9 +93,12 @@ new class extends Component {
                 />
                 {{ $transaction->symbol }} 
                 ({{ $transaction->quantity }} 
-                @ {{ $transaction->transaction_type == 'BUY' 
-                    ? Number::currency($transaction->cost_basis)
-                    : Number::currency($transaction->sale_price) }})
+                @ {{ Number::currency(
+                    $transaction->transaction_type == 'BUY' 
+                        ? $transaction->cost_basis
+                        : $transaction->sale_price,
+                    $transaction->market_data?->currency
+                ) }})
 
                 <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>

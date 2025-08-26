@@ -3,16 +3,16 @@
 use App\Models\Holding;
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // props
     public Holding $holding;
 
     protected $listeners = [
         'transaction-updated' => '$refresh',
-        'transaction-saved' => '$refresh'
+        'transaction-saved' => '$refresh',
     ];
-    
+
     // methods
 
 }; ?>
@@ -27,9 +27,9 @@ new class extends Component {
                 $owned = ($dividend->purchased - $dividend->sold);
             @endphp 
 
-            {{ Number::currency($dividend->dividend_amount) }}
+            {{ Number::currency($dividend->dividend_amount, $holding->market_data->currency) }}
             x {{ $owned }}
-            = {{ Number::currency($owned * $dividend->dividend_amount) }}
+            = {{ Number::currency($owned * $dividend->dividend_amount, $holding->market_data->currency) }}
 
         </x-slot:value>
         <x-slot:sub-value>

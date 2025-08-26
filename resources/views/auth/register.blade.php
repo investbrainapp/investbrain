@@ -31,7 +31,7 @@
                 <x-input id="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
-            @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
+            @if (! config('investbrain.self_hosted'))
                 <div class="mt-4">
                     <label>
                         <div class="flex items-center">

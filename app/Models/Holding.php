@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Holding extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -27,20 +31,23 @@ class Holding extends Model
     ];
 
     protected $casts = [
+        'reinvest_dividends' => 'boolean',
         'splits_synced_at' => 'datetime',
         'first_transaction_date' => 'datetime',
-        'reinvest_dividends' => 'boolean',
+        'quantity' => 'float',
+        'average_cost_basis' => 'float',
+        'total_cost_basis' => 'float',
+        'realized_gain_dollars' => 'float',
+        'dividends_earned' => 'float',
+        'total_market_gain_dollars' => 'float',
+        'market_gain_dollars' => 'float',
+        'total_market_value' => 'float',
+        'total_dividends_earned' => 'float',
+        'market_data_market_value' => 'float',
+        'market_data_fifty_two_week_low' => 'float',
+        'market_data_fifty_two_week_high' => 'float',
+        'market_gain_percent' => 'float',
     ];
-
-    /**
-     * Market data for holding
-     *
-     * @return void
-     */
-    public function market_data()
-    {
-        return $this->hasOne(MarketData::class, 'symbol', 'symbol');
-    }
 
     /**
      * Related transactions for holding
@@ -60,10 +67,10 @@ class Holding extends Model
     public function dividends()
     {
         return $this->hasMany(Dividend::class, 'symbol', 'symbol')
-            ->select(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount'])
+            ->select(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount', 'dividends.dividend_amount_base'])
             ->selectRaw("SUM(
-                    CASE WHEN transaction_type = 'BUY' 
-                        AND transactions.symbol = dividends.symbol 
+                    CASE WHEN transaction_type = 'BUY'
+                        AND transactions.symbol = dividends.symbol
                         AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
@@ -71,27 +78,40 @@ class Holding extends Model
                 ) AS purchased")
             ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'SELL'
-                        AND transactions.symbol = dividends.symbol 
-                        AND transactions.portfolio_id = '$this->portfolio_id' 
+                        AND transactions.symbol = dividends.symbol
+                        AND transactions.portfolio_id = '$this->portfolio_id'
                         AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
                     ELSE 0 END
                 ) AS sold")
             ->selectRaw("SUM(
-                    (CASE WHEN transaction_type = 'BUY' 
-                        AND transactions.symbol = dividends.symbol 
+                    (CASE WHEN transaction_type = 'BUY'
+                        AND transactions.symbol = dividends.symbol
                         AND transactions.portfolio_id = '$this->portfolio_id'
-                        AND date(transactions.date) <= date(dividends.date) 
+                        AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END
-                    - CASE WHEN transaction_type = 'SELL' 
-                        AND transactions.symbol = dividends.symbol 
+                    - CASE WHEN transaction_type = 'SELL'
+                        AND transactions.symbol = dividends.symbol
                         AND transactions.portfolio_id = '$this->portfolio_id'
-                        AND date(transactions.date) <= date(dividends.date) 
+                        AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END)
                     * dividends.dividend_amount
                 ) AS total_received")
+            ->selectRaw("SUM(
+                (CASE WHEN transaction_type = 'BUY'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND date(transactions.date) <= date(dividends.date)
+                    THEN transactions.quantity ELSE 0 END
+                - CASE WHEN transaction_type = 'SELL'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND date(transactions.date) <= date(dividends.date)
+                    THEN transactions.quantity ELSE 0 END)
+                * dividends.dividend_amount_base
+            ) AS total_received_base")
             ->join('transactions', 'transactions.symbol', 'dividends.symbol')
-            ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount'])
+            ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount', 'dividends.dividend_amount_base'])
             ->orderBy('dividends.date', 'DESC')
             ->where('dividends.date', '>=', function ($query) {
                 $query->selectRaw('min(transactions.date)')
@@ -99,7 +119,25 @@ class Holding extends Model
                     ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
                     ->whereRaw("transactions.symbol = '$this->symbol'");
             })
-            ->having('total_received', '>', 0);
+            ->havingRaw("SUM(
+                (CASE 
+                    WHEN transaction_type = 'BUY'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.date <= dividends.date
+                THEN transactions.quantity 
+                ELSE 0 
+                END)
+                - 
+                (CASE 
+                    WHEN transaction_type = 'SELL'
+                    AND transactions.symbol = dividends.symbol
+                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.date <= dividends.date
+                THEN transactions.quantity 
+                ELSE 0 
+                END)
+            ) * dividends.dividend_amount_base > 0");
     }
 
     /**
@@ -137,17 +175,21 @@ class Holding extends Model
     {
         return $query->withAggregate('market_data', 'name')
             ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'market_value_base')
             ->withAggregate('market_data', 'fifty_two_week_low')
             ->withAggregate('market_data', 'fifty_two_week_high')
             ->withAggregate('market_data', 'updated_at')
             ->join('market_data', 'holdings.symbol', 'market_data.symbol');
     }
 
+    /**
+     * Calculate performance for holding in its local currency
+     */
     public function scopeWithPerformance($query)
     {
         return $query->selectRaw('COALESCE(market_data.market_value * holdings.quantity, 0) AS total_market_value')
             ->selectRaw('COALESCE((market_data.market_value - holdings.average_cost_basis) * holdings.quantity, 0) AS market_gain_dollars')
-            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / holdings.average_cost_basis) * 100, 0) AS market_gain_percent');
+            ->selectRaw('COALESCE(((market_data.market_value - holdings.average_cost_basis) / NULLIF(holdings.average_cost_basis, 0)) * 100, 0) AS market_gain_percent');
     }
 
     public function scopePortfolio($query, $portfolio)
@@ -174,15 +216,197 @@ class Holding extends Model
         });
     }
 
-    public function scopeWithPortfolioMetrics($query)
+    /**
+     * Scope which returns collection of performance metrics for holdings
+     *
+     * @param  string  $currency  Allows casting to specified currency
+     */
+    public function scopeGetPortfolioMetrics($query, $currency = null): Collection
     {
-        return $query->selectRaw('COALESCE(SUM(holdings.dividends_earned), 0) AS total_dividends_earned')
-            ->selectRaw('COALESCE(SUM(holdings.realized_gain_dollars), 0) AS realized_gain_dollars')
-            ->selectRaw('COALESCE(SUM(holdings.quantity * market_data.market_value), 0) AS total_market_value')
-            ->selectRaw('COALESCE(SUM(holdings.total_cost_basis), 0) AS total_cost_basis')
-            ->selectRaw('COALESCE(SUM(holdings.quantity * market_data.market_value), 0) - COALESCE(SUM(holdings.total_cost_basis), 0) AS total_gain_dollars')
-                    // ->selectRaw('COALESCE((@total_gain_dollars / @sum_total_cost_basis) * 100,0) AS total_gain_percent')
-            ->join('market_data', 'market_data.symbol', '=', 'holdings.symbol');
+        $result = $query->withPortfolioMetrics($currency)->get();
+
+        return collect([
+            'total_cost_basis' => $result->sum('total_cost_basis'),
+            'total_market_value' => $result->sum('total_market_value'),
+            'total_market_gain_dollars' => $result->sum('total_market_gain_dollars'),
+            'realized_gain_dollars' => $result->sum('realized_gain_dollars'),
+            'total_dividends_earned' => $result->sum('total_dividends_earned'),
+        ]);
+    }
+
+    /**
+     * Scope to collect performance metrics for holdings
+     *
+     * @param  string  $currency  Allows casting to specified currency
+     */
+    public function scopeWithPortfolioMetrics($query, $currency = null): mixed
+    {
+        $currency = $currency ?? auth()->user()->getCurrency();
+
+        $cost_basis_sub = DB::table('transactions')
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                $join
+                    ->on('cr.date', '=', 'transactions.date')
+                    ->where('cr.currency', '=', $currency);
+            })
+            ->select([
+                'transactions.id',
+                'transactions.symbol',
+                'transactions.portfolio_id',
+            ])
+            ->leftJoinSub(
+                DB::table('transactions')
+                    ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                        $join
+                            ->on('cr.date', '=', 'transactions.date')
+                            ->where('cr.currency', '=', $currency);
+                    })
+                    ->select([
+                        'transactions.symbol',
+                        'transactions.portfolio_id',
+                        'transactions.quantity',
+                        'transactions.cost_basis_base',
+                        'transactions.date',
+                    ])
+                    ->selectRaw("
+                            (CASE
+                                WHEN 
+                                    transactions.transaction_type = 'BUY'
+                                    OR SUM(transactions.cost_basis_base) = 0
+                                THEN 
+                                    COALESCE(cr.rate, 1)
+                                ELSE (
+                                    SELECT
+                                        SUM(COALESCE(cr2.rate, 1) * buy.cost_basis_base)
+                                        / SUM(buy.cost_basis_base)
+                                    FROM transactions as buy
+                                    LEFT JOIN currency_rates as cr2
+                                        ON cr2.date = buy.date
+                                        AND cr2.currency = '{$currency}'
+                                    WHERE buy.symbol = transactions.symbol
+                                        AND buy.portfolio_id = transactions.portfolio_id
+                                        AND buy.transaction_type = 'BUY'
+                                        AND buy.date <= transactions.date
+                                ) END)
+                                AS rate")
+                    ->groupBy([
+                        'transactions.id',
+                        'transactions.symbol',
+                        'transactions.date',
+                        'transactions.portfolio_id',
+                        'transactions.transaction_type',
+                        'transactions.cost_basis_base',
+                        'transactions.quantity',
+                        'cr.rate',
+                    ]),
+                'cost_basis_display',
+                function ($join) {
+                    $join
+                        ->on('transactions.symbol', '=', 'cost_basis_display.symbol')
+                        ->on(
+                            'transactions.portfolio_id',
+                            '=',
+                            'cost_basis_display.portfolio_id'
+                        )
+                        ->on('transactions.date', '=', 'cost_basis_display.date');
+                }
+            )
+            ->selectRaw(
+                "CASE WHEN transactions.transaction_type = 'SELL' THEN (transactions.sale_price_base - transactions.cost_basis_base) * transactions.quantity * COALESCE(cr.rate, 1) END AS realized_gain_dollars"
+            )
+            ->selectRaw(
+                "CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.cost_basis_base * transactions.quantity * cost_basis_display.rate END AS total_cost_basis"
+            )
+            ->selectRaw(
+                "CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity END AS total_purchases"
+            )
+            ->groupBy([
+                'transactions.id',
+                'transactions.symbol',
+                'transactions.portfolio_id',
+                'transactions.cost_basis_base',
+                'transactions.quantity',
+                'cost_basis_display.rate',
+                'cr.rate',
+            ]);
+
+        $dividends_sub = DB::table('dividends')
+            ->join('transactions as tx', function ($join) {
+                $join
+                    ->on('tx.symbol', '=', 'dividends.symbol')
+                    ->on('tx.date', '<=', 'dividends.date');
+            })
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                $join
+                    ->on('cr.date', '=', 'dividends.date')
+                    ->where('cr.currency', '=', $currency);
+            })
+            ->select(['dividends.symbol', 'tx.portfolio_id'])
+            ->selectRaw(
+                "SUM(((CASE WHEN transaction_type = 'BUY' THEN tx.quantity ELSE 0 END) - (CASE WHEN transaction_type = 'SELL' THEN tx.quantity ELSE 0 END)) * dividends.dividend_amount_base * COALESCE(cr.rate, 1)) AS total_dividends_earned"
+            )
+            ->groupBy(['dividends.symbol', 'tx.portfolio_id']);
+
+        return $query->select([
+            'holdings.symbol',
+            'holdings.portfolio_id',
+            'dividends_display.total_dividends_earned',
+        ])
+            ->groupBy([
+                'holdings.symbol',
+                'holdings.quantity',
+                'holdings.portfolio_id',
+                'cr.rate',
+                'dividends_display.total_dividends_earned',
+                'market_data.market_value_base',
+            ])
+            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
+                $join->where('cr.currency', '=', $currency);
+
+                if (config('database.default') === 'sqlite') {
+                    $join->whereRaw("strftime('%Y-%m-%d', cr.date) = ?", [
+                        now()->toDateString(),
+                    ]);
+                } else {
+                    $join->on('cr.date', '=', DB::raw("'".now()->toDateString()."'"));
+                }
+            })
+            ->leftJoin('market_data', function ($join) {
+                $join->on('market_data.symbol', '=', 'holdings.symbol');
+            })
+            ->selectRaw('
+                holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1) 
+                AS total_market_value
+            ')
+            ->selectRaw('
+                SUM(transactions_display.realized_gain_dollars) 
+                AS realized_gain_dollars
+            ')
+            ->selectRaw('
+                (SUM(transactions_display.total_cost_basis) / SUM(transactions_display.total_purchases)) 
+                * holdings.quantity 
+                AS total_cost_basis
+            ')
+            ->selectRaw('
+                (holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1)) 
+                - (SUM(transactions_display.total_cost_basis) / SUM(transactions_display.total_purchases)) 
+                * holdings.quantity 
+                AS total_market_gain_dollars
+            ')
+            ->leftJoinSub($cost_basis_sub, 'transactions_display',
+                function ($join) {
+                    $join
+                        ->on('holdings.symbol', '=', 'transactions_display.symbol')
+                        ->on('holdings.portfolio_id', '=', 'transactions_display.portfolio_id');
+                }
+            )
+            ->leftJoinSub($dividends_sub, 'dividends_display',
+                function ($join) {
+                    $join->on('holdings.symbol', '=', 'dividends_display.symbol') // todo: this isnt limiting to port ids
+                        ->on('holdings.portfolio_id', '=', 'dividends_display.portfolio_id');
+                }
+            );
+
     }
 
     public function syncTransactionsAndDividends()
@@ -190,30 +414,35 @@ class Holding extends Model
         // pull existing transaction data
         $query = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
-            'symbol' => $this->symbol,
-        ])->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN quantity ELSE 0 END) AS `qty_purchases`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN quantity ELSE 0 END) AS `qty_sales`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "BUY" THEN (quantity * cost_basis) ELSE 0 END) AS `total_cost_basis`')
-            ->selectRaw('SUM(CASE WHEN transaction_type = "SELL" THEN (quantity * sale_price) ELSE 0 END) AS `total_sale_price`')
+            'transactions.symbol' => $this->symbol,
+        ])->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) AS qty_purchases")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sales")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price - cost_basis) * quantity ELSE 0 END) AS realized_gain_dollars")
+            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis")
             ->first();
 
-        $total_quantity = round($query->qty_purchases - $query->qty_sales, 3);
+        // delete holding if no transactions
+        if (empty($query->qty_purchases + $query->qty_sales)) {
+
+            $this->delete();
+
+            return;
+        }
+
+        $total_quantity = round($query->qty_purchases - $query->qty_sales, 4);
 
         $average_cost_basis = (
             $query->qty_purchases > 0
             && $total_quantity > 0
-        )
-                                    ? $query->total_cost_basis / $query->qty_purchases
-                                    : 0;
+        ) ? $query->total_cost_basis / $query->qty_purchases
+        : 0;
 
         // update holding
         $this->fill([
             'quantity' => $total_quantity,
             'average_cost_basis' => $average_cost_basis,
             'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->qty_purchases > 0 && $query->total_sale_price > 0
-                    ? $query->total_sale_price - ($query->qty_sales * ($query->total_cost_basis / $query->qty_purchases))
-                    : 0,
+            'realized_gain_dollars' => $query->realized_gain_dollars ?? 0,
             'dividends_earned' => $this->dividends->sum('total_received'),
         ]);
 
@@ -235,6 +464,11 @@ class Holding extends Model
         return $purchases - $sales;
     }
 
+    /**
+     * Method that enables calculating daily performance for a given holding
+     *
+     * @return void
+     */
     public function dailyPerformance(
         ?\Illuminate\Support\Carbon $start_date = null,
         ?\Illuminate\Support\Carbon $end_date = null,
@@ -246,49 +480,83 @@ class Holding extends Model
             $end_date = now();
         }
 
+        // MySQL default interval
         $date_interval = 'DATE_ADD(date, INTERVAL 1 DAY)';
+        $castNumberType = 'decimal';
 
+        // Use SQLite interval grammar
         if (config('database.default') === 'sqlite') {
 
             $date_interval = "date(date, '+1 day')";
-        } else {
-
-            DB::statement('SET cte_max_recursion_depth=1000000;');
         }
 
-        return DB::table(DB::raw("(
-                WITH RECURSIVE date_series AS (
-                    SELECT '{$start_date->format('Y-m-d')}' AS date
-                    UNION ALL
-                    SELECT $date_interval
-                    FROM date_series
-                    WHERE date < '{$end_date->format('Y-m-d')}'
-                )
-                SELECT date_series.date
+        // Default CTE time series query (for MySQL and SQLite)
+        $timeSeriesQuery = DB::table(DB::raw("(
+            WITH RECURSIVE date_series AS (
+                SELECT '{$start_date->toDateString()}' AS date
+                UNION ALL
+                SELECT $date_interval
                 FROM date_series
-            ) as date_series")
-        )
+                WHERE date < '{$end_date->toDateString()}'
+            )
+            SELECT date_series.date
+            FROM date_series
+        ) as date_series"));
+
+        // PGSql time series query
+        if (config('database.default') === 'pgsql') {
+
+            $timeSeriesQuery = DB::table(DB::raw("
+                generate_series(
+                    date '{$start_date->toDateString()}', 
+                    date '{$end_date->toDateString()}', 
+                    interval '1 day'
+                ) as date_series"));
+
+            $castNumberType = 'numeric';
+        }
+
+        // Set MySQL-like query CTE max iterations
+        if (config('database.default') === 'mysql') {
+
+            // MySQL default
+            $max_recursion_var_name = 'cte_max_recursion_depth';
+
+            // Determine if running MySQL or MariaDB
+            $versionString = Arr::get(
+                DB::select('SELECT VERSION() as version;'),
+                '0', new \stdClass
+            )->version;
+            if (stripos($versionString, 'MariaDB') !== false) {
+                $max_recursion_var_name = 'max_recursive_iterations'; // Must be MariaDB
+            }
+
+            DB::statement("SET $max_recursion_var_name=1000000;");
+        }
+
+        // Extracted query for counting QTY owned
+        $quantityQuery = "ROUND(CAST(COALESCE(
+            SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END) 
+            - SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END),
+            0
+        ) AS {$castNumberType}), 3)";
+
+        return $timeSeriesQuery
             ->select([
                 'date_series.date',
                 DB::raw("
-                ROUND(
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) -
-                COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3) AS `owned`
-            "),
+                    {$quantityQuery} AS owned
+                "),
                 DB::raw("
-               COALESCE(CASE 
-                    WHEN (
-                        ROUND(
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity ELSE 0 END), 0) - 
-                        COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL' THEN transactions.quantity ELSE 0 END), 0), 3)
-                    ) = 0 THEN 0
-                    ELSE SUM(CASE 
-                        WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis 
-                        ELSE 0 
-                    END)
-                END, 0) AS cost_basis
-            "),
-                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price - cost_basis) * quantity) ELSE 0 END), 0) AS `realized_gains`"),
+                    CASE
+                        WHEN ({$quantityQuery}) = 0 THEN 0
+                        ELSE SUM(CASE
+                            WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity * transactions.cost_basis_base
+                            ELSE 0
+                        END)
+                    END AS cost_basis
+                "),
+                DB::raw("COALESCE(SUM(CASE WHEN transaction_type = 'SELL' THEN ((sale_price_base - cost_basis_base) * quantity) ELSE 0 END), 0) AS realized_gains"),
             ])
             ->leftJoin('transactions', function ($join) {
                 $join->on(DB::raw('DATE(transactions.date)'), '<=', 'date_series.date')
@@ -305,7 +573,7 @@ class Holding extends Model
     {
         $formattedTransactions = '';
         foreach ($this->transactions->sortByDesc('date') as $transaction) {
-            $formattedTransactions .= ' * '.$transaction->date->format('Y-m-d')
+            $formattedTransactions .= ' * '.$transaction->date->toDateString()
                                     .' '.$transaction->transaction_type
                                     .' '.$transaction->quantity
                                     .' @ '.$transaction->cost_basis

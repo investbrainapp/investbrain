@@ -25,6 +25,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
             'Quantity',
             'Cost Basis',
             'Sale Price',
+            'Currency',
             'Split',
             'Reinvested Dividend',
             'Date',
@@ -38,7 +39,30 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
      */
     public function collection()
     {
-        return $this->empty ? collect() : Transaction::myTransactions()->get();
+        if ($this->empty) {
+            return collect();
+        }
+
+        return Transaction::myTransactions()
+            ->withMarketData()
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'id' => $transaction->id,
+                    'symbol' => $transaction->symbol,
+                    'portfolio_id' => $transaction->portfolio_id,
+                    'transaction_type' => $transaction->transaction_type,
+                    'quantity' => $transaction->quantity,
+                    'cost_basis' => $transaction->cost_basis,
+                    'sale_price' => $transaction->sale_price,
+                    'currency' => $transaction->market_data_currency,
+                    'split' => $transaction->split,
+                    'reinvested_dividend' => $transaction->reinvested_dividend,
+                    'date' => $transaction->date,
+                    'created_at' => $transaction->created_at,
+                    'updated_at' => $transaction->updated_at,
+                ];
+            });
     }
 
     public function title(): string

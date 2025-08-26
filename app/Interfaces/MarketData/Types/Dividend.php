@@ -21,7 +21,7 @@ class Dividend extends MarketDataType
         return $this->items['symbol'] ?? '';
     }
 
-    public function setDividendAmount($dividendAmount): self
+    public function setDividendAmount(int|float $dividendAmount): self
     {
         $this->items['dividend_amount'] = (float) $dividendAmount;
 

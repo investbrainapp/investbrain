@@ -73,7 +73,7 @@ new class extends Component {
                 'model' => config('openai.model'),
                 'messages' => [
                     ['role' => 'system', 'content' => "Today's date is "
-                                                                    .now()->format('Y-m-d')
+                                                                    .now()->toDateString()
                                                                     .".\n\n".$this->system_prompt],
                     ...array_slice($this->messages, -10)
                 ],

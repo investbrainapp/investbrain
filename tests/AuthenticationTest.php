@@ -11,6 +11,40 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_first_user_is_admin(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'should_be_admin',
+            'email' => 'should_be_admin@example.net',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'terms' => 1,
+        ]);
+
+        $should_be_admin = User::where(['email' => 'should_be_admin@example.net'])->first();
+
+        $this->assertModelExists($should_be_admin);
+        $this->assertTrue($should_be_admin->admin);
+    }
+
+    public function test_other_users_are_not_admin(): void
+    {
+        User::factory()->create();
+
+        $this->post('/register', [
+            'name' => 'not_admin',
+            'email' => 'not_admin@example.net',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'terms' => 1,
+        ]);
+
+        $not_admin = User::where(['email' => 'not_admin@example.net'])->first();
+
+        $this->assertModelExists($not_admin);
+        $this->assertNotTrue($not_admin->admin);
+    }
+
     public function test_login_screen_can_be_rendered(): void
     {
         $response = $this->get('/login');

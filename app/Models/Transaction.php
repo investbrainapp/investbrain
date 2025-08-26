@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Actions\ConvertToMarketDataCurrency;
+use App\Actions\CopyToBaseCurrency;
+use App\Actions\EnsureCostBasisAddedToSale;
+use App\Actions\EnsureDailyChangeIsSynced;
+use App\Casts\BaseCurrency;
+use App\Traits\HasMarketData;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Pipeline;
 
 class Transaction extends Model
 {
     use HasFactory;
+    use HasMarketData;
     use HasUuids;
 
     protected $fillable = [
@@ -23,6 +30,7 @@ class Transaction extends Model
         'date',
         'portfolio_id',
         'transaction_type',
+        'currency',
         'quantity',
         'cost_basis',
         'sale_price',
@@ -36,6 +44,11 @@ class Transaction extends Model
         'date' => 'datetime',
         'split' => 'boolean',
         'reinvested_dividend' => 'boolean',
+        'quantity' => 'float',
+        'cost_basis' => 'float',
+        'sale_price' => 'float',
+        'cost_basis_base' => BaseCurrency::class,
+        'sale_price_base' => BaseCurrency::class,
     ];
 
     protected static function boot()
@@ -44,17 +57,24 @@ class Transaction extends Model
 
         static::saving(function ($transaction) {
 
-            if ($transaction->transaction_type == 'SELL') {
-
-                $transaction->ensureCostBasisIsAddedToSale();
-            }
+            $transaction = Pipeline::send($transaction)
+                ->through([
+                    ConvertToMarketDataCurrency::class,
+                    EnsureCostBasisAddedToSale::class,
+                    CopyToBaseCurrency::class,
+                ])
+                ->then(fn (Transaction $transaction) => $transaction);
         });
 
         static::saved(function ($transaction) {
 
             $transaction->syncToHolding();
 
-            $transaction->refreshMarketData();
+            $transaction = Pipeline::send($transaction)
+                ->through([
+                    EnsureDailyChangeIsSynced::class,
+                ])
+                ->then(fn (Transaction $transaction) => $transaction);
 
             cache()->forget('portfolio-metrics-'.$transaction->portfolio_id);
         });
@@ -78,16 +98,6 @@ class Transaction extends Model
     }
 
     /**
-     * Related market data for transaction
-     *
-     * @return void
-     */
-    public function market_data(): HasOne
-    {
-        return $this->hasOne(MarketData::class, 'symbol', 'symbol');
-    }
-
-    /**
      * Related portfolio
      *
      * @return void
@@ -101,6 +111,7 @@ class Transaction extends Model
     {
         return $query->withAggregate('market_data', 'name')
             ->withAggregate('market_data', 'market_value')
+            ->withAggregate('market_data', 'currency')
             ->withAggregate('market_data', 'fifty_two_week_low')
             ->withAggregate('market_data', 'fifty_two_week_high')
             ->withAggregate('market_data', 'updated_at')
@@ -141,28 +152,6 @@ class Transaction extends Model
         });
     }
 
-    public function refreshMarketData(): void
-    {
-        MarketData::getMarketData($this->attributes['symbol']);
-    }
-
-    /**
-     * Writes average cost basis to a sale transaction
-     */
-    public function ensureCostBasisIsAddedToSale(): Transaction
-    {
-        $average_cost_basis = Transaction::where([
-            'portfolio_id' => $this->portfolio_id,
-            'symbol' => $this->symbol,
-            'transaction_type' => 'BUY',
-        ])->whereDate('date', '<=', $this->date)
-            ->average('cost_basis');
-
-        $this->cost_basis = $average_cost_basis ?? 0;
-
-        return $this;
-    }
-
     /**
      * Syncs the holding related to this transaction
      */
@@ -187,8 +176,8 @@ class Transaction extends Model
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,
             'quantity' => $this->quantity,
-            'average_cost_basis' => $this->cost_basis,
-            'total_cost_basis' => $this->quantity * $this->cost_basis,
+            'average_cost_basis' => $this->cost_basis_base,
+            'total_cost_basis' => $this->quantity * $this->cost_basis_base,
             'splits_synced_at' => now(),
         ])->syncTransactionsAndDividends();
     }

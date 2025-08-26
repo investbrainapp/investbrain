@@ -31,7 +31,7 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             BeforeSheet::class => function (BeforeSheet $event) {
                 DB::commit();
                 $this->backupImport->update([
-                    'message' => __('Importing daily changes...'),
+                    'message' => __('Preparing to import daily changes...'),
                 ]);
                 DB::beginTransaction();
             },
@@ -40,22 +40,23 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
 
     public function collection(Collection $dailyChanges)
     {
-        $dailyChanges->chunk($this->batchSize())->each(function ($chunk) {
+        $totalBatches = count($dailyChanges) / $this->batchSize();
+
+        $dailyChanges->chunk($this->batchSize())->each(function ($chunk, $index) use ($totalBatches) {
 
             $this->validatePortfolioAccess($chunk);
+
+            $this->backupImport->update([
+                'message' => __('Importing daily changes (Batch :currentBatch of :totalBatches)...', ['currentBatch' => $index + 1, 'totalBatches' => $totalBatches]),
+            ]);
 
             // have to cast to native values
             $chunk = $chunk->map(function ($dailyChange) {
 
                 return [
-                    'total_market_value' => $dailyChange['total_market_value'],
-                    'total_cost_basis' => $dailyChange['total_cost_basis'],
-                    'total_gain' => $dailyChange['total_gain'],
-                    'total_dividends_earned' => $dailyChange['total_dividends_earned'],
-                    'realized_gains' => $dailyChange['realized_gains'],
                     'annotation' => $dailyChange['annotation'],
                     'portfolio_id' => $dailyChange['portfolio_id'],
-                    'date' => Carbon::parse($dailyChange['date'])->format('Y-m-d'),
+                    'date' => Carbon::parse($dailyChange['date'])->toDateString(),
                 ];
             });
 
@@ -63,11 +64,6 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                 $chunk->toArray(),
                 ['portfolio_id', 'date'],
                 [
-                    'total_market_value',
-                    'total_cost_basis',
-                    'total_gain',
-                    'total_dividends_earned',
-                    'realized_gains',
                     'annotation',
                     'portfolio_id',
                     'date',
@@ -86,11 +82,6 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
         return [
             'portfolio_id' => ['required', 'uuid'],
             'date' => ['required', 'date'],
-            'total_market_value' => ['sometimes', 'nullable', 'numeric'],
-            'total_cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],
-            'total_gain' => ['sometimes', 'nullable', 'numeric'],
-            'total_dividends_earned' => ['sometimes', 'nullable', 'min:0', 'numeric'],
-            'realized_gains' => ['sometimes', 'nullable', 'numeric'],
             'annotation' => ['sometimes', 'nullable', 'string'],
         ];
     }
