@@ -26,7 +26,7 @@ new class extends Component
                 <x-icon name="o-bars-3" class="cursor-pointer" />
             </label>
 
-            <div class="hidden md:block" style="height:3.1em">
+            <div class="hidden md:block" style="height:2.5em">
                 <x-application-logo  />
             </div>
 
