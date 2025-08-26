@@ -28,7 +28,7 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 
 ## Under the hood
 
-Investbrain is a Laravel PHP web application that leverages Livewire and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature three market data providers: [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), and [Alpha Vantage](https://www.alphavantage.co/support/). But we also offer an extensible market data provider interface for intrepid developers to create their own! We also offer integrations with OpenAI and Ollama for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
+Investbrain is a Laravel PHP web application that leverages Livewire and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature many market data providers. But we also offer an extensible market data provider interface for intrepid developers to create their own! We also offer integrations with OpenAI and Ollama for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
 
 ## Self hosting
 
@@ -74,7 +74,7 @@ Always keep in mind the limitations of LLMs. When in doubt, consult a licensed i
 
 ## Market data providers
 
-Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as Yahoo Finance, Alpha Vantage, or Finnhub. The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
+Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as [Yahoo Finance](https://finance.yahoo.com/), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), [Alpaca](https://alpaca.markets/), and [Alpha Vantage](https://www.alphavantage.co/support/). The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
 
 ### Configuration
 
@@ -138,7 +138,7 @@ There are several optional configurations available when installing using the re
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
 | APP_KEY | Must be set during install - encryption key for various security-related functions | `null` |
-| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, or `finnhub`) | yahoo |
+| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `alphavantage`, `alpaca`, or `finnhub`) | yahoo |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
