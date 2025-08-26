@@ -78,17 +78,19 @@ class ImportExportTest extends TestCase
     {
         $this->actingAs($user = User::factory()->create());
 
-        Portfolio::create([
+        $portfolio = Portfolio::create([
             'id' => '9e792bb8-94e7-4ed3-b8cc-43b50d34c337',
             'title' => 'Test Portfolio',
         ]);
 
         $holding = Holding::create([
-            'portfolio_id' => '9e792bb8-94e7-4ed3-b8cc-43b50d34c337',
+            'portfolio_id' => $portfolio->id,
             'symbol' => 'ACME',
             'quantity' => 0,
             'reinvest_dividends' => false,
         ]);
+
+        Transaction::factory()->buy()->lastYear()->costBasis(100)->portfolio($portfolio->id)->symbol('AAPL')->create();
 
         $this->assertEquals(false, $holding->reinvest_dividends);
 

@@ -421,6 +421,14 @@ class Holding extends Model
             ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis")
             ->first();
 
+        // delete holding if no transactions
+        if (empty($query->qty_purchases + $query->qty_sales)) {
+
+            $this->delete();
+
+            return;
+        }
+
         $total_quantity = round($query->qty_purchases - $query->qty_sales, 4);
 
         $average_cost_basis = (

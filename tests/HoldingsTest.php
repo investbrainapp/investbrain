@@ -59,4 +59,19 @@ class HoldingsTest extends TestCase
         $holding = Holding::query()->getPortfolioMetrics();
         $this->assertEquals(400, $holding->get('total_cost_basis'));
     }
+
+    public function test_delete_holding_on_sync_if_no_transactions(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        $transaction = Transaction::factory()->buy()->lastYear()->costBasis(100)->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $this->assertDatabaseCount('holdings', 1);
+
+        $transaction->delete();
+
+        $this->assertDatabaseEmpty('holdings');
+    }
 }
