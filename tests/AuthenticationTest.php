@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AuthenticationTest extends TestCase
@@ -14,15 +13,17 @@ class AuthenticationTest extends TestCase
 
     public function test_first_user_is_admin(): void
     {
-        $this->post('/register', [
+        $response = $this->post('/register', [
             'name' => 'should_be_admin',
             'email' => 'should_be_admin@example.net',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $should_be_admin = User::where(['email' => 'should_be_admin@example.net'])->first();
 
+        $this->assertModelExists($should_be_admin);
         $this->assertTrue($should_be_admin->admin);
     }
 
@@ -35,10 +36,12 @@ class AuthenticationTest extends TestCase
             'email' => 'not_admin@example.net',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $not_admin = User::where(['email' => 'not_admin@example.net'])->first();
 
+        $this->assertModelExists($not_admin);
         $this->assertNotTrue($not_admin->admin);
     }
 
