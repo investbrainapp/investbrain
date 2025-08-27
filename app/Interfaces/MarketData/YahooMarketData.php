@@ -21,7 +21,10 @@ class YahooMarketData implements MarketDataInterface
     {
 
         // create yahoo finance client factory
-        $this->client = YahooFinance::createApiClient();
+        $this->client = YahooFinance::createApiClient(
+            clientOptions: ['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36']],
+            cache: app('cache.psr6')
+        );
     }
 
     public function exists(string $symbol): bool

@@ -26,6 +26,7 @@
         "robsontenorio/mary": "^1.35",
         "scheb/yahoo-finance-api": "^5.0",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
+        "symfony/cache": "^7.3",
         "tschucki/alphavantage-laravel": "^0.0"
     },
     "require-dev": {
