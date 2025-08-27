@@ -69,7 +69,7 @@ class AlphaVantageMarketData implements MarketDataInterface
                         ? Arr::get($fundamental, 'DividendDate')
                         : null,
             'dividend_yield' => Arr::get($fundamental, 'DividendYield') != 'None'
-                        ? Arr::get($fundamental, 'DividendYield') * 100
+                        ? ((float) Arr::get($fundamental, 'DividendYield')) * 100
                         : null,
             'meta_data' => [
                 'industry' => Arr::get($fundamental, 'Industry'),
