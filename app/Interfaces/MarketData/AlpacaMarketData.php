@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AlpacaMarketData implements MarketDataInterface
 {
@@ -51,9 +52,7 @@ class AlpacaMarketData implements MarketDataInterface
 
         $quote = $response->json('trade');
 
-        if (is_null(Arr::get($quote, 'p'))) {
-            throw new \Exception('Could not find ticker on Alpaca');
-        }
+        throw_if(empty(Arr::get($quote, 'p')), NotFoundHttpException::class, "Symbol `{$symbol}` was not found");
 
         $fundamental = cache()->remember(
             'ap-symbol-'.$symbol,
@@ -158,6 +157,8 @@ class AlpacaMarketData implements MarketDataInterface
             ])->get("v2/stocks/{$symbol}/bars");
 
             $history = $response->json('bars');
+
+            throw_if(empty($history), NotFoundHttpException::class, "Symbol `{$symbol}` was not found");
 
             $chunkedHistory = collect($history)
                 ->mapWithKeys(function ($history) use ($symbol) {

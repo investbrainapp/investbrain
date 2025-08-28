@@ -13,6 +13,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TwelveDataMarketData implements MarketDataInterface
 {
@@ -53,9 +54,7 @@ class TwelveDataMarketData implements MarketDataInterface
 
         $quote = $response->json();
 
-        if (! isset($quote['price'])) {
-            throw new \Exception('Could not find ticker on Twelve Data');
-        }
+        throw_if(empty(Arr::get($quote, 'price')), NotFoundHttpException::class, "Symbol `{$symbol}` was not found");
 
         $current_market_value = Arr::get($quote, 'price');
 
@@ -152,9 +151,11 @@ class TwelveDataMarketData implements MarketDataInterface
             ])
             ->get('time_series');
 
-        $values = $response->json('values');
+        $history = $response->json('values');
 
-        return collect($values)
+        throw_if(empty($history), NotFoundHttpException::class, "Symbol `{$symbol}` was not found");
+
+        return collect($history)
             ->mapWithKeys(function ($history) use ($symbol) {
 
                 $date = Carbon::parse(Arr::get($history, 'datetime'))->toDateString();
