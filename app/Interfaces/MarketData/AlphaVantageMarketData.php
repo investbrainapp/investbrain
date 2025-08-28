@@ -145,7 +145,7 @@ class AlphaVantageMarketData implements MarketDataInterface
                 return [$date => new Ohlc([
                     'symbol' => $symbol,
                     'date' => $date,
-                    'close' => Arr::get($history, '4. close'),
+                    'close' => (float) Arr::get($history, '4. close'),
                 ])];
             });
     }
