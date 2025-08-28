@@ -28,7 +28,7 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 
 ## Under the hood
 
-Investbrain is a Laravel PHP web application that leverages Livewire and Tailwind for its frontend. Most databases should work, including MySQL and SQLite. Out of the box, we feature many market data providers. But we also offer an extensible market data provider interface for intrepid developers to create their own! We also offer integrations with OpenAI and Ollama for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
+Investbrain is a Laravel PHP web application that has an extensible market data provider interface. Out of the box, we feature many market data providers. But intrepid developers can create their own providers! We also offer integrations with OpenAI and Ollama for our ["chat with your holdings"](#chat-with-your-holdings) capability. Finally, of course we have robust support for i18n, a11y, and dark mode. 
 
 ## Self hosting
 
@@ -92,7 +92,7 @@ Your selected providers should be listed in your environment variables. Each sho
 MARKET_DATA_PROVIDER=yahoo,alphavantage
 ```
 
-In the above example, Yahoo Finance will be attempted first and the Alpha Vantage provider will be used as the fallback. If Yahoo Finance fails to retrieve market data, the application will automatically try Alpha Vantage.
+In the above example, Yahoo Finance will be attempted first. If Yahoo Finance fails to retrieve market data, the application will automatically try Alpha Vantage.
 
 ### Custom providers
 
@@ -181,7 +181,7 @@ Easy as that!
 
 ## Command line utilities
 
-Investbrain comes bundled with several helpful command line utilities to make managing your portfolios and holdings more efficient. Keep in mind these commands are extremely powerful and can make irreversable changes to your holdings. 
+Investbrain comes bundled with several helpful command line utilities to make managing your portfolios and holdings more efficient. Keep in mind these commands are extremely powerful and can make irreversable changes to your holdings.  Just to be safe, we recommend backing up your portfolios before using these commands.
 
 To run these commands, you can use `docker exec` like this:
 
@@ -189,7 +189,12 @@ To run these commands, you can use `docker exec` like this:
 docker exec -it investbrain-app php artisan <replace with command you want to run>
 ```
 
-Just to be safe, we recommend backing up your portfolios before using these commands:
+If you need more details on what the command does, you can take a look at the options available using the `help` option:
+
+```bash
+<command you want to run> --help
+```
+
 
 | Command      | Description      |
 | ------------- | ------------- |
@@ -198,8 +203,9 @@ Just to be safe, we recommend backing up your portfolios before using these comm
 | refresh:split-data | Refreshes splits data with your configured market data provider. Will also create new transactions to account for any splits. |
 | refresh:currency-data | Grabs the latest daily currency exchange rate data and persists to the database. |
 | capture:daily-change | Captures a snapshot of each portfolio's daily performance. |
-| sync:daily-change | Re-calculates daily snapshots of your portfolio's daily performance. Useful to fill in gaps in your portfolio charts. (Note: this is an extremely resource intensive query.) |
-| sync:holdings | Re-calculates performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
+| sync:daily-change | Syncs daily snapshots of your portfolio's daily performance. Useful to fill in gaps in your portfolio charts. (Note: this is an extremely resource intensive query.) |
+| sync:holdings | Syncs performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
+| fix:cost-basis-for-sales | Utility to automatically re-calculates cost basis for sale transactions. |
 
 ## Troubleshooting
 
