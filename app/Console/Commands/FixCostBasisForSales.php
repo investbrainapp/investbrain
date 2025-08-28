@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Models\Portfolio;
 use App\Models\Transaction;
 use Illuminate\Console\Command;
 
@@ -15,7 +16,8 @@ class FixCostBasisForSales extends Command
      * @var string
      */
     protected $signature = 'fix:cost-basis-for-sales
-                                    {portfolio_id : The ID of the portfolio to fix.}';
+                                    {--portfolio= : The ID of the portfolio to fix.}
+                                    {--user= : The user ID of transactions to fix.}';
 
     /**
      * The console command description.
@@ -42,7 +44,31 @@ class FixCostBasisForSales extends Command
     public function handle()
     {
 
-        $transactions = Transaction::where(['transaction_type' => 'SELL', 'portfolio_id' => $this->argument('portfolio_id')])->get();
+        if (empty($this->option('user')) && empty($this->option('portfolio'))) {
+
+            $this->error('Must provide at least a user or portfolio.');
+
+            return;
+        }
+
+        $transactions = Transaction::where(['transaction_type' => 'SELL']);
+
+        if ($this->option('user')) {
+
+            $portfolios = Portfolio::fullAccess($this->option('user'))->get('id')
+                ->pluck('id')
+                ->toArray();
+
+            $transactions->whereIn('portfolio_id', $portfolios);
+
+        } else {
+
+            $transactions->where(['portfolio_id' => $this->option('portfolio')]);
+        }
+
+        $transactions = $transactions->get();
+
+        $this->line("Fixing cost basis for {$transactions->count()} sale transactions...");
 
         $transactions->chunk(10)->each(function ($chunk) {
 
@@ -69,5 +95,7 @@ class FixCostBasisForSales extends Command
                 });
             });
         });
+
+        $this->line('Done!');
     }
 }
