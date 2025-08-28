@@ -8,6 +8,7 @@ use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\Types\Split;
+use Carbon\CarbonInterval;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -23,6 +24,11 @@ class AlpacaMarketData implements MarketDataInterface
     public string $apiBaseUrl = 'https://api.alpaca.markets/';
 
     public function __construct()
+    {
+        $this->createNewClient();
+    }
+
+    private function createNewClient()
     {
         $this->client = Http::withOptions([
             'headers' => [
@@ -53,6 +59,8 @@ class AlpacaMarketData implements MarketDataInterface
             'ap-symbol-'.$symbol,
             1440,
             function () use ($symbol) {
+
+                $this->createNewClient();
 
                 $basic = $this->client->baseUrl($this->apiBaseUrl)->get("v2/assets/{$symbol}")->json();
                 $fifty_two_week = $this->client->baseUrl($this->dataBaseUrl)->withQueryParameters([
@@ -125,24 +133,47 @@ class AlpacaMarketData implements MarketDataInterface
 
     public function history(string $symbol, $startDate, $endDate): Collection
     {
-        $response = $this->client->baseUrl($this->dataBaseUrl)->withQueryParameters([
-            'timeframe' => '1D',
-            'start' => Carbon::parse($startDate)->format('Y-m-d'),
-            'end' => Carbon::parse($endDate)->subHours(36)->format('Y-m-d'), // todo: can't query recent SIP data
-        ])->get("v2/stocks/{$symbol}/bars");
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate)->subHours(36); // alpaca has sip data limits
 
-        $history = $response->json('bars');
+        $allHistory = collect();
 
-        return collect($history)
-            ->map(function ($history) use ($symbol) {
+        $chunks = 1000;
 
-                $date = Carbon::parse($history['t'])->format('Y-m-d');
+        $period = CarbonInterval::days($chunks)->toPeriod($startDate, $endDate);
+        foreach ($period as $startDate) {
 
-                return [$date => new Ohlc([
-                    'symbol' => $symbol,
-                    'date' => $date,
-                    'close' => Arr::get($history, 'c'),
-                ])];
-            });
+            $chunkEnd = $startDate->copy()->addDays($chunks - 1);
+
+            if ($chunkEnd->gt($endDate)) {
+                $chunkEnd = $endDate;
+            }
+
+            $this->createNewClient();
+
+            $response = $this->client->baseUrl($this->dataBaseUrl)->withQueryParameters([
+                'timeframe' => '1D',
+                'start' => $startDate->format('Y-m-d'),
+                'end' => $chunkEnd->format('Y-m-d'),
+            ])->get("v2/stocks/{$symbol}/bars");
+
+            $history = $response->json('bars');
+
+            $chunkedHistory = collect($history)
+                ->mapWithKeys(function ($history) use ($symbol) {
+
+                    $date = Carbon::parse($history['t'])->format('Y-m-d');
+
+                    return [$date => new Ohlc([
+                        'symbol' => $symbol,
+                        'date' => $date,
+                        'close' => Arr::get($history, 'c'),
+                    ])];
+                });
+
+            $allHistory = $allHistory->merge($chunkedHistory);
+        }
+
+        return $allHistory;
     }
 }
