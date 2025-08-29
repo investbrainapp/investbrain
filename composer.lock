@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d5d786656eb888c2966c648ddf946280",
+    "content-hash": "09faf36704392ba5099e39fe62908057",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -62,16 +62,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.356.5",
+            "version": "3.356.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "5872ccb5100c4afb0dae3db0bd46636f63ae8147"
+                "reference": "6b44237a218485bf43a0015600aebf43cb726d4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5872ccb5100c4afb0dae3db0bd46636f63ae8147",
-                "reference": "5872ccb5100c4afb0dae3db0bd46636f63ae8147",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/6b44237a218485bf43a0015600aebf43cb726d4e",
+                "reference": "6b44237a218485bf43a0015600aebf43cb726d4e",
                 "shasum": ""
             },
             "require": {
@@ -153,9 +153,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.356.5"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.356.7"
             },
-            "time": "2025-08-26T18:05:04+00:00"
+            "time": "2025-08-28T18:14:39+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -1803,21 +1803,21 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hackeresq/filter-models",
-                "reference": "847950d3277fe7df3a2dcdcdd3ba37d3b07ee667"
+                "reference": "e92c1e1e8af299cb2c3c3e6d7768f2fb2dcb9146"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hackeresq/filter-models/zipball/847950d3277fe7df3a2dcdcdd3ba37d3b07ee667",
-                "reference": "847950d3277fe7df3a2dcdcdd3ba37d3b07ee667",
+                "url": "https://api.github.com/repos/hackeresq/filter-models/zipball/e92c1e1e8af299cb2c3c3e6d7768f2fb2dcb9146",
+                "reference": "e92c1e1e8af299cb2c3c3e6d7768f2fb2dcb9146",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^11.9",
+                "laravel/framework": "^11.0||^12.0",
                 "php": "^8.2"
             },
             "require-dev": {
                 "orchestra/testbench": "^9.9",
-                "phpunit/phpunit": "^10.0|^11.0"
+                "phpunit/phpunit": "^10.0||^11.0"
             },
             "default-branch": true,
             "type": "library",
@@ -1839,7 +1839,7 @@
                 }
             },
             "description": "Simple package to filter your Laravel models with query parameters",
-            "time": "2025-01-27T23:18:08+00:00"
+            "time": "2025-08-29T02:40:27+00:00"
         },
         {
             "name": "investbrainapp/frankfurter-client",
@@ -1847,16 +1847,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/investbrainapp/frankfurter-client",
-                "reference": "738b2b53f48b7cdf4d66c44a592430dea4de9fd0"
+                "reference": "d2a96d7db2d17e91245b0cf2146e2b8a295b8d4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/investbrainapp/frankfurter-client/zipball/738b2b53f48b7cdf4d66c44a592430dea4de9fd0",
-                "reference": "738b2b53f48b7cdf4d66c44a592430dea4de9fd0",
+                "url": "https://api.github.com/repos/investbrainapp/frankfurter-client/zipball/d2a96d7db2d17e91245b0cf2146e2b8a295b8d4b",
+                "reference": "d2a96d7db2d17e91245b0cf2146e2b8a295b8d4b",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^11.9",
+                "laravel/framework": "^11.0||^12.0",
                 "php": "^8.2"
             },
             "default-branch": true,
@@ -1874,7 +1874,7 @@
                 }
             },
             "description": "Laravel SDK for interacting with the Frankfurter currency exchange API",
-            "time": "2025-04-11T02:35:18+00:00"
+            "time": "2025-08-29T02:39:41+00:00"
         },
         {
             "name": "jfcherng/php-color-output",
@@ -9911,16 +9911,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "11.0.10",
+            "version": "11.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "1a800a7446add2d79cc6b3c01c45381810367d76"
+                "reference": "4f7722aa9a7b76aa775e2d9d4e95d1ea16eeeef4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/1a800a7446add2d79cc6b3c01c45381810367d76",
-                "reference": "1a800a7446add2d79cc6b3c01c45381810367d76",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/4f7722aa9a7b76aa775e2d9d4e95d1ea16eeeef4",
+                "reference": "4f7722aa9a7b76aa775e2d9d4e95d1ea16eeeef4",
                 "shasum": ""
             },
             "require": {
@@ -9977,7 +9977,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/show"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/11.0.11"
             },
             "funding": [
                 {
@@ -9997,7 +9997,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-18T08:56:18+00:00"
+            "time": "2025-08-27T14:37:49+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -10246,16 +10246,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.5.34",
+            "version": "11.5.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "3e4c6ef395f7cb61a6206c23e0e04b31724174f2"
+                "reference": "d341ee94ee5007b286fc7907b383aae6b5b3cc91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3e4c6ef395f7cb61a6206c23e0e04b31724174f2",
-                "reference": "3e4c6ef395f7cb61a6206c23e0e04b31724174f2",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d341ee94ee5007b286fc7907b383aae6b5b3cc91",
+                "reference": "d341ee94ee5007b286fc7907b383aae6b5b3cc91",
                 "shasum": ""
             },
             "require": {
@@ -10269,7 +10269,7 @@
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.2",
-                "phpunit/php-code-coverage": "^11.0.10",
+                "phpunit/php-code-coverage": "^11.0.11",
                 "phpunit/php-file-iterator": "^5.1.0",
                 "phpunit/php-invoker": "^5.0.1",
                 "phpunit/php-text-template": "^4.0.1",
@@ -10327,7 +10327,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.34"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.35"
             },
             "funding": [
                 {
@@ -10351,7 +10351,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-20T14:41:45+00:00"
+            "time": "2025-08-28T05:13:54+00:00"
         },
         {
             "name": "sebastian/cli-parser",
