@@ -83,7 +83,7 @@ new class extends Component
 
                     <x-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
                     <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        {{ csrf_field() }}
+                        @csrf
                     </form>
 
                 </x-dropdown>
