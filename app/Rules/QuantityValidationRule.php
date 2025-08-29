@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Rules;
 
 use App\Models\Portfolio;
-use App\Models\Transaction;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Carbon;
 
 class QuantityValidationRule implements ValidationRule
 {
@@ -21,7 +20,7 @@ class QuantityValidationRule implements ValidationRule
         protected ?string $symbol,
         protected ?string $transactionType,
         protected string|Carbon|null $date
-    ) { }
+    ) {}
 
     /**
      * Validate the attribute.
