@@ -122,19 +122,21 @@ class TransactionFactory extends Factory
         ]);
     }
 
-    public function buy(): static
+    public function buy($quantity = 1): static
     {
         return $this->state(fn (array $attributes) => [
             'transaction_type' => 'BUY',
+            'quantity' => $quantity,
             'cost_basis' => $this->faker->randomFloat(2, 10, 500),
             'sale_price' => null,
         ]);
     }
 
-    public function sell(): static
+    public function sell($quantity = 1): static
     {
         return $this->state(fn (array $attributes) => [
             'transaction_type' => 'SELL',
+            'quantity' => $quantity,
             'sale_price' => $this->faker->randomFloat(2, 10, 500),
             'cost_basis' => null,
         ]);

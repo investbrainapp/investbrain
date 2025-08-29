@@ -6,8 +6,8 @@ namespace App\Rules;
 
 use App\Models\Portfolio;
 use App\Models\Transaction;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Carbon;
 
 class QuantityValidationRule implements ValidationRule
 {
@@ -20,8 +20,9 @@ class QuantityValidationRule implements ValidationRule
         protected ?Portfolio $portfolio,
         protected ?string $symbol,
         protected ?string $transactionType,
-        protected string|Carbon|null $date
-    ) { }
+        protected string|Carbon|null $date,
+        protected ?Transaction $transaction
+    ) {}
 
     /**
      * Validate the attribute.
@@ -42,6 +43,7 @@ class QuantityValidationRule implements ValidationRule
                 ->sum('quantity');
 
             $sales_qty = (float) $this->portfolio->transactions()
+                ->where('id', '!=', $this->transaction?->id)
                 ->symbol($this->symbol)
                 ->sell()
                 ->whereDate('date', '<', $this->date)
