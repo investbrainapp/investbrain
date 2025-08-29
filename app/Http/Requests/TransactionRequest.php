@@ -39,7 +39,8 @@ class TransactionRequest extends FormRequest
                     $this->input('portfolio'),
                     $this->requestOrModelValue('symbol', 'transaction'),
                     $this->requestOrModelValue('transaction_type', 'transaction'),
-                    $this->requestOrModelValue('date', 'transaction')
+                    $this->requestOrModelValue('date', 'transaction'),
+                    $this->transaction
                 ),
             ],
             'currency' => ['required', 'exists:currencies,currency'],
