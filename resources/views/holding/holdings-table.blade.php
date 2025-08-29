@@ -98,6 +98,6 @@ new class extends Component
         {{ Number::currency($row->dividends_earned ?? 0, $row->market_data->currency) }}
     @endscope
     @scope('cell_market_data_updated_at', $row)
-        {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}
+        {{ \Illuminate\Support\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}
     @endscope
 </x-table>
