@@ -26,19 +26,20 @@ export default {
 	},
     content: [
 		'./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-		 './vendor/laravel/jetstream/**/*.blade.php',
-		 './storage/framework/views/*.php',
-		 './resources/views/**/*.blade.php',
-		 "./vendor/robsontenorio/mary/src/View/Components/**/*.php"
+		'./vendor/laravel/jetstream/**/*.blade.php',
+		'./storage/framework/views/*.php',
+		'./resources/views/**/*.blade.php',
+		'./vendor/robsontenorio/mary/src/View/Components/**/*.php',
+		'./vendor/livewire/flux-pro/stubs/**/*.blade.php',
+		'./vendor/livewire/flux/stubs/**/*.blade.php'
 	],
     theme: {
-        extend: {
-            fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-            },
+        fontFamily: {
+            sans: ['Inter', 'sans-serif'],
         },
     },
-	darkMode: ['class', '[data-theme="business"]'],
+	darkMode: 'selector',
+	// darkMode: ['class', '[data-theme="business"]'],
     plugins: [
 		typography,
 		require("daisyui")
