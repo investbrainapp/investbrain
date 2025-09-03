@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layouts.app>
     <div x-data>  
 
         <x-ib-alpine-modal 
@@ -25,4 +25,4 @@
         @livewire('transactions-table')
 
     </div>
-</x-app-layout>
+</x-layouts.app>

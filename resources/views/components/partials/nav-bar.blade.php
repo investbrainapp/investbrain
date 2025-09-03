@@ -18,27 +18,29 @@ new class extends Component
     // methods
 
 }; ?>
-<div class="bg-base-100 border-base-300 border-b sticky top-0 z-10">
-    <div class="flex justify-between items-center px-7 py-3 gap-4 mx-auto">
-        <div class="flex flex-0 items-center">
-            
-            <label for="main-drawer" class="lg:hidden mr-3">
-                <x-icon name="o-bars-3" class="cursor-pointer" />
-            </label>
 
-            <div class="hidden md:block" style="height:2.5em">
-                <x-application-logo  />
-            </div>
+<nav class="z-10 p-4 ml-0 md:ml-64 md:border-0 border-b border-zinc-200 dark:border-zinc-800">
 
-        </div>
-        <div class="flex flex-1 justify-center" x-data>
+    <div
+        class="block md:hidden z-10 fixed w-screen h-screen inset-0 bg-black/20"
+        x-on:click="sideBarOpen=false"
+        x-show="sideBarOpen"
+        x-cloak
+    ></div>
+    
+    <div class="flex flex-wrap justify-between items-center">
 
-            <x-spotlight
-                shortcut="slash"
-                search-text="{{ __('Search holdings, portfolios, or anything else...') }}"
-                no-results-text="{{ __('Darn! Nothing found for that search.') }}"
+        <div>
+            <x-button
+                aria-controls="drawer-navigation"
+                title="{{ __('Toggle Sidebar') }}"
+                class="btn-circle btn-ghost btn-sm block md:hidden"
+                icon="o-bars-3"
+                @click="sideBarOpen = true"
             />
-            
+        </div>
+    
+        <div>
             <x-button 
                 @click.stop="$dispatch('mary-search-open')"
                 class="btn-sm flex-1 justify-start md:flex-none"
@@ -55,8 +57,8 @@ new class extends Component
                     </span>
                 </x-slot:label>
             </x-button>
-
         </div>
+
         <div class="flex flex-0 items-center gap-4">
 
             <x-button 
@@ -85,4 +87,6 @@ new class extends Component
             />
         </div>
     </div>
-</div>
+</nav>
+
+

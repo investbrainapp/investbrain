@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-layouts.guest>
     <x-authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
@@ -60,4 +60,4 @@
             @endif
         </form>
     </x-authentication-card>
-</x-guest-layout>
+</x-layouts.guest>

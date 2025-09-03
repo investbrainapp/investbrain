@@ -1,6 +1,6 @@
 @use('App\Models\Currency')
 
-<x-app-layout>
+<x-layouts.app>
     <div x-data>
 
         <x-ib-alpine-modal 
@@ -184,4 +184,4 @@
 
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app>
