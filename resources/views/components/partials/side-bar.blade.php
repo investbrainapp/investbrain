@@ -53,7 +53,7 @@ new class extends Component
     
     <div class="h-full px-1 overflow-y-auto flex flex-col">
 
-        <div class="w-10 mx-5 my-3"> <x-application-logo /> </div>
+        <div class="w-10 m-5"> <x-application-logo /> </div>
 
         <ul class="space-y-2 font-medium">
             <li>
