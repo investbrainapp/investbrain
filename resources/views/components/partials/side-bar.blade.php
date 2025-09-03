@@ -51,6 +51,15 @@ new class extends Component
     @resize.window="responsiveSidebar"
     @keyup.escape.window="sideBarOpen = false"
 >
+    <template x-teleport="body">
+        <div
+            aria-label="Overlay"
+            class="block md:hidden z-10 fixed w-screen h-screen inset-0 bg-black/20 backdrop-blur-sm"
+            x-on:click="sideBarOpen=false"
+            x-show="sideBarOpen"
+            x-cloak
+        ></div>
+    </template>
     
     <div class="h-full px-1 overflow-y-auto flex flex-col">
 

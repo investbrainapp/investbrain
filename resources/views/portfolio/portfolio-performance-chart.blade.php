@@ -116,7 +116,7 @@ new class extends Component
     }
 }; ?>
 
-<x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">
+<x-ib-card class="mb-6">
     <div class="flex flex-col md:flex-row md:justify-between mb-2">
                     
         <div class="flex flex-col md:flex-row items-start md:items-center">
@@ -159,4 +159,4 @@ new class extends Component
         <x-ib-apex-chart :series-data="$chartSeries" :name="$name" />
     </div>
 
-</x-card>
+</x-ib-card>

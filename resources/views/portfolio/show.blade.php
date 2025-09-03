@@ -65,30 +65,25 @@
 
         <div class="grid sm:grid-cols-5 gap-5">
 
-            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-                <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Market Gain/Loss') }}</div>
+            <x-ib-card dense sub-title="{{ __('Market Gain/Loss') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_gain_dollars', 0)) }} </div>
-            </x-card>
+            </x-ib-card>
             
-            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-                <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Total Cost Basis') }}</div>
+            <x-ib-card dense sub-title="{{ __('Total Cost Basis') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_cost_basis', 0)) }} </div>
-            </x-card>
+            </x-ib-card>
             
-            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-                <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Total Market Value') }}</div>
+            <x-ib-card dense sub-title="{{ __('Total Market Value') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_value', 0)) }} </div>
-            </x-card>
+            </x-ib-card>
             
-            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-                <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Realized Gain/Loss') }}</div>
+            <x-ib-card dense sub-title="{{ __('Realized Gain/Loss') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('realized_gain_dollars', 0)) }} </div>
-            </x-card>
+            </x-ib-card>
 
-            <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-                <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Dividends Earned') }}</div>
+            <x-ib-card dense sub-title="{{ __('Dividends Earned') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_dividends_earned', 0)) }} </div>
-            </x-card>
+            </x-ib-card>
                 
         </div>
 

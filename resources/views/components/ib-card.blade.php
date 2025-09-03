@@ -1,10 +1,19 @@
-@props(['title' => ''])
+@props([
+    'title' => '',
+    'subTitle' => '',
+    'dense' => false,
+])
 
-<x-card 
-    {{ $attributes->merge(['class' => 'bg-slate-100 dark:bg-base-200 rounded-lg']) }} 
+<div 
+    {{ $attributes->merge(['class' => 'p-5 bg-slate-100 dark:bg-base-200 rounded-lg shadow-sm']) }} 
 >
 
-    <h2 class="text-xl mb-2 flex items-center truncate"> {{ $title }} </h2>
+    @if($title)
+        <h3 @class(['pb-2' => !$subTitle && !$dense, 'text-xl font-bold leading-none tracking-tight flex items-center truncate'])> {{ $title }} </h3>
+    @endif
+    @if($subTitle) 
+        <h5 @class(['pb-2' => !$dense, 'text-sm text-gray-400 flex items-center truncate'])> {{ $subTitle }} </h5>
+    @endif
 
     {{ $slot }}
-</x-card>
+</div>
