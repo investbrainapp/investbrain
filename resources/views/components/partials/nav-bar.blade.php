@@ -22,7 +22,7 @@ new class extends Component
 <nav class="z-10 p-5 ml-0 md:ml-64 md:border-0 border-b border-zinc-200 dark:border-zinc-800">
 
     <div
-        class="block md:hidden z-10 fixed w-screen h-screen inset-0 bg-black/20"
+        class="block md:hidden z-10 fixed w-screen h-screen inset-0 bg-black/20 backdrop-blur-sm"
         x-on:click="sideBarOpen=false"
         x-show="sideBarOpen"
         x-cloak

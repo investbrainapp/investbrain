@@ -21,6 +21,7 @@ new class extends Component
 
 <div 
     aria-label="Sidebar"
+    style="background-image: url('{{ asset('images/noise.svg') }}')"
     class="
         h-full
         bg-base-200
