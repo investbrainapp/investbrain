@@ -22,7 +22,7 @@
         "livewire/volt": "^1.6",
         "maatwebsite/excel": "^3.1",
         "openai-php/client": "^0.10.3",
-        "predis/predis": "^2.2",
+        "predis/predis": "^3.2",
         "robsontenorio/mary": "^1.35",
         "scheb/yahoo-finance-api": "^5.0",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
