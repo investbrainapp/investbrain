@@ -2,7 +2,7 @@
     <x-authentication-card>
         <x-slot:logo>
             <div class="w-24 mb-10">
-                <x-glyph-only-logo />
+                <x-ib-logo />
             </div>
         </x-slot:logo>
 

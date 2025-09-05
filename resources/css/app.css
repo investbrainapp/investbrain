@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-[x-cloak] {
-    display: none;
-}
-
 .ai-chat ul, .ai-chat ol, .ai-chat ol li > ul {
     margin-left: 1.1rem;
 }

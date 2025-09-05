@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('components.partials.head')
     </head>
 
-    <body class="font-sans antialiased min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
+    <body class="font-sans antialiased min-h-screen" x-data="{}">
     
         <main class=""">
             {{ $slot }}

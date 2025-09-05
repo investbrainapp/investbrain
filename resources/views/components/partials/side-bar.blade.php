@@ -24,7 +24,7 @@ new class extends Component
     style="background-image: url('{{ asset('images/noise.svg') }}')"
     class="
         h-full
-        bg-base-200
+        bg-base-300
         border-r
         border-zinc-200
         dark:border-zinc-800
@@ -42,12 +42,11 @@ new class extends Component
         responsiveSidebar() {
             if (window.innerWidth >= 768) {
                 this.sideBarOpen = true
-            } else {
-                this.sideBarOpen = false
+                return;
             }
+            this.sideBarOpen = false
         }
     }"
-    x-init="window.addEventListener('resize', () => responsiveSidebar())"
     @resize.window="responsiveSidebar"
     @keyup.escape.window="sideBarOpen = false"
 >
@@ -63,11 +62,11 @@ new class extends Component
     
     <div class="h-full px-1 overflow-y-auto flex flex-col">
 
-        <div class="w-10 m-5"> <x-application-logo /> </div>
+        <div class="w-10 m-5"> <x-ib-logo /> </div>
 
         <ul class="space-y-2 font-medium">
             <li>
-                <a title="title="{{ __('Dashboard') }}" href="{{ route('dashboard') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <a title="title="{{ __('Dashboard') }}" href="{{ route('dashboard') }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 
                 <span class="ms-3"> {{ __('Dashboard') }} </span>
                 </a>
@@ -75,7 +74,7 @@ new class extends Component
 
             @foreach (auth()->user()->portfolios as $portfolio)
             <li>
-                <a title="title="{{ __('Portfolios') }}" href="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <a title="title="{{ __('Portfolios') }}" href="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 
                 <span class="ms-3"> {{ $portfolio->title }}  
                     @if($portfolio->wishlist)
@@ -87,20 +86,20 @@ new class extends Component
             @endforeach
 
             <li>
-                <a title="title="{{ __('Dashboard') }}"" href="{{ route('dashboard') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <a title="title="{{ __('Dashboard') }}"" href="{{ route('dashboard') }}" class="flex items-center p-2 text-gray-900 rounded-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 
                 <span class="ms-3"> {{ __('Dashboard') }} </span>
                 </a>
             </li>
             
             <li>
-                <a title="title="{{ __('Create Portfolio') }}"" href="{{ route('portfolio.create') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <a title="title="{{ __('Create Portfolio') }}"" href="{{ route('portfolio.create') }}" class="flex items-center p-2 text-gray-900 rounded-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 
                 <span class="ms-3"> {{ __('Create Portfolio') }} </span>
                 </a>
             </li>
             <li>
-                <a title="title="{{ __('Transactions') }}"" href="{{ route('transaction.index') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <a title="title="{{ __('Transactions') }}"" href="{{ route('transaction.index') }}" class="flex items-center p-2 text-gray-900 rounded-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 
                 <span class="ms-3"> {{ __('Transactions') }} </span>
                 </a>

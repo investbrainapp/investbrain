@@ -2,7 +2,7 @@
     <x-authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-glyph-only-logo />
+                <x-ib-logo />
             </div>
         </x-slot>
 
@@ -21,9 +21,9 @@
                 @csrf
 
                 <div>
-                    <x-button type="submit" type="submit" class="btn-primary">
-                        {{ __('Resend Verification Email') }}
-                    </x-button>
+                    <x-ib-button label="{{ __('Resend Verification Email') }}" type="submit" class="bg-primary hover:bg-secondary focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 focus:shadow-outline focus:outline-none" />
+                        
+                    
                 </div>
             </form>
 

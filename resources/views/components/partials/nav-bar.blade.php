@@ -32,7 +32,7 @@ new class extends Component
                 @click="sideBarOpen = true"
             />
 
-            <div class="ml-3 w-8 hidden sm:block md:hidden"> <x-application-logo /> </div>
+            <div class="ml-3 w-8 hidden sm:block md:hidden"> <x-ib-logo /> </div>
         </div>
     
         <div>
@@ -77,8 +77,8 @@ new class extends Component
             <x-theme-toggle 
                 title="{{ __('Toggle Theme') }}" 
                 class="btn-circle btn-ghost btn-sm" 
-                darkTheme="business" 
-                lightTheme="corporate"
+                darkTheme="dark" 
+                lightTheme="light"
             />
         </div>
     </div>

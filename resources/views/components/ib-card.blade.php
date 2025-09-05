@@ -5,7 +5,7 @@
 ])
 
 <div 
-    {{ $attributes->merge(['class' => 'p-5 bg-slate-100 dark:bg-base-200 rounded-lg shadow-sm']) }} 
+    {{ $attributes->merge(['class' => 'p-5 bg-base-200 rounded-lg shadow-sm']) }} 
 >
 
     @if($title)
