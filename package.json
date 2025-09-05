@@ -12,7 +12,7 @@
         "axios": "^1.7.4",
         "daisyui": "^4.12.10",
         "laravel-vite-plugin": "^1.0",
-        "postcss": "^8.4.40",
+        "postcss": "^8.5.6",
         "tailwindcss": "^3.4.7",
         "vite": "^5.4"
     },
