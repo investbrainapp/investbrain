@@ -24,6 +24,5 @@
         <x-toast />
 
         @livewireScripts
-        @fluxScripts
     </body>
 </html>

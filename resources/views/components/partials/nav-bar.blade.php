@@ -74,11 +74,9 @@ new class extends Component
                 <x-github-icon />
             </x-button>
 
-            <x-theme-toggle 
+            <x-ib-theme-selector
                 title="{{ __('Toggle Theme') }}" 
                 class="btn-circle btn-ghost btn-sm" 
-                darkTheme="dark" 
-                lightTheme="light"
             />
         </div>
     </div>

@@ -8,9 +8,9 @@
     
         <main class=""">
             {{ $slot }}
+            <x-ib-theme-selector hidden="true" />
         </main>
         
         @livewireScripts
-        @fluxScripts
     </body>
 </html>

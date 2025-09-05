@@ -76,7 +76,7 @@ export default {
 			sans: ['Inter', 'sans-serif'],
 		},
 	},
-	darkMode: ['class', '[data-theme="dark"]'],
+	darkMode: ['selector', '[data-theme="dark"]'],
 	plugins: [
 		typography,
 		require("daisyui")

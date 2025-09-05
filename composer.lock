@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< Updated upstream
     "content-hash": "d5d786656eb888c2966c648ddf946280",
-=======
-    "content-hash": "40b0d6ecf11596108d55c29a47f87700",
->>>>>>> Stashed changes
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -66,7 +62,6 @@
         },
         {
             "name": "aws/aws-sdk-php",
-<<<<<<< Updated upstream
             "version": "3.356.5",
             "source": {
                 "type": "git",
@@ -77,18 +72,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5872ccb5100c4afb0dae3db0bd46636f63ae8147",
                 "reference": "5872ccb5100c4afb0dae3db0bd46636f63ae8147",
-=======
-            "version": "3.356.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "3efa8c62c11fedb17b90f60b2d3a9f815b406e63"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/3efa8c62c11fedb17b90f60b2d3a9f815b406e63",
-                "reference": "3efa8c62c11fedb17b90f60b2d3a9f815b406e63",
->>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -170,15 +153,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-<<<<<<< Updated upstream
                 "source": "https://github.com/aws/aws-sdk-php/tree/3.356.5"
             },
             "time": "2025-08-26T18:05:04+00:00"
-=======
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.356.8"
-            },
-            "time": "2025-08-29T18:06:18+00:00"
->>>>>>> Stashed changes
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -3486,69 +3463,6 @@
                 }
             ],
             "time": "2024-12-08T08:18:47+00:00"
-        },
-        {
-            "name": "livewire/flux",
-            "version": "v1.1.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/livewire/flux.git",
-                "reference": "aab9937b1248840e88ed3d401e32ffc3dcaff79d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/livewire/flux/zipball/aab9937b1248840e88ed3d401e32ffc3dcaff79d",
-                "reference": "aab9937b1248840e88ed3d401e32ffc3dcaff79d",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/console": "^10.0|^11.0|^12.0",
-                "illuminate/support": "^10.0|^11.0|^12.0",
-                "illuminate/view": "^10.0|^11.0|^12.0",
-                "laravel/prompts": "^0.1|^0.2|^0.3",
-                "livewire/livewire": "^3.5.19",
-                "php": "^8.1",
-                "symfony/console": "^6.0|^7.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Flux": "Flux\\Flux"
-                    },
-                    "providers": [
-                        "Flux\\FluxServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Flux\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "proprietary"
-            ],
-            "authors": [
-                {
-                    "name": "Caleb Porzio",
-                    "email": "calebporzio@gmail.com"
-                }
-            ],
-            "description": "The official UI component library for Livewire.",
-            "keywords": [
-                "components",
-                "flux",
-                "laravel",
-                "livewire",
-                "ui"
-            ],
-            "support": {
-                "issues": "https://github.com/livewire/flux/issues",
-                "source": "https://github.com/livewire/flux/tree/v1.1.6"
-            },
-            "time": "2025-02-26T01:01:44+00:00"
         },
         {
             "name": "livewire/livewire",
