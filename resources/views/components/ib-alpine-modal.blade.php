@@ -28,7 +28,7 @@
                     x-cloak
                 ></div>
 
-                <x-card     
+                <x-ib-card     
                     x-trap.inert.noscroll="open"
                     :title="$title"
                     :subtitle="$subtitle"
@@ -47,7 +47,7 @@
 
                     {{ $slot }}
 
-                </x-card>
+                </x-ib-card>
             </div>
         </template>
     </dialog>

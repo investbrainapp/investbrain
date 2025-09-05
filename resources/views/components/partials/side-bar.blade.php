@@ -122,7 +122,7 @@ new class extends Component
                     <x-menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
                     <x-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 
-                    <x-section-border class="py-1" />
+                    <x-ib-section-border class="py-1" />
 
                     <x-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
                     <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">

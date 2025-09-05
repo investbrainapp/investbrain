@@ -17,7 +17,7 @@
             @keydown.escape.window = "$wire.{{ $attributes->wire('model')->value() }} = false"
         @endif
     >
-        <x-card     
+        <x-ib-card     
             :title="$title"
             :subtitle="$subtitle"
             {{ $attributes->merge(['class' => 'modal-box relative transform overflow-hidden rounded-md ext-left shadow-xl w-full sm:w-2/3 lg:w-1/3 m-2 sm:m-0']) }} 
@@ -33,7 +33,7 @@
 
             {{ $slot }}
 
-        </x-card>
+        </x-ib-card>
 
         <div class="modal-backdrop" method="dialog">
             <a 

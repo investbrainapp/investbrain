@@ -48,7 +48,7 @@
     </x-forms.form-section>
 
     @if ($this->user->tokens->isNotEmpty())
-        <x-section-border hide-on-mobile />
+        <x-ib-section-border hide-on-mobile />
 
         <!-- Manage API Tokens -->
         <div class="mt-10 sm:mt-0">

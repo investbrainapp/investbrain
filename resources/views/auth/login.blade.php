@@ -46,7 +46,7 @@
 
             @if (\Laravel\Fortify\Features::enabled('registration'))
 
-                <x-section-border />
+                <x-ib-section-border />
 
                 <x-connected-accounts-login />
                 

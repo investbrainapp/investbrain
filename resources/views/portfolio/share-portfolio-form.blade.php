@@ -1,15 +1,13 @@
 <?php
 
 use App\Models\Portfolio;
-use App\Models\User;
 use App\Traits\WithTrimStrings;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
-use Illuminate\Support\Collection;
 use Mary\Traits\Toast;
 
-new class extends Component {
-
+new class extends Component
+{
     use Toast;
     use WithTrimStrings;
 
@@ -23,18 +21,20 @@ new class extends Component {
     public int $fullAccess = 0;
 
     public array $permissions;
+
     public bool $confirmingAccessDeletion = false;
+
     public ?string $deletingAccessFor = null;
 
     // methods
     public function mount()
     {
-        if (!$this->portfolio) {
+        if (! $this->portfolio) {
             $this->permissions = [
                 auth()->user()->id => [
                     'owner' => true,
-                    'full_access' => false
-                ]
+                    'full_access' => false,
+                ],
             ];
 
         } else {
@@ -43,8 +43,8 @@ new class extends Component {
                 return [
                     $user->id => [
                         'owner' => $user->pivot->owner ?? 0,
-                        'full_access' => $user->pivot->full_access ?? 0
-                    ]
+                        'full_access' => $user->pivot->full_access ?? 0,
+                    ],
                 ];
             })->toArray();
         }
@@ -65,13 +65,13 @@ new class extends Component {
     {
         $this->authorize('fullAccess', $this->portfolio);
 
-        if (!$confirmed) {
+        if (! $confirmed) {
             $this->deletingAccessFor = $userId;
             $this->confirmingAccessDeletion = true;
 
             return;
         }
-        
+
         unset($this->permissions[$userId]);
 
         $this->portfolio->unShare($userId);
@@ -101,7 +101,6 @@ new class extends Component {
         $this->emailAddress = '';
         $this->fullAccess = false;
     }
-
 }; ?>
 
 <div class="">
