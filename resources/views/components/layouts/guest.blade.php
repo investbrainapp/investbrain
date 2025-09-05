@@ -7,8 +7,9 @@
     <body class="font-sans antialiased min-h-screen" x-data="{}">
     
         <main class=""">
-            {{ $slot }}
             <x-ib-theme-selector hidden="true" />
+            
+            {{ $slot }}
         </main>
         
         @livewireScripts
