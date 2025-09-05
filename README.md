@@ -50,8 +50,6 @@ curl -O https://raw.githubusercontent.com/investbrainapp/investbrain/main/docker
 
 Adjust the `environment` properties in the compose file to your preferences. 
 
-**Importantly**, you need to set the `APP_KEY` value.  If you're unsure, Investbrain will generate an `APP_KEY` for you on first run, but it will not persist. You must _manually_ update your environment configuration with this generated value!
-
 **3. Run `docker compose up`**
 
 It might take a few minutes to pull the Docker images. But assuming everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
@@ -137,7 +135,6 @@ There are several optional configurations available when installing using the re
 | ------------- | ------------- | ------------- |
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
-| APP_KEY | Must be set during install - encryption key for various security-related functions | `null` |
 | MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `twelvedata`, `alphavantage`, `alpaca`, or `finnhub`) | yahoo |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
