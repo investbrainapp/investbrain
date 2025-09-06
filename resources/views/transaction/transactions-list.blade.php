@@ -118,23 +118,23 @@ new class extends Component
             
             <span>
                 @if($offset > 0)
-                <x-button 
+                <x-ib-button 
                     class="btn btn-sm btn-ghost text-secondary"
                     wire:click="updateOffset(-{{ $perPage }})"
                 >
                     {!! __('pagination.previous') !!}
-                </x-button>
+                </x-ib-button>
                 @endif
             </span>
 
             <span>
                 @if(count($transactions) - $offset >  $offset)
-                <x-button 
+                <x-ib-button 
                     class="btn btn-sm btn-ghost text-secondary"
                     wire:click="updateOffset({{ $perPage }})"
                 >
                     {!! __('pagination.next') !!}
-                </x-button>
+                </x-ib-button>
                 @endif
             </span>
             

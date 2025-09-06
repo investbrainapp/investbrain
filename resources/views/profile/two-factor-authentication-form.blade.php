@@ -78,42 +78,42 @@
         <div class="mt-5">
             @if (! $this->enabled)
                 <x-forms.confirms-password wire:then="enableTwoFactorAuthentication">
-                    <x-button type="button" wire:loading.attr="disabled">
+                    <x-ib-button type="button" wire:loading.attr="disabled">
                         {{ __('Enable') }}
-                    </x-button>
+                    </x-ib-button>
                 </x-forms.confirms-password>
             @else
                 @if ($showingRecoveryCodes)
                     <x-forms.confirms-password wire:then="regenerateRecoveryCodes">
-                        <x-button class="btn-outline" class="me-3">
+                        <x-ib-button class="btn-outline" class="me-3">
                             {{ __('Regenerate Recovery Codes') }}
-                        </x-button>
+                        </x-ib-button>
                     </x-forms.confirms-password>
                 @elseif ($showingConfirmation)
                     <x-forms.confirms-password wire:then="confirmTwoFactorAuthentication">
-                        <x-button type="button" class="me-3" wire:loading.attr="disabled">
+                        <x-ib-button type="button" class="me-3" wire:loading.attr="disabled">
                             {{ __('Confirm') }}
-                        </x-button>
+                        </x-ib-button>
                     </x-forms.confirms-password>
                 @else
                     <x-forms.confirms-password wire:then="showRecoveryCodes">
-                        <x-button class="btn-outline" class="me-3">
+                        <x-ib-button class="btn-outline" class="me-3">
                             {{ __('Show Recovery Codes') }}
-                        </x-button>
+                        </x-ib-button>
                     </x-forms.confirms-password>
                 @endif
 
                 @if ($showingConfirmation)
                     <x-forms.confirms-password wire:then="disableTwoFactorAuthentication">
-                        <x-button class="btn-outline" wire:loading.attr="disabled">
+                        <x-ib-button class="btn-outline" wire:loading.attr="disabled">
                             {{ __('Cancel') }}
-                        </x-button>
+                        </x-ib-button>
                     </x-forms.confirms-password>
                 @else
                     <x-forms.confirms-password wire:then="disableTwoFactorAuthentication">
-                        <x-button class="btn-error text-white" wire:loading.attr="disabled">
+                        <x-ib-button class="btn-error text-white" wire:loading.attr="disabled">
                             {{ __('Disable') }}
-                        </x-button>
+                        </x-ib-button>
                     </x-forms.confirms-password>
                 @endif
 

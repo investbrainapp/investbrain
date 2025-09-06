@@ -13,9 +13,9 @@
         </div>
 
         <div class="mt-5">
-            <x-button class="btn-error text-white" wire:click="confirmUserDeletion" wire:loading.attr="disabled">
+            <x-ib-button class="btn-error text-white" wire:click="confirmUserDeletion" wire:loading.attr="disabled">
                 {{ __('Delete Account') }}
-            </x-button>
+            </x-ib-button>
         </div>
 
         <!-- Delete User Confirmation Modal -->
@@ -39,13 +39,13 @@
             </x-slot>
 
             <x-slot name="footer">
-                <x-button class="btn-outline" wire:click="$toggle('confirmingUserDeletion')" wire:loading.attr="disabled">
+                <x-ib-button class="btn-outline" wire:click="$toggle('confirmingUserDeletion')" wire:loading.attr="disabled">
                     {{ __('Cancel') }}
-                </x-button>
+                </x-ib-button>
 
-                <x-button class="ms-3 btn-error text-white" wire:click="deleteUser" wire:loading.attr="disabled">
+                <x-ib-button class="ms-3 btn-error text-white" wire:click="deleteUser" wire:loading.attr="disabled">
                     {{ __('Delete Account') }}
-                </x-button>
+                </x-ib-button>
             </x-slot>
         </x-dialog-modal>
     </x-slot>

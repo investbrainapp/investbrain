@@ -23,7 +23,7 @@
             {{ $attributes->merge(['class' => 'modal-box relative transform overflow-hidden rounded-md ext-left shadow-xl w-full sm:w-2/3 lg:w-1/3 m-2 sm:m-0']) }} 
         >
             @if ($showClose)
-                <x-button 
+                <x-ib-button 
                     icon="o-x-mark" 
                     title="{{ __('Close') }}"
                     class="absolute top-4 right-4 btn-ghost btn-circle btn-sm" 

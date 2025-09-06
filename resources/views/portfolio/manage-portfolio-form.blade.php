@@ -1,33 +1,34 @@
 <?php
 
 use App\Models\Portfolio;
-use Illuminate\Support\Collection;
+use App\Traits\WithTrimStrings;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
-use App\Traits\WithTrimStrings;
 
-new class extends Component {
+new class extends Component
+{
     use Toast;
     use WithTrimStrings;
 
     // props
     public ?Portfolio $portfolio;
-    public Bool $hideCancel = false;
+
+    public bool $hideCancel = false;
 
     #[Rule('required|min:5')]
-    public String $title;
+    public string $title;
 
     #[Rule('sometimes|nullable')]
-    public ?String $notes;
+    public ?string $notes;
 
     #[Rule('sometimes|nullable|boolean')]
-    public Bool $wishlist = false;
+    public bool $wishlist = false;
 
-    public Bool $confirmingPortfolioDeletion = false;
+    public bool $confirmingPortfolioDeletion = false;
 
     // methods
-    public function mount() 
+    public function mount()
     {
         if (isset($this->portfolio)) {
 
@@ -49,7 +50,7 @@ new class extends Component {
 
     public function save()
     {
-        $portfolio = (new Portfolio())->fill($this->validate());
+        $portfolio = (new Portfolio)->fill($this->validate());
 
         $portfolio->save();
 
@@ -85,7 +86,7 @@ new class extends Component {
 
         <x-slot:actions>
             @if ($portfolio)
-                <x-button 
+                <x-ib-button 
                     wire:click="$toggle('confirmingPortfolioDeletion')" 
                     wire:loading.attr="disabled"
                     class="btn  text-error" 
@@ -95,9 +96,9 @@ new class extends Component {
             @endif
 
             @if (!$hideCancel)
-                <x-button label="{{ __('Cancel') }}" link="/dashboard" />
+                <x-ib-button label="{{ __('Cancel') }}" link="/dashboard" />
             @endif
-            <x-button label="{{ $portfolio ? __('Update') : __('Create') }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
+            <x-ib-button label="{{ $portfolio ? __('Update') : __('Create') }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
         </x-slot:actions>
     </x-ib-form>
 
@@ -111,13 +112,13 @@ new class extends Component {
         </x-slot>
 
         <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$toggle('confirmingPortfolioDeletion')" wire:loading.attr="disabled">
+            <x-ib-button class="btn-outline" wire:click="$toggle('confirmingPortfolioDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
+            <x-ib-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
                 {{ __('Delete Portfolio') }}
-            </x-button>
+            </x-ib-button>
         </x-slot>
     </x-confirmation-modal>
 </div>

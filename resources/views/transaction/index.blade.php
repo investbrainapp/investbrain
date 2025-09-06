@@ -14,7 +14,7 @@
             <x-ib-flex-spacer />
             
             <div>
-                <x-button 
+                <x-ib-button 
                     label="{{ __('Create Transaction') }}" 
                     class="btn-sm btn-primary whitespace-nowrap " 
                     @click="$dispatch('toggle-create-transaction')"

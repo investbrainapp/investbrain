@@ -6,10 +6,11 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // props
     public Portfolio $portfolio;
+
     public User $user;
 
     #[Rule('required|string')]
@@ -41,7 +42,6 @@ new class extends Component {
 
         return redirect(route('portfolio.show', ['portfolio' => $this->portfolio->id]));
     }
-
 }; ?>
 
 <x-form wire:submit="updateUserInformation" class="">
@@ -63,8 +63,8 @@ new class extends Component {
 
     <div class="flex items-center justify-end mt-2">
 
-        <x-button class="btn-primary" type="submit">
+        <x-ib-button class="btn-primary" type="submit">
             {{ __('Get Started') }}
-        </x-button>
+        </x-ib-button>
     </div>
 </x-form>

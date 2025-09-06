@@ -24,7 +24,7 @@ new class extends Component
     <div class="flex flex-wrap justify-between items-center">
 
         <div class="flex">
-            <x-button
+            <x-ib-button
                 aria-controls="drawer-navigation"
                 title="{{ __('Toggle Sidebar') }}"
                 class="btn-circle btn-ghost btn-sm block md:hidden"
@@ -36,7 +36,7 @@ new class extends Component
         </div>
     
         <div>
-            <x-button 
+            <x-ib-button 
                 @click.stop="$dispatch('mary-search-open')"
                 class="btn-sm flex-1 justify-start md:flex-none"
             >
@@ -51,28 +51,28 @@ new class extends Component
                         </span>
                     </span>
                 </x-slot:label>
-            </x-button>
+            </x-ib-button>
         </div>
 
         <div class="flex flex-0 items-center gap-4">
 
-            <x-button 
+            <x-ib-button 
                 title="{{ __('Documentation') }}"
                 icon="o-book-open"
                 class="btn-circle btn-ghost btn-sm"
                 link="https://github.com/investbrainapp/investbrain"
                 external
             >
-            </x-button>
+            </x-ib-button>
 
-            <x-button 
+            <x-ib-button 
                 title="{{ __('We\'re open source!') }}"
                 class="btn-circle btn-ghost btn-sm"
                 link="https://github.com/investbrainapp/investbrain"
                 external
             >
                 <x-github-icon />
-            </x-button>
+            </x-ib-button>
 
             <x-ib-theme-selector
                 title="{{ __('Toggle Theme') }}" 

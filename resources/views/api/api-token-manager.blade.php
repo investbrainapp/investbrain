@@ -41,9 +41,9 @@
                 {{ __('Created.') }}
             </x-forms.action-message>
 
-            <x-button type="submit">
+            <x-ib-button type="submit">
                 {{ __('Create') }}
-            </x-button>
+            </x-ib-button>
         </x-slot>
     </x-forms.form-section>
 
@@ -114,9 +114,9 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
+            <x-ib-button class="btn-outline" wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
                 {{ __('Close') }}
-            </x-button>
+            </x-ib-button>
         </x-slot>
     </x-dialog-modal>
 
@@ -138,13 +138,13 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
+            <x-ib-button class="btn-outline" wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-button>
+            </x-ib-button>
 
-            <x-button type="submit" class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
+            <x-ib-button type="submit" class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
                 {{ __('Save') }}
-            </x-button>
+            </x-ib-button>
         </x-slot>
     </x-dialog-modal>
 
@@ -159,13 +159,13 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$toggle('confirmingApiTokenDeletion')" wire:loading.attr="disabled">
+            <x-ib-button class="btn-outline" wire:click="$toggle('confirmingApiTokenDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-button>
+            </x-ib-button>
 
-            <x-button class="ms-3 btn-error text-white" wire:click="deleteApiToken" wire:loading.attr="disabled">
+            <x-ib-button class="ms-3 btn-error text-white" wire:click="deleteApiToken" wire:loading.attr="disabled">
                 {{ __('Delete') }}
-            </x-button>
+            </x-ib-button>
         </x-slot>
     </x-confirmation-modal>
 </div>

@@ -33,8 +33,8 @@
             {{ __('Saved.') }}
         </x-forms.action-message>
 
-        <x-button type="submit">
+        <x-ib-button type="submit">
             {{ __('Save') }}
-        </x-button>
+        </x-ib-button>
     </x-slot>
 </x-forms.form-section>

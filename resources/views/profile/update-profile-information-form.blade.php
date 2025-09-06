@@ -42,14 +42,14 @@
                     </span>
                 </div>
 
-                <x-button class="btn-outline" class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
+                <x-ib-button class="btn-outline" class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
                     {{ __('Select A New Photo') }}
-                </x-button>
+                </x-ib-button>
 
                 @if ($this->user->profile_photo_path)
-                    <x-button class="btn-outline" type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                    <x-ib-button class="btn-outline" type="button" class="mt-2" wire:click="deleteProfilePhoto">
                         {{ __('Remove Photo') }}
-                    </x-button>
+                    </x-ib-button>
                 @endif
 
                 @if ($errors->has('photo') && is_array($errors->get('photo')))
@@ -94,8 +94,8 @@
             {{ __('Saved.') }}
         </x-forms.action-message>
 
-        <x-button type="submit" spinner="photo" wire:loading.attr="disabled" wire:target="photo">
+        <x-ib-button type="submit" spinner="photo" wire:loading.attr="disabled" wire:target="photo">
             {{ __('Save') }}
-        </x-button>
+        </x-ib-button>
     </x-slot>
 </x-forms.form-section>

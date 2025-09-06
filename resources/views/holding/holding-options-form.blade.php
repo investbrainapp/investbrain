@@ -1,19 +1,17 @@
 <?php
 
 use App\Models\Holding;
-use Illuminate\Support\Collection;
-use Livewire\Attributes\{Computed};
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
-use Illuminate\Validation\Rule;
 
-new class extends Component {
+new class extends Component
+{
     use Toast;
 
     // props
     public Holding $holding;
 
-    public Bool $reinvest_dividends = false;
+    public bool $reinvest_dividends = false;
 
     // methods
     public function rules()
@@ -24,9 +22,9 @@ new class extends Component {
         ];
     }
 
-    public function mount() 
+    public function mount()
     {
-        
+
         $this->reinvest_dividends = $this->holding?->reinvest_dividends ?? false;
     }
 
@@ -52,7 +50,7 @@ new class extends Component {
 
         <x-slot:actions>
 
-            <x-button 
+            <x-ib-button 
                 label="{{ __('Save') }}" 
                 type="submit" 
                 icon="o-paper-airplane" 

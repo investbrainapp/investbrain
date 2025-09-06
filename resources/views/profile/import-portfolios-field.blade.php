@@ -123,11 +123,11 @@ new class extends Component
             <x-slot name="footer">
                 @if($backupImport?->status == 'failed')
 
-                    <x-button wire:click="$toggle('importStatusDialog')"> {{ __('Try again') }} </x-button>
+                    <x-ib-button wire:click="$toggle('importStatusDialog')"> {{ __('Try again') }} </x-ib-button>
                 @else
                     <div wire:poll="checkImportStatus" class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
                     <x-ib-flex-spacer />
-                    <x-button wire:click="$toggle('importStatusDialog')"> {{ __('Close') }} </x-button>
+                    <x-ib-button wire:click="$toggle('importStatusDialog')"> {{ __('Close') }} </x-ib-button>
                 @endif
             </x-slot>
         </x-dialog-modal>
@@ -140,9 +140,9 @@ new class extends Component
             {{ __('Saved.') }}
         </x-forms.action-message>
   
-        <x-button type="submit" wire:loading.attr="disabled" spinner="import">
+        <x-ib-button type="submit" wire:loading.attr="disabled" spinner="import">
             {{ __('Import') }}
-        </x-button>
+        </x-ib-button>
     </x-slot>
 </x-forms.form-section>
 

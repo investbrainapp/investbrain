@@ -50,9 +50,9 @@
                         {{ __('Use an authentication code') }}
                     </button>
 
-                    <x-button type="submit" class="btn-primary ms-4">
+                    <x-ib-button type="submit" class="btn-primary ms-4">
                         {{ __('Log in') }}
-                    </x-button>
+                    </x-ib-button>
                 </div>
             </form>
         </div>

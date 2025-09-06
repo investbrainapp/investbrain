@@ -38,9 +38,9 @@
                     </a>
                 @endif
 
-                <x-button type="submit" class="btn-primary ms-4" >
+                <x-ib-button type="submit" class="btn-primary ms-4" >
                     {{ __('Log in') }}
-                </x-button>
+                </x-ib-button>
 
             </div>
 
@@ -50,12 +50,12 @@
 
                 <x-connected-accounts-login />
                 
-                <x-button 
+                <x-ib-button 
                     link="{{ route('register') }}" 
                     class="btn-sm btn-block btn-outline btn-secondary my-1" 
                 >
                     {{ __('Sign up with email') }}
-                </x-button>
+                </x-ib-button>
 
             @endif
         </form>

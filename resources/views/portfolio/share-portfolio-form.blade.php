@@ -159,14 +159,14 @@ new class extends Component
                         wire:model.live.number="permissions.{{ $user->id }}.full_access"
                     />
                     
-                    <x-button 
+                    <x-ib-button 
                         class="btn-sm btn-ghost btn-circle" 
                         wire:click="deleteUser('{{ $user->id }}')"
                         spinner="deleteUser('{{ $user->id }}')"
                         title="{{ __('Remove Access') }}"
                     >
                         <x-icon name="o-x-mark" class="w-4" />
-                    </x-button>      
+                    </x-ib-button>      
                     @endif
                 </x-slot:actions>
             </x-list-item>
@@ -182,13 +182,13 @@ new class extends Component
             </x-slot>
     
             <x-slot name="footer">
-                <x-button class="btn-outline" wire:click="$toggle('confirmingAccessDeletion')" wire:loading.attr="disabled">
+                <x-ib-button class="btn-outline" wire:click="$toggle('confirmingAccessDeletion')" wire:loading.attr="disabled">
                     {{ __('Cancel') }}
                 </x-secondary-button>
     
-                <x-button class="ms-3 btn-error text-white" wire:click="deleteUser('{{ $this->deletingAccessFor }}', true)" spinner="deleteUser" wire:loading.attr="disabled">
+                <x-ib-button class="ms-3 btn-error text-white" wire:click="deleteUser('{{ $this->deletingAccessFor }}', true)" spinner="deleteUser" wire:loading.attr="disabled">
                     {{ __('Remove Access') }}
-                </x-button>
+                </x-ib-button>
             </x-slot>
         </x-confirmation-modal>
 
@@ -218,7 +218,7 @@ new class extends Component
                     
                     <x-slot:actions>
                     
-                        <x-button 
+                        <x-ib-button 
                             label="{{ __('Share') }}" 
                             title="{{ __('Share Portfolio') }}"
                             type="submit" 
@@ -233,8 +233,8 @@ new class extends Component
             
         </x-ib-alpine-modal>
 
-        <x-button class="btn-sm block mt-4" @click="$dispatch('toggle-add-user-modal')">
+        <x-ib-button class="btn-sm block mt-4" @click="$dispatch('toggle-add-user-modal')">
             {{ __('Add People') }}
-        </x-button>
+        </x-ib-button>
     </div>
 </div>

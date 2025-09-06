@@ -37,7 +37,7 @@
                     x-cloak
                 >
                     @if ($showClose)
-                        <x-button 
+                        <x-ib-button 
                             icon="o-x-mark" 
                             title="{{ __('Close') }}"
                             class="absolute top-4 right-4 btn-ghost btn-circle btn-sm" 

@@ -52,9 +52,9 @@
         @endif
 
         <div class="flex items-center mt-5">
-            <x-button type="submit" wire:click="confirmLogout" wire:loading.attr="disabled">
+            <x-ib-button type="submit" wire:click="confirmLogout" wire:loading.attr="disabled">
                 {{ __('Log Out Other Browser Sessions') }}
-            </x-button>
+            </x-ib-button>
 
             <x-forms.action-message class="ms-3" on="loggedOut">
                 {{ __('Done.') }}
@@ -82,15 +82,15 @@
             </x-slot>
 
             <x-slot name="footer">
-                <x-button class="btn-outline" wire:click="$toggle('confirmingLogout')" wire:loading.attr="disabled">
+                <x-ib-button class="btn-outline" wire:click="$toggle('confirmingLogout')" wire:loading.attr="disabled">
                     {{ __('Cancel') }}
-                </x-button>
+                </x-ib-button>
 
-                <x-button type="submit" class="ms-3"
+                <x-ib-button type="submit" class="ms-3"
                             wire:click="logoutOtherBrowserSessions"
                             wire:loading.attr="disabled">
                     {{ __('Log Out Other Browser Sessions') }}
-                </x-button>
+                </x-ib-button>
             </x-slot>
         </x-dialog-modal>
     </x-slot>

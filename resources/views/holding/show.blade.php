@@ -33,7 +33,7 @@
             </x-slot:title>
 
             @can('fullAccess', $portfolio)
-            <x-button 
+            <x-ib-button 
                 title="{{ __('Holding options') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
@@ -46,7 +46,7 @@
             <x-ib-flex-spacer />
             
             @can('fullAccess', $portfolio)
-            <x-button 
+            <x-ib-button 
                 label="{{ __('Create transaction') }}" 
                 class="btn-sm btn-primary whitespace-nowrap" 
                 @click="$dispatch('toggle-create-transaction')"

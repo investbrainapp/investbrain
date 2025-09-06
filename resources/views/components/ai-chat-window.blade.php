@@ -1,27 +1,29 @@
 <?php
 
-use Mary\Traits\Toast;
 use App\Models\AiChat;
-use App\Models\Holding;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Volt\Component;
-use OpenAI\Factory;
-use OpenAI\Responses\StreamResponse;
+use Mary\Traits\Toast;
 
-new class extends Component {
-
+new class extends Component
+{
     use Toast;
 
     // props
     public Model $chatable;
+
     public string $system_prompt = 'You are an investment portfolio assistant providing advice to an investor.  Use the following information to provide relevant recommendations.  Use the words \'likely\' or \'may\' instead of concrete statements (except for obvious statements of fact or common sense). Use github style markdown for any formatting.';
+
     public array $suggested_prompts = [];
 
     public array $messages = [];
+
     public ?string $prompt = null;
+
     public ?string $answer = null;
+
     public bool $streaming = false;
-    
+
     // methods
     public function mount()
     {
@@ -33,10 +35,11 @@ new class extends Component {
         // prevent spam
         if ($this->isRateLimited() || $this->streaming) {
             array_push($this->messages, [
-                'role' => 'assistant', 
-                'content' => __('Hang on! You\'re doing that too much.')
+                'role' => 'assistant',
+                'content' => __('Hang on! You\'re doing that too much.'),
             ]);
             $this->js('scrollChatWindow(250)');
+
             return;
         }
 
@@ -51,7 +54,7 @@ new class extends Component {
             $this->js('scrollChatWindow(250)');
 
             return;
-        } 
+        }
 
         $this->chatable->chats()->save(new AiChat(['role' => 'user', 'content' => $this->prompt]));
         array_push($this->messages, ['role' => 'user', 'content' => $this->prompt]);
@@ -65,17 +68,17 @@ new class extends Component {
 
     public function generateCompletion(): void
     {
-    
+
         try {
             $client = $this->createOpenAiClient();
-            
+
             $stream = $client->chat()->createStreamed([
                 'model' => config('openai.model'),
                 'messages' => [
                     ['role' => 'system', 'content' => "Today's date is "
                                                                     .now()->toDateString()
                                                                     .".\n\n".$this->system_prompt],
-                    ...array_slice($this->messages, -10)
+                    ...array_slice($this->messages, -10),
                 ],
             ]);
         } catch (\Exception $e) {
@@ -83,14 +86,15 @@ new class extends Component {
             $this->chatable->chats()->save(new AiChat(['role' => 'assistant', 'content' => $e->getMessage()]));
             array_push($this->messages, ['role' => 'assistant', 'content' => $e->getMessage()]);
             $this->resetPrompt();
+
             return;
         }
 
-        $this->stream(to: "answer", content: '', replace: true);
-        
-        foreach($stream as $response){
-            
-            if(!empty($response->choices[0]->delta->content)) {
+        $this->stream(to: 'answer', content: '', replace: true);
+
+        foreach ($stream as $response) {
+
+            if (! empty($response->choices[0]->delta->content)) {
                 $this->stream(to: 'answer', content: $response->choices[0]->delta->content, replace: false);
                 $this->answer .= $response->choices[0]->delta->content;
             }
@@ -116,34 +120,34 @@ new class extends Component {
                         'name' => 'suggested_prompts_schema',
                         'strict' => true,
                         'schema' => [
-                            "type" => "object",
-                            "properties" => [
-                                "suggested_prompts" => [
-                                    "type" => "array",
-                                    "items" => [
-                                        "type" => "object",
-                                        "properties" => [
-                                            "text" => [
-                                                "type" => "string",
-                                                "description" => "The suggested prompt question (no more than 5 words)"
+                            'type' => 'object',
+                            'properties' => [
+                                'suggested_prompts' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'text' => [
+                                                'type' => 'string',
+                                                'description' => 'The suggested prompt question (no more than 5 words)',
                                             ],
-                                            "value" => [
-                                                "type" => "string",
-                                                "description" => "The detailed version of the question"
-                                            ]
+                                            'value' => [
+                                                'type' => 'string',
+                                                'description' => 'The detailed version of the question',
+                                            ],
                                         ],
-                                        "required" => ["text", "value"],
-                                        "additionalProperties" => false
-                                    ]
-                                ]
+                                        'required' => ['text', 'value'],
+                                        'additionalProperties' => false,
+                                    ],
+                                ],
                             ],
-                            "required" => ["suggested_prompts"],
-                            "additionalProperties" => false
-                        ]
-                    ]
+                            'required' => ['suggested_prompts'],
+                            'additionalProperties' => false,
+                        ],
+                    ],
                 ],
                 'messages' => [
-                    ['role' => 'system', 'content' => "
+                    ['role' => 'system', 'content' => '
                         Your role is to assist investors in asking thoughtful questions of their investment advisors. 
                         
                         When you help investors ask good questions, you should ensure the you questions you recommend 
@@ -155,12 +159,12 @@ new class extends Component {
                         explanation.
 
                         Your response should only include valid JSON.  
-                    "],
+                    '],
                     ['role' => 'user', 'content' => "
                         Generate between 1 and 5 (no more than 5) follow up questions a savvy investor might ask their 
                         advisor based on the following conversation:
                         \n\n
-                        ".json_encode(array_slice($this->messages, -4))
+                        ".json_encode(array_slice($this->messages, -4)),
                     ],
                 ],
             ]);
@@ -171,6 +175,7 @@ new class extends Component {
 
             $this->suggested_prompts = [];
             $this->error($e->getMessage());
+
             return;
         }
     }
@@ -184,10 +189,10 @@ new class extends Component {
 
     public function isRateLimited(): bool
     {
-        $rateLimitKey = auth()->id() . '/' . $this->chatable->id;
+        $rateLimitKey = auth()->id().'/'.$this->chatable->id;
 
         if (RateLimiter::tooManyAttempts($rateLimitKey, 20)) {
-            
+
             return true;
         }
 
@@ -210,7 +215,6 @@ new class extends Component {
             ->withBaseUri($baseUri)
             ->make();
     }
-
 }; ?>
 
 <div 
@@ -227,7 +231,7 @@ new class extends Component {
     class="fixed z-50 bottom-8 right-8"
 >
     {{-- toggle button --}}
-    <x-button 
+    <x-ib-button 
         x-show="!open"
         @click="$dispatch('toggle-ai-chat')"
         class="flex btn btn-circle md:btn-lg btn-primary" 
@@ -235,7 +239,7 @@ new class extends Component {
         <x-slot:label>
             <x-icon name="o-sparkles" class="w-6 h-6 md:w-8 md:h-8"></x-icon>
         </x-slot:label>
-    </x-button>
+    </x-ib-button>
 
     {{-- popup --}}
     <div 
@@ -261,7 +265,7 @@ new class extends Component {
         >
             <div class="flex grow-0 justify-between items-center pb-4 ">
                 <h2 class="text-lg text-bold">{{ __('AI Chat') }}</h2>
-                <x-button 
+                <x-ib-button 
                     icon="o-x-mark" 
                     class="absolute top-5 right-4 btn-ghost btn-circle btn-sm" 
                     title="{{ __('Close') }}"
@@ -356,10 +360,10 @@ new class extends Component {
                 <form submit="startCompletion" >       
                     <div class="">
                         @foreach($suggested_prompts as $prompt)
-                        <x-button 
+                        <x-ib-button 
                             class="btn-xs btn-primary btn-outline mr-1 mb-2" 
                             wire:click="startCompletion('{{ addslashes($prompt['value']) }}')" 
-                        >{{ $prompt['text'] }}</x-button>
+                        >{{ $prompt['text'] }}</x-ib-button>
                         @endforeach
                         
                     </div>
@@ -376,12 +380,12 @@ new class extends Component {
                                 autofocus
                             ></x-textarea>
                         </div>
-                        <x-button
+                        <x-ib-button
                             spinner="generateCompletion"
                             wire:click="startCompletion"
                             class="btn btn-ghost h-24"
                             icon="o-paper-airplane"
-                        ></x-button>
+                        ></x-ib-button>
                         
                     </div>
                     

@@ -205,7 +205,7 @@ new class extends Component
 
         <x-slot:actions>
             @if ($transaction)
-                <x-button 
+                <x-ib-button 
                     wire:click="$toggle('confirmingTransactionDeletion')" 
                     wire:loading.attr="disabled"
                     class="btn text-error" 
@@ -214,7 +214,7 @@ new class extends Component
                 />
             @endif
 
-            <x-button 
+            <x-ib-button 
                 label="{{ $transaction ? __('Update') : __('Create') }}" 
                 type="submit" 
                 icon="o-paper-airplane" 
@@ -234,13 +234,13 @@ new class extends Component
         </x-slot>
 
         <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$toggle('confirmingTransactionDeletion')" wire:loading.attr="disabled">
+            <x-ib-button class="btn-outline" wire:click="$toggle('confirmingTransactionDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
+            <x-ib-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
                 {{ __('Delete Transaction') }}
-            </x-button>
+            </x-ib-button>
         </x-slot>
     </x-confirmation-modal>
 </div>

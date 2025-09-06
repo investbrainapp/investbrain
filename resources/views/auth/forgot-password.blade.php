@@ -27,9 +27,9 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <x-button class="btn-primary" type="submit">
+                <x-ib-button class="btn-primary" type="submit">
                     {{ __('Email Password Reset Link') }}
-                </x-button>
+                </x-ib-button>
             </div>
         </form>
     </x-authentication-card>

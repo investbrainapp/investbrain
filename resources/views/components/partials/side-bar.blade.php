@@ -115,7 +115,7 @@ new class extends Component
             <x-slot:actions>
                 <x-dropdown>
                     <x-slot:trigger>
-                        <x-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-xs" />
+                        <x-ib-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-xs" />
                     </x-slot:trigger>
                     
                     <x-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />

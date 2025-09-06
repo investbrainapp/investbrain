@@ -128,7 +128,7 @@ new class extends Component
         </div>
         
         <div class="flex items-center" x-data="{ loading: false }">
-            {{-- <x-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
+            {{-- <x-ib-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
 
             <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
 

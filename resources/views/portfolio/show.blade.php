@@ -35,7 +35,7 @@
             @endif
 
             @can('fullAccess', $portfolio)
-            <x-button 
+            <x-ib-button 
                 title="{{ __('Manage Portfolio') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
@@ -49,7 +49,7 @@
             
             @can('fullAccess', $portfolio)
             <div>
-                <x-button 
+                <x-ib-button 
                     label="{{ __('Create Transaction') }}" 
                     class="btn-sm btn-primary whitespace-nowrap" 
                     @click="$dispatch('toggle-create-transaction')"
