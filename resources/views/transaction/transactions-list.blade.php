@@ -100,7 +100,7 @@ new class extends Component
                     $transaction->market_data?->currency
                 ) }})
 
-                <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+                <x-ib-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>
             <x-slot:sub-value>
                 @if($showPortfolio)

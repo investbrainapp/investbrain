@@ -32,6 +32,10 @@
         target="_blank"
     @endif
 
+    @if($link && !$external)
+        wire:navigate
+    @endif
+
     data-tip="{{ $tooltip }}"
 
     @if($spinner)

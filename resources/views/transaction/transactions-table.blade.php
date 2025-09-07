@@ -4,7 +4,6 @@ use App\Models\Transaction;
 use App\Models\User;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
-use App\Models\Currency;
 
 new class extends Component
 {
@@ -74,7 +73,7 @@ new class extends Component
         @scope('cell_symbol', $row)
             <span class="flex">
                 {{ $row->symbol }}
-                <x-loading x-show="loadingId === '{{ $row->id }}'" x-cloak class="text-gray-400 ml-2" />
+                <x-ib-loading x-show="loadingId === '{{ $row->id }}'" x-cloak class="text-gray-400 ml-2" />
             </span>
         @endscope
         @scope('cell_date', $row)

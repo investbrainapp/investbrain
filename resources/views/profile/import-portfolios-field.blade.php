@@ -111,7 +111,7 @@ new class extends Component
             </x-slot>
             <x-slot name="content">
                 @if($backupImport?->status != 'failed')
-                <x-progress 
+                <x-ib-progress 
                     :indeterminate="$backupImport?->status == 'pending'"
                     class="progress-primary h-3"
                     value="{{ $percent }}"
@@ -119,7 +119,7 @@ new class extends Component
                 />
                 @endif
             </x-slot>
-
+            
             <x-slot name="footer">
                 @if($backupImport?->status == 'failed')
 
