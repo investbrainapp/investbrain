@@ -113,7 +113,7 @@ new class extends Component
 
         <x-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded">
             <x-slot:actions>
-                <x-dropdown>
+                <x-ib-dropdown>
                     <x-slot:trigger>
                         <x-ib-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-xs" />
                     </x-slot:trigger>
@@ -129,7 +129,7 @@ new class extends Component
                         @csrf
                     </form>
 
-                </x-dropdown>
+                </x-ib-dropdown>
                 
             </x-slot:actions>
         </x-list-item>

@@ -132,7 +132,7 @@ new class extends Component
 
             <x-ib-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
 
-            <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
+            <x-ib-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
                     
                 @foreach($scopeOptions as $option)
 

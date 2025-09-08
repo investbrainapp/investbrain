@@ -77,7 +77,7 @@
 
         >
             @if($placeholder)
-                <option value="{{ $placeholderValue }}">{{ $placeholder }}</option>
+                <option value="">{{ $placeholder }}</option>
             @endif
 
             @foreach ($options as $option)
