@@ -9,6 +9,7 @@
         "ext-gd": "*",
         "ext-mbstring": "*",
         "ext-zip": "*",
+        "blade-ui-kit/blade-heroicons": "^2.6",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",

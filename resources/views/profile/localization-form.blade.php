@@ -66,7 +66,7 @@ new class extends Component
     <x-slot name="form">
 
         <div class="col-span-6 sm:col-span-4">
-            <x-select 
+            <x-ib-select 
                 label="{{ __('Locale') }}"
                 class="select block mt-1 w-full"
                 :options="config('app.available_locales')"
@@ -80,7 +80,7 @@ new class extends Component
         </div>
 
         <div class="col-span-6 sm:col-span-4">
-            <x-select 
+            <x-ib-select 
                 label="{{ __('Display Currency') }}"
                 class="select block mt-1 w-full"
                 :options="$currencies"

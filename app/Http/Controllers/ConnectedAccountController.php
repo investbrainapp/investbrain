@@ -124,7 +124,7 @@ class ConnectedAccountController extends Controller
                 'title' => __('Your :provider account has been connected.', ['provider' => config("services.{$connected_account->provider}.name")]),
                 'description' => null,
                 'css' => 'alert-success',
-                'icon' => Blade::render("<x-mary-icon class='w-7 h-7' name='o-check-circle' />"),
+                'icon' => Blade::render("<x-ib-icon class='w-7 h-7' name='o-check-circle' />"),
                 'position' => 'toast-top toast-end',
                 'timeout' => '5000',
             ],

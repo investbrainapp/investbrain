@@ -17,7 +17,7 @@ export default {
 					...commonThemes,
 					"primary": "#78716c",
 					"primary-content": "#e3e1e0",
-					"secondary": "#302f3c",
+					"secondary": "#7a7a7a",
 					"secondary-content": "#d1d1d5",
 					"accent": "#8c9ae3",
 					"accent-content": "#d3d4dd",

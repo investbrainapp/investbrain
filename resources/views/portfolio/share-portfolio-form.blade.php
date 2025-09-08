@@ -153,7 +153,7 @@ new class extends Component
                 </x-slot:sub-value>
                 <x-slot:actions>
                     @if (auth()->user()->id != $user->id) 
-                    <x-select 
+                    <x-ib-select 
                         class="select select-ghost border-none focus:outline-none focus:ring-0"
                         :options="[['id' => 0, 'name' => __('Read only')], ['id' => 1, 'name' => __('Full access')]]"
                         wire:model.live.number="permissions.{{ $user->id }}.full_access"

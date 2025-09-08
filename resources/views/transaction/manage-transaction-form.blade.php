@@ -137,7 +137,7 @@ new class extends Component
 
         @if(empty($portfolio))
 
-            <x-select 
+            <x-ib-select 
                 label="{{ __('Portfolio') }}" 
                 wire:model="portfolio_id" 
                 required 
@@ -149,7 +149,7 @@ new class extends Component
 
         <x-input label="{{ __('Symbol') }}" wire:model="symbol" required />
 
-        <x-select label="{{ __('Transaction Type') }}" :options="[
+        <x-ib-select label="{{ __('Transaction Type') }}" :options="[
             ['id' => 'BUY', 'name' => 'Buy'], 
             ['id' => 'SELL', 'name' => 'Sell']
         ]" wire:model.live="transaction_type" />
@@ -168,7 +168,7 @@ new class extends Component
             >
                 <x-slot:prepend>
                     
-                    <x-select 
+                    <x-ib-select 
                         class="rounded-e-none border-e-0 bg-base-200"
                         icon="o-banknotes"
                         :options="$currencies"
@@ -189,7 +189,7 @@ new class extends Component
             >
                 <x-slot:prepend>
 
-                    <x-select 
+                    <x-ib-select 
                         class="rounded-e-none border-e-0 bg-base-200"
                         icon="o-banknotes"
                         :options="$currencies"
