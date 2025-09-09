@@ -1,13 +1,3 @@
-{{-- 
-    label="{{ __('Portfolio') }}" 
-    :options="auth()->user()->portfolios()->fullAccess()->get()"
-    placeholder="Select a portfolio"
-    option-value="locale"
-    option-label="label"
-    id="locale"
---}}
-
-
 @props([
     'id' => Str::uuid()->toString(),
     'label' => null,
@@ -23,7 +13,7 @@
     'append' => null,
 
     'errorField' => null,
-    'errorClass' => '',
+    'errorClass' => 'text-red-500 label-text-alt p-1',
     'omitError' => false,
     'firstErrorOnly' => false,
 ])
@@ -31,7 +21,7 @@
 @php
     $modelName = $attributes->whereStartsWith('wire:model')->first();
     $errorFieldName = $errorField ?? $modelName;
-    $id = $id . $modelName;
+    $id = $id == $modelName ? $modelName : "{$id}{$modelName}";
 @endphp
 
 <div>

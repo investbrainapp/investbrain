@@ -48,17 +48,17 @@ new class extends Component
 
     <div class="mt-2">
         
-        <x-input wire:model="name" label="{{ __('Name') }}" class="block mt-1 w-full" required autofocus />
+        <x-ib-input wire:model="name" label="{{ __('Name') }}" class="block mt-1 w-full" required autofocus />
     </div>
 
     <div class="mt-2">
         
-        <x-input wire:model="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
+        <x-ib-input wire:model="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
     </div>
 
     <div class="mt-2">
         
-        <x-input wire:model="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
+        <x-ib-input wire:model="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
     </div>
 
     <div class="flex items-center justify-end mt-2">

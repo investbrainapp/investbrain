@@ -84,22 +84,15 @@ new class extends Component
                 </a>
             </li>
             @endforeach
-
-            <li>
-                <a wire:navigate title="title="{{ __('Dashboard') }}"" href="{{ route('dashboard') }}" class="flex items-center p-2 text-gray-900 rounded-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                
-                <span class="ms-3"> {{ __('Dashboard') }} </span>
-                </a>
-            </li>
             
             <li>
-                <a wire:navigate title="title="{{ __('Create Portfolio') }}"" href="{{ route('portfolio.create') }}" class="flex items-center p-2 text-gray-900 rounded-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <a wire:navigate title="title="{{ __('Create Portfolio') }}"" href="{{ route('portfolio.create') }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 
                 <span class="ms-3"> {{ __('Create Portfolio') }} </span>
                 </a>
             </li>
             <li>
-                <a wire:navigate title="title="{{ __('Transactions') }}"" href="{{ route('transaction.index') }}" class="flex items-center p-2 text-gray-900 rounded-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <a wire:navigate title="title="{{ __('Transactions') }}"" href="{{ route('transaction.index') }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 
                 <span class="ms-3"> {{ __('Transactions') }} </span>
                 </a>

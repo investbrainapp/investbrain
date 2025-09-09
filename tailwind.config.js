@@ -2,9 +2,9 @@ import typography from '@tailwindcss/typography';
 
 const commonThemes = {
 	"--rounded-box": ".5rem",          
-	"--rounded-btn": ".5rem",        
-	"--rounded-badge": ".25rem",
-	"--tab-radius": "0.5rem",
+	"--rounded-btn": ".35rem",        
+	"--rounded-badge": ".35rem",
+	"--tab-radius": ".5rem",
 	"--animation-input": "0.15s",
 }
 

@@ -60,12 +60,12 @@
 
         <!-- Name -->
         <div class="col-span-6 sm:col-span-4">
-            <x-input id="name" label="{{ __('Name') }}" type="text" class="mt-1 block w-full" wire:model="state.name" error-field="name" required autocomplete="name" />
+            <x-ib-input id="name" label="{{ __('Name') }}" type="text" class="mt-1 block w-full" wire:model="state.name" error-field="name" required autocomplete="name" />
         </div>
 
         <!-- Email -->
         <div class="col-span-6 sm:col-span-4">
-            <x-input id="email" label="{{ __('Email') }}" type="email" class="mt-1 block w-full" wire:model="state.email" error-field="email" required autocomplete="username" />
+            <x-ib-input id="email" label="{{ __('Email') }}" type="email" class="mt-1 block w-full" wire:model="state.email" error-field="email" required autocomplete="username" />
 
             @if (
                 ! config('investbrain.self_hosted')

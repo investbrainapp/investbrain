@@ -11,19 +11,19 @@
 
         <div class="col-span-6 sm:col-span-4">
             
-            <x-input id="current_password" label="{{ __('Current Password') }}" type="password" class="mt-1 block w-full" wire:model="state.current_password" error-field="current_password" autocomplete="current-password" />
+            <x-ib-input id="current_password" label="{{ __('Current Password') }}" type="password" class="mt-1 block w-full" wire:model="state.current_password" error-field="current_password" autocomplete="current-password" />
             
         </div>
 
         <div class="col-span-6 sm:col-span-4">
             
-            <x-input id="password" label="{{ __('New Password') }}"  type="password" class="mt-1 block w-full" wire:model="state.password" error-field="password" autocomplete="new-password" />
+            <x-ib-input id="password" label="{{ __('New Password') }}"  type="password" class="mt-1 block w-full" wire:model="state.password" error-field="password" autocomplete="new-password" />
             
         </div>
 
         <div class="col-span-6 sm:col-span-4">
             
-            <x-input id="password_confirmation" label="{{ __('Confirm Password') }}" type="password" class="mt-1 block w-full" wire:model="state.password_confirmation" error-field="password_confirmation" autocomplete="new-password" />
+            <x-ib-input id="password_confirmation" label="{{ __('Confirm Password') }}" type="password" class="mt-1 block w-full" wire:model="state.password_confirmation" error-field="password_confirmation" autocomplete="new-password" />
             
         </div>
     </x-slot>

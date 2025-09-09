@@ -147,19 +147,19 @@ new class extends Component
             />
         @endif
 
-        <x-input label="{{ __('Symbol') }}" wire:model="symbol" required />
+        <x-ib-input label="{{ __('Symbol') }}" wire:model="symbol" required />
 
         <x-ib-select label="{{ __('Transaction Type') }}" :options="[
             ['id' => 'BUY', 'name' => 'Buy'], 
             ['id' => 'SELL', 'name' => 'Sell']
         ]" wire:model.live="transaction_type" />
         
-        <x-datetime label="{{ __('Transaction Date') }}" wire:model="date" required />
+        <x-ib-datetime label="{{ __('Transaction Date') }}" wire:model="date" required />
         
-        <x-input label="{{ __('Quantity') }}" type="number" step="any" wire:model="quantity" required />
+        <x-ib-input label="{{ __('Quantity') }}" type="number" step="any" wire:model="quantity" required />
         
         @if($transaction_type == 'SELL')
-            <x-input 
+            <x-ib-input 
                 label="{{ __('Sale Price') }}" 
                 wire:model.number="sale_price" 
                 required 
@@ -178,9 +178,9 @@ new class extends Component
                         id="currency"
                     />
                 </x-slot:prepend>
-            </x-input>
+            </x-ib-input>
         @else
-            <x-input 
+            <x-ib-input 
                 label="{{ __('Cost Basis') }}" 
                 wire:model.number="cost_basis" 
                 required 
@@ -200,7 +200,7 @@ new class extends Component
                     />
                 </x-slot:prepend>
              
-            </x-input>
+            </x-ib-input>
         @endif
 
         <x-slot:actions>

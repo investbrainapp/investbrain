@@ -70,7 +70,7 @@ new class extends Component
 <div class="w-full md:w-3/4">
 
     <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" >
-        <x-input label="{{ __('Title') }}" wire:model="title" required />
+        <x-ib-input label="{{ __('Title') }}" wire:model="title" required />
 
         <x-ib-textarea class="mt-1" label="{{ __('Notes') }}" wire:model="notes" rows="4" />
 

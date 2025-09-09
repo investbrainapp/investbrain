@@ -199,7 +199,7 @@ new class extends Component
             <div class="" x-data="{  }">
                 <x-ib-form wire:submit="addUser" class="">
             
-                    <x-input 
+                    <x-ib-input 
                         label="Email" 
                         icon="o-envelope" 
                         placeholder="{{ __('Type an email address to share portfolio') }}"

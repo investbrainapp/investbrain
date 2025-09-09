@@ -22,12 +22,12 @@
 
                 <div class="mt-4" x-show="! recovery">
                     
-                    <x-input id="code" label="{{ __('Code') }}" class="block mt-1 w-full" type="text" inputmode="numeric" name="code" autofocus x-ref="code" autocomplete="one-time-code" />
+                    <x-ib-input id="code" label="{{ __('Code') }}" class="block mt-1 w-full" type="text" inputmode="numeric" name="code" autofocus x-ref="code" autocomplete="one-time-code" />
                 </div>
 
                 <div class="mt-4" x-cloak x-show="recovery">
                     
-                    <x-input id="recovery_code" label="{{ __('Recovery Code') }}" class="block mt-1 w-full" type="text" name="recovery_code" x-ref="recovery_code" autocomplete="one-time-code" />
+                    <x-ib-input id="recovery_code" label="{{ __('Recovery Code') }}" class="block mt-1 w-full" type="text" name="recovery_code" x-ref="recovery_code" autocomplete="one-time-code" />
                 </div>
 
                 <div class="flex items-center justify-end mt-4">

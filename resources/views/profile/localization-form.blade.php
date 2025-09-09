@@ -75,6 +75,7 @@ new class extends Component
                 placeholder="Choose a locale"
                 wire:model="locale"
                 id="locale"
+                required
             />
             
         </div>
@@ -89,6 +90,7 @@ new class extends Component
                 placeholder="Choose a display currency"
                 wire:model="display_currency"
                 id="display_currency"
+                required
             />
             
         </div>
