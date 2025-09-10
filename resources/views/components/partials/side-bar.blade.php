@@ -64,40 +64,24 @@ new class extends Component
 
         <div class="w-10 m-5"> <x-ib-logo /> </div>
 
-        <ul class="space-y-2 font-medium">
-            <li>
-                <a wire:navigate title="title="{{ __('Dashboard') }}" href="{{ route('dashboard') }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                
-                <span class="ms-3"> {{ __('Dashboard') }} </span>
-                </a>
-            </li>
+        <x-ib-menu class="space-y-2" activate-by-route="true">
+            <x-ib-menu-item title="{{ __('Dashboard') }}" link="{{ route('dashboard') }}" class="font-medium text-lg" />
 
             @foreach (auth()->user()->portfolios as $portfolio)
-            <li>
-                <a wire:navigate title="title="{{ __('Portfolios') }}" href="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                
-                <span class="ms-3"> {{ $portfolio->title }}  
-                    @if($portfolio->wishlist)
-                        <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-sm ml-2" />
-                    @endif
-                </span>
-                </a>
-            </li>
+                <x-ib-menu-item 
+                    :title="$portfolio->title" 
+                    :badge="$portfolio->wishlist ? __('Wishlist') : null" 
+                    badge-classes="badge-neutral"
+                    link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" 
+                    class="font-medium text-md ms-1"
+                />
             @endforeach
             
-            <li>
-                <a wire:navigate title="title="{{ __('Create Portfolio') }}"" href="{{ route('portfolio.create') }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                
-                <span class="ms-3"> {{ __('Create Portfolio') }} </span>
-                </a>
-            </li>
-            <li>
-                <a wire:navigate title="title="{{ __('Transactions') }}"" href="{{ route('transaction.index') }}" class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                
-                <span class="ms-3"> {{ __('Transactions') }} </span>
-                </a>
-            </li>
-        </ul>
+            <x-ib-menu-item title="{{ __('Create Portfolio') }}" link="{{ route('portfolio.create') }}" class="font-medium text-lg" />
+
+            <x-ib-menu-item title="{{ __('Transactions') }}" link="{{ route('transaction.index') }}" class="font-medium text-lg" />
+       
+        </x-ib-menu>
         <div class="flex-1"></div>
 
         @php
@@ -108,7 +92,7 @@ new class extends Component
             <x-slot:actions>
                 <x-ib-dropdown>
                     <x-slot:trigger>
-                        <x-ib-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-xs" />
+                        <x-ib-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-sm focus:rotate-180" />
                     </x-slot:trigger>
                     
                     <x-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
