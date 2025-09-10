@@ -17,6 +17,12 @@
     $id = $id == $modelName ? $modelName : "{$id}{$modelName}";
 @endphp
 
+<style>
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        color: transparent;
+        background: transparent;
+    }
+</style>
 
 <div
     x-cloak
@@ -119,12 +125,10 @@
         </label>
     @endif
 
-    <div 
-        class="flex-1 relative"
-    >
+    <div class="flex-1 relative">
         {{-- DESKTOP --}}
         <div
-            x-ref="datePickerInput"
+            x-ref="desktopDatePickerInput"
             x-html="parseDate(datePickerValue).toLocaleDateString()"
             x-on:keydown.escape="datePickerOpen=false"
             @click="datePickerOpen=true"
@@ -137,35 +141,27 @@
                 ]) }}
         ></div>
 
-        {{-- MOBILE --}}
-        <input 
-            type="date"
-            x-model="datePickerValue"
-            placeholder="Select date"
-            id="{{ $id }}"
-
-            {{ $attributes->class([
-                    "block md:hidden input input-primary w-full peer appearance-none",
-                    'ps-10' => ($icon),
-                    'border border-dashed' => $attributes->has('readonly') && $attributes->get('readonly') == true,
-                    'input-error' => $errors->has($errorFieldName)
-                ]) }}
-        />
-
         <div @click="
-                datePickerOpen=!datePickerOpen;
-                if(datePickerOpen) {
-                    $refs.datePickerInput.focus()
+                if ($refs.mobileDatePickerInput?.checkVisibility()) {
+                    $refs.mobileDatePickerInput?.showPicker()
+                    return;
                 }
+                if(datePickerOpen) {
+                    $refs.desktopDatePickerInput.focus();
+                    return;
+                }
+                datePickerOpen=!datePickerOpen;
             "
-            class="hidden md:block absolute top-0 right-0 p-3 cursor-pointer text-neutral-400 hover:text-neutral-500"
+            class="absolute top-0 right-0 p-3 cursor-pointer text-neutral-400 hover:text-neutral-500"
         >
             <x-ib-icon name="o-calendar" />
         </div>
 
         <div  
             x-show="datePickerOpen"
-            x-transition
+            x-transition:enter="ease-out duration-200"
+            x-transition:enter-start="-translate-x-2"
+            x-transition:enter-end="translate-x-0"
             @click.away="datePickerOpen = false" 
             class="
                 p-4
@@ -180,6 +176,7 @@
                 dark:bg-base-300
                 rounded-box
                 shadow-md   
+                select-none
             "
         >
             <div class="flex justify-between items-center mb-2">
@@ -223,6 +220,23 @@
                 </template>
             </div>
         </div>
+
+        {{-- MOBILE/NATIVE --}}
+        <input 
+            type="date"
+            x-model="datePickerValue"
+            placeholder="Select date"
+            id="{{ $id }}"
+            onfocus="this.showPicker?.()"
+            x-ref="mobileDatePickerInput"
+
+            {{ $attributes->class([
+                    "block md:hidden input input-primary w-full peer appearance-none",
+                    'ps-10' => ($icon),
+                    'border border-dashed' => $attributes->has('readonly') && $attributes->get('readonly') == true,
+                    'input-error' => $errors->has($errorFieldName)
+                ]) }}
+        />
 
         {{-- ICON --}}
         @if($icon)
