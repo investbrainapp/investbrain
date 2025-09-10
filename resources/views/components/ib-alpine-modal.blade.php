@@ -45,7 +45,9 @@
                         />
                     @endif
 
-                    {{ $slot }}
+                    <div class="mt-5">
+                        {{ $slot }}
+                    </div>
 
                 </x-ib-card>
             </div>
