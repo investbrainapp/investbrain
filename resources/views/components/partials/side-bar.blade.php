@@ -104,7 +104,7 @@ new class extends Component
             $user = auth()->user();
         @endphp
 
-        <x-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded">
+        <x-ib-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded">
             <x-slot:actions>
                 <x-ib-dropdown>
                     <x-slot:trigger>
@@ -125,6 +125,6 @@ new class extends Component
                 </x-ib-dropdown>
                 
             </x-slot:actions>
-        </x-list-item>
+        </x-ib-list-item>
    </div>
 </div>

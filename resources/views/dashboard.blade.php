@@ -44,14 +44,14 @@
                 @endif
                 
                 @foreach($user->portfolios as $portfolio)
-                    <x-list-item :item="$portfolio" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}">
+                    <x-ib-list-item no-separator :item="$portfolio" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}">
                         <x-slot:value>
                             {{ $portfolio->title }}
                             @if($portfolio->wishlist)
                                 <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-sm ml-2" />
                             @endif
                         </x-slot:value>
-                    </x-list-item>
+                    </x-ib-list-item>
                 @endforeach
 
             </x-ib-card>

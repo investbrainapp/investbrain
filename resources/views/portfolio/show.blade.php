@@ -146,7 +146,7 @@
                 @endphp
                 
                 @foreach($users as $user)
-                    <x-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
+                    <x-ib-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
                 @endforeach
 
             </x-ib-card> --}}

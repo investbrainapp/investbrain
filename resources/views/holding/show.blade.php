@@ -158,7 +158,7 @@
 
                 @foreach ($holding->splits->take(5) as $split)
 
-                    <x-list-item :item="$split">
+                    <x-ib-list-item :item="$split" no-separator>
                         <x-slot:value>
         
                         1:{{ $split->split_amount }}
@@ -167,7 +167,7 @@
                         <x-slot:sub-value>
                             <span title="{{ __('Distribution Date') }}">{{ $split->date->format('F d, Y') }}</span>
                         </x-slot:sub-value>
-                    </x-list-item>
+                    </x-ib-list-item>
                 
                 @endforeach
 

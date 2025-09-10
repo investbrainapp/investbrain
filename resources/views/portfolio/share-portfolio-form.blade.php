@@ -110,7 +110,7 @@ new class extends Component
 
     <div class="border-primary border rounded-sm px-2 py-5 mb-2 max-h-[20rem] overflow-y-scroll">
         @if ($portfolio?->owner)
-        <x-list-item 
+        <x-ib-list-item 
             :item="$portfolio->owner" 
             avatar="profile_photo_url" 
             no-separator
@@ -128,11 +128,11 @@ new class extends Component
             <x-slot:sub-value>
                 {{ __('Owner') }}
             </x-slot:sub-value>
-        </x-list-item>
+        </x-ib-list-item>
         @endif
 
         @foreach (collect($portfolio?->users)->where('pivot.owner', '!=', 1) as $user)
-            <x-list-item 
+            <x-ib-list-item 
                 :item="$user" 
                 avatar="profile_photo_url" 
                 no-separator
@@ -169,7 +169,7 @@ new class extends Component
                     </x-ib-button>      
                     @endif
                 </x-slot:actions>
-            </x-list-item>
+            </x-ib-list-item>
         @endforeach
 
         <x-confirmation-modal wire:model.live="confirmingAccessDeletion">

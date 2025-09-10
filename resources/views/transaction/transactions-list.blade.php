@@ -60,7 +60,7 @@ new class extends Component
 
     @foreach($transactions->sortByDesc('date')->slice($offset)->take($perPage) as $transaction)
 
-        <x-list-item 
+        <x-ib-list-item 
             no-separator 
             :item="$transaction" 
             class="cursor-pointer"
@@ -109,7 +109,7 @@ new class extends Component
                 @endif
                 <span title="{{ __('Transaction Date') }}">{{ $transaction->date->format('F j, Y') }} </span>
             </x-slot:sub-value>
-        </x-list-item>
+        </x-ib-list-item>
 
     @endforeach
 
