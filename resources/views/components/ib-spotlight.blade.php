@@ -54,7 +54,8 @@
             $refs.spotlightSearch.focus()
 
             if (this.value == '') {
-                this.results = []
+                this.results = [];
+                this.$refs.progressBar.classList.add('hidden');
                 return
             }
 
@@ -87,10 +88,9 @@
         key="spotlight"
         x-ref="spotlightModal"
         class="backdrop-blur-sm rounded-box shadow-lg "
-        box-class="absolute p-0 top-10 lg:top-24 h-auto w-full lg:max-w-3xl bg-transparent"
-        no-padding="true"
+        box-class="absolute p-0 top-10 lg:top-24 w-full lg:max-w-3xl bg-base-100 shadow-lg"
+        :card-options="['noPadding' => true, 'noShadow' => true]"
     >
-    
         <div class="relative">
 
             {{-- INPUT --}}
@@ -116,20 +116,23 @@
 
         {{-- NO RESULTS --}}
         <template x-if="searchedWithNoResults && value != ''">
-            <div class="text-base-content/50 p-3 spotlight-element">{{ $noResultsText }}</div>
+            <div class="bg-base-100 text-base-content/50 p-4 spotlight-element">{{ $noResultsText }}</div>
         </template>
 
         {{-- RESULTS --}}
-        <div class="-mx-1 mt-1" @click="close()" @keydown.enter="close()">
+        <div class="mt-1" @click="close()" @keydown.enter="close()">
             <template x-for="(item, index) in results" :key="index">
+
                 {{-- ITEM --}}
                 <a x-bind:href="item.link" class="spotlight-element" wire:navigate tabindex="0">
-                    <div class="p-3 hover:bg-base-100" >
+                    <div class="p-4 bg-base-100 hover:bg-base-200 rounded-md">
                         <div class="flex gap-3 items-center">
+
                             {{-- ICON --}}
                             <template x-if="item.icon">
                                 <div x-html="item.icon"></div>
                             </template>
+
                             {{-- AVATAR --}}
                             <template x-if="item.avatar && !item.icon">
                                 <div>
@@ -137,6 +140,7 @@
                                 </div>
                             </template>
                             <div class="flex-1 overflow-hidden whitespace-nowrap text-ellipsis truncate w-0">
+
                                 {{-- NAME --}}
                                 <div x-text="item.name" class="font-semibold truncate"></div>
 

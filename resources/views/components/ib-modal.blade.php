@@ -5,7 +5,10 @@
     'persistent' => false,
     'withoutTrapFocus' => false,
     'boxClass' => '',
-    'noPadding' => false
+    'cardOptions' => [
+        'noPadding' => false,
+        'noShadow' => false
+    ],
 ])
 
 <template x-teleport="body">
@@ -38,14 +41,16 @@
                 :title="$title"
                 :subtitle="$subtitle"
                 dense="true"
-                no-padding="{{ $noPadding }}"
+                no-padding="{{ $cardOptions['noPadding'] }}"
+                no-shadow="{{ $cardOptions['noShadow'] }}"
             >
                 @if (!$persistent)
                     <x-ib-button 
                         icon="o-x-mark" 
                         title="{{ __('Close') }}"
-                        class="absolute top-4 right-4 btn-ghost btn-circle btn-sm z-90" 
+                        class="absolute top-4 right-4 btn-ghost btn-circle btn-sm z-10" 
                         @click="{{ $key }}?.close()" 
+                        tabindex="-999"
                     />
                 @endif
                 
