@@ -9,13 +9,34 @@
         'noPadding' => false,
         'noShadow' => false
     ],
+    'shortcut' => null
 ])
 
 <template x-teleport="body">
     <dialog 
+        x-data="{ 
+            open: false,  
+            close() {
+                this.open = false;
+                $el.close()
+            },
+            show() {
+                this.open = true;
+                $el.showModal();
+            }
+        }"
+
+        :open="open"
+        
         {{ $attributes->except('wire:model')->class(["modal z-50"]) }}
 
         id="{{ $key }}"
+
+        x-on:toggle-{{ $key }}.window="show();"
+
+        @if($shortcut)
+            @keydown.window.prevent.{{ $shortcut }}="show();"
+        @endif
 
         @if($persistent)
             @keydown.escape.prevent.stop="()=>null"
@@ -29,7 +50,7 @@
         {{-- BACKDROP --}}
         <div 
             @if(!$persistent)
-                @click.prevent.stop="{{ $key }}?.close()" 
+                @click.prevent.stop="close()" 
             @endif
             class="absolute inset-0 w-full h-full"
         ></div>
@@ -49,7 +70,7 @@
                         icon="o-x-mark" 
                         title="{{ __('Close') }}"
                         class="absolute top-4 right-4 btn-ghost btn-circle btn-sm z-10" 
-                        @click="{{ $key }}?.close()" 
+                        @click="close()" 
                         tabindex="-999"
                     />
                 @endif

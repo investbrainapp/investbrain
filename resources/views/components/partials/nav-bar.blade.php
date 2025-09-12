@@ -37,7 +37,7 @@ new class extends Component
     
         <div>
             <x-ib-button 
-                @click.stop="$dispatch('spotlight-open')"
+                @click.stop="$dispatch('toggle-spotlight')"
                 class="btn-sm flex-1 justify-start md:flex-none"
             >
                 <x-slot:label>
@@ -51,7 +51,13 @@ new class extends Component
                         </span>
                     </span>
                 </x-slot:label>
+                
             </x-ib-button>
+
+            <x-ib-spotlight
+                search-text="{{ __('Search holdings, portfolios, or anything else...') }}"
+                no-results-text="{{ __('Darn! Nothing found for that search.') }}"
+            />
         </div>
 
         <div class="flex flex-0 items-center gap-4">

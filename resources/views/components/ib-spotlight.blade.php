@@ -5,91 +5,64 @@
     'noResultsText' => "Nothing found.",
     'url' => null,
     'fallbackAvatar' => null,
-]);
+])
 
 @php
     $url = $url ?? route('mary.spotlight', absolute: false);
 @endphp
 
-
 <div x-data="{
-        value: '',
-        results: [],
-        open: false,
-        maxDebounce: 250,
-        debounceTimer: null,
-        controller: new AbortController(),
-        query: '',
-        searchedWithNoResults: false,
-        init(){
-            if(this.open) {
-                this.show()
-            }            
+    loading: false,
+    value: '',
+    results: [],
+    maxDebounce: 250,
+    debounceTimer: null,
+    controller: new AbortController(),
+    query: '',
+    searchedWithNoResults: false,
+    init(){
+        this.$watch('value', value => {
+            this.loading = true
 
-            this.$watch('value', value => {
-                this.$refs.progressBar.classList.remove('hidden');
+            this.debounce(() => this.search(), this.maxDebounce)
+        })
+    },
+    debounce(fn, waitTime) {
+        clearTimeout(this.debounceTimer)
+        this.debounceTimer = setTimeout(() => fn(), waitTime)
+    },
+    async search() {
 
-                this.debounce(() => this.search(), this.maxDebounce)
-            })
-        },
-        close() {
-            this.open = false
-            this.$refs.spotlightModal?.close()
-        },
-        show() {
-            this.open = true;
-            this.$refs.spotlightModal?.showModal();
-        },
-        focus() {
-            setTimeout(() => {
-                this.$refs.spotlightSearch.focus();
-                this.$refs.spotlightSearch.select();
-            }, 100)
-        },
-        debounce(fn, waitTime) {
-            clearTimeout(this.debounceTimer)
-            this.debounceTimer = setTimeout(() => fn(), waitTime)
-        },
-        async search() {
-            $refs.spotlightSearch.focus()
-
-            if (this.value == '') {
-                this.results = [];
-                this.$refs.progressBar.classList.add('hidden');
-                return
-            }
-
-            try {
-                this.controller?.abort()
-                this.controller = new AbortController();
-
-                let response = await fetch(`{{$url}}?search=${this.value}&${this.query}`, { signal: this.controller.signal })
-                this.results = await response.json()
-            } catch(e) {
-                console.log(e)
-                return
-            }
-
-            this.$refs.progressBar.classList.add('hidden');
-
-            Object.keys(this.results).length
-                ? this.searchedWithNoResults = false
-                : this.searchedWithNoResults = true
+        if (this.value == '') {
+            this.results = [];
+            this.loading = false
+            return
         }
-    }"
 
-    @keydown.window.prevent.{{ $shortcut }}="show(); focus();"
-    @keydown.escape="close()"
-    @keydown.up="$focus.previous()"
-    @keydown.down="$focus.next()"
-    @spotlight-open.window="show(); focus();"
->
+        try {
+            this.controller?.abort()
+            this.controller = new AbortController();
+
+            let response = await fetch(`{{$url}}?search=${this.value}&${this.query}`, { signal: this.controller.signal })
+            this.results = await response.json()
+        } catch(e) {
+            console.log(e)
+            return
+        }
+
+        this.loading = false
+
+        Object.keys(this.results).length
+            ? this.searchedWithNoResults = false
+            : this.searchedWithNoResults = true
+    }
+}">
     <x-ib-modal
         key="spotlight"
-        x-ref="spotlightModal"
         class="backdrop-blur-sm rounded-box shadow-lg "
         box-class="absolute p-0 top-10 lg:top-24 w-full lg:max-w-3xl bg-base-100 shadow-lg"
         :card-options="['noPadding' => true, 'noShadow' => true]"
+        shortcut="slash"
     >
         <div class="relative">
 
@@ -98,7 +71,6 @@
                 id="{{ $id }}"
                 icon="o-magnifying-glass"
                 x-model="value"
-                x-ref="spotlightSearch"
                 placeholder=" {{ $searchText }}"
                 class="flex w-full input my-2 border-none outline-none shadow-none border-transparent focus:shadow-none focus:outline-none focus:border-transparent"
                 @focus="$el.focus()"
@@ -108,8 +80,8 @@
 
             {{-- PROGRESS --}}
             <x-ib-progress 
-                x-ref="progressBar" 
-                class="absolute hidden left-0 bottom-0 w-full progress progress-secondary h-[2px]" 
+                x-show="loading"
+                class="absolute left-0 bottom-0 w-full progress progress-secondary h-[2px]" 
                 indeterminate="true"
             />
         </div>
@@ -120,7 +92,12 @@
         </template>
 
         {{-- RESULTS --}}
-        <div class="mt-1" @click="close()" @keydown.enter="close()">
+        <div 
+            @click="close()"
+            @keydown.enter="close()"
+            @keydown.up="$focus.previous()"
+            @keydown.down="$focus.next()"
+        >
             <template x-for="(item, index) in results" :key="index">
 
                 {{-- ITEM --}}
