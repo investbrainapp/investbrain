@@ -1,8 +1,9 @@
 @props([
-    'value' => true,
-    'max' => true,
+    'value' => 0,
+    'max' => 100,
     'indeterminate' => null,
 ])
+
 <progress
     {{ $attributes->class("progress") }}
 

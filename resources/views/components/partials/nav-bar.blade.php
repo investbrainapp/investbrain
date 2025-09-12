@@ -37,7 +37,7 @@ new class extends Component
     
         <div>
             <x-ib-button 
-                @click.stop="$dispatch('mary-search-open')"
+                @click.stop="$dispatch('spotlight-open')"
                 class="btn-sm flex-1 justify-start md:flex-none"
             >
                 <x-slot:label>

@@ -10,6 +10,7 @@
         "ext-mbstring": "*",
         "ext-zip": "*",
         "blade-ui-kit/blade-heroicons": "^2.6",
+        "filament/tables": "^4.0",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",

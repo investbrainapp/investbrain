@@ -2,18 +2,21 @@
     'title' => '',
     'subTitle' => '',
     'dense' => false,
+    'noPadding' => false,
 ])
 
 <div 
-    {{ $attributes->merge(['class' => 'p-5 bg-base-200 rounded-lg shadow-sm']) }} 
+    {{ $attributes->merge()->class(['p-5' => !$noPadding, 'rounded-lg bg-base-200 shadow-sm']) }} 
 >
-
     @if($title)
         <h3 @class(['pb-2' => !$subTitle && !$dense, 'text-xl font-bold leading-none tracking-tight flex items-center truncate'])> {{ $title }} </h3>
     @endif
+    
     @if($subTitle) 
         <h5 @class(['pb-2' => !$dense, 'text-sm text-gray-400 flex items-center truncate'])> {{ $subTitle }} </h5>
     @endif
 
-    {{ $slot }}
+    <div @class(['mt-2' => !$dense])>
+        {{ $slot }}
+    </div>
 </div>

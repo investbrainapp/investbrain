@@ -14,6 +14,12 @@
             {{ $slot }}
         </main>
 
+        <x-ib-spotlight
+            shortcut="slash"
+            search-text="{{ __('Search holdings, portfolios, or anything else...') }}"
+            no-results-text="{{ __('Darn! Nothing found for that search.') }}"
+        />
+
         @if(session('toast'))
             <script lang="text/javascript">
                 window.addEventListener('DOMContentLoaded', function () {

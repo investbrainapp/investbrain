@@ -3,7 +3,6 @@
 use App\Models\Portfolio;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
-use App\Models\Currency; 
 
 new class extends Component
 {

@@ -7,23 +7,23 @@
         ])
 
         <div class="grid sm:grid-cols-5 gap-5">
-            <x-ib-card dense sub-title="{{ __('Market Gain/Loss') }}" class="col-span-5 sm:col-span-1">
+            <x-ib-card dense="true" sub-title="{{ __('Market Gain/Loss') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_gain_dollars', 0)) }} </div>
             </x-ib-card>
             
-            <x-ib-card dense sub-title="{{ __('Total Cost Basis') }}" class="col-span-5 sm:col-span-1">
+            <x-ib-card dense="true" sub-title="{{ __('Total Cost Basis') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_cost_basis', 0)) }} </div>
             </x-ib-card>
             
-            <x-ib-card dense sub-title="{{ __('Total Market Value') }}" class="col-span-5 sm:col-span-1">
+            <x-ib-card dense="true" sub-title="{{ __('Total Market Value') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_value', 0)) }} </div>
             </x-ib-card>
             
-            <x-ib-card dense sub-title="{{ __('Realized Gain/Loss') }}" class="col-span-5 sm:col-span-1">
+            <x-ib-card dense="true" sub-title="{{ __('Realized Gain/Loss') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('realized_gain_dollars', 0)) }} </div>
             </x-ib-card>
 
-            <x-ib-card dense sub-title="{{ __('Dividends Earned') }}" class="col-span-5 sm:col-span-1">
+            <x-ib-card dense="true" sub-title="{{ __('Dividends Earned') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_dividends_earned', 0)) }} </div>
             </x-ib-card>
                 
@@ -48,7 +48,7 @@
                         <x-slot:value>
                             {{ $portfolio->title }}
                             @if($portfolio->wishlist)
-                                <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-sm ml-2" />
+                                <x-badge value="{{ __('Wishlist') }}" class="badge-neutral badge-sm ml-2" />
                             @endif
                         </x-slot:value>
                     </x-ib-list-item>
