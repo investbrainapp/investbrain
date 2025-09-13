@@ -48,7 +48,7 @@
                         <x-slot:value>
                             {{ $portfolio->title }}
                             @if($portfolio->wishlist)
-                                <x-badge value="{{ __('Wishlist') }}" class="badge-neutral badge-sm ml-2" />
+                                <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-outline badge-sm ml-2" />
                             @endif
                         </x-slot:value>
                     </x-ib-list-item>

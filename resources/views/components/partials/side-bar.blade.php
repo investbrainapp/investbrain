@@ -71,7 +71,7 @@ new class extends Component
                 <x-ib-menu-item 
                     :title="$portfolio->title" 
                     :badge="$portfolio->wishlist ? __('Wishlist') : null" 
-                    badge-classes="badge-neutral"
+                    badge-classes="badge-secondary badge-outline"
                     link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" 
                     class="font-medium text-md ms-1"
                 />

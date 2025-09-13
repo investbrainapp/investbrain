@@ -14,7 +14,7 @@
     'enabled' => true,
 ])
 
-@aware(['activateByRoute' => false, 'activeBgColor' => 'bg-base-100'])
+@aware(['activateByRoute' => false, 'activeBgColor' => 'bg-neutral text-neutral-content'])
 
 @php
     $spinnerTarget = $spinner == true ? $attributes->whereStartsWith('wire:click')->first() : $spinner;

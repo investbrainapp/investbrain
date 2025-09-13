@@ -38,7 +38,7 @@ new class extends Component
         <div>
             <x-ib-button 
                 @click.stop="$dispatch('toggle-spotlight')"
-                class="btn-sm flex-1 justify-start md:flex-none"
+                class="btn-sm bg-base-300 flex-1 justify-start md:flex-none"
             >
                 <x-slot:label>
                     <span class="flex items-center text-gray-400">

@@ -27,7 +27,7 @@
         <x-ib-toolbar :title="$portfolio->title">
 
             @if($portfolio->wishlist)
-            <x-badge value="{{ __('Wishlist') }}" title="{{ __('Wishlist') }}" class="badge-neutral mr-3" />
+            <x-badge value="{{ __('Wishlist') }}" title="{{ __('Wishlist') }}" class="badge-secondary badge-outline mr-3" />
             @endif
 
             @if(auth()->user()->id !== $portfolio->owner_id)
