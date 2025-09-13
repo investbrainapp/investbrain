@@ -8,7 +8,7 @@
 ])
 
 @php
-    $url = $url ?? route('mary.spotlight', absolute: false);
+    $url = $url ?? route('spotlight', absolute: false);
 @endphp
 
 <div x-data="{

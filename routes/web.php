@@ -8,6 +8,8 @@ use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\InvitedOnboardingController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\TransactionController;
+use App\Support\Spotlight;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Laravel\Jetstream\Http\Controllers\Livewire\ApiTokenController;
@@ -38,6 +40,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
     Route::get('/portfolio/{portfolio}/{symbol}', [HoldingController::class, 'show'])->name('holding.show');
 
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
+
+    Route::get('/spotlight', function (Request $request) {
+        return app()->make(Spotlight::class)->search($request);
+    })->name('spotlight');
 });
 
 // Invited onboarding
