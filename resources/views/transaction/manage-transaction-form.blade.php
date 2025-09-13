@@ -6,10 +6,10 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Rules\QuantityValidationRule;
 use App\Rules\SymbolValidationRule;
+use App\Traits\Toast;
 use App\Traits\WithTrimStrings;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
-use Mary\Traits\Toast;
 
 new class extends Component
 {

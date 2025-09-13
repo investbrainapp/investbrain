@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\AiChat;
+use App\Traits\Toast;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Volt\Component;
-use Mary\Traits\Toast;
 
 new class extends Component
 {
@@ -237,7 +237,7 @@ new class extends Component
         class="flex btn btn-circle md:btn-lg btn-primary" 
     >
         <x-slot:label>
-            <x-icon name="o-sparkles" class="w-6 h-6 md:w-8 md:h-8"></x-icon>
+            <x-ib-icon name="o-sparkles" class="w-6 h-6 md:w-8 md:h-8"></x-ib-icon>
         </x-slot:label>
     </x-ib-button>
 
@@ -288,7 +288,7 @@ new class extends Component
                         bg-slate-200
                         dark:bg-slate-800
                     ">
-                        <x-icon name="o-sparkles" class="h-auto p-1 w-10" />
+                        <x-ib-icon name="o-sparkles" class="h-auto p-1 w-10" />
                     </span>
                     <p class="leading-relaxed w-full">
                         <span class="block font-bold">AI</span> {{ __('Hi, how can I help?') }}
@@ -302,7 +302,7 @@ new class extends Component
                         <div class="flex gap-3 mb-5 flex-1">
                             <span class="relative flex shrink-0 overflow-hidden rounded-full w-10 h-10">
                 
-                                <x-avatar :image="auth()->user()->profile_photo_url" class="!w-10" />
+                                <x-ib-avatar :image="auth()->user()->profile_photo_url" class="!w-10" />
                 
                             </span>
                             <p class="leading-relaxed">
@@ -323,7 +323,7 @@ new class extends Component
                                 bg-slate-200
                                 dark:bg-slate-800
                             ">                    
-                                <x-icon name="o-sparkles" class="h-auto p-1 w-10" />
+                                <x-ib-icon name="o-sparkles" class="h-auto p-1 w-10" />
                             </span>
                             <div class="leading-relaxed" >
                                 <span class="block font-bold ">AI </span> {!! Str::markdown($message['content']) !!}
@@ -346,7 +346,7 @@ new class extends Component
                             bg-slate-200
                             dark:bg-slate-800
                         ">                    
-                            <x-icon name="o-sparkles" class="h-auto p-1 w-10" />
+                            <x-ib-icon name="o-sparkles" class="h-auto p-1 w-10" />
                         </span>
                         <p class="leading-relaxed" >
                             <span class="block font-bold ">AI </span> <span wire:stream="answer">{{ $answer }}</span>
@@ -372,13 +372,13 @@ new class extends Component
                         
                         <div class="w-full">
                             
-                            <x-textarea
+                            <x-ib-textarea
                                 wire:model="prompt"
                                 class="h-24 resize-none "
                                 placeholder="{{ __('Have a question? AI might be able to help...') }}"
                                 wire:keydown.enter.prevent="startCompletion"
                                 autofocus
-                            ></x-textarea>
+                            ></x-ib-textarea>
                         </div>
                         <x-ib-button
                             spinner="generateCompletion"

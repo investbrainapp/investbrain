@@ -95,13 +95,13 @@ new class extends Component
                         <x-ib-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-sm focus:rotate-180" />
                     </x-slot:trigger>
                     
-                    <x-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
-                    <x-menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
-                    <x-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
+                    <x-ib-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
+                    <x-ib-menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
+                    <x-ib-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 
                     <x-ib-section-border class="py-1" />
 
-                    <x-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
+                    <x-ib-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
                     <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>

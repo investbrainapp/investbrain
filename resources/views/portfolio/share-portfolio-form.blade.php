@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\Portfolio;
+use App\Traits\Toast;
 use App\Traits\WithTrimStrings;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
-use Mary\Traits\Toast;
 
 new class extends Component
 {
@@ -165,7 +165,7 @@ new class extends Component
                         spinner="deleteUser('{{ $user->id }}')"
                         title="{{ __('Remove Access') }}"
                     >
-                        <x-icon name="o-x-mark" class="w-4" />
+                        <x-ib-icon name="o-x-mark" class="w-4" />
                     </x-ib-button>      
                     @endif
                 </x-slot:actions>
@@ -208,7 +208,7 @@ new class extends Component
                         required
                     />
                 
-                    <x-toggle 
+                    <x-ib-toggle 
                         class="mt-2"
                         label="{{ __('Grant full access') }}" 
                         wire:model="fullAccess" 

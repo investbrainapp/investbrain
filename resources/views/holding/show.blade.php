@@ -40,7 +40,7 @@
                 @click="$dispatch('toggle-holding-options')"
             />
             @else
-            <x-icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
+            <x-ib-icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
             @endcan
 
             <x-ib-flex-spacer />

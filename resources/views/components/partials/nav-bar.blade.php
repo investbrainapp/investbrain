@@ -38,11 +38,11 @@ new class extends Component
         <div>
             <x-ib-button 
                 @click.stop="$dispatch('toggle-spotlight')"
-                class="btn-sm bg-base-300 flex-1 justify-start md:flex-none"
+                class="btn-sm bg-base-300 flex-1 justify-start md:flex-none border-none"
             >
                 <x-slot:label>
                     <span class="flex items-center text-gray-400">
-                        <x-icon name="o-magnifying-glass" class="mr-2" />
+                        <x-ib-icon name="o-magnifying-glass" class="mr-2" />
                         <span class=" truncate hidden sm:block">
                             @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
                         </span>
@@ -51,7 +51,6 @@ new class extends Component
                         </span>
                     </span>
                 </x-slot:label>
-                
             </x-ib-button>
 
             <x-ib-spotlight

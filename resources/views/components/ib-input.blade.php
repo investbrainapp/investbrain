@@ -17,7 +17,6 @@
     'firstErrorOnly' => false,
 ])
 
-
 @php
     $modelName = $attributes->whereStartsWith('wire:model')->first();
     $errorFieldName = $errorField ?? $modelName;

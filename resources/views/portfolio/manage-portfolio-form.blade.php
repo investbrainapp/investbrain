@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\Portfolio;
+use App\Traits\Toast;
 use App\Traits\WithTrimStrings;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
-use Mary\Traits\Toast;
 
 new class extends Component
 {
@@ -78,11 +78,11 @@ new class extends Component
         @livewire('share-portfolio-form', ['portfolio' => $portfolio])
         @endif
 
-        <x-toggle label="{{ __('Wishlist') }}" wire:model="wishlist" >
+        <x-ib-toggle label="{{ __('Wishlist') }}" wire:model="wishlist" >
             <x-slot:hint>
                 {{ __('Treat this portfolio as a "wishlist" (holdings will be excluded from realized gains, unrealized gains, and dividends)') }}
             </x-slot:hint>
-        </x-toggle>
+        </x-ib-toggle>
 
         <x-slot:actions>
             @if ($portfolio)

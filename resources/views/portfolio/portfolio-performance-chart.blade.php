@@ -136,7 +136,7 @@ new class extends Component
                     
                 @foreach($scopeOptions as $option)
 
-                    <x-menu-item 
+                    <x-ib-menu-item 
                         title="{{ $option['name'] }}" 
                         @click="
                             timeout = setTimeout(() => { loading = true }, 200);

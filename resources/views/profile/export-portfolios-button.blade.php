@@ -1,10 +1,10 @@
 <?php
 
 use App\Exports\BackupExport;
+use App\Traits\Toast;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Volt\Component;
 use Maatwebsite\Excel\Facades\Excel;
-use Mary\Traits\Toast;
 
 new class extends Component
 {

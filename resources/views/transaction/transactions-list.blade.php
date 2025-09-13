@@ -2,9 +2,9 @@
 
 use App\Models\Portfolio;
 use App\Models\Transaction;
+use App\Traits\Toast;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
-use Mary\Traits\Toast;
 
 new class extends Component
 {
@@ -81,7 +81,7 @@ new class extends Component
             "
         >
             <x-slot:value class="flex items-center">
-                <x-badge 
+                <x-ib-badge 
                     :value="$transaction->split
                         ? 'SPLIT'
                         : ($transaction->reinvested_dividend

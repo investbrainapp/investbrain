@@ -55,8 +55,9 @@ new class extends Component
     }
 }; ?>
 
+<div></div>
 
-<x-table 
+{{-- <x-table 
     :headers="$headers" 
     :rows="$this->holdings()" 
     :sort-by="$sortBy"
@@ -99,4 +100,4 @@ new class extends Component
     @scope('cell_market_data_updated_at', $row)
         {{ \Carbon\Carbon::parse($row->market_data_updated_at)->diffForHumans() }}
     @endscope
-</x-table>
+</x-table> --}}

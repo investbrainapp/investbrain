@@ -27,11 +27,11 @@
         <x-ib-toolbar :title="$portfolio->title">
 
             @if($portfolio->wishlist)
-            <x-badge value="{{ __('Wishlist') }}" title="{{ __('Wishlist') }}" class="badge-secondary badge-outline mr-3" />
+            <x-ib-badge value="{{ __('Wishlist') }}" title="{{ __('Wishlist') }}" class="badge-secondary badge-outline mr-3" />
             @endif
 
             @if(auth()->user()->id !== $portfolio->owner_id)
-            <x-badge value="{{ $portfolio->owner->name }}" title="{{ __('Owner').': '.$portfolio->owner->name }}" class="badge-secondary badge-outline mr-3" />
+            <x-ib-badge value="{{ $portfolio->owner->name }}" title="{{ __('Owner').': '.$portfolio->owner->name }}" class="badge-secondary badge-outline mr-3" />
             @endif
 
             @can('fullAccess', $portfolio)
@@ -42,7 +42,7 @@
                 @click="$dispatch('toggle-manage-portfolio')"
             />
             @else
-            <x-icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
+            <x-ib-icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
             @endcan
 
             <x-ib-flex-spacer />

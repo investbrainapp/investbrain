@@ -1,7 +1,7 @@
 @props([
-    'value' => ''
+    'value' => null
 ])
 
-<div {{ $attributes->class(["badge"])}}>
-    {{ $slot ?? $value }}
+<div {{ $attributes->class(["badge select-none"])}}>
+    {{ $value ?? $slot  }}
 </div>

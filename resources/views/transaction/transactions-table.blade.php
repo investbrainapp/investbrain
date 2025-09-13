@@ -56,7 +56,7 @@ new class extends Component
 
 <div class="">
     
-    <x-table 
+    {{-- <x-table 
         :headers="$headers" 
         :rows="$this->transactions()" 
         x-data="{ loadingId: null, timeout: null }"
@@ -83,7 +83,7 @@ new class extends Component
             {{ $row->split ? __('Yes') : '' }}
         @endscope
         @scope('cell_transaction_type', $row)
-            <x-badge 
+            <x-ib-badge 
                 :value="$row->split
                         ? 'SPLIT'
                         : ($row->reinvested_dividend
@@ -109,7 +109,7 @@ new class extends Component
         @scope('cell_total_market_value', $row)
             {{ Number::currency($row->total_market_value ?? 0, $row->market_data->currency) }}
         @endscope
-    </x-table>
+    </x-table> --}}
 
     <x-ib-modal 
         key="manage-transaction"
