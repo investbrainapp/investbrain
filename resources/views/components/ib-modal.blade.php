@@ -5,17 +5,18 @@
     'persistent' => false,
     'withoutTrapFocus' => false,
     'boxClass' => '',
-    'cardOptions' => [
-        'noPadding' => false,
-        'noShadow' => false
-    ],
+    'noCard' => false,
     'shortcut' => null
 ])
 
 <template x-teleport="body">
     <dialog 
         x-data="{ 
-            open: false,  
+            {{-- @if (!empty($attributes->whereStartsWith('wire:model')))
+                open: $wire.entangle('confirmingTransactionDeletion').live,
+            @else --}}
+                open: false,
+            {{-- @endif --}}
             close() {
                 this.open = false;
                 $el.close()
@@ -27,12 +28,16 @@
         }"
 
         :open="open"
-        
-        {{ $attributes->except('wire:model')->class(["modal z-50"]) }}
+
+        {{ 
+            $attributes->filter(
+                fn ($value, $key) => !Str::startsWith($key, 'wire:model')
+            )->class(["modal z-50"]) 
+        }}
 
         id="{{ $key }}"
 
-        x-on:toggle-{{ $key }}.window="show();"
+        x-on:toggle-{{ $key }}.window="open ? close() : show();"
 
         @if($shortcut)
             @keydown.window.prevent.{{ $shortcut }}="show();"
@@ -52,20 +57,20 @@
             @if(!$persistent)
                 @click.prevent.stop="close()" 
             @endif
-            class="absolute inset-0 w-full h-full"
+            class="absolute inset-0 w-full h-full bg-transparent"
         ></div>
         
         {{-- MODAL CONTENT --}}
-        <div class="modal-box {{ $boxClass }}">
+        <div class="modal-box p-0 {{ $boxClass }}">
 
-            <x-ib-card     
-                :title="$title"
-                :subtitle="$subtitle"
-                dense="true"
-                no-padding="{{ $cardOptions['noPadding'] }}"
-                no-shadow="{{ $cardOptions['noShadow'] }}"
-            >
-                @if (!$persistent)
+            @if(!$noCard)
+                <x-ib-card     
+                    :title="$title"
+                    :subtitle="$subtitle"
+                    expanded="true"      
+                >
+        
+                @if (!$persistent && !$noCard)
                     <x-ib-button 
                         icon="o-x-mark" 
                         title="{{ __('Close') }}"
@@ -74,10 +79,17 @@
                         tabindex="-999"
                     />
                 @endif
-                
+                    
+                    {{ $slot }}
+
+                </x-ib-card>
+
+            @else 
+
                 {{ $slot }}
-   
-            </x-ib-card>
+
+            @endif
+
         </div>
         
     </dialog>

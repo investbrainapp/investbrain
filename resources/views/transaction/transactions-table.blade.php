@@ -26,7 +26,7 @@ new class extends Component
     // methods
     public function goToHolding($holding)
     {
-        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
+        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]), navigate: true);
     }
 
     public function mount()

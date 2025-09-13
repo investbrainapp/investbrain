@@ -59,10 +59,12 @@
 }">
     <x-ib-modal
         key="spotlight"
-        class="backdrop-blur-sm rounded-box shadow-lg "
-        box-class="absolute p-0 top-10 lg:top-24 w-full lg:max-w-3xl bg-base-100 shadow-lg"
-        :card-options="['noPadding' => true, 'noShadow' => true]"
+        class="backdrop-blur-sm shadow-xl"
+        box-class="absolute top-10 lg:top-24 w-full lg:max-w-3xl "
+        no-card="true"
         shortcut="slash"
+        @keydown.up="$focus.previous()"
+        @keydown.down="$focus.next()"
     >
         <div class="relative">
 
@@ -95,8 +97,6 @@
         <div 
             @click="close()"
             @keydown.enter="close()"
-            @keydown.up="$focus.previous()"
-            @keydown.down="$focus.next()"
         >
             <template x-for="(item, index) in results" :key="index">
 

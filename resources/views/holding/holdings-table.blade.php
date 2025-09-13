@@ -51,7 +51,7 @@ new class extends Component
 
     public function goToHolding($holding)
     {
-        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
+        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]), navigate: true);
     }
 }; ?>
 

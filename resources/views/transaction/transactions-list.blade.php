@@ -47,7 +47,7 @@ new class extends Component
 
     public function goToHolding($holding)
     {
-        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
+        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]), navigate: true);
     }
 
     public function updateOffset($amount = 0)
@@ -69,7 +69,7 @@ new class extends Component
             @click="
                 if ($wire.shouldGoToHolding) {
 
-                    $wire.goToHolding({{ $transaction }})
+                    $wire.goToHolding({{ json_encode($transaction) }})
                     
                     return;
                 }
@@ -141,7 +141,7 @@ new class extends Component
         </div>
     @endif
 
-    <x-ib-alpine-modal 
+    <x-ib-modal 
         key="manage-transaction"
         title="{{ __('Manage Transaction') }}"
     >
@@ -150,5 +150,5 @@ new class extends Component
             'transaction' => $editingTransaction, 
         ], key($editingTransaction?->id.rand()))
 
-    </x-ib-alpine-modal>
+    </x-ib-modal>
 </div>

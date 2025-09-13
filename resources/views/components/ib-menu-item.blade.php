@@ -12,38 +12,12 @@
     'badge' => false,
     'separator' => false,
     'enabled' => true,
-    'active' => false,
-    'exact' => false
 ])
 
 @aware(['activateByRoute' => false, 'activeBgColor' => 'bg-base-100'])
 
 @php
     $spinnerTarget = $spinner == true ? $attributes->whereStartsWith('wire:click')->first() : $spinner;
-
-    if ($link == null) {
-        
-        $routeMatches = false;
-
-    } else if ($route) {
-
-        $routeMatches = request()->routeIs($route);
-
-    } else {
-
-        $link = url($link ?? '');
-        $route = url(request()->url());
-
-        if ($link == $route) {
-
-            $routeMatches = true;
-
-        } else {
-            
-            $routeMatches = ! $exact && $link != '/' && Str::startsWith($route, $link);
-        }
-    }
-
 @endphp
 
 @if (!$enabled) 
@@ -52,16 +26,15 @@
     {{-- ENABLED --}}
     <li 
         title="{{ $title }}" 
-        {{
-            $attributes->class([
-                "my-0.5 hover:text-inherit rounded-md",
-                "$activeBgColor" => ($active || ($activateByRoute && $routeMatches))
-            ])
-        }}
+        {{ $attributes->class(["my-0.5 hover:text-inherit rounded-md"]) }}
     >
         <a
             @if($link)
                 href="{{ $link }}"
+
+                @if($activateByRoute)
+                    wire:current="{{ $activeBgColor }}"
+                @endif
 
                 @if($external)
                     target="_blank"
