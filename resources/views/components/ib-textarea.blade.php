@@ -7,7 +7,7 @@
 ])
 
 <div {{ $attributes->class([]) }}>
-    <!-- STANDARD LABEL -->
+    {{-- STANDARD LABEL --}}
     @if($label)
         <label for="{{ $uuid }}" class="pt-0 label label-text font-semibold">
             <span>
@@ -52,7 +52,7 @@
         @endforeach
     @endif
 
-    <!-- HINT -->
+    {{-- HINT --}}
     @if($hint)
         <div x-classes="label-text-alt text-gray-400 py-1 pb-0">{{ $hint }}</div>
     @endif

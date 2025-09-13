@@ -192,7 +192,7 @@ new class extends Component
             </x-slot>
         </x-confirmation-modal>
 
-        <x-ib-alpine-modal 
+        <x-ib-modal 
             key="add-user-modal"
             title="{{ __('Share Portfolio') }}"
         >
@@ -231,7 +231,7 @@ new class extends Component
         
             </div>
             
-        </x-ib-alpine-modal>
+        </x-ib-modal>
 
         <x-ib-button class="btn-sm block mt-4" @click="$dispatch('toggle-add-user-modal')">
             {{ __('Add People') }}

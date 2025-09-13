@@ -1,17 +1,19 @@
-@props(['id' => null, 'maxWidth' => null])
+@props(['id' => null])
 
-<x-ib-livewire-modal :id="$id" :maxWidth="$maxWidth" {{ $attributes }} :showClose="false">
-    <div class="p-2">
-        <div class="text-lg font-medium text-gray-900 dark:text-gray-100">
+<x-ib-modal :id="$id" box-class="max-w-xl" persistent="true" no-card="true" {{ $attributes }} >
+
+    <div class="p-5">
+        <div class="text-xl font-bold text-primary-content">
             {{ $title }}
         </div>
 
-        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+        <div class="mt-2 text-sm text-secondary-content">
             {{ $content }}
         </div>
-    </div>
+    
 
-    <div class="flex flex-row items-center justify-end mt-3 p-2 text-end">
-        {{ $footer }}
+        <div class="flex flex-row items-center justify-end mt-8 text-end">
+            {{ $footer }}
+        </div>
     </div>
-</x-ib-livewire-modal>
+</x-ib-modal>

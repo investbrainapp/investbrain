@@ -3,7 +3,7 @@
 <x-layouts.app>
     <div x-data>
 
-        <x-ib-alpine-modal 
+        <x-ib-modal 
             key="create-transaction"
             title="{{ __('Create Transaction') }}"
         >
@@ -11,7 +11,7 @@
                 'portfolio' => $portfolio, 
             ])
 
-        </x-ib-alpine-modal>
+        </x-ib-modal>
 
         <x-ib-drawer 
             key="manage-portfolio"

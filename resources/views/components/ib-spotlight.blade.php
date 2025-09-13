@@ -80,6 +80,16 @@
                 tabindex="1"
             />
 
+            {{-- CLOSE --}}
+            <x-ib-button 
+                title="{{ __('Close') }}"
+                class="absolute top-3 right-4 btn-ghost hover:bg-transparent border-none shadow-none btn-xs" 
+                @click="close()" 
+                tabindex="-999"
+            >
+                <kbd class="kbd kbd-xs">ESC</kbd>
+            </x-ib-button>
+
             {{-- PROGRESS --}}
             <x-ib-progress 
                 x-show="loading"

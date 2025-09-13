@@ -16,7 +16,7 @@
         <h5 @class(['pb-2' => !$dense, 'text-sm text-gray-400 flex items-center truncate'])> {{ $subTitle }} </h5>
     @endif
 
-    <div @class(['mt-2' => !$dense, 'mt-5' => $expanded])>
+    <div @class(['mt-2' => !$dense && !$expanded, 'mt-0' => $dense, 'mt-5' => $expanded])>
         {{ $slot }}
     </div>
 </div>

@@ -6,27 +6,44 @@
     'withoutTrapFocus' => false,
     'boxClass' => '',
     'noCard' => false,
-    'shortcut' => null
+    'shortcut' => null,
 ])
 
 <template x-teleport="body">
-    <dialog 
+    <dialog
         x-data="{ 
-            {{-- @if (!empty($attributes->whereStartsWith('wire:model')))
-                open: $wire.entangle('confirmingTransactionDeletion').live,
-            @else --}}
-                open: false,
-            {{-- @endif --}}
+            @if (!empty($attributes->whereStartsWith('wire:model')->first()))
+                init(){
+                    this.$watch('wireModelValue', value => this.wireModelValue ? this.show() : this.close())
+                },
+                wireModelValue: $wire.entangle('{{ $attributes->whereStartsWith('wire:model')->first() }}').live,
+            @endif
+            open: false,
             close() {
                 this.open = false;
                 $el.close()
             },
+            cancel() {
+                @if($persistent)
+                    this.$refs.modalContent.classList.add('wiggle')
+                    this.$refs.modalContent.addEventListener('animationend', (e) => {
+                        this.$refs.modalContent.classList.remove('wiggle')
+                    })
+                @else
+                    this.close()
+                @endif
+            },
             show() {
                 this.open = true;
-                $el.showModal();
+                @if($persistent)
+                    $el.showModal();
+                @else
+                    $el.show();
+                @endif
             }
         }"
 
+        @close="close()"
         :open="open"
 
         {{ 
@@ -43,9 +60,7 @@
             @keydown.window.prevent.{{ $shortcut }}="show();"
         @endif
 
-        @if($persistent)
-            @keydown.escape.prevent.stop="()=>null"
-        @endif
+        @keydown.escape.prevent.stop="cancel()"
 
         @if(!$withoutTrapFocus)
             x-trap="open" 
@@ -54,14 +69,12 @@
     >
         {{-- BACKDROP --}}
         <div 
-            @if(!$persistent)
-                @click.prevent.stop="close()" 
-            @endif
-            class="absolute inset-0 w-full h-full bg-transparent"
+            @click.prevent.stop="cancel()" 
+            class="absolute inset-0 w-full h-full bg-base-300/50"
         ></div>
         
         {{-- MODAL CONTENT --}}
-        <div class="modal-box p-0 {{ $boxClass }}">
+        <div x-ref="modalContent" class="modal-box p-0 {{ $boxClass }}">
 
             @if(!$noCard)
                 <x-ib-card     
@@ -93,4 +106,5 @@
         </div>
         
     </dialog>
+
 </template> 

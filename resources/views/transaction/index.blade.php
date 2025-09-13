@@ -1,13 +1,13 @@
 <x-layouts.app>
     <div x-data>  
 
-        <x-ib-alpine-modal 
+        <x-ib-modal 
             key="create-transaction"
             title="{{ __('Create Transaction') }}"
         >
             @livewire('manage-transaction-form')
 
-        </x-ib-alpine-modal>
+        </x-ib-modal>
 
         <x-ib-toolbar title="{{ __('All Transactions') }}">
 

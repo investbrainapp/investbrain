@@ -111,7 +111,7 @@ new class extends Component
         @endscope
     </x-table>
 
-    <x-ib-alpine-modal 
+    <x-ib-modal 
         key="manage-transaction"
         title="Manage Transaction"
     >
@@ -119,5 +119,5 @@ new class extends Component
             'transaction' => $editingTransaction, 
         ], key($editingTransaction->id ?? 'new'))
 
-    </x-ib-alpine-modal>
+    </x-ib-modal>
 </div>

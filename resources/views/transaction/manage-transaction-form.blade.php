@@ -236,7 +236,7 @@ new class extends Component
         <x-slot name="footer">
             <x-ib-button class="btn-outline" wire:click="$toggle('confirmingTransactionDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-secondary-button>
+            </x-ib-button>
 
             <x-ib-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
                 {{ __('Delete Transaction') }}
