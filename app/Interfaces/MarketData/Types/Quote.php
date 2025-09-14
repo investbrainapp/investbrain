@@ -38,6 +38,14 @@ class Quote extends MarketDataType
 
     public function setCurrency(string $currency): self
     {
+        // need to standardize to ISO 4217
+        $currency = match ($currency) {
+            'US' => 'USD',
+            'CA' => 'CAD',
+            'GBp' => 'GBX',
+            default => $currency
+        };
+
         $this->items['currency'] = strtoupper((string) $currency);
 
         return $this;
