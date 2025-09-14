@@ -16,8 +16,7 @@
 @if(strlen($label ?? '') > 0)
     <div class="inline-flex items-center gap-1">
 @endif
-        <x-svg
-            :name="$icon"
+        <x-icon :name="$icon"
             {{
                 $attributes->class([
                     'inline',
