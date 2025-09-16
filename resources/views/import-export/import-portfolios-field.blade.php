@@ -95,7 +95,7 @@ new class extends Component
     <x-slot:form>
         
         <div class="col-span-6 sm:col-span-4">
-            <x-file wire:model="file" label="{{ __('Select a file') }}" hint="" accept=".xlsx" required />
+            <x-ui.file wire:model="file" label="{{ __('Select a file') }}" hint="" accept=".xlsx" required />
         </div>
 
         <x-ui.dialog-modal wire:model.live="importStatusDialog" persistent>

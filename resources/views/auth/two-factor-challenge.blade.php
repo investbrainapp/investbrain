@@ -15,7 +15,7 @@
                 {{ __('Please confirm access to your account by entering one of your emergency recovery codes.') }}
             </div>
 
-            <x-errors class="mb-4" />
+            <x-ui.errors class="mb-4" />
 
             <form method="POST" action="{{ route('two-factor.login') }}">
                 @csrf

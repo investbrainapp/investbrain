@@ -6,7 +6,7 @@
             </div>
         </x-slot>
 
-        <x-errors class="mb-4" />
+        <x-ui.errors class="mb-4" />
 
         @session('status')
             <x-ui.alert icon="o-envelope" class="alert-success mb-4">
@@ -28,7 +28,7 @@
             </div>
 
             <div class="block mt-4">
-                <x-checkbox id="remember_me" name="remember" class="text-sm" label="{{ __('Remember me') }}" />
+                <x-ui.checkbox id="remember_me" name="remember" class="text-sm" label="{{ __('Remember me') }}" />
             </div>
 
             <div class="flex items-center justify-end mt-4">

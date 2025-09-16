@@ -16,7 +16,7 @@
             </x-ui.alert>
         @endsession
 
-        <x-errors class="mb-4" />
+        <x-ui.errors class="mb-4" />
 
         <form method="POST" action="{{ route('password.email') }}">
             @csrf

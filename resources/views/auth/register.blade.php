@@ -6,7 +6,7 @@
             </div>
         </x-slot>
 
-        <x-errors class="mb-4" />
+        <x-ui.errors class="mb-4" />
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
@@ -35,7 +35,7 @@
                 <div class="mt-4">
                     <label>
                         <div class="flex items-center">
-                            <x-checkbox name="terms" id="terms" required />
+                            <x-ui.checkbox name="terms" id="terms" required />
 
                             <div class="ms-2 text-sm">
                                 {!! __('I agree to the :terms_of_service and :privacy_policy', [

@@ -28,7 +28,7 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
-    Route::view('/import-export', 'import-export')
+    Route::view('/import-export', 'import-export.show')
         ->name('import-export')
         ->when(! config('investbrain.self_hosted'), function ($route) {
             return $route->middleware('verified');
