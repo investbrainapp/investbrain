@@ -255,7 +255,7 @@ new class extends Component
         x-transition:leave-end="opacity-0 transform translate-y-full"
         x-cloak
         key="ai-chat" 
-        class="fixed bg-base-100 shadow-2xl rounded-none md:rounded-lg
+        class="fixed bg-base-200 shadow-2xl rounded-none md:rounded-lg
                 inset-0 h-screen w-full 
                 md:inset-auto md:right-6 md:bottom-6 md:w-[32rem] md:h-[46rem]"
     >
@@ -374,7 +374,7 @@ new class extends Component
                             
                             <x-ib-textarea
                                 wire:model="prompt"
-                                class="h-18 resize-none"
+                                class="h-18 resize-none bg-base-200"
                                 placeholder="{{ __('Have a question? AI might be able to help...') }}"
                                 wire:keydown.enter.prevent="startCompletion"
                                 autofocus
@@ -383,7 +383,7 @@ new class extends Component
                         <x-ib-button
                             spinner="generateCompletion"
                             wire:click="startCompletion"
-                            class="btn btn-ghost h-24"
+                            class="btn btn-ghost h-32"
                             icon="o-paper-airplane"
                         ></x-ib-button>
                         
