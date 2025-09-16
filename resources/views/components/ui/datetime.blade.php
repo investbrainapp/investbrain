@@ -154,7 +154,7 @@
             "
             class="absolute top-0 right-0 p-3 cursor-pointer text-neutral-400 hover:text-neutral-500"
         >
-            <x-ib-icon name="o-calendar" />
+            <x-ui.icon name="o-calendar" />
         </div>
 
         <div  
@@ -186,10 +186,10 @@
                 </div>
                 <div>
                     <button @click="datePickerPreviousMonth()" type="button" class="inline-flex p-1 rounded-full transition duration-100 ease-in-out cursor-pointer focus:outline-none focus:shadow-outline hover:bg-accent/50">
-                        <x-ib-icon name="o-chevron-left" />
+                        <x-ui.icon name="o-chevron-left" />
                     </button>
                     <button @click="datePickerNextMonth()" type="button" class="inline-flex p-1 rounded-full transition duration-100 ease-in-out cursor-pointer focus:outline-none focus:shadow-outline hover:bg-accent/50">
-                        <x-ib-icon name="o-chevron-right" />
+                        <x-ui.icon name="o-chevron-right" />
                     </button>
                 </div>
             </div>
@@ -240,7 +240,7 @@
 
         {{-- ICON --}}
         @if($icon)
-            <x-ib-icon :name="$icon" class="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400 pointer-events-none" />
+            <x-ui.icon :name="$icon" class="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400 pointer-events-none" />
         @endif
 
     </div>

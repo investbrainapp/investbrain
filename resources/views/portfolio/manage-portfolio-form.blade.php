@@ -69,24 +69,24 @@ new class extends Component
 
 <div class="w-full md:w-3/4">
 
-    <x-ib-form wire:submit="{{ $portfolio ? 'update' : 'save' }}" >
-        <x-ib-input label="{{ __('Title') }}" wire:model="title" required />
+    <x-ui.form wire:submit="{{ $portfolio ? 'update' : 'save' }}" >
+        <x-ui.input label="{{ __('Title') }}" wire:model="title" required />
 
-        <x-ib-textarea class="mt-1" label="{{ __('Notes') }}" wire:model="notes" rows="4" />
+        <x-ui.textarea class="mt-1" label="{{ __('Notes') }}" wire:model="notes" rows="4" />
 
         @if (isset($this->portfolio))
         @livewire('share-portfolio-form', ['portfolio' => $portfolio])
         @endif
 
-        <x-ib-toggle label="{{ __('Wishlist') }}" wire:model="wishlist" >
+        <x-ui.toggle label="{{ __('Wishlist') }}" wire:model="wishlist" >
             <x-slot:hint>
                 {{ __('Treat this portfolio as a "wishlist" (holdings will be excluded from realized gains, unrealized gains, and dividends)') }}
             </x-slot:hint>
-        </x-ib-toggle>
+        </x-ui.toggle>
 
         <x-slot:actions>
             @if ($portfolio)
-                <x-ib-button 
+                <x-ui.button 
                     wire:click="$toggle('confirmingPortfolioDeletion')" 
                     wire:loading.attr="disabled"
                     class="btn  text-error" 
@@ -96,13 +96,13 @@ new class extends Component
             @endif
 
             @if (!$hideCancel)
-                <x-ib-button label="{{ __('Cancel') }}" link="/dashboard" />
+                <x-ui.button label="{{ __('Cancel') }}" link="/dashboard" />
             @endif
-            <x-ib-button label="{{ $portfolio ? __('Update') : __('Create') }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
+            <x-ui.button label="{{ $portfolio ? __('Update') : __('Create') }}" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="save" />
         </x-slot:actions>
-    </x-ib-form>
+    </x-ui.form>
 
-    <x-confirmation-modal wire:model.live="confirmingPortfolioDeletion">
+    <x-ui.confirmation-modal wire:model.live="confirmingPortfolioDeletion">
         <x-slot name="title">
             {{ __('Delete Portfolio') }}
         </x-slot>
@@ -112,13 +112,13 @@ new class extends Component
         </x-slot>
 
         <x-slot name="footer">
-            <x-ib-button class="btn-outline" wire:click="$toggle('confirmingPortfolioDeletion')" wire:loading.attr="disabled">
+            <x-ui.button class="btn-outline" wire:click="$toggle('confirmingPortfolioDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-ib-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
+            <x-ui.button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
                 {{ __('Delete Portfolio') }}
-            </x-ib-button>
+            </x-ui.button>
         </x-slot>
-    </x-confirmation-modal>
+    </x-ui.confirmation-modal>
 </div>

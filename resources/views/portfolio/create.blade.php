@@ -1,7 +1,7 @@
 <x-layouts.app>
     <div>  
 
-        <x-ib-toolbar title="{{ __('Create Portfolio') }}" />
+        <x-ui.toolbar title="{{ __('Create Portfolio') }}" />
 
         @livewire('manage-portfolio-form')
     </div>

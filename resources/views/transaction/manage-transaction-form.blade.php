@@ -133,11 +133,11 @@ new class extends Component
 }; ?>
 
 <div class="" x-data="{ transaction_type: @entangle('transaction_type') }">
-    <x-ib-form wire:submit="{{ $transaction ? 'update' : 'save' }}" class="">
+    <x-ui.form wire:submit="{{ $transaction ? 'update' : 'save' }}" class="">
 
         @if(empty($portfolio))
 
-            <x-ib-select 
+            <x-ui.select 
                 label="{{ __('Portfolio') }}" 
                 wire:model="portfolio_id" 
                 required 
@@ -147,19 +147,19 @@ new class extends Component
             />
         @endif
 
-        <x-ib-input label="{{ __('Symbol') }}" wire:model="symbol" required />
+        <x-ui.input label="{{ __('Symbol') }}" wire:model="symbol" required />
 
-        <x-ib-select label="{{ __('Transaction Type') }}" :options="[
+        <x-ui.select label="{{ __('Transaction Type') }}" :options="[
             ['id' => 'BUY', 'name' => 'Buy'], 
             ['id' => 'SELL', 'name' => 'Sell']
         ]" wire:model.live="transaction_type" />
         
-        <x-ib-datetime label="{{ __('Transaction Date') }}" wire:model="date" required />
+        <x-ui.datetime label="{{ __('Transaction Date') }}" wire:model="date" required />
         
-        <x-ib-input label="{{ __('Quantity') }}" type="number" step="any" wire:model="quantity" required />
+        <x-ui.input label="{{ __('Quantity') }}" type="number" step="any" wire:model="quantity" required />
         
         @if($transaction_type == 'SELL')
-            <x-ib-input 
+            <x-ui.input 
                 label="{{ __('Sale Price') }}" 
                 wire:model.number="sale_price" 
                 required 
@@ -168,7 +168,7 @@ new class extends Component
             >
                 <x-slot:prepend>
                     
-                    <x-ib-select 
+                    <x-ui.select 
                         class="rounded-e-none border-e-0 bg-base-200"
                         icon="o-banknotes"
                         :options="$currencies"
@@ -178,9 +178,9 @@ new class extends Component
                         id="currency"
                     />
                 </x-slot:prepend>
-            </x-ib-input>
+            </x-ui.input>
         @else
-            <x-ib-input 
+            <x-ui.input 
                 label="{{ __('Cost Basis') }}" 
                 wire:model.number="cost_basis" 
                 required 
@@ -189,7 +189,7 @@ new class extends Component
             >
                 <x-slot:prepend>
 
-                    <x-ib-select 
+                    <x-ui.select 
                         class="rounded-e-none border-e-0 bg-base-200"
                         icon="o-banknotes"
                         :options="$currencies"
@@ -200,12 +200,12 @@ new class extends Component
                     />
                 </x-slot:prepend>
              
-            </x-ib-input>
+            </x-ui.input>
         @endif
 
         <x-slot:actions>
             @if ($transaction)
-                <x-ib-button 
+                <x-ui.button 
                     wire:click="$toggle('confirmingTransactionDeletion')" 
                     wire:loading.attr="disabled"
                     class="btn text-error" 
@@ -214,7 +214,7 @@ new class extends Component
                 />
             @endif
 
-            <x-ib-button 
+            <x-ui.button 
                 label="{{ $transaction ? __('Update') : __('Create') }}" 
                 type="submit" 
                 icon="o-paper-airplane" 
@@ -222,9 +222,9 @@ new class extends Component
                 spinner="{{ $transaction ? 'update' : 'save' }}"
             />
         </x-slot:actions>
-    </x-ib-form>
+    </x-ui.form>
 
-    <x-confirmation-modal wire:model.live="confirmingTransactionDeletion">
+    <x-ui.confirmation-modal wire:model.live="confirmingTransactionDeletion">
         <x-slot name="title">
             {{ __('Delete Transaction') }}
         </x-slot>
@@ -234,13 +234,13 @@ new class extends Component
         </x-slot>
 
         <x-slot name="footer">
-            <x-ib-button class="btn-outline" wire:click="$toggle('confirmingTransactionDeletion')" wire:loading.attr="disabled">
+            <x-ui.button class="btn-outline" wire:click="$toggle('confirmingTransactionDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-ib-button>
+            </x-ui.button>
 
-            <x-ib-button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
+            <x-ui.button class="ms-3 btn-error text-white" wire:click="delete" wire:loading.attr="disabled">
                 {{ __('Delete Transaction') }}
-            </x-ib-button>
+            </x-ui.button>
         </x-slot>
-    </x-confirmation-modal>
+    </x-ui.confirmation-modal>
 </div>

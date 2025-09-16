@@ -98,7 +98,7 @@ new class extends Component
             <x-file wire:model="file" label="{{ __('Select a file') }}" hint="" accept=".xlsx" required />
         </div>
 
-        <x-dialog-modal wire:model.live="importStatusDialog" persistent>
+        <x-ui.dialog-modal wire:model.live="importStatusDialog" persistent>
             <x-slot name="title">
 
                 @if($backupImport?->status)
@@ -111,7 +111,7 @@ new class extends Component
             </x-slot>
             <x-slot name="content">
                 @if($backupImport?->status != 'failed')
-                <x-ib-progress 
+                <x-ui.progress 
                     :indeterminate="$backupImport?->status == 'pending'"
                     class="progress-primary h-3"
                     value="{{ $percent }}"
@@ -123,14 +123,14 @@ new class extends Component
             <x-slot name="footer">
                 @if($backupImport?->status == 'failed')
 
-                    <x-ib-button wire:click="$toggle('importStatusDialog')"> {{ __('Try again') }} </x-ib-button>
+                    <x-ui.button wire:click="$toggle('importStatusDialog')"> {{ __('Try again') }} </x-ui.button>
                 @else
                     <div wire:poll="checkImportStatus" class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
-                    <x-ib-flex-spacer />
-                    <x-ib-button wire:click="$toggle('importStatusDialog')"> {{ __('Close') }} </x-ib-button>
+                    <x-ui.flex-spacer />
+                    <x-ui.button wire:click="$toggle('importStatusDialog')"> {{ __('Close') }} </x-ui.button>
                 @endif
             </x-slot>
-        </x-dialog-modal>
+        </x-ui.dialog-modal>
 
     </x-slot:form>
 
@@ -140,9 +140,9 @@ new class extends Component
             {{ __('Saved.') }}
         </x-forms.action-message>
   
-        <x-ib-button type="submit" wire:loading.attr="disabled" spinner="import">
+        <x-ui.button type="submit" wire:loading.attr="disabled" spinner="import">
             {{ __('Import') }}
-        </x-ib-button>
+        </x-ui.button>
     </x-slot>
 </x-forms.form-section>
 

@@ -42,14 +42,14 @@
                     </span>
                 </div>
 
-                <x-ib-button class="btn-outline" class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
+                <x-ui.button class="btn-outline" class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
                     {{ __('Select A New Photo') }}
-                </x-ib-button>
+                </x-ui.button>
 
                 @if ($this->user->profile_photo_path)
-                    <x-ib-button class="btn-outline" type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                    <x-ui.button class="btn-outline" type="button" class="mt-2" wire:click="deleteProfilePhoto">
                         {{ __('Remove Photo') }}
-                    </x-ib-button>
+                    </x-ui.button>
                 @endif
 
                 @if ($errors->has('photo') && is_array($errors->get('photo')))
@@ -60,12 +60,12 @@
 
         <!-- Name -->
         <div class="col-span-6 sm:col-span-4">
-            <x-ib-input id="name" label="{{ __('Name') }}" type="text" class="mt-1 block w-full" wire:model="state.name" error-field="name" required autocomplete="name" />
+            <x-ui.input id="name" label="{{ __('Name') }}" type="text" class="mt-1 block w-full" wire:model="state.name" error-field="name" required autocomplete="name" />
         </div>
 
         <!-- Email -->
         <div class="col-span-6 sm:col-span-4">
-            <x-ib-input id="email" label="{{ __('Email') }}" type="email" class="mt-1 block w-full" wire:model="state.email" error-field="email" required autocomplete="username" />
+            <x-ui.input id="email" label="{{ __('Email') }}" type="email" class="mt-1 block w-full" wire:model="state.email" error-field="email" required autocomplete="username" />
 
             @if (
                 ! config('investbrain.self_hosted')
@@ -94,8 +94,8 @@
             {{ __('Saved.') }}
         </x-forms.action-message>
 
-        <x-ib-button type="submit" spinner="photo" wire:loading.attr="disabled" wire:target="photo">
+        <x-ui.button type="submit" spinner="photo" wire:loading.attr="disabled" wire:target="photo">
             {{ __('Save') }}
-        </x-ib-button>
+        </x-ui.button>
     </x-slot>
 </x-forms.form-section>

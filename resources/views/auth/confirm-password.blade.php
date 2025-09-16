@@ -1,8 +1,8 @@
 <x-layouts.guest>
-    <x-authentication-card>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-ib-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -16,14 +16,14 @@
             @csrf
 
             <div>
-                <x-ib-input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" autofocus />
+                <x-ui.input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" autofocus />
             </div>
 
             <div class="flex justify-end mt-4">
-                <x-ib-button type="submit" class="btn-primary ms-4">
+                <x-ui.button type="submit" class="btn-primary ms-4">
                     {{ __('Confirm') }}
-                </x-ib-button>
+                </x-ui.button>
             </div>
         </form>
-    </x-authentication-card>
+    </x-ui.authentication-card>
 </x-layouts.guest>

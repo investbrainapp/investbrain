@@ -11,7 +11,7 @@
 
     @if ($actions)
         @if(!$noSeparator)
-            <x-ib-section-border class="my-3" />
+            <x-ui.section-border class="my-3" />
         @endif
 
         <div class="flex justify-end gap-3">

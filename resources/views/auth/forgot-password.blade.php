@@ -1,8 +1,8 @@
 <x-layouts.guest>
-    <x-authentication-card>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-ib-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -23,14 +23,14 @@
 
             <div class="block">
 
-                <x-ib-input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <x-ui.input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <x-ib-button class="btn-primary" type="submit">
+                <x-ui.button class="btn-primary" type="submit">
                     {{ __('Email Password Reset Link') }}
-                </x-ib-button>
+                </x-ui.button>
             </div>
         </form>
-    </x-authentication-card>
+    </x-ui.authentication-card>
 </x-layouts.guest>

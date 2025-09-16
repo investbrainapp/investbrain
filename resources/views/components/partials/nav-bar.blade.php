@@ -24,7 +24,7 @@ new class extends Component
     <div class="flex flex-wrap justify-between items-center">
 
         <div class="flex">
-            <x-ib-button
+            <x-ui.button
                 aria-controls="drawer-navigation"
                 title="{{ __('Toggle Sidebar') }}"
                 class="btn-circle btn-ghost btn-sm block md:hidden"
@@ -32,17 +32,17 @@ new class extends Component
                 @click="sideBarOpen = true"
             />
 
-            <div class="ml-3 w-8 hidden sm:block md:hidden"> <x-ib-logo /> </div>
+            <div class="ml-3 w-8 hidden sm:block md:hidden"> <x-ui.logo /> </div>
         </div>
     
         <div>
-            <x-ib-button 
+            <x-ui.button 
                 @click.stop="$dispatch('toggle-spotlight')"
                 class="btn-sm bg-base-300 flex-1 justify-start md:flex-none border-none"
             >
                 <x-slot:label>
                     <span class="flex items-center text-gray-400">
-                        <x-ib-icon name="o-magnifying-glass" class="mr-2" />
+                        <x-ui.icon name="o-magnifying-glass" class="mr-2" />
                         <span class=" truncate hidden sm:block">
                             @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
                         </span>
@@ -51,9 +51,9 @@ new class extends Component
                         </span>
                     </span>
                 </x-slot:label>
-            </x-ib-button>
+            </x-ui.button>
 
-            <x-ib-spotlight
+            <x-ui.spotlight
                 search-text="{{ __('Search holdings, portfolios, or anything else...') }}"
                 no-results-text="{{ __('Darn! Nothing found for that search.') }}"
             />
@@ -61,25 +61,25 @@ new class extends Component
 
         <div class="flex flex-0 items-center gap-4">
 
-            <x-ib-button 
+            <x-ui.button 
                 title="{{ __('Documentation') }}"
                 icon="o-book-open"
                 class="btn-circle btn-ghost btn-sm"
                 link="https://github.com/investbrainapp/investbrain"
                 external
             >
-            </x-ib-button>
+            </x-ui.button>
 
-            <x-ib-button 
+            <x-ui.button 
                 title="{{ __('We\'re open source!') }}"
                 class="btn-circle btn-ghost btn-sm"
                 link="https://github.com/investbrainapp/investbrain"
                 external
             >
                 <x-github-icon />
-            </x-ib-button>
+            </x-ui.button>
 
-            <x-ib-theme-selector
+            <x-ui.theme-selector
                 title="{{ __('Toggle Theme') }}" 
                 class="btn-circle btn-ghost btn-sm" 
             />

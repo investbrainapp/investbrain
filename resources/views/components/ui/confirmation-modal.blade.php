@@ -1,6 +1,6 @@
 @props(['id' => null])
 
-<x-ib-modal :id="$id" box-class="max-w-xl" persistent="true" no-card="true" {{ $attributes }} >
+<x-ui.modal :id="$id" box-class="max-w-xl" persistent="true" no-card="true" {{ $attributes }} >
 
     <div class="p-5">
         <div class="sm:flex sm:items-start">
@@ -25,4 +25,4 @@
             {{ $footer }}
         </div>
     </div>
-</x-ib-modal>
+</x-ui.modal>

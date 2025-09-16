@@ -66,7 +66,7 @@ new class extends Component
     <x-slot name="form">
 
         <div class="col-span-6 sm:col-span-4">
-            <x-ib-select 
+            <x-ui.select 
                 label="{{ __('Locale') }}"
                 class="select block mt-1 w-full"
                 :options="config('app.available_locales')"
@@ -81,7 +81,7 @@ new class extends Component
         </div>
 
         <div class="col-span-6 sm:col-span-4">
-            <x-ib-select 
+            <x-ui.select 
                 label="{{ __('Display Currency') }}"
                 class="select block mt-1 w-full"
                 :options="$currencies"
@@ -102,8 +102,8 @@ new class extends Component
             {{ __('Saved.') }}
         </x-forms.action-message>
 
-        <x-ib-button type="submit">
+        <x-ui.button type="submit">
             {{ __('Save') }}
-        </x-ib-button>
+        </x-ui.button>
     </x-slot>
 </x-forms.form-section>

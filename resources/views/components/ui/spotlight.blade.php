@@ -57,7 +57,7 @@
             : this.searchedWithNoResults = true
     }
 }">
-    <x-ib-modal
+    <x-ui.modal
         key="spotlight"
         class="backdrop-blur-sm shadow-xl"
         box-class="absolute top-10 lg:top-24 w-full lg:max-w-3xl "
@@ -69,7 +69,7 @@
         <div class="relative">
 
             {{-- INPUT --}}
-            <x-ib-input
+            <x-ui.input
                 id="{{ $id }}"
                 icon="o-magnifying-glass"
                 x-model="value"
@@ -81,17 +81,17 @@
             />
 
             {{-- CLOSE --}}
-            <x-ib-button 
+            <x-ui.button 
                 title="{{ __('Close') }}"
                 class="absolute top-3 right-4 btn-ghost hover:bg-transparent border-none shadow-none btn-xs" 
                 @click="close()" 
                 tabindex="-999"
             >
                 <kbd class="kbd kbd-xs">ESC</kbd>
-            </x-ib-button>
+            </x-ui.button>
 
             {{-- PROGRESS --}}
-            <x-ib-progress 
+            <x-ui.progress 
                 x-show="loading"
                 class="absolute left-0 bottom-0 w-full progress progress-secondary h-[2px]" 
                 indeterminate="true"
@@ -143,5 +143,5 @@
             <div x-show="results.length" class="mb-3"></div>
         </div>
 
-    </x-ib-modal>
+    </x-ui.modal>
 </div>

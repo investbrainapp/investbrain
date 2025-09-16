@@ -1,8 +1,8 @@
 <x-layouts.guest>
-    <x-authentication-card>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-ib-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -21,7 +21,7 @@
                 @csrf
 
                 <div>
-                    <x-ib-button label="{{ __('Resend Verification Email') }}" type="submit" class="bg-primary hover:bg-secondary focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 focus:shadow-outline focus:outline-none" />
+                    <x-ui.button label="{{ __('Resend Verification Email') }}" type="submit" class="bg-primary hover:bg-secondary focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 focus:shadow-outline focus:outline-none" />
                         
                     
                 </div>
@@ -43,5 +43,5 @@
                 </form>
             </div>
         </div>
-    </x-authentication-card>
+    </x-ui.authentication-card>
 </x-layouts.guest>

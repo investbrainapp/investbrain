@@ -1,8 +1,8 @@
 <x-layouts.guest>
-    <x-authentication-card>
+    <x-ui.authentication-card>
         <x-slot:logo>
             <div class="w-24 mb-10">
-                <x-ib-logo />
+                <x-ui.logo />
             </div>
         </x-slot:logo>
 
@@ -14,5 +14,5 @@
             'user' => $user,
         ])
 
-    </x-authentication-card>
+    </x-ui.authentication-card>
 </x-layouts.guest>

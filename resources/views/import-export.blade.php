@@ -4,7 +4,7 @@
         
         @livewire('import-portfolios-field')
 
-        <x-ib-section-border hide-on-mobile />
+        <x-ui.section-border hide-on-mobile />
     </div>
 
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

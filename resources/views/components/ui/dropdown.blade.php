@@ -28,7 +28,7 @@
         >
             {{ $label }}
             <span class="transition-transform" :class="{'rotate-180': dropdownOpen }">
-                <x-ib-icon :name="$icon" />
+                <x-ui.icon :name="$icon" />
             </span>
         </summary>
     @endif

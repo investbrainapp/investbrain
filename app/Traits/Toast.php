@@ -23,7 +23,7 @@ trait Toast
             'title' => $title,
             'description' => $description,
             'position' => $position,
-            'icon' => Blade::render("<x-ib-icon class='w-7 h-7' name='".$icon."' />"),
+            'icon' => Blade::render("<x-ui.icon class='w-7 h-7' name='".$icon."' />"),
             'css' => $css,
             'timeout' => $timeout,
         ];

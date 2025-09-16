@@ -1,8 +1,8 @@
 <x-layouts.guest>
-    <x-authentication-card>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-ib-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -22,12 +22,12 @@
 
                 <div class="mt-4" x-show="! recovery">
                     
-                    <x-ib-input id="code" label="{{ __('Code') }}" class="block mt-1 w-full" type="text" inputmode="numeric" name="code" autofocus x-ref="code" autocomplete="one-time-code" />
+                    <x-ui.input id="code" label="{{ __('Code') }}" class="block mt-1 w-full" type="text" inputmode="numeric" name="code" autofocus x-ref="code" autocomplete="one-time-code" />
                 </div>
 
                 <div class="mt-4" x-cloak x-show="recovery">
                     
-                    <x-ib-input id="recovery_code" label="{{ __('Recovery Code') }}" class="block mt-1 w-full" type="text" name="recovery_code" x-ref="recovery_code" autocomplete="one-time-code" />
+                    <x-ui.input id="recovery_code" label="{{ __('Recovery Code') }}" class="block mt-1 w-full" type="text" name="recovery_code" x-ref="recovery_code" autocomplete="one-time-code" />
                 </div>
 
                 <div class="flex items-center justify-end mt-4">
@@ -50,11 +50,11 @@
                         {{ __('Use an authentication code') }}
                     </button>
 
-                    <x-ib-button type="submit" class="btn-primary ms-4">
+                    <x-ui.button type="submit" class="btn-primary ms-4">
                         {{ __('Log in') }}
-                    </x-ib-button>
+                    </x-ui.button>
                 </div>
             </form>
         </div>
-    </x-authentication-card>
+    </x-ui.authentication-card>
 </x-layouts.guest>

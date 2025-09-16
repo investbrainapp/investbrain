@@ -73,7 +73,7 @@ new class extends Component
         @scope('cell_symbol', $row)
             <span class="flex">
                 {{ $row->symbol }}
-                <x-ib-loading x-show="loadingId === '{{ $row->id }}'" x-cloak class="text-gray-400 ml-2" />
+                <x-ui.loading x-show="loadingId === '{{ $row->id }}'" x-cloak class="text-gray-400 ml-2" />
             </span>
         @endscope
         @scope('cell_date', $row)
@@ -83,7 +83,7 @@ new class extends Component
             {{ $row->split ? __('Yes') : '' }}
         @endscope
         @scope('cell_transaction_type', $row)
-            <x-ib-badge 
+            <x-ui.badge 
                 :value="$row->split
                         ? 'SPLIT'
                         : ($row->reinvested_dividend
@@ -111,7 +111,7 @@ new class extends Component
         @endscope
     </x-table> --}}
 
-    <x-ib-modal 
+    <x-ui.modal 
         key="manage-transaction"
         title="Manage Transaction"
     >
@@ -119,5 +119,5 @@ new class extends Component
             'transaction' => $editingTransaction, 
         ], key($editingTransaction->id ?? 'new'))
 
-    </x-ib-modal>
+    </x-ui.modal>
 </div>

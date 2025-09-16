@@ -231,15 +231,15 @@ new class extends Component
     class="fixed z-50 bottom-8 right-8"
 >
     {{-- toggle button --}}
-    <x-ib-button 
+    <x-ui.button 
         x-show="!open"
         @click="$dispatch('toggle-ai-chat')"
         class="flex btn btn-circle md:btn-lg btn-primary" 
     >
         <x-slot:label>
-            <x-ib-icon name="o-sparkles" class="w-6 h-6 md:w-8 md:h-8"></x-ib-icon>
+            <x-ui.icon name="o-sparkles" class="w-6 h-6 md:w-8 md:h-8"></x-ui.icon>
         </x-slot:label>
-    </x-ib-button>
+    </x-ui.button>
 
     {{-- popup --}}
     <div 
@@ -265,7 +265,7 @@ new class extends Component
         >
             <div class="flex grow-0 justify-between items-center pb-4 ">
                 <h2 class="text-lg text-bold select-none">{{ __('AI Chat') }}</h2>
-                <x-ib-button 
+                <x-ui.button 
                     icon="o-x-mark" 
                     class="absolute top-5 right-4 btn-ghost btn-circle btn-sm" 
                     title="{{ __('Close') }}"
@@ -288,7 +288,7 @@ new class extends Component
                         bg-slate-200
                         dark:bg-slate-800
                     ">
-                        <x-ib-icon name="o-sparkles" class="h-auto p-1 w-10" />
+                        <x-ui.icon name="o-sparkles" class="h-auto p-1 w-10" />
                     </span>
                     <p class="leading-relaxed w-full">
                         <span class="block font-bold">AI</span> {{ __('Hi, how can I help?') }}
@@ -302,7 +302,7 @@ new class extends Component
                         <div class="flex gap-3 mb-5 flex-1">
                             <span class="relative flex shrink-0 overflow-hidden rounded-full w-10 h-10">
                 
-                                <x-ib-avatar :image="auth()->user()->profile_photo_url" class="!w-10" />
+                                <x-ui.avatar :image="auth()->user()->profile_photo_url" class="!w-10" />
                 
                             </span>
                             <p class="leading-relaxed">
@@ -323,7 +323,7 @@ new class extends Component
                                 bg-slate-200
                                 dark:bg-slate-800
                             ">                    
-                                <x-ib-icon name="o-sparkles" class="h-auto p-1 w-10" />
+                                <x-ui.icon name="o-sparkles" class="h-auto p-1 w-10" />
                             </span>
                             <div class="leading-relaxed" >
                                 <span class="block font-bold ">AI </span> {!! Str::markdown($message['content']) !!}
@@ -346,7 +346,7 @@ new class extends Component
                             bg-slate-200
                             dark:bg-slate-800
                         ">                    
-                            <x-ib-icon name="o-sparkles" class="h-auto p-1 w-10" />
+                            <x-ui.icon name="o-sparkles" class="h-auto p-1 w-10" />
                         </span>
                         <p class="leading-relaxed" >
                             <span class="block font-bold ">AI </span> <span wire:stream="answer">{{ $answer }}</span>
@@ -360,10 +360,10 @@ new class extends Component
                 <form submit="startCompletion" >       
                     <div class="">
                         @foreach($suggested_prompts as $prompt)
-                        <x-ib-button 
+                        <x-ui.button 
                             class="btn-xs btn-primary btn-outline mr-1 mb-2" 
                             wire:click="startCompletion('{{ addslashes($prompt['value']) }}')" 
-                        >{{ $prompt['text'] }}</x-ib-button>
+                        >{{ $prompt['text'] }}</x-ui.button>
                         @endforeach
                         
                     </div>
@@ -372,20 +372,20 @@ new class extends Component
                         
                         <div class="w-full">
                             
-                            <x-ib-textarea
+                            <x-ui.textarea
                                 wire:model="prompt"
                                 class="h-18 resize-none bg-base-200"
                                 placeholder="{{ __('Have a question? AI might be able to help...') }}"
                                 wire:keydown.enter.prevent="startCompletion"
                                 autofocus
-                            ></x-ib-textarea>
+                            ></x-ui.textarea>
                         </div>
-                        <x-ib-button
+                        <x-ui.button
                             spinner="generateCompletion"
                             wire:click="startCompletion"
                             class="btn btn-ghost h-32"
                             icon="o-paper-airplane"
-                        ></x-ib-button>
+                        ></x-ui.button>
                         
                     </div>
                     

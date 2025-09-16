@@ -39,9 +39,9 @@ new class extends Component
 }; ?>
 
 <div class="" x-data="{ }"> {{-- grid lg:grid-cols-4 gap-10 --}}
-    <x-ib-form wire:submit="save" class=""> {{-- col-span-3 --}}
+    <x-ui.form wire:submit="save" class=""> {{-- col-span-3 --}}
 
-        <x-ib-toggle 
+        <x-ui.toggle 
             label="{{ __('Reinvest Dividends') }}" 
             wire:model="reinvest_dividends" 
             right 
@@ -50,7 +50,7 @@ new class extends Component
 
         <x-slot:actions>
 
-            <x-ib-button 
+            <x-ui.button 
                 label="{{ __('Save') }}" 
                 type="submit" 
                 icon="o-paper-airplane" 
@@ -58,6 +58,6 @@ new class extends Component
                 spinner="save"
             />
         </x-slot:actions>
-    </x-ib-form>
+    </x-ui.form>
 
 </div>

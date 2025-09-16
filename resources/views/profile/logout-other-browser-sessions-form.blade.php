@@ -52,9 +52,9 @@
         @endif
 
         <div class="flex items-center mt-5">
-            <x-ib-button type="submit" wire:click="confirmLogout" wire:loading.attr="disabled">
+            <x-ui.button type="submit" wire:click="confirmLogout" wire:loading.attr="disabled">
                 {{ __('Log Out Other Browser Sessions') }}
-            </x-ib-button>
+            </x-ui.button>
 
             <x-forms.action-message class="ms-3" on="loggedOut">
                 {{ __('Done.') }}
@@ -62,7 +62,7 @@
         </div>
 
         <!-- Log Out Other Devices Confirmation Modal -->
-        <x-dialog-modal wire:model.live="confirmingLogout">
+        <x-ui.dialog-modal wire:model.live="confirmingLogout">
             <x-slot name="title">
                 {{ __('Log Out Other Browser Sessions') }}
             </x-slot>
@@ -71,7 +71,7 @@
                 {{ __('Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.') }}
 
                 <div class="mt-4" x-data="{}" x-on:confirming-logout-other-browser-sessions.window="setTimeout(() => $refs.password.focus(), 250)">
-                    <x-ib-input type="password" class="mt-1 block w-3/4"
+                    <x-ui.input type="password" class="mt-1 block w-3/4"
                                 autocomplete="current-password"
                                 placeholder="{{ __('Password') }}"
                                 x-ref="password"
@@ -82,16 +82,16 @@
             </x-slot>
 
             <x-slot name="footer">
-                <x-ib-button class="btn-outline" wire:click="$toggle('confirmingLogout')" wire:loading.attr="disabled">
+                <x-ui.button class="btn-outline" wire:click="$toggle('confirmingLogout')" wire:loading.attr="disabled">
                     {{ __('Cancel') }}
-                </x-ib-button>
+                </x-ui.button>
 
-                <x-ib-button type="submit" class="ms-3"
+                <x-ui.button type="submit" class="ms-3"
                             wire:click="logoutOtherBrowserSessions"
                             wire:loading.attr="disabled">
                     {{ __('Log Out Other Browser Sessions') }}
-                </x-ib-button>
+                </x-ui.button>
             </x-slot>
-        </x-dialog-modal>
+        </x-ui.dialog-modal>
     </x-slot>
 </x-forms.action-section>

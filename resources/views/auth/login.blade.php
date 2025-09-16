@@ -1,8 +1,8 @@
 <x-layouts.guest>
-    <x-authentication-card>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-ib-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -19,12 +19,12 @@
 
             <div>
                 
-                <x-ib-input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <x-ui.input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             </div>
 
             <div class="mt-4">
                 
-                <x-ib-input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+                <x-ui.input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
             </div>
 
             <div class="block mt-4">
@@ -38,26 +38,26 @@
                     </a>
                 @endif
 
-                <x-ib-button type="submit" class="btn-primary ms-4" >
+                <x-ui.button type="submit" class="btn-primary ms-4" >
                     {{ __('Log in') }}
-                </x-ib-button>
+                </x-ui.button>
 
             </div>
 
             @if (\Laravel\Fortify\Features::enabled('registration'))
 
-                <x-ib-section-border />
+                <x-ui.section-border />
 
-                <x-connected-accounts-login />
+                <x-social.connected-accounts-login />
                 
-                <x-ib-button 
+                <x-ui.button 
                     link="{{ route('register') }}" 
                     class="btn-sm btn-block btn-outline btn-secondary my-1" 
                 >
                     {{ __('Sign up with email') }}
-                </x-ib-button>
+                </x-ui.button>
 
             @endif
         </form>
-    </x-authentication-card>
+    </x-ui.authentication-card>
 </x-layouts.guest>

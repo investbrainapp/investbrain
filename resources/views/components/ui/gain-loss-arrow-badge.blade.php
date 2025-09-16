@@ -14,7 +14,7 @@
 
     @if(!empty($percent))
 
-        <x-ib-badge class="badge-sm {{ $isUp ? 'badge-success' : 'badge-error' }} badge-outline ml-2">
+        <x-ui.badge class="badge-sm {{ $isUp ? 'badge-success' : 'badge-error' }} badge-outline ml-2">
             <x-slot:value>
                 {!! $isUp ?  '&#9650;' :'&#9660;' !!}
                 {{ Number::percentage(
@@ -22,6 +22,6 @@
                     $percent < 1 ? 2 : 0
                 ) }}
             </x-slot:value>
-        </x-ib-badge>
+        </x-ui.badge>
         
     @endif

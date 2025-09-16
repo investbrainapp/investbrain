@@ -21,7 +21,7 @@
                 });
             </script>
         @endif
-        <x-ib-toast />
+        <x-ui.toast />
 
         @livewireScripts
     </body>

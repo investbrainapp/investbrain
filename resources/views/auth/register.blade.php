@@ -1,8 +1,8 @@
 <x-layouts.guest>
-    <x-authentication-card>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-ib-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -13,22 +13,22 @@
 
             <div>
                 
-                <x-ib-input id="name" label="{{ __('Name') }}" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                <x-ui.input id="name" label="{{ __('Name') }}" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
             <div class="mt-4">
                 
-                <x-ib-input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+                <x-ui.input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             </div>
 
             <div class="mt-4">
                 
-                <x-ib-input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                <x-ui.input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4">
                 
-                <x-ib-input id="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <x-ui.input id="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
             @if (! config('investbrain.self_hosted'))
@@ -53,10 +53,10 @@
                     {{ __('Already registered?') }}
                 </a>
 
-                <x-ib-button type="submit" class="btn-primary ms-4">
+                <x-ui.button type="submit" class="btn-primary ms-4">
                     {{ __('Register') }}
-                </x-ib-button>
+                </x-ui.button>
             </div>
         </form>
-    </x-authentication-card>
+    </x-ui.authentication-card>
 </x-layouts.guest>

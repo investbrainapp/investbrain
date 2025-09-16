@@ -77,7 +77,7 @@
 
         {{-- ICON --}}
         @if($icon)
-            <x-ib-icon :name="$icon" class="absolute pointer-events-none top-1/2 -translate-y-1/2 start-3 text-gray-400" />
+            <x-ui.icon :name="$icon" class="absolute pointer-events-none top-1/2 -translate-y-1/2 start-3 text-gray-400" />
         @endif
 
     </div>

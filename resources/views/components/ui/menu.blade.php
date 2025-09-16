@@ -12,7 +12,7 @@
             <div class="flex items-center gap-2">
 
                 @if($icon)
-                    <x-ib-icon :name="$icon" class="w-4 h-4 inline-flex"  />
+                    <x-ui.icon :name="$icon" class="w-4 h-4 inline-flex"  />
                 @endif
 
                 {{ $title }}

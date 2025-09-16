@@ -3,7 +3,7 @@
 <x-layouts.app>
     <div x-data>
 
-        <x-ib-modal 
+        <x-ui.modal 
             key="create-transaction"
             title="{{ __('Create Transaction') }}"
         >
@@ -11,9 +11,9 @@
                 'portfolio' => $portfolio, 
             ])
 
-        </x-ib-modal>
+        </x-ui.modal>
 
-        <x-ib-drawer 
+        <x-ui.drawer 
             key="manage-portfolio"
             title="{{ __('Manage Portfolio') }}"
         >
@@ -22,41 +22,41 @@
                 'hideCancel' => true
             ])
 
-        </x-ib-drawer>
+        </x-ui.drawer>
 
-        <x-ib-toolbar :title="$portfolio->title">
+        <x-ui.toolbar :title="$portfolio->title">
 
             @if($portfolio->wishlist)
-            <x-ib-badge value="{{ __('Wishlist') }}" title="{{ __('Wishlist') }}" class="badge-secondary badge-outline mr-3" />
+            <x-ui.badge value="{{ __('Wishlist') }}" title="{{ __('Wishlist') }}" class="badge-secondary badge-outline mr-3" />
             @endif
 
             @if(auth()->user()->id !== $portfolio->owner_id)
-            <x-ib-badge value="{{ $portfolio->owner->name }}" title="{{ __('Owner').': '.$portfolio->owner->name }}" class="badge-secondary badge-outline mr-3" />
+            <x-ui.badge value="{{ $portfolio->owner->name }}" title="{{ __('Owner').': '.$portfolio->owner->name }}" class="badge-secondary badge-outline mr-3" />
             @endif
 
             @can('fullAccess', $portfolio)
-            <x-ib-button 
+            <x-ui.button 
                 title="{{ __('Manage Portfolio') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-manage-portfolio')"
             />
             @else
-            <x-ib-icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
+            <x-ui.icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
             @endcan
 
-            <x-ib-flex-spacer />
+            <x-ui.flex-spacer />
             
             @can('fullAccess', $portfolio)
             <div>
-                <x-ib-button 
+                <x-ui.button 
                     label="{{ __('Create Transaction') }}" 
                     class="btn-sm btn-primary whitespace-nowrap" 
                     @click="$dispatch('toggle-create-transaction')"
                 />
             </div>
             @endcan
-        </x-ib-toolbar>
+        </x-ui.toolbar>
 
         @livewire('portfolio-performance-chart', [
             'name' => 'portfolio-'.$portfolio->id,
@@ -65,31 +65,31 @@
 
         <div class="grid sm:grid-cols-5 gap-5">
 
-            <x-ib-card dense="true" sub-title="{{ __('Market Gain/Loss') }}" class="col-span-5 sm:col-span-1">
+            <x-ui.card dense="true" sub-title="{{ __('Market Gain/Loss') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_gain_dollars', 0)) }} </div>
-            </x-ib-card>
+            </x-ui.card>
             
-            <x-ib-card dense="true" sub-title="{{ __('Total Cost Basis') }}" class="col-span-5 sm:col-span-1">
+            <x-ui.card dense="true" sub-title="{{ __('Total Cost Basis') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_cost_basis', 0)) }} </div>
-            </x-ib-card>
+            </x-ui.card>
             
-            <x-ib-card dense="true" sub-title="{{ __('Total Market Value') }}" class="col-span-5 sm:col-span-1">
+            <x-ui.card dense="true" sub-title="{{ __('Total Market Value') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_value', 0)) }} </div>
-            </x-ib-card>
+            </x-ui.card>
             
-            <x-ib-card dense="true" sub-title="{{ __('Realized Gain/Loss') }}" class="col-span-5 sm:col-span-1">
+            <x-ui.card dense="true" sub-title="{{ __('Realized Gain/Loss') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('realized_gain_dollars', 0)) }} </div>
-            </x-ib-card>
+            </x-ui.card>
 
-            <x-ib-card dense="true" sub-title="{{ __('Dividends Earned') }}" class="col-span-5 sm:col-span-1">
+            <x-ui.card dense="true" sub-title="{{ __('Dividends Earned') }}" class="col-span-5 sm:col-span-1">
                 <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_dividends_earned', 0)) }} </div>
-            </x-ib-card>
+            </x-ui.card>
                 
         </div>
 
         <div class="mt-6 grid md:grid-cols-7 gap-5">
 
-            <x-ib-card title="{{ __('Holdings') }}" class="md:col-span-4 overflow-scroll">
+            <x-ui.card title="{{ __('Holdings') }}" class="md:col-span-4 overflow-scroll">
 
                 @if($portfolio->holdings->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -104,9 +104,9 @@
                     ])
 
                 @endif
-            </x-ib-card>
+            </x-ui.card>
 
-            <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('Recent activity') }}" class="md:col-span-3">
 
                 @if($portfolio->transactions->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -121,9 +121,9 @@
                     'transactions' => $portfolio->transactions
                 ])
 
-            </x-ib-card>
+            </x-ui.card>
 
-            <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('Top performers') }}" class="md:col-span-3">
 
                 @if($portfolio->holdings->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -137,22 +137,22 @@
                     'holdings' => $portfolio->holdings
                 ])
 
-            </x-ib-card>
+            </x-ui.card>
 
-            {{-- <x-ib-card title="{{ __('Top headlines') }}" class="md:col-span-3">
+            {{-- <x-ui.card title="{{ __('Top headlines') }}" class="md:col-span-3">
             
                 @php
                     $users = App\Models\User::take(3)->get();
                 @endphp
                 
                 @foreach($users as $user)
-                    <x-ib-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
+                    <x-ui.list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
                 @endforeach
 
-            </x-ib-card> --}}
+            </x-ui.card> --}}
 
             @if(config('services.ai_chat_enabled'))
-            @livewire('ai-chat-window', [
+            @livewire('ui.ai-chat-window', [
                 'chatable' => $portfolio,
                 'suggested_prompts' => [
                     [

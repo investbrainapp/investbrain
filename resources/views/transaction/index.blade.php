@@ -1,26 +1,26 @@
 <x-layouts.app>
     <div x-data>  
 
-        <x-ib-modal 
+        <x-ui.modal 
             key="create-transaction"
             title="{{ __('Create Transaction') }}"
         >
             @livewire('manage-transaction-form')
 
-        </x-ib-modal>
+        </x-ui.modal>
 
-        <x-ib-toolbar title="{{ __('All Transactions') }}">
+        <x-ui.toolbar title="{{ __('All Transactions') }}">
 
-            <x-ib-flex-spacer />
+            <x-ui.flex-spacer />
             
             <div>
-                <x-ib-button 
+                <x-ui.button 
                     label="{{ __('Create Transaction') }}" 
                     class="btn-sm btn-primary whitespace-nowrap " 
                     @click="$dispatch('toggle-create-transaction')"
                 />
             </div>
-        </x-ib-toolbar>
+        </x-ui.toolbar>
 
         @livewire('transactions-table')
 

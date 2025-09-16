@@ -21,7 +21,7 @@ new class extends Component
     <div class="font-bold text-2xl py-1 flex items-center">
         {{ Number::currency($holding->market_data->market_value ?? 0, $holding->market_data->currency) }} 
         
-        <x-gain-loss-arrow-badge 
+        <x-ui.gain-loss-arrow-badge 
             :cost-basis="$holding->average_cost_basis"
             :market-value="$holding->market_data->market_value_base"
         />

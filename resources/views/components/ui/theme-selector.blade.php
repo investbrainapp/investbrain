@@ -33,8 +33,8 @@
         {{ $attributes->class(["swap swap-rotate"]) }}
     >
         <input id="{{ $id }}" type="checkbox" class="theme-controller opacity-0" @click="toggle()" :value="theme" />
-        <x-ib-icon x-ref="sun" name="o-sun" x-cloak />
-        <x-ib-icon x-ref="moon" name="o-moon" x-cloak />
+        <x-ui.icon x-ref="sun" name="o-sun" x-cloak />
+        <x-ui.icon x-ref="moon" name="o-moon" x-cloak />
     </label>
 </div>
 <script>

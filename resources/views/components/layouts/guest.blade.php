@@ -7,7 +7,7 @@
     <body class="font-sans antialiased min-h-screen" x-data="{}">
     
         <main class=""">
-            <x-ib-theme-selector hidden="true" />
+            <x-ui.theme-selector hidden="true" />
             
             {{ $slot }}
         </main>

@@ -20,7 +20,7 @@ new class extends Component
 <div>
     @foreach ($holding->dividends->take(5) as $dividend)
 
-    <x-ib-list-item :item="$dividend" no-separator>
+    <x-ui.list-item :item="$dividend" no-separator>
         <x-slot:value>
         
             @php
@@ -35,7 +35,7 @@ new class extends Component
         <x-slot:sub-value>
             <span title="{{ __('Ex Dividend Date') }}">{{ $dividend->date->format('F d, Y') }}</span>
         </x-slot:sub-value>
-    </x-ib-list-item>
+    </x-ui.list-item>
 
     @endforeach
 </div>

@@ -62,13 +62,13 @@ new class extends Component
     
     <div class="h-full px-1 overflow-y-auto flex flex-col">
 
-        <div class="w-10 m-5"> <x-ib-logo /> </div>
+        <div class="w-10 m-5"> <x-ui.logo /> </div>
 
-        <x-ib-menu class="space-y-2" activate-by-route="true">
-            <x-ib-menu-item title="{{ __('Dashboard') }}" link="{{ route('dashboard') }}" class="font-medium text-lg" />
+        <x-ui.menu class="space-y-2" activate-by-route="true">
+            <x-ui.menu-item title="{{ __('Dashboard') }}" link="{{ route('dashboard') }}" class="font-medium text-lg" />
 
             @foreach (auth()->user()->portfolios as $portfolio)
-                <x-ib-menu-item 
+                <x-ui.menu-item 
                     :title="$portfolio->title" 
                     :badge="$portfolio->wishlist ? __('Wishlist') : null" 
                     badge-classes="badge-secondary badge-outline"
@@ -77,38 +77,38 @@ new class extends Component
                 />
             @endforeach
             
-            <x-ib-menu-item title="{{ __('Create Portfolio') }}" link="{{ route('portfolio.create') }}" class="font-medium text-lg" />
+            <x-ui.menu-item title="{{ __('Create Portfolio') }}" link="{{ route('portfolio.create') }}" class="font-medium text-lg" />
 
-            <x-ib-menu-item title="{{ __('Transactions') }}" link="{{ route('transaction.index') }}" class="font-medium text-lg" />
+            <x-ui.menu-item title="{{ __('Transactions') }}" link="{{ route('transaction.index') }}" class="font-medium text-lg" />
        
-        </x-ib-menu>
+        </x-ui.menu>
         <div class="flex-1"></div>
 
         @php
             $user = auth()->user();
         @endphp
 
-        <x-ib-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded">
+        <x-ui.list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded">
             <x-slot:actions>
-                <x-ib-dropdown>
+                <x-ui.dropdown>
                     <x-slot:trigger>
-                        <x-ib-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-sm focus:rotate-180" />
+                        <x-ui.button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-sm focus:rotate-180" />
                     </x-slot:trigger>
                     
-                    <x-ib-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
-                    <x-ib-menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
-                    <x-ib-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
+                    <x-ui.menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
+                    <x-ui.menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
+                    <x-ui.menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 
-                    <x-ib-section-border class="py-1" />
+                    <x-ui.section-border class="py-1" />
 
-                    <x-ib-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
+                    <x-ui.menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
                     <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
 
-                </x-ib-dropdown>
+                </x-ui.dropdown>
                 
             </x-slot:actions>
-        </x-ib-list-item>
+        </x-ui.list-item>
    </div>
 </div>

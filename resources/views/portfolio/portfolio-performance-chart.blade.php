@@ -116,7 +116,7 @@ new class extends Component
     }
 }; ?>
 
-<x-ib-card class="mb-6">
+<x-ui.card class="mb-6">
     <div class="flex flex-col md:flex-row md:justify-between mb-2">
                     
         <div class="flex flex-col md:flex-row items-start md:items-center">
@@ -128,15 +128,15 @@ new class extends Component
         </div>
         
         <div class="flex items-center" x-data="{ loading: false }">
-            {{-- <x-ib-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
+            {{-- <x-ui.button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
 
-            <x-ib-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+            <x-ui.loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
 
-            <x-ib-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
+            <x-ui.dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
                     
                 @foreach($scopeOptions as $option)
 
-                    <x-ib-menu-item 
+                    <x-ui.menu-item 
                         title="{{ $option['name'] }}" 
                         @click="
                             timeout = setTimeout(() => { loading = true }, 200);
@@ -156,7 +156,7 @@ new class extends Component
     <div
         class="h-[280px] mb-5"
     >
-        <x-ib-apex-chart :series-data="$chartSeries" :name="$name" />
+        <x-ui.apex-chart :series-data="$chartSeries" :name="$name" />
     </div>
 
-</x-ib-card>
+</x-ui.card>

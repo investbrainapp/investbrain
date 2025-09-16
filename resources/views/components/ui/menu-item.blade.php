@@ -57,7 +57,7 @@
 
             @if($icon)
                 <span class="block -mt-0.5" @if($spinner) wire:loading.class="hidden" wire:target="{{ $spinnerTarget }}" @endif>
-                    <x-ib-icon :name="$icon" />
+                    <x-ui.icon :name="$icon" />
                 </span>
             @endif
 

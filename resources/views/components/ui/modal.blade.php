@@ -77,14 +77,14 @@
         <div x-ref="modalContent" class="modal-box p-0 {{ $boxClass }}">
 
             @if(!$noCard)
-                <x-ib-card     
+                <x-ui.card     
                     :title="$title"
                     :subtitle="$subtitle"
                     expanded="true"      
                 >
         
                 @if (!$persistent && !$noCard)
-                    <x-ib-button 
+                    <x-ui.button 
                         icon="o-x-mark" 
                         title="{{ __('Close') }}"
                         class="absolute top-4 right-4 btn-ghost btn-circle btn-sm z-10" 
@@ -95,7 +95,7 @@
                     
                     {{ $slot }}
 
-                </x-ib-card>
+                </x-ui.card>
 
             @else 
 

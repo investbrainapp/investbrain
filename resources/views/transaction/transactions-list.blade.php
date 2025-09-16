@@ -60,7 +60,7 @@ new class extends Component
 
     @foreach($transactions->sortByDesc('date')->slice($offset)->take($perPage) as $transaction)
 
-        <x-ib-list-item 
+        <x-ui.list-item 
             no-separator 
             :item="$transaction" 
             class="cursor-pointer"
@@ -81,7 +81,7 @@ new class extends Component
             "
         >
             <x-slot:value class="flex items-center">
-                <x-ib-badge 
+                <x-ui.badge 
                     :value="$transaction->split
                         ? 'SPLIT'
                         : ($transaction->reinvested_dividend
@@ -100,7 +100,7 @@ new class extends Component
                     $transaction->market_data?->currency
                 ) }})
 
-                <x-ib-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+                <x-ui.loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>
             <x-slot:sub-value>
                 @if($showPortfolio)
@@ -109,7 +109,7 @@ new class extends Component
                 @endif
                 <span title="{{ __('Transaction Date') }}">{{ $transaction->date->format('F j, Y') }} </span>
             </x-slot:sub-value>
-        </x-ib-list-item>
+        </x-ui.list-item>
 
     @endforeach
 
@@ -118,30 +118,30 @@ new class extends Component
             
             <span>
                 @if($offset > 0)
-                <x-ib-button 
+                <x-ui.button 
                     class="btn btn-sm btn-ghost text-secondary"
                     wire:click="updateOffset(-{{ $perPage }})"
                 >
                     {!! __('pagination.previous') !!}
-                </x-ib-button>
+                </x-ui.button>
                 @endif
             </span>
 
             <span>
                 @if(count($transactions) - $offset >  $offset)
-                <x-ib-button 
+                <x-ui.button 
                     class="btn btn-sm btn-ghost text-secondary"
                     wire:click="updateOffset({{ $perPage }})"
                 >
                     {!! __('pagination.next') !!}
-                </x-ib-button>
+                </x-ui.button>
                 @endif
             </span>
             
         </div>
     @endif
 
-    <x-ib-modal 
+    <x-ui.modal 
         key="manage-transaction"
         title="{{ __('Manage Transaction') }}"
     >
@@ -150,5 +150,5 @@ new class extends Component
             'transaction' => $editingTransaction, 
         ], key($editingTransaction?->id.rand()))
 
-    </x-ib-modal>
+    </x-ui.modal>
 </div>

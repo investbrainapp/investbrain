@@ -12,7 +12,7 @@
         <x-slot name="form">
             <!-- Token Name -->
             <div class="col-span-6 sm:col-span-4">
-                <x-ib-input id="name" label="{{ __('Token Name') }}" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
+                <x-ui.input id="name" label="{{ __('Token Name') }}" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
             </div>
 
             <!-- Token Permissions -->
@@ -41,14 +41,14 @@
                 {{ __('Created.') }}
             </x-forms.action-message>
 
-            <x-ib-button type="submit">
+            <x-ui.button type="submit">
                 {{ __('Create') }}
-            </x-ib-button>
+            </x-ui.button>
         </x-slot>
     </x-forms.form-section>
 
     @if ($this->user->tokens->isNotEmpty())
-        <x-ib-section-border hide-on-mobile />
+        <x-ui.section-border hide-on-mobile />
 
         <!-- Manage API Tokens -->
         <div class="mt-10 sm:mt-0">
@@ -96,7 +96,7 @@
     @endif
 
     <!-- Token Value Modal -->
-    <x-dialog-modal wire:model.live="displayingToken">
+    <x-ui.dialog-modal wire:model.live="displayingToken">
         <x-slot name="title">
             {{ __('API Token') }}
         </x-slot>
@@ -106,7 +106,7 @@
                 {{ __('Please copy your new API token. For your security, it won\'t be shown again.') }}
             </div>
 
-            <x-ib-input x-ref="plaintextToken" type="text" readonly :value="$plainTextToken"
+            <x-ui.input x-ref="plaintextToken" type="text" readonly :value="$plainTextToken"
                 class="mt-4 px-4 py-2 rounded font-mono text-sm w-full break-all"
                 autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                 @showing-token-modal.window="setTimeout(() => $refs.plaintextToken.select(), 250)"
@@ -114,14 +114,14 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-ib-button class="btn-outline" wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
+            <x-ui.button class="btn-outline" wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
                 {{ __('Close') }}
-            </x-ib-button>
+            </x-ui.button>
         </x-slot>
-    </x-dialog-modal>
+    </x-ui.dialog-modal>
 
     <!-- API Token Permissions Modal -->
-    <x-dialog-modal wire:model.live="managingApiTokenPermissions">
+    <x-ui.dialog-modal wire:model.live="managingApiTokenPermissions">
         <x-slot name="title">
             {{ __('API Token Permissions') }}
         </x-slot>
@@ -138,18 +138,18 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-ib-button class="btn-outline" wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
+            <x-ui.button class="btn-outline" wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-ib-button>
+            </x-ui.button>
 
-            <x-ib-button type="submit" class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
+            <x-ui.button type="submit" class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
                 {{ __('Save') }}
-            </x-ib-button>
+            </x-ui.button>
         </x-slot>
-    </x-dialog-modal>
+    </x-ui.dialog-modal>
 
     <!-- Delete Token Confirmation Modal -->
-    <x-confirmation-modal wire:model.live="confirmingApiTokenDeletion">
+    <x-ui.confirmation-modal wire:model.live="confirmingApiTokenDeletion">
         <x-slot name="title">
             {{ __('Delete API Token') }}
         </x-slot>
@@ -159,13 +159,13 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-ib-button class="btn-outline" wire:click="$toggle('confirmingApiTokenDeletion')" wire:loading.attr="disabled">
+            <x-ui.button class="btn-outline" wire:click="$toggle('confirmingApiTokenDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-ib-button>
+            </x-ui.button>
 
-            <x-ib-button class="ms-3 btn-error text-white" wire:click="deleteApiToken" wire:loading.attr="disabled">
+            <x-ui.button class="ms-3 btn-error text-white" wire:click="deleteApiToken" wire:loading.attr="disabled">
                 {{ __('Delete') }}
-            </x-ib-button>
+            </x-ui.button>
         </x-slot>
-    </x-confirmation-modal>
+    </x-ui.confirmation-modal>
 </div>
