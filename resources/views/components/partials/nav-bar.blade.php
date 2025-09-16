@@ -76,7 +76,7 @@ new class extends Component
                 link="https://github.com/investbrainapp/investbrain"
                 external
             >
-                <x-github-icon />
+                <x-social.github-icon />
             </x-ui.button>
 
             <x-ui.theme-selector

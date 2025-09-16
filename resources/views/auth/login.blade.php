@@ -9,9 +9,9 @@
         <x-errors class="mb-4" />
 
         @session('status')
-            <x-alert icon="o-envelope" class="alert-success mb-4">
+            <x-ui.alert icon="o-envelope" class="alert-success mb-4">
                 {{ $value }}
-            </x-alert>
+            </x-ui.alert>
         @endsession
 
         <form method="POST" action="{{ route('login') }}">
