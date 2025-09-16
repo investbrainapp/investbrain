@@ -3,7 +3,8 @@
     'label' => null,
     'right' => false,
     'hint' => null,
-    'hintClass' => 'text-xs label-text-alt fieldset-label',
+    'hintClass' => 'label-text-alt text-gray-400 py-1 pb-0',
+    'tight' => false,
     
     'errorField' => null,
     'errorClass' => 'text-red-500 label-text-alt p-1',
@@ -18,49 +19,42 @@
 @endphp
 
 <div>
-    <fieldset class="fieldset">
-        <div class="w-full">
-            <label @class(["flex gap-3 items-center cursor-pointer select-none", "justify-between" => $right, "!items-start" => $hint])>
+    <label for="{{ $id }}" class="flex items-center gap-3 cursor-pointer font-semibold">
 
-                {{-- TOGGLE --}}
-                <input
-                    id="{{ $id }}"
-                    type="checkbox"
+        @if($right)
+            <span @class(["flex-1" => !$tight])>
+                {{ $label}}
 
-                    {{
-                        $attributes->whereDoesntStartWith('id')
-                            ->class(["order-2" => $right])
-                            ->merge(['class' => 'toggle'])
-                    }}
-                />
+                @if($attributes->get('required'))
+                    <span class="text-error">*</span>
+                @endif
+            </span>
+        @endif
 
-                {{-- LABEL --}}
-                    <div @class(["order-1" => $right])>
-                    <div class="text-sm font-medium">
-                        {{ $label }}
+        <input id="{{ $id }}" type="checkbox" {{ $attributes->whereDoesntStartWith('class') }} {{ $attributes->class(['toggle toggle-primary']) }}  />
 
-                        @if($attributes->get('required'))
-                            <span class="text-error">*</span>
-                        @endif
-                    </div>
+        @if(!$right)
+            {{ $label}}
 
-                    {{-- HINT --}}
-                    @if($hint)
-                        <div class="{{ $hintClass }}" x-classes="fieldset-label">{{ $hint }}</div>
-                    @endif
-                </div>
-            </label>
-        </div>
+            @if($attributes->get('required'))
+                <span class="text-error">*</span>
+            @endif
+        @endif
+    </label>
 
-        {{-- ERROR --}}
-        @if(!$omitError && $errors->has($errorFieldName))
-            @foreach($errors->get($errorFieldName) as $message)
-                @foreach(Arr::wrap($message) as $line)
-                    <div class="{{ $errorClass }}" x-class="text-error">{{ $line }}</div>
-                    @break($firstErrorOnly)
-                @endforeach
+    {{-- ERROR --}}
+    @if(!$omitError && $errors->has($errorFieldName))
+        @foreach($errors->get($errorFieldName) as $message)
+            @foreach(Arr::wrap($message) as $line)
+                <div class="{{ $errorClass }}" x-classes="text-red-500 label-text-alt p-1">{{ $line }}</div>
                 @break($firstErrorOnly)
             @endforeach
-        @endif
-    </fieldset>
+            @break($firstErrorOnly)
+        @endforeach
+    @endif
+
+    {{-- HINT --}}
+    @if($hint)
+        <div class="{{ $hintClass }}" x-classes="label-text-alt text-gray-400 py-1 pb-0">{{ $hint }}</div>
+    @endif
 </div>
