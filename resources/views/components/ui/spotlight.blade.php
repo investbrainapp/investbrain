@@ -63,8 +63,8 @@
         box-class="absolute top-10 lg:top-24 w-full lg:max-w-3xl "
         no-card="true"
         shortcut="slash"
-        @keydown.up="$focus.previous()"
-        @keydown.down="$focus.next()"
+        @keydown.up="$focus.wrap().previous()"
+        @keydown.down="$focus.wrap().next()"
     >
         <div class="relative">
 
