@@ -1,5 +1,5 @@
 @props([
-    'id' => Str::uuid()->toString(),
+    'id' => null,
     'item' => array(),
     'avatar' => 'avatar',
     'value' => 'name',

@@ -1,5 +1,5 @@
 @props([
-    'id' => Str::uuid()->toString(),
+    'id' => null,
     'label' => null,
     'right' => false,
     'hint' => null,

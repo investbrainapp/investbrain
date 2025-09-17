@@ -1,5 +1,5 @@
 @props([
-    'id' => Str::uuid()->toString(),
+    'id' => null,
     'shortcut' => "meta.g",
     'searchText' => "Search ...",
     'noResultsText' => "Nothing found.",

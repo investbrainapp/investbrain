@@ -127,7 +127,7 @@ new class extends Component
                 @else
                     <div wire:poll="checkImportStatus" class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
                     <x-ui.flex-spacer />
-                    <x-ui.button wire:click="$toggle('importStatusDialog')"> {{ __('Close') }} </x-ui.button>
+                    <x-ui.button wire:click="$toggle('importStatusDialog')"> {{ __('Dismiss') }} </x-ui.button>
                 @endif
             </x-slot>
         </x-ui.dialog-modal>
