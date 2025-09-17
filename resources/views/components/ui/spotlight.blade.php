@@ -68,6 +68,16 @@
     >
         <div class="relative">
 
+            {{-- CLOSE --}}
+            <x-ui.button 
+                title="{{ __('Close') }}"
+                class="absolute top-3 right-4 btn-ghost hover:bg-transparent border-none shadow-none btn-xs select-none z-50" 
+                @click="close()" 
+                @focus="$focus.lastFocused().focus()"
+            >
+                <kbd class="kbd kbd-xs">ESC</kbd>
+            </x-ui.button>
+
             {{-- INPUT --}}
             <x-ui.input
                 id="{{ $id }}"
@@ -79,16 +89,6 @@
                 autofocus
                 tabindex="1"
             />
-
-            {{-- CLOSE --}}
-            <x-ui.button 
-                title="{{ __('Close') }}"
-                class="absolute top-3 right-4 btn-ghost hover:bg-transparent border-none shadow-none btn-xs" 
-                @click="close()" 
-                tabindex="-999"
-            >
-                <kbd class="kbd kbd-xs">ESC</kbd>
-            </x-ui.button>
 
             {{-- PROGRESS --}}
             <x-ui.progress 
