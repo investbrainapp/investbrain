@@ -70,7 +70,7 @@
 
             {{-- CLOSE --}}
             <x-ui.button 
-                title="{{ __('Close') }}"
+                title="{{ __('Close') }} (esc)"
                 class="absolute top-3 right-4 btn-ghost hover:bg-transparent border-none shadow-none btn-xs select-none z-50" 
                 @click="close()" 
                 @focus="$focus.lastFocused().focus()"
