@@ -69,8 +69,7 @@ new class extends Component
 
         return redirect('/');
     }
-};
-?>
+}; ?>
 
 <x-forms.action-section>
     <x-slot name="title">

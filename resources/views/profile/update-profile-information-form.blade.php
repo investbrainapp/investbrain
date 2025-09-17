@@ -1,7 +1,5 @@
 <?php
 
-namespace Laravel\Jetstream\Http\Livewire;
-
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Livewire\Volt\Component;
@@ -104,7 +102,7 @@ new class extends Component
     {
         return Auth::user();
     }
-} ?>
+}; ?>
 
 <x-forms.form-section submit="updateProfileInformation">
     <x-slot name="title">

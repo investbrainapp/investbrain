@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\ConnectedAccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\InvitedOnboardingController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\PrivacyPolicyController;
+use App\Http\Controllers\TermsOfServiceController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserProfileController;
 use App\Support\Spotlight;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
-use Laravel\Jetstream\Http\Controllers\Livewire\ApiTokenController;
-use Laravel\Jetstream\Http\Controllers\Livewire\PrivacyPolicyController;
-use Laravel\Jetstream\Http\Controllers\Livewire\TermsOfServiceController;
 
 Route::get('/', function () {
     if (! config('investbrain.self_hosted', true) && View::exists('landing-page::index')) {
@@ -28,6 +29,7 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
+
     Route::view('/import-export', 'import-export.show')
         ->name('import-export')
         ->when(! config('investbrain.self_hosted'), function ($route) {
@@ -44,6 +46,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
     Route::get('/spotlight', function (Request $request) {
         return app()->make(Spotlight::class)->search($request);
     })->name('spotlight');
+
+    Route::get('/user/profile', [UserProfileController::class, 'show'])->name('profile.show');
+
+    Route::get('/user/api-tokens', [ApiTokenController::class, 'index'])
+        ->name('api-tokens.index')
+        ->when(! config('investbrain.self_hosted'), function ($route) {
+            return $route->middleware('verified');
+        });
 });
 
 // Invited onboarding

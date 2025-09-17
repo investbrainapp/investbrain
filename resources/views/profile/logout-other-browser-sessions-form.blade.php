@@ -1,7 +1,5 @@
 <?php
 
-namespace Laravel\Jetstream\Http\Livewire;
-
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -126,7 +124,7 @@ new class extends Component
     {
         return tap(new Agent, fn ($agent) => $agent->setUserAgent($session->user_agent));
     }
-} ?>
+}; ?>
 
 <x-forms.action-section>
     <x-slot name="title">

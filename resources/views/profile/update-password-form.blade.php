@@ -1,7 +1,5 @@
 <?php
 
-namespace Laravel\Jetstream\Http\Livewire;
-
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
 use Livewire\Volt\Component;
@@ -54,7 +52,7 @@ new class extends Component
     {
         return Auth::user();
     }
-} ?>
+}; ?>
 
 <x-forms.form-section submit="updatePassword">
     <x-slot name="title">

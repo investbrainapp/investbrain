@@ -54,6 +54,7 @@ new class extends Component
         // $this->js('window.location.reload();');
     }
 }; ?>
+
 <x-forms.form-section submit="updateProfileInformation">
     <x-slot name="title">
         {{ __('Locale Options') }}

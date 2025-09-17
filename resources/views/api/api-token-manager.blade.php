@@ -1,7 +1,5 @@
 <?php
 
-namespace Laravel\Jetstream\Http\Livewire;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Jetstream;
@@ -190,7 +188,7 @@ new class extends Component
     {
         return Auth::user();
     }
-} ?>
+}; ?>
 
 <div>
     <!-- Generate API Token -->
