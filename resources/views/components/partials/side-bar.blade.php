@@ -88,7 +88,7 @@ new class extends Component
             $user = auth()->user();
         @endphp
 
-        <x-ui.list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded">
+        <x-ui.list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded mb-2">
             <x-slot:actions>
                 <x-ui.dropdown>
                     <x-slot:trigger>

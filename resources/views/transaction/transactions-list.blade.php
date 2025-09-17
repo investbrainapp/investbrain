@@ -69,7 +69,7 @@ new class extends Component
             @click="
                 if ($wire.shouldGoToHolding) {
 
-                    $wire.goToHolding({{ json_encode($transaction) }})
+                    $wire.goToHolding(JSON.parse('{{ json_encode($transaction->only(['portfolio_id', 'symbol'])) }}'))
                     
                     return;
                 }

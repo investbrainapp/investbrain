@@ -108,7 +108,7 @@ new class extends Component
         <span>{{ __('People with access') }}</span>
     </label>
 
-    <div class="border-primary border rounded-sm px-2 py-5 mb-2 max-h-[20rem] overflow-y-scroll">
+    <div class="border-primary border rounded-md px-2 py-5 mb-2 max-h-[20rem] overflow-y-scroll">
         @if ($portfolio?->owner)
         <x-ui.list-item 
             :item="$portfolio->owner" 
