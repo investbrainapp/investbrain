@@ -2,9 +2,10 @@
 
 use App\Models\DailyChange;
 use App\Models\Portfolio;
+use Livewire\Attributes\Lazy;
 use Livewire\Volt\Component;
 
-new class extends Component
+new #[Lazy] class extends Component
 {
     // props
     public ?Portfolio $portfolio = null;
@@ -31,8 +32,18 @@ new class extends Component
         $this->chartSeries = $this->generatePerformanceData();
     }
 
+    public function placeholder()
+    {
+        return <<<'HTML'
+        <div class="skeleton h-[395px] mb-5">
+     
+        </div>
+        HTML;
+    }
+
     public function generatePerformanceData()
     {
+        sleep(1);
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
         $dailyChangeQuery = DailyChange::withDailyPerformance();
