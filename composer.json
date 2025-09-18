@@ -9,6 +9,7 @@
         "ext-gd": "*",
         "ext-mbstring": "*",
         "ext-zip": "*",
+        "ext-json": "*",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "filament/tables": "^4.0",
         "finnhub/client": "master@dev",

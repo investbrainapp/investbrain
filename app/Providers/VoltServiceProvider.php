@@ -26,6 +26,7 @@ class VoltServiceProvider extends ServiceProvider
             // config('livewire.view_path', resource_path('views/livewire')),
             resource_path('views/components'),
             resource_path('views/profile'),
+            resource_path('views/api'),
             resource_path('views/holding'),
             resource_path('views/transaction'),
             resource_path('views/portfolio'),
