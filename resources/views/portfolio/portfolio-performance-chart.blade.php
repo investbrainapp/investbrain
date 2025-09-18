@@ -41,7 +41,6 @@ new #[Lazy] class extends Component
 
     public function generatePerformanceData()
     {
-        sleep(1);
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
         $dailyChangeQuery = DailyChange::withDailyPerformance();
