@@ -26,7 +26,7 @@ Route::get('/', function () {
     return redirect(route('dashboard'));
 });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
+Route::middleware(['auth:sanctum', 'web'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
 
@@ -59,13 +59,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
 // Invited onboarding
 Route::get('invite/{portfolio}/{user}', InvitedOnboardingController::class)->name('invited_onboarding')->scopeBindings();
 
-// Overwrites Jetstream routes
-Route::get('/user/api-tokens', [ApiTokenController::class, 'index'])
-    ->name('api-tokens.index')
-    ->middleware('auth:sanctum')
-    ->when(! config('investbrain.self_hosted'), function ($route) {
-        return $route->middleware(['verified']);
-    });
 Route::get('/terms', [TermsOfServiceController::class, 'show'])->name('terms.show');
 Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('policy.show');
 

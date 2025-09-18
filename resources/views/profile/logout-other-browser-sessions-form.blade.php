@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Laravel\Jetstream\Agent;
+use App\Support\Agent;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -118,7 +118,7 @@ new class extends Component
      * Create a new agent instance from the given session.
      *
      * @param  mixed  $session
-     * @return \Laravel\Jetstream\Agent
+     * @return \App\Support\Agent
      */
     protected function createAgent($session)
     {
@@ -142,7 +142,7 @@ new class extends Component
 
         @if (count($this->sessions) > 0)
             <div class="mt-5 space-y-6">
-                <!-- Other Browser Sessions -->
+                {{-- Other Browser Sessions --}}
                 @foreach ($this->sessions as $session)
                     <div class="flex items-center">
                         <div>
@@ -189,7 +189,7 @@ new class extends Component
             </x-forms.action-message>
         </div>
 
-        <!-- Log Out Other Devices Confirmation Modal -->
+        {{-- Log Out Other Devices Confirmation Modal --}}
         <x-ui.dialog-modal wire:model.live="confirmingLogout">
             <x-slot name="title">
                 {{ __('Log Out Other Browser Sessions') }}

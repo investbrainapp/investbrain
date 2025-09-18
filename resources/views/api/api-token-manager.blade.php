@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Laravel\Jetstream\Jetstream;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -75,7 +74,7 @@ new class extends Component
      */
     public function mount()
     {
-        $this->createApiTokenForm['permissions'] = Jetstream::$defaultPermissions;
+        //
     }
 
     /**
@@ -94,12 +93,10 @@ new class extends Component
         ])->validateWithBag('createApiToken');
 
         $this->displayTokenValue($this->user->createToken(
-            $this->createApiTokenForm['name'],
-            Jetstream::validPermissions($this->createApiTokenForm['permissions'])
+            $this->createApiTokenForm['name']
         ));
 
         $this->createApiTokenForm['name'] = '';
-        $this->createApiTokenForm['permissions'] = Jetstream::$defaultPermissions;
 
         $this->dispatch('created');
     }
@@ -144,7 +141,7 @@ new class extends Component
     public function updateApiToken()
     {
         $this->managingPermissionsFor->forceFill([
-            'abilities' => Jetstream::validPermissions($this->updateApiTokenForm['permissions']),
+            'abilities' => [],
         ])->save();
 
         $this->managingApiTokenPermissions = false;
@@ -191,7 +188,7 @@ new class extends Component
 }; ?>
 
 <div>
-    <!-- Generate API Token -->
+    {{-- Generate API Token --}}
     <x-forms.form-section submit="createApiToken">
         <x-slot name="title">
             {{ __('Create API Token') }}
@@ -202,13 +199,13 @@ new class extends Component
         </x-slot>
 
         <x-slot name="form">
-            <!-- Token Name -->
+            {{-- Token Name --}}
             <div class="col-span-6 sm:col-span-4">
                 <x-ui.input id="name" label="{{ __('Token Name') }}" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
             </div>
 
-            <!-- Token Permissions -->
-            @if (Laravel\Jetstream\Jetstream::hasPermissions())
+            {{-- Token Permissions --}}
+            @if (false)
                 <div class="col-span-6">
                     <label class="pt-0 label label-text font-semibold">
                         <span>
@@ -217,7 +214,7 @@ new class extends Component
                     </span>
 
                     <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach (Laravel\Jetstream\Jetstream::$permissions as $label => $permission)
+                        @foreach ([] as $label => $permission)
                             <label class="flex items-center">
                                 <x-ui.checkbox wire:model="createApiTokenForm.permissions" :value="$permission"/>
                                 <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ $label }}</span>
@@ -242,7 +239,7 @@ new class extends Component
     @if ($this->user->tokens->isNotEmpty())
         <x-ui.section-border hide-on-mobile />
 
-        <!-- Manage API Tokens -->
+        {{-- Manage API Tokens --}}
         <div class="mt-10 sm:mt-0">
             <x-forms.action-section>
                 <x-slot name="title">
@@ -253,7 +250,7 @@ new class extends Component
                     {{ __('You may delete any of your existing tokens if they are no longer needed.') }}
                 </x-slot>
 
-                <!-- API Token List -->
+                {{-- API Token List --}}
                 <x-slot name="content">
                     <div class="space-y-6">
                         @foreach ($this->user->tokens->sortBy('name') as $token)
@@ -269,7 +266,7 @@ new class extends Component
                                         </div>
                                     @endif
 
-                                    @if (Laravel\Jetstream\Jetstream::hasPermissions())
+                                    @if (false)
                                         <button class="cursor-pointer ms-6 text-sm text-gray-400 underline" wire:click="manageApiTokenPermissions({{ $token->id }})">
                                             {{ __('Permissions') }}
                                         </button>
@@ -287,7 +284,7 @@ new class extends Component
         </div>
     @endif
 
-    <!-- Token Value Modal -->
+    {{-- Token Value Modal --}}
     <x-ui.dialog-modal wire:model.live="displayingToken">
         <x-slot name="title">
             {{ __('API Token') }}
@@ -312,7 +309,7 @@ new class extends Component
         </x-slot>
     </x-ui.dialog-modal>
 
-    <!-- API Token Permissions Modal -->
+    {{-- API Token Permissions Modal --}}
     <x-ui.dialog-modal wire:model.live="managingApiTokenPermissions">
         <x-slot name="title">
             {{ __('API Token Permissions') }}
@@ -320,7 +317,7 @@ new class extends Component
 
         <x-slot name="content">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach (Laravel\Jetstream\Jetstream::$permissions as $label => $permission)
+                @foreach ([] as $label => $permission)
                     <label class="flex items-center">
                         <x-ui.checkbox wire:model="updateApiTokenForm.permissions" :value="$permission"/>
                         <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ $label }}</span>
@@ -340,7 +337,7 @@ new class extends Component
         </x-slot>
     </x-ui.dialog-modal>
 
-    <!-- Delete Token Confirmation Modal -->
+    {{-- Delete Token Confirmation Modal --}}
     <x-ui.confirmation-modal wire:model.live="confirmingApiTokenDeletion">
         <x-slot name="title">
             {{ __('Delete API Token') }}
