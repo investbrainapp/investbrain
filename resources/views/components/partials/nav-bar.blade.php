@@ -80,6 +80,7 @@ new class extends Component
             </x-ui.button>
 
             <x-ui.theme-selector
+                id="theme-selector"
                 title="{{ __('Toggle Theme') }}" 
                 class="btn-circle btn-ghost btn-sm" 
             />
