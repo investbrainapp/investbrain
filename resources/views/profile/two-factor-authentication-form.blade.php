@@ -6,6 +6,7 @@ use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
 use Livewire\Volt\Component;
+use Laravel\Fortify\Features;
 use App\Traits\ConfirmsPasswords;
 
 new class extends Component
@@ -47,7 +48,10 @@ new class extends Component
      */
     public function mount()
     {
-        //
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm') &&
+            is_null(Auth::user()->two_factor_confirmed_at)) {
+            app(DisableTwoFactorAuthentication::class)(Auth::user());
+        }
     }
 
     /**
@@ -57,15 +61,19 @@ new class extends Component
      */
     public function enableTwoFactorAuthentication(EnableTwoFactorAuthentication $enable)
     {
-        //
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')) {
+            $this->ensurePasswordIsConfirmed();
+        }
 
         $enable(Auth::user());
 
         $this->showingQrCode = true;
 
-        //
-        $this->showingRecoveryCodes = true;
-
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm')) {
+            $this->showingConfirmation = true;
+        } else {
+            $this->showingRecoveryCodes = true;
+        }
     }
 
     /**
@@ -75,7 +83,9 @@ new class extends Component
      */
     public function confirmTwoFactorAuthentication(ConfirmTwoFactorAuthentication $confirm)
     {
-        //
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')) {
+            $this->ensurePasswordIsConfirmed();
+        }
 
         $confirm(Auth::user(), $this->code);
 
@@ -91,7 +101,9 @@ new class extends Component
      */
     public function showRecoveryCodes()
     {
-        //
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')) {
+            $this->ensurePasswordIsConfirmed();
+        }
 
         $this->showingRecoveryCodes = true;
     }
@@ -103,7 +115,9 @@ new class extends Component
      */
     public function regenerateRecoveryCodes(GenerateNewRecoveryCodes $generate)
     {
-        //
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')) {
+            $this->ensurePasswordIsConfirmed();
+        }
 
         $generate(Auth::user());
 
@@ -117,7 +131,9 @@ new class extends Component
      */
     public function disableTwoFactorAuthentication(DisableTwoFactorAuthentication $disable)
     {
-        //
+        if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')) {
+            $this->ensurePasswordIsConfirmed();
+        }
 
         $disable(Auth::user());
 
