@@ -35,9 +35,7 @@ new #[Lazy] class extends Component
     public function placeholder()
     {
         return <<<'HTML'
-        <div class="skeleton h-[395px] mb-5">
-     
-        </div>
+        <div class="skeleton h-[395px] mb-5"></div>
         HTML;
     }
 
