@@ -6,9 +6,12 @@ use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
 use Livewire\Volt\Component;
+use App\Traits\ConfirmsPasswords;
 
 new class extends Component
 {
+    use ConfirmsPasswords;
+    
     /**
      * Indicates if two factor authentication QR code is being displayed.
      *

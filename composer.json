@@ -29,11 +29,7 @@
         "staudenmeir/eloquent-has-many-deep": "^1.20",
         "symfony/cache": "^7.3",
         "tschucki/alphavantage-laravel": "^0.0",
-        "mobiledetect/mobiledetectlib": "^4.8.08",
-        "pragmarx/google2fa": "^8.0.3",
-        "laravel/fortify": "^1.30.0",
-        "dasprid/enum": "^1.0.7",
-        "bacon/bacon-qr-code": "^3.0.1"
+        "laravel/fortify": "^1.30.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

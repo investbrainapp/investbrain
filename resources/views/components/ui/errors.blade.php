@@ -8,7 +8,7 @@
 
 <div>
     @if ($errors->any())
-        <div {{ $attributes->class(["alert alert-error rounded rounded-sm"]) }} >
+        <div {{ $attributes->class(["flex justify-start alert alert-error rounded rounded-md"]) }} >
             <div class="grid gap-3">
                 <div class="flex gap-2">
                     @if($title)
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div>
-                    <ul class="list-disc ms-5 space-y-2 sm:ms-12 pb-3">
+                    <ul class="list-disc ms-3 space-y-2 sm:ms-6 pb-3">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach

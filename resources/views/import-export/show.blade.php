@@ -1,13 +1,11 @@
 <x-layouts.app>
 
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
         
         @livewire('import-portfolios-field')
 
         <x-ui.section-border hide-on-mobile />
-    </div>
 
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <x-forms.action-section>
             <x-slot name="title">
                 {{ __('Export') }}
