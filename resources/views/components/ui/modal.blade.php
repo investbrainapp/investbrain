@@ -7,21 +7,24 @@
     'boxClass' => '',
     'noCard' => false,
     'shortcut' => null,
+    'noTeleport' => false,
 ])
 
+@if(!$noTeleport)
 <template x-teleport="body">
+@endif
     <dialog
         x-data="{ 
             @if (!empty($attributes->whereStartsWith('wire:model')->first()))
                 init(){
-                    this.$watch('wireModelValue', value => this.wireModelValue ? this.show() : this.close())
+                    this.$watch('wireModelValue', value => value ? this.show() : this.close())
                 },
                 wireModelValue: $wire.entangle('{{ $attributes->whereStartsWith('wire:model')->first() }}').live,
             @endif
             open: false,
             close() {
                 this.open = false;
-                $el.close()
+                this.$el.close()
             },
             cancel() {
                 @if($persistent)
@@ -36,9 +39,9 @@
             show() {
                 this.open = true;
                 @if($persistent)
-                    $el.showModal();
+                    this.$el.showModal();
                 @else
-                    $el.show();
+                    this.$el.show();
                 @endif
             }
         }"
@@ -107,4 +110,6 @@
         
     </dialog>
 
+@if(!$noTeleport)
 </template> 
+@endif
