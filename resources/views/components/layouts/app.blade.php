@@ -4,7 +4,7 @@
         @include('components.partials.head')
     </head>
 
-    <body class="font-sans antialiased" x-data="{ sideBarOpen: false }">
+    <body class="font-sans antialiased scroll-smooth" x-data="{ sideBarOpen: false }">
 
         @livewire('partials.nav-bar')
 

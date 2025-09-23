@@ -2,7 +2,12 @@
     "name": "investbrainapp/investbrain",
     "type": "project",
     "description": "A smart open-source tool that consolidates and tracks portfolios from your different brokerages",
-    "keywords": ["stocks", "dividends", "investments", "tracking"],
+    "keywords": [
+        "stocks",
+        "dividends",
+        "investments",
+        "tracking"
+    ],
     "license": "CC-BY-NC 4.0",
     "require": {
         "php": "^8.3",
@@ -71,7 +76,8 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"

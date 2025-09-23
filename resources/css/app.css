@@ -1,7 +1,100 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.bunny.net/css?family=Inter:400,500,600&display=swap");
 
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", sans-serif; 
+}
+
+@plugin "daisyui" {
+  themes: light, dark --default --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --animation-input: 0.15s;
+
+  --radius-selector: 0.15rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --color-primary: "#78716c";
+  --color-primary-content: "#e3e1e0";
+  --color-secondary: "#7a7a7a";
+  --color-secondary-content: "#d1d1d5";
+  --color-accent: "#8c9ae3";
+  --color-accent-content: "#d3d4dd";
+  --color-neutral: "#302f3c";
+  --color-neutral-content: "#d1d1d5";
+  --color-base-100: "#20202A";
+  --color-base-200: "#1a1a23";
+  --color-base-300: "#15151c";
+  --color-base-content: "#cecdd0";
+  --color-info: "#1e40af";
+  --color-info-content: "#ced9f2";
+  --color-success: "#166534";
+  --color-success-content: "#d1dfd3";
+  --color-warning: "#a16207";
+  --color-warning-content: "#eddfd1";
+  --color-error: "#991b1b";
+  --color-error-content: "#efd3cf";
+}
+@plugin "daisyui/theme" {
+  name: "light";
+  prefersdark: false;
+  color-scheme: light; 
+
+  --animation-input: 0.15s;
+
+  --radius-selector: 0.15rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --color-primary: "#d6d3d1";
+  --color-primary-content: "#101010";
+  --color-secondary: "#9ca3af";
+  --color-secondary-content: "#090a0b";
+  --color-accent: "#525783";
+  --color-accent-content: "#110c16";
+  --color-neutral: "#6b7280";
+  --color-neutral-content: "#e0e1e4";
+  --color-base-100: "oklch(100% 0 0)";
+  --color-base-200: "oklch(97.466% 0.011 259.822)"; 
+  --color-base-300: "oklch(93.268% 0.016 262.751)";
+  --color-base-content: "#161616";
+  --color-info: "#60a5fa";
+  --color-info-content: "#030a15";
+  --color-success: "#10b981";
+  --color-success-content: "#000d06";
+  --color-warning: "#fb923c";
+  --color-warning-content: "#150801";
+  --color-error: "#ef4444";
+  --color-error-content: "#140202";
+}
+
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../../app/Filament/**/*.php";
+@source "../views/filament/**/*.blade.php";
+@source "../../vendor/filament/**/*.blade.php";
+
+/* Filament */
+@import '../../vendor/filament/support/resources/css/index.css';
+@import '../../vendor/filament/tables/resources/css/index.css';
+
+/* Wiggle animation */
 @keyframes wiggle {
   10%, 90% {
     transform: translate3d(-1px, 0, 0);
@@ -21,6 +114,7 @@
     animation: wiggle 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
 
+/* AI chat styles */
 .ai-chat ul, .ai-chat ol, .ai-chat ol li > ul {
     margin-left: 1.1rem;
 }
