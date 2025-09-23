@@ -93,7 +93,7 @@
             {{-- PROGRESS --}}
             <x-ui.progress 
                 x-show="loading"
-                class="absolute left-0 bottom-0 w-full progress progress-secondary h-[2px]" 
+                class="z-60 absolute left-0 bottom-0 w-full progress progress-secondary h-[2px]" 
                 indeterminate="true"
             />
         </div>

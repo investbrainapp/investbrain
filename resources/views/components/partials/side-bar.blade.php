@@ -26,13 +26,13 @@ new class extends Component
         h-full
         bg-base-300
         border-r
-        border-zinc-200
-        dark:border-zinc-800
+        border-base-100
         fixed
         top-0
         left-0
         z-50
-        w-64
+        md:w-68
+        w-3/4
         transition-transform
         -translate-x-full
         md:translate-x-0
@@ -92,7 +92,7 @@ new class extends Component
             <x-slot:actions>
                 <x-ui.dropdown>
                     <x-slot:trigger>
-                        <x-ui.button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-sm focus:rotate-180" />
+                        <x-ui.button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-sm relative transition-transform focus:rotate-90" />
                     </x-slot:trigger>
                     
                     <x-ui.menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />

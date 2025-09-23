@@ -46,7 +46,7 @@
 
     {{-- spinner --}}
     @if($spinner)
-        <span wire:loading wire:target="{{ $spinnerTarget }}" class="loading loading-spinner w-5 h-5">test</span>
+        <span wire:loading wire:target="{{ $spinnerTarget }}" class="loading loading-spinner w-5 h-5">Loading</span>
     @endif
     
     {{-- icon --}}

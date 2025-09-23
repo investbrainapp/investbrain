@@ -10,7 +10,7 @@
 
         @livewire('partials.side-bar')
         
-        <main class="py-5 px-6 md:py-0 md:ml-64">
+        <main class="py-5 px-6 md:py-0 md:ml-68">
             {{ $slot }}
         </main>
 

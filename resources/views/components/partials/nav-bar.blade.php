@@ -19,7 +19,7 @@ new class extends Component
 
 }; ?>
 
-<nav class="z-10 p-5 ml-0 md:ml-64 md:border-0 border-b border-zinc-200 dark:border-zinc-800">
+<nav class="z-10 p-5 ml-0 md:ml-68 md:border-0 border-b border-zinc-200 dark:border-zinc-800">
     
     <div class="flex flex-wrap justify-between items-center">
 
