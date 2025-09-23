@@ -86,13 +86,6 @@
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
-@source "../../app/Filament/**/*.php";
-@source "../views/filament/**/*.blade.php";
-@source "../../vendor/filament/**/*.blade.php";
-
-/* Filament */
-@import '../../vendor/filament/support/resources/css/index.css';
-@import '../../vendor/filament/tables/resources/css/index.css';
 
 /* Wiggle animation */
 @keyframes wiggle {

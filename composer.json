@@ -12,13 +12,14 @@
     "require": {
         "php": "^8.3",
         "ext-gd": "*",
+        "ext-json": "*",
         "ext-mbstring": "*",
         "ext-zip": "*",
-        "ext-json": "*",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",
+        "laravel/fortify": "^1.30.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
@@ -29,11 +30,11 @@
         "maatwebsite/excel": "^3.1",
         "openai-php/client": "^0.10.3",
         "predis/predis": "^2.2",
+        "rappasoft/laravel-livewire-tables": "^3.7",
         "scheb/yahoo-finance-api": "^5.0",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
         "symfony/cache": "^7.3",
-        "tschucki/alphavantage-laravel": "^0.0",
-        "laravel/fortify": "^1.30.0"
+        "tschucki/alphavantage-laravel": "^0.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

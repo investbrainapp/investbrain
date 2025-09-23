@@ -56,8 +56,6 @@ new class extends Component
     }
 }; ?>
 
-<div></div>
-
 {{-- <x-table 
     :headers="$headers" 
     :rows="$this->holdings()" 
