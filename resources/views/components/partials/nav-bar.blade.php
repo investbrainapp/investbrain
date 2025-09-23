@@ -38,7 +38,7 @@ new class extends Component
         <div>
             <x-ui.button 
                 @click.stop="$dispatch('toggle-spotlight')"
-                class="btn-sm bg-base-300 flex-1 justify-start md:flex-none border-none"
+                class="btn-sm btn-ghost bg-base-300 flex-1 justify-start md:flex-none border-none"
             >
                 <x-slot:label>
                     <span class="flex items-center text-gray-400">
