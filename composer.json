@@ -16,7 +16,6 @@
         "ext-zip": "*",
         "ext-json": "*",
         "blade-ui-kit/blade-heroicons": "^2.6",
-        "filament/tables": "^4.0",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",
@@ -76,8 +75,7 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi",
-            "@php artisan filament:upgrade"
+            "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"

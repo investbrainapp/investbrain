@@ -4,21 +4,9 @@ use App\Models\Portfolio;
 use App\Models\Holding;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Actions\Contracts\HasActions;
-use Filament\Tables\Table;
 
-new class extends Component implements HasTable, HasForms, HasActions
+new class extends Component
 {
-    use InteractsWithTable;
-    use InteractsWithForms;
-    use InteractsWithActions;
-
     // props
     public Portfolio $portfolio;
 
@@ -47,25 +35,6 @@ new class extends Component implements HasTable, HasForms, HasActions
         ];
     }
 
-    public function table(Table $table): Table
-    {
-        //
-        return $table
-            ->query(Holding::query())
-            ->columns([
-                TextColumn::make('id'),
-            ])
-            ->filters([
-                // ...
-            ])
-            ->actions([
-                // ...
-            ])
-            ->bulkActions([
-                // ...
-            ]);
-    }
-
     public function holdings(): Collection
     {
 
@@ -87,9 +56,7 @@ new class extends Component implements HasTable, HasForms, HasActions
     }
 }; ?>
 
-
-
-{{ $this->table }}
+<div></div>
 
 {{-- <x-table 
     :headers="$headers" 
