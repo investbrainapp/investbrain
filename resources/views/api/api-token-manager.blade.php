@@ -310,7 +310,6 @@ new class extends Component
         </div>
     @endif
 
-    
     {{-- API Token Permissions Modal --}}
     <x-ui.dialog-modal key="manage-permission-modal" wire:model.live="managingApiTokenPermissions">
         <x-slot name="title">
