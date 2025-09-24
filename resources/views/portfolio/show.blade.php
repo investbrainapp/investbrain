@@ -99,10 +99,9 @@
 
                 @else
 
-                 @livewire('users-table')
-                    {{-- @livewire('holdings-table', [
-                        'portfolio' => $portfolio
-                    ]) --}}
+                @livewire('holdings-table', [
+                    'portfolio' => $portfolio
+                ])
 
                 @endif
             </x-ui.card>
