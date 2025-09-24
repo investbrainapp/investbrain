@@ -2,13 +2,23 @@
 
 namespace App\Livewire;
 
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
+use App\Models\Holding;
+use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use App\Models\User;
+use Rappasoft\LaravelLivewireTables\DataTableComponent;
+use Rappasoft\LaravelLivewireTables\Views\Columns\CountColumn;
 
 class UsersTable extends DataTableComponent
 {
-    protected $model = User::class;
+    public function builder(): Builder
+    {
+        
+        return Holding::query()
+            ->portfolio('9cf8a691-58ea-4bf9-99a9-399069bcb186')
+            ->withCount(['transactions as num_transactions' => function ($query) {
+                return $query->whereRaw('transactions.symbol = holdings.symbol');
+            }]);
+    }
 
     public function configure(): void
     {
@@ -68,18 +78,17 @@ class UsersTable extends DataTableComponent
         $this->setDisplayPaginationDetailsDisabled();
         
         $this->setPrimaryKey('id');
-        
+
     }
 
     public function columns(): array
     {
         return [
-            Column::make("Id", "id")
+            Column::make("Symbol", "symbol")
                 ->sortable(),
-            Column::make("Name", "name")
-                ->sortable(),
-            Column::make("Email", "email")
-                ->sortable(),
+            Column::make("Number of Transactions")
+                ->sortable(fn (Builder $query, string $direction) => $query->orderBy('num_transactions', $direction))
+                ->label(fn ($row, Column $column) => $row->num_transactions),
             Column::make("Created at", "created_at")
                 ->sortable(),
             Column::make("Updated at", "updated_at")
