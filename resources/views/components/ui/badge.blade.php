@@ -1,7 +1,13 @@
 @props([
-    'value' => null
+    'value' => null,
 ])
 
-<div {{ $attributes->class(["badge select-none"])}}>
-    {{ $value ?? $slot  }}
+@php
+    if (isset($class)) {
+        $attributes->setAttributes(['class' => $class]);
+    }
+@endphp
+
+<div {{ $attributes->class(["badge select-none"]) }}>
+    {{ $value ?? $slot ?? '' }}
 </div>
