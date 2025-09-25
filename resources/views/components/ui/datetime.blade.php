@@ -134,7 +134,7 @@
             @click="datePickerOpen=true"
 
             {{ $attributes->class([
-                    "hidden md:block input py-3 px-4 input-primary w-full peer appearance-none",
+                    "hidden md:block py-2 input px-4 input-primary w-full peer appearance-none",
                     'ps-10' => ($icon),
                     'border border-dashed' => $attributes->has('readonly') && $attributes->get('readonly') == true,
                     'input-error' => $errors->has($errorFieldName)
@@ -152,7 +152,7 @@
                 }
                 datePickerOpen=!datePickerOpen;
             "
-            class="absolute top-0 right-0 p-3 cursor-pointer text-neutral-400 hover:text-neutral-500"
+            class="absolute top-1/2 -translate-y-1/2 right-0 p-3 cursor-pointer text-neutral-400 hover:text-neutral-500"
         >
             <x-ui.icon name="o-calendar" />
         </div>
