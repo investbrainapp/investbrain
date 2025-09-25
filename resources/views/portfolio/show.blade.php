@@ -89,7 +89,7 @@
 
         <div class="mt-6 grid md:grid-cols-7 gap-5">
 
-            <x-ui.card title="{{ __('Holdings') }}" class="md:col-span-4 overflow-scroll">
+            <x-ui.card title="{{ __('Holdings') }}" class="md:col-span-4">
 
                 @if($portfolio->holdings->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -99,7 +99,7 @@
 
                 @else
 
-                @livewire('holdings-table', [
+                @livewire('datatables.holdings-table', [
                     'portfolio' => $portfolio
                 ])
 
