@@ -73,7 +73,8 @@
         {{-- BACKDROP --}}
         <div 
             @click.prevent.stop="cancel()" 
-            class="absolute inset-0 w-full h-full bg-base-300/50"
+            class="absolute inset-0 w-full h-full bg-base-300/50 transition-none"
+            x-show="open"
         ></div>
         
         {{-- MODAL CONTENT --}}

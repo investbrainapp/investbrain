@@ -1,5 +1,5 @@
 <x-layouts.guest>
-    <div class="pt-4">
+    <div class="my-22">
         <div class="min-h-screen flex flex-col items-center pt-6 sm:pt-0">
             <div class="w-24 mb-10">
                 <x-ui.logo />

@@ -75,7 +75,7 @@
                 @click="close()" 
                 @focus="$focus.lastFocused().focus()"
             >
-                <kbd class="kbd kbd-xs">ESC</kbd>
+                <kbd class="kbd kbd-sm">ESC</kbd>
             </x-ui.button>
 
             {{-- INPUT --}}
@@ -84,7 +84,7 @@
                 icon="o-magnifying-glass"
                 x-model="value"
                 placeholder=" {{ $searchText }}"
-                class="flex w-full input my-2 border-none outline-none shadow-none border-transparent focus:shadow-none focus:outline-none focus:border-transparent"
+                class="text-xl flex w-full input my-2 py-6 border-none outline-none shadow-none border-transparent focus:shadow-none focus:outline-none focus:border-transparent"
                 @focus="$el.focus()"
                 autofocus
                 tabindex="1"
