@@ -231,7 +231,7 @@ new class extends Component
             >
                 <div class="mt-2 text-sm text-secondary-content">
 
-                    <div>
+                    <div class="mb-4">
                         {{ __('Please copy your new API token. For your security, it won\'t be shown again.') }}
                     </div>
 
@@ -240,12 +240,24 @@ new class extends Component
                         type="text" 
                         readonly
                         :value="$plainTextToken"
-                        class="mt-4 px-4 py-2 rounded font-mono text-sm w-full break-all"
+                        class="font-mono break-all"
                         autocomplete="off"
                         autocorrect="off"
                         autocapitalize="off"
                         spellcheck="false"
-                    />
+                    >
+                        <x-slot:suffix>
+                            <x-ui.button
+                                title="{{ __('Copy to clipboard') }}"
+                                class="btn-circle btn-sm btn-ghost me-2"
+                                icon="o-clipboard"
+                                @click="
+                                    navigator.clipboard.writeText($wire.plainTextToken); 
+                                    $wire.$set('displayingToken', false)
+                                "
+                            />
+                        </x-slot:suffix>
+                    </x-ui.input>
                 </div>
         
                 <div class="flex flex-row items-center justify-end mt-8 text-end">

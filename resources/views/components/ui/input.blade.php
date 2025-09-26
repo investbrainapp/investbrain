@@ -4,10 +4,9 @@
     'icon' => null,
     'hint' => null,
     'hintClass' => 'label-text-alt text-gray-400 py-1 pb-0',
+
     'prefix' => null,
     'suffix' => null,
-    'locale' => 'en-US',
-
     'prepend' => null,
     'append' => null,
 
@@ -48,9 +47,9 @@
     @if($prefix || $prepend)
         <div
             @class([
-                    "rounded-s-lg flex items-center bg-base-200",
+                    "rounded-s-lg flex items-center",
                     "border border-primary border-e-0 px-4" => $prefix,
-                    "border-0 bg-base-300" => $attributes->has('disabled') && $attributes->get('disabled') == true,
+                    "border-0" => $attributes->has('disabled') && $attributes->get('disabled') == true,
                     "border-dashed" => $attributes->has('readonly') && $attributes->get('readonly') == true,
                     "!border-error" => $errorFieldName && $errors->has($errorFieldName) && !$omitError
                 ])
@@ -78,6 +77,7 @@
                         'ps-10' => ($icon),
                         'rounded-s-none' => $prefix || $prepend,
                         'rounded-e-none' => $suffix || $append,
+                        'border-e-0' => $suffix,
                         'border border-dashed' => $attributes->has('readonly') && $attributes->get('readonly') == true,
                         'input-error' => $errorFieldName && $errors->has($errorFieldName) && !$omitError
                 ])
@@ -94,9 +94,9 @@
     @if($suffix || $append)
             <div
             @class([
-                    "rounded-e-lg flex items-center bg-base-200",
-                    "border border-primary border-s-0 px-4" => $suffix,
-                    "border-0 bg-base-300" => $attributes->has('disabled') && $attributes->get('disabled') == true,
+                    "rounded-e-lg flex items-center",
+                    "border border-primary border-s-0" => $suffix,
+                    "border-0" => $attributes->has('disabled') && $attributes->get('disabled') == true,
                     "border-dashed" => $attributes->has('readonly') && $attributes->get('readonly') == true,
                     "!border-error" => $errorFieldName && $errors->has($errorFieldName) && !$omitError
                 ])

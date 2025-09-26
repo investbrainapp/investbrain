@@ -48,6 +48,8 @@
   --color-warning-content: "#eddfd1";
   --color-error: "#991b1b";
   --color-error-content: "#efd3cf";
+  --depth: 0;
+  --noise: 0;
 }
 @plugin "daisyui/theme" {
   name: "light";
@@ -83,6 +85,8 @@
   --color-warning-content: "#150801";
   --color-error: "#ef4444";
   --color-error-content: "#140202";
+  --depth: 0;
+  --noise: 0;
 }
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";

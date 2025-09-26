@@ -1,14 +1,11 @@
 <?php
 
 use App\Models\AiChat;
-use App\Traits\Toast;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Volt\Component;
 
 new class extends Component
 {
-    use Toast;
-
     // props
     public Model $chatable;
 
