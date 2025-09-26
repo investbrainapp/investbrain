@@ -1,5 +1,195 @@
-<div>
-    <!-- Generate API Token -->
+<?php
+
+use App\Traits\Toast;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Livewire\Volt\Component;
+
+new class extends Component
+{
+    use Toast;
+
+    /**
+     * The create API token form state.
+     *
+     * @var array
+     */
+    public $createApiTokenForm = [
+        'name' => '',
+        'permissions' => [],
+    ];
+
+    /**
+     * Indicates if the plain text token is being displayed to the user.
+     *
+     * @var bool
+     */
+    public $displayingToken = false;
+
+    /**
+     * The plain text token value.
+     *
+     * @var string|null
+     */
+    public $plainTextToken;
+
+    /**
+     * Indicates if the user is currently managing an API token's permissions.
+     *
+     * @var bool
+     */
+    public $managingApiTokenPermissions = false;
+
+    /**
+     * The token that is currently having its permissions managed.
+     *
+     * @var \Laravel\Sanctum\PersonalAccessToken|null
+     */
+    public $managingPermissionsFor;
+
+    /**
+     * The update API token form state.
+     *
+     * @var array
+     */
+    public $updateApiTokenForm = [
+        'permissions' => [],
+    ];
+
+    /**
+     * Indicates if the application is confirming if an API token should be deleted.
+     *
+     * @var bool
+     */
+    public $confirmingApiTokenDeletion = false;
+
+    /**
+     * The ID of the API token being deleted.
+     *
+     * @var int
+     */
+    public $apiTokenIdBeingDeleted;
+
+    /**
+     * Mount the component.
+     *
+     * @return void
+     */
+    public function mount()
+    {
+        //
+    }
+
+    /**
+     * Create a new API token.
+     *
+     * @return void
+     */
+    public function createApiToken()
+    {
+        $this->resetErrorBag();
+
+        Validator::make([
+            'name' => $this->createApiTokenForm['name'],
+        ], [
+            'name' => ['required', 'string', 'max:255'],
+        ])->validateWithBag('createApiToken');
+
+        $this->displayTokenValue($this->user->createToken(
+            $this->createApiTokenForm['name']
+        ));
+
+        $this->createApiTokenForm['name'] = '';
+
+        $this->dispatch('created');
+    }
+
+    /**
+     * Display the token value to the user.
+     *
+     * @param  \Laravel\Sanctum\NewAccessToken  $token
+     * @return void
+     */
+    protected function displayTokenValue($token)
+    {
+        $this->displayingToken = true;
+
+        $this->plainTextToken = explode('|', $token->plainTextToken, 2)[1];
+    }
+
+    /**
+     * Allow the given token's permissions to be managed.
+     *
+     * @param  int  $tokenId
+     * @return void
+     */
+    public function manageApiTokenPermissions($tokenId)
+    {
+        $this->managingApiTokenPermissions = true;
+
+        $this->managingPermissionsFor = $this->user->tokens()->where(
+            'id', $tokenId
+        )->firstOrFail();
+
+        $this->updateApiTokenForm['permissions'] = $this->managingPermissionsFor->abilities;
+    }
+
+    /**
+     * Update the API token's permissions.
+     *
+     * @return void
+     */
+    public function updateApiToken()
+    {
+        $this->managingPermissionsFor->forceFill([
+            'abilities' => [],
+        ])->save();
+
+        $this->managingApiTokenPermissions = false;
+    }
+
+    /**
+     * Confirm that the given API token should be deleted.
+     *
+     * @param  int  $tokenId
+     * @return void
+     */
+    public function confirmApiTokenDeletion($tokenId)
+    {
+        $this->confirmingApiTokenDeletion = true;
+
+        $this->apiTokenIdBeingDeleted = $tokenId;
+    }
+
+    /**
+     * Delete the API token.
+     *
+     * @return void
+     */
+    public function deleteApiToken()
+    {
+        $this->user->tokens()->where('id', $this->apiTokenIdBeingDeleted)->first()->delete();
+
+        $this->user->load('tokens');
+
+        $this->confirmingApiTokenDeletion = false;
+
+        $this->managingPermissionsFor = null;
+    }
+
+    /**
+     * Get the current user of the application.
+     *
+     * @return mixed
+     */
+    public function getUserProperty()
+    {
+        return Auth::user();
+    }
+}; ?>
+
+<div x-data>
+    {{-- Generate API Token --}}
     <x-forms.form-section submit="createApiToken">
         <x-slot name="title">
             {{ __('Create API Token') }}
@@ -10,13 +200,13 @@
         </x-slot>
 
         <x-slot name="form">
-            <!-- Token Name -->
+            {{-- Token Name --}}
             <div class="col-span-6 sm:col-span-4">
-                <x-input id="name" label="{{ __('Token Name') }}" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
+                <x-ui.input id="name" label="{{ __('Token Name') }}" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
             </div>
 
-            <!-- Token Permissions -->
-            @if (Laravel\Jetstream\Jetstream::hasPermissions())
+            {{-- Token Permissions --}}
+            @if (false)
                 <div class="col-span-6">
                     <label class="pt-0 label label-text font-semibold">
                         <span>
@@ -25,15 +215,63 @@
                     </span>
 
                     <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach (Laravel\Jetstream\Jetstream::$permissions as $label => $permission)
+                        @foreach ([] as $label => $permission)
                             <label class="flex items-center">
-                                <x-checkbox wire:model="createApiTokenForm.permissions" :value="$permission"/>
+                                <x-ui.checkbox wire:model="createApiTokenForm.permissions" :value="$permission"/>
                                 <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ $label }}</span>
                             </label>
                         @endforeach
                     </div>
                 </div>
             @endif
+
+            {{-- Token Value Modal --}}
+            <x-ui.modal
+                persistent
+                key="token-display-modal"
+                wire:model.live="displayingToken"
+                title="{{ __('API Token') }}"
+            >
+                <div class="mt-2 text-sm text-secondary-content">
+
+                    <div class="mb-4">
+                        {{ __('Please copy your new API token. For your security, it won\'t be shown again.') }}
+                    </div>
+
+                    <x-ui.input 
+                        x-ref="plaintextToken" 
+                        type="text" 
+                        readonly
+                        :value="$plainTextToken"
+                        class="font-mono break-all focus:outline-none focus:ring-0"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    >
+                        <x-slot:suffix>
+                            <x-ui.button
+                                title="{{ __('Copy to clipboard') }}"
+                                class="btn-circle btn-sm btn-ghost me-2"
+                                icon="o-clipboard"
+                                @click="
+                                    navigator.clipboard.writeText($wire.plainTextToken); 
+                                    $wire.$set('displayingToken', false);
+                                    $wire.success('{{ __('Successfully copied!') }}')
+                                "
+                            />
+                        </x-slot:suffix>
+                    </x-ui.input>
+                </div>
+        
+                <div class="flex flex-row items-center justify-end mt-8 text-end">
+                    <x-ui.button class="btn-outline" wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
+                        {{ __('Close') }}
+                    </x-ui.button>
+                </div>
+      
+            </x-ui.modal>
+
         </x-slot>
 
         <x-slot name="actions">
@@ -41,16 +279,16 @@
                 {{ __('Created.') }}
             </x-forms.action-message>
 
-            <x-button type="submit">
+            <x-ui.button type="submit">
                 {{ __('Create') }}
-            </x-button>
+            </x-ui.button>
         </x-slot>
     </x-forms.form-section>
 
     @if ($this->user->tokens->isNotEmpty())
-        <x-section-border hide-on-mobile />
+        <x-ui.section-border hide-on-mobile />
 
-        <!-- Manage API Tokens -->
+        {{-- Manage API Tokens --}}
         <div class="mt-10 sm:mt-0">
             <x-forms.action-section>
                 <x-slot name="title">
@@ -61,12 +299,12 @@
                     {{ __('You may delete any of your existing tokens if they are no longer needed.') }}
                 </x-slot>
 
-                <!-- API Token List -->
+                {{-- API Token List --}}
                 <x-slot name="content">
                     <div class="space-y-6">
                         @foreach ($this->user->tokens->sortBy('name') as $token)
                             <div class="flex items-center justify-between">
-                                <div class="break-all dark:text-white">
+                                <div class="break-all">
                                     {{ $token->name }}
                                 </div>
 
@@ -77,7 +315,7 @@
                                         </div>
                                     @endif
 
-                                    @if (Laravel\Jetstream\Jetstream::hasPermissions())
+                                    @if (false)
                                         <button class="cursor-pointer ms-6 text-sm text-gray-400 underline" wire:click="manageApiTokenPermissions({{ $token->id }})">
                                             {{ __('Permissions') }}
                                         </button>
@@ -95,42 +333,17 @@
         </div>
     @endif
 
-    <!-- Token Value Modal -->
-    <x-dialog-modal wire:model.live="displayingToken">
-        <x-slot name="title">
-            {{ __('API Token') }}
-        </x-slot>
-
-        <x-slot name="content">
-            <div>
-                {{ __('Please copy your new API token. For your security, it won\'t be shown again.') }}
-            </div>
-
-            <x-input x-ref="plaintextToken" type="text" readonly :value="$plainTextToken"
-                class="mt-4 px-4 py-2 rounded font-mono text-sm w-full break-all"
-                autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                @showing-token-modal.window="setTimeout(() => $refs.plaintextToken.select(), 250)"
-            />
-        </x-slot>
-
-        <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
-                {{ __('Close') }}
-            </x-button>
-        </x-slot>
-    </x-dialog-modal>
-
-    <!-- API Token Permissions Modal -->
-    <x-dialog-modal wire:model.live="managingApiTokenPermissions">
+    {{-- API Token Permissions Modal --}}
+    <x-ui.dialog-modal key="manage-permission-modal" wire:model.live="managingApiTokenPermissions">
         <x-slot name="title">
             {{ __('API Token Permissions') }}
         </x-slot>
 
         <x-slot name="content">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach (Laravel\Jetstream\Jetstream::$permissions as $label => $permission)
+                @foreach ([] as $label => $permission)
                     <label class="flex items-center">
-                        <x-checkbox wire:model="updateApiTokenForm.permissions" :value="$permission"/>
+                        <x-ui.checkbox wire:model="updateApiTokenForm.permissions" :value="$permission"/>
                         <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ $label }}</span>
                     </label>
                 @endforeach
@@ -138,18 +351,18 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
+            <x-ui.button class="btn-outline" wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-button>
+            </x-ui.button>
 
-            <x-button type="submit" class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
+            <x-ui.button type="submit" class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
                 {{ __('Save') }}
-            </x-button>
+            </x-ui.button>
         </x-slot>
-    </x-dialog-modal>
+    </x-ui.dialog-modal>
 
-    <!-- Delete Token Confirmation Modal -->
-    <x-confirmation-modal wire:model.live="confirmingApiTokenDeletion">
+    {{-- Delete Token Confirmation Modal --}}
+    <x-ui.confirmation-modal key="confirm-deletion-modal" wire:model.live="confirmingApiTokenDeletion">
         <x-slot name="title">
             {{ __('Delete API Token') }}
         </x-slot>
@@ -159,13 +372,13 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-button class="btn-outline" wire:click="$toggle('confirmingApiTokenDeletion')" wire:loading.attr="disabled">
+            <x-ui.button class="btn-outline" wire:click="$toggle('confirmingApiTokenDeletion')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
-            </x-button>
+            </x-ui.button>
 
-            <x-button class="ms-3 btn-error text-white" wire:click="deleteApiToken" wire:loading.attr="disabled">
+            <x-ui.button class="ms-3 btn-error text-white" wire:click="deleteApiToken" wire:loading.attr="disabled">
                 {{ __('Delete') }}
-            </x-button>
+            </x-ui.button>
         </x-slot>
-    </x-confirmation-modal>
+    </x-ui.confirmation-modal>
 </div>

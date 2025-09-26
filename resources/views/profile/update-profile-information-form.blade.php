@@ -1,3 +1,109 @@
+<?php
+
+use Illuminate\Support\Facades\Auth;
+use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
+
+new class extends Component
+{
+    use WithFileUploads;
+
+    /**
+     * The component's state.
+     *
+     * @var array
+     */
+    public $state = [];
+
+    /**
+     * The new avatar for the user.
+     *
+     * @var mixed
+     */
+    public $photo;
+
+    /**
+     * Determine if the verification email was sent.
+     *
+     * @var bool
+     */
+    public $verificationLinkSent = false;
+
+    /**
+     * Prepare the component.
+     *
+     * @return void
+     */
+    public function mount()
+    {
+        $user = Auth::user();
+
+        $this->state = array_merge([
+            'email' => $user->email,
+        ], $user->withoutRelations()->toArray());
+    }
+
+    /**
+     * Update the user's profile information.
+     *
+     * @return \Illuminate\Http\RedirectResponse|null
+     */
+    public function updateProfileInformation(UpdatesUserProfileInformation $updater)
+    {
+        $this->resetErrorBag();
+
+        $updater->update(
+            Auth::user(),
+            $this->photo
+                ? array_merge($this->state, ['photo' => $this->photo])
+                : $this->state
+        );
+
+        if (isset($this->photo)) {
+            return redirect()->route('profile.show');
+        }
+
+        $this->dispatch('saved');
+
+        $this->dispatch('refresh-navigation-menu');
+    }
+
+    /**
+     * Delete user's profile photo.
+     *
+     * @return void
+     */
+    public function deleteProfilePhoto()
+    {
+        Auth::user()->deleteProfilePhoto();
+
+        $this->dispatch('refresh-navigation-menu');
+    }
+
+    /**
+     * Sent the email verification.
+     *
+     * @return void
+     */
+    public function sendEmailVerification()
+    {
+        Auth::user()->sendEmailVerificationNotification();
+
+        $this->verificationLinkSent = true;
+    }
+
+    /**
+     * Get the current user of the application.
+     *
+     * @return mixed
+     */
+    public function getUserProperty()
+    {
+        return Auth::user();
+    }
+}; ?>
+
 <x-forms.form-section submit="updateProfileInformation">
     <x-slot name="title">
         {{ __('Profile Information') }}
@@ -9,63 +115,61 @@
 
     <x-slot name="form">
         
-        <!-- Profile Photo -->
-        @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-            <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
+        {{-- Profile Photo --}}
+        <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
 
-                <!-- Profile Photo File Input -->
-                <input type="file" id="photo" class="hidden"
-                            wire:model.live="photo"
-                            x-ref="photo"
-                            x-on:change="
-                                    photoName = $refs.photo.files[0].name;
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => {
-                                        photoPreview = e.target.result;
-                                    };
-                                    reader.readAsDataURL($refs.photo.files[0]);
-                            " />
+            {{-- Profile Photo File Input --}}
+            <input type="file" id="photo" class="hidden"
+                        wire:model.live="photo"
+                        x-ref="photo"
+                        x-on:change="
+                                photoName = $refs.photo.files[0].name;
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    photoPreview = e.target.result;
+                                };
+                                reader.readAsDataURL($refs.photo.files[0]);
+                        " />
 
-                <label for="photo" class="pt-0 label label-text font-semibold">
-                    <span>{{ __('Photo') }} </span>
-                </label>
+            <label for="photo" class="pt-0 label label-text font-semibold">
+                <span>{{ __('Photo') }} </span>
+            </label>
 
-                <!-- Current Profile Photo -->
-                <div class="mt-2" x-show="! photoPreview">
-                    <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="rounded-full h-20 w-20 object-cover">
-                </div>
-
-                <!-- New Profile Photo Preview -->
-                <div class="mt-2" x-show="photoPreview" style="display: none;">
-                    <span class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
-                          x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
-                    </span>
-                </div>
-
-                <x-button class="btn-outline" class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
-                    {{ __('Select A New Photo') }}
-                </x-button>
-
-                @if ($this->user->profile_photo_path)
-                    <x-button class="btn-outline" type="button" class="mt-2" wire:click="deleteProfilePhoto">
-                        {{ __('Remove Photo') }}
-                    </x-button>
-                @endif
-
-                @if ($errors->has('photo') && is_array($errors->get('photo')))
-                    <p class="text-sm text-red-600 dark:text-red-400">{{ $errors->get('photo')[0] }}</p>
-                @endif
+            {{-- Current Profile Photo --}}
+            <div class="mt-2" x-show="! photoPreview">
+                <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="rounded-full h-20 w-20 object-cover">
             </div>
-        @endif
 
-        <!-- Name -->
-        <div class="col-span-6 sm:col-span-4">
-            <x-input id="name" label="{{ __('Name') }}" type="text" class="mt-1 block w-full" wire:model="state.name" error-field="name" required autocomplete="name" />
+            {{-- New Profile Photo Preview --}}
+            <div class="mt-2" x-show="photoPreview" style="display: none;">
+                <span class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
+                        x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
+                </span>
+            </div>
+
+            <x-ui.button class="btn-outline" class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
+                {{ __('Select A New Photo') }}
+            </x-ui.button>
+
+            @if ($this->user->profile_photo_path)
+                <x-ui.button class="btn-outline" type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                    {{ __('Remove Photo') }}
+                </x-ui.button>
+            @endif
+
+            @if ($errors->has('photo') && is_array($errors->get('photo')))
+                <p class="text-sm text-red-600 dark:text-red-400">{{ $errors->get('photo')[0] }}</p>
+            @endif
         </div>
 
-        <!-- Email -->
+        {{-- Name --}}
         <div class="col-span-6 sm:col-span-4">
-            <x-input id="email" label="{{ __('Email') }}" type="email" class="mt-1 block w-full" wire:model="state.email" error-field="email" required autocomplete="username" />
+            <x-ui.input id="name" label="{{ __('Name') }}" type="text" class="mt-1 block w-full" wire:model="state.name" error-field="name" required autocomplete="name" />
+        </div>
+
+        {{-- Email --}}
+        <div class="col-span-6 sm:col-span-4">
+            <x-ui.input id="email" label="{{ __('Email') }}" type="email" class="mt-1 block w-full" wire:model="state.email" error-field="email" required autocomplete="username" />
 
             @if (
                 ! config('investbrain.self_hosted')
@@ -94,8 +198,8 @@
             {{ __('Saved.') }}
         </x-forms.action-message>
 
-        <x-button type="submit" spinner="photo" wire:loading.attr="disabled" wire:target="photo">
+        <x-ui.button type="submit" spinner="photo" wire:loading.attr="disabled" wire:target="photo">
             {{ __('Save') }}
-        </x-button>
+        </x-ui.button>
     </x-slot>
 </x-forms.form-section>

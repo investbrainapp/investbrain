@@ -1,17 +1,17 @@
-<x-guest-layout>
-    <x-authentication-card>
+<x-layouts.guest>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-glyph-only-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
-        <x-errors class="mb-4" />
+        <x-ui.errors class="mb-4" />
 
         @session('status')
-            <x-alert icon="o-envelope" class="alert-success mb-4">
+            <x-ui.alert icon="o-envelope" class="alert-success mb-4">
                 {{ $value }}
-            </x-alert>
+            </x-ui.alert>
         @endsession
 
         <form method="POST" action="{{ route('login') }}">
@@ -19,16 +19,16 @@
 
             <div>
                 
-                <x-input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <x-ui.input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             </div>
 
             <div class="mt-4">
                 
-                <x-input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+                <x-ui.input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
             </div>
 
             <div class="block mt-4">
-                <x-checkbox id="remember_me" name="remember" class="text-sm" label="{{ __('Remember me') }}" />
+                <x-ui.checkbox id="remember_me" name="remember" class="text-sm" label="{{ __('Remember me') }}" />
             </div>
 
             <div class="flex items-center justify-end mt-4">
@@ -38,26 +38,26 @@
                     </a>
                 @endif
 
-                <x-button type="submit" class="btn-primary ms-4" >
+                <x-ui.button type="submit" class="btn-primary ms-4" >
                     {{ __('Log in') }}
-                </x-button>
+                </x-ui.button>
 
             </div>
 
             @if (\Laravel\Fortify\Features::enabled('registration'))
 
-                <x-section-border />
+                <x-ui.section-border />
 
-                <x-connected-accounts-login />
+                <x-social.connected-accounts-login />
                 
-                <x-button 
+                <x-ui.button 
                     link="{{ route('register') }}" 
                     class="btn-sm btn-block btn-outline btn-secondary my-1" 
                 >
                     {{ __('Sign up with email') }}
-                </x-button>
+                </x-ui.button>
 
             @endif
         </form>
-    </x-authentication-card>
-</x-guest-layout>
+    </x-ui.authentication-card>
+</x-layouts.guest>

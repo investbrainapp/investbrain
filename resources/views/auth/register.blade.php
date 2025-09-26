@@ -1,41 +1,41 @@
-<x-guest-layout>
-    <x-authentication-card>
+<x-layouts.guest>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-glyph-only-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
-        <x-errors class="mb-4" />
+        <x-ui.errors class="mb-4" />
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
             <div>
                 
-                <x-input id="name" label="{{ __('Name') }}" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                <x-ui.input id="name" label="{{ __('Name') }}" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
             <div class="mt-4">
                 
-                <x-input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+                <x-ui.input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             </div>
 
             <div class="mt-4">
                 
-                <x-input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                <x-ui.input id="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4">
                 
-                <x-input id="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <x-ui.input id="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
             @if (! config('investbrain.self_hosted'))
                 <div class="mt-4">
                     <label>
                         <div class="flex items-center">
-                            <x-checkbox name="terms" id="terms" required />
+                            <x-ui.checkbox name="terms" id="terms" required />
 
                             <div class="ms-2 text-sm">
                                 {!! __('I agree to the :terms_of_service and :privacy_policy', [
@@ -53,10 +53,10 @@
                     {{ __('Already registered?') }}
                 </a>
 
-                <x-button type="submit" class="btn-primary ms-4">
+                <x-ui.button type="submit" class="btn-primary ms-4">
                     {{ __('Register') }}
-                </x-button>
+                </x-ui.button>
             </div>
         </form>
-    </x-authentication-card>
-</x-guest-layout>
+    </x-ui.authentication-card>
+</x-layouts.guest>

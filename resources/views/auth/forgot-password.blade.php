@@ -1,8 +1,8 @@
-<x-guest-layout>
-    <x-authentication-card>
+<x-layouts.guest>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-glyph-only-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -11,26 +11,26 @@
         </div>
 
         @session('status')
-            <x-alert icon="o-envelope" class="alert-success mb-4">
+            <x-ui.alert icon="o-envelope" class="alert-success mb-4">
                 {{ $value }}
-            </x-alert>
+            </x-ui.alert>
         @endsession
 
-        <x-errors class="mb-4" />
+        <x-ui.errors class="mb-4" />
 
         <form method="POST" action="{{ route('password.email') }}">
             @csrf
 
             <div class="block">
 
-                <x-input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <x-ui.input id="email" label="{{ __('Email') }}" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <x-button class="btn-primary" type="submit">
+                <x-ui.button class="btn-primary" type="submit">
                     {{ __('Email Password Reset Link') }}
-                </x-button>
+                </x-ui.button>
             </div>
         </form>
-    </x-authentication-card>
-</x-guest-layout>
+    </x-ui.authentication-card>
+</x-layouts.guest>

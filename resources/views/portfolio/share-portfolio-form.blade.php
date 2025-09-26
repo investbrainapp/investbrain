@@ -1,15 +1,13 @@
 <?php
 
 use App\Models\Portfolio;
-use App\Models\User;
+use App\Traits\Toast;
 use App\Traits\WithTrimStrings;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
-use Illuminate\Support\Collection;
-use Mary\Traits\Toast;
 
-new class extends Component {
-
+new class extends Component
+{
     use Toast;
     use WithTrimStrings;
 
@@ -23,18 +21,20 @@ new class extends Component {
     public int $fullAccess = 0;
 
     public array $permissions;
+
     public bool $confirmingAccessDeletion = false;
+
     public ?string $deletingAccessFor = null;
 
     // methods
     public function mount()
     {
-        if (!$this->portfolio) {
+        if (! $this->portfolio) {
             $this->permissions = [
                 auth()->user()->id => [
                     'owner' => true,
-                    'full_access' => false
-                ]
+                    'full_access' => false,
+                ],
             ];
 
         } else {
@@ -43,8 +43,8 @@ new class extends Component {
                 return [
                     $user->id => [
                         'owner' => $user->pivot->owner ?? 0,
-                        'full_access' => $user->pivot->full_access ?? 0
-                    ]
+                        'full_access' => $user->pivot->full_access ?? 0,
+                    ],
                 ];
             })->toArray();
         }
@@ -65,13 +65,13 @@ new class extends Component {
     {
         $this->authorize('fullAccess', $this->portfolio);
 
-        if (!$confirmed) {
+        if (! $confirmed) {
             $this->deletingAccessFor = $userId;
             $this->confirmingAccessDeletion = true;
 
             return;
         }
-        
+
         unset($this->permissions[$userId]);
 
         $this->portfolio->unShare($userId);
@@ -101,7 +101,6 @@ new class extends Component {
         $this->emailAddress = '';
         $this->fullAccess = false;
     }
-
 }; ?>
 
 <div class="">
@@ -109,9 +108,9 @@ new class extends Component {
         <span>{{ __('People with access') }}</span>
     </label>
 
-    <div class="border-primary border rounded-sm px-2 py-5 mb-2 max-h-[20rem] overflow-y-scroll">
+    <div class="border-primary border rounded-md px-2 py-5 mb-2 max-h-[20rem] overflow-y-scroll">
         @if ($portfolio?->owner)
-        <x-list-item 
+        <x-ui.list-item 
             :item="$portfolio->owner" 
             avatar="profile_photo_url" 
             no-separator
@@ -129,11 +128,11 @@ new class extends Component {
             <x-slot:sub-value>
                 {{ __('Owner') }}
             </x-slot:sub-value>
-        </x-list-item>
+        </x-ui.list-item>
         @endif
 
         @foreach (collect($portfolio?->users)->where('pivot.owner', '!=', 1) as $user)
-            <x-list-item 
+            <x-ui.list-item 
                 :item="$user" 
                 avatar="profile_photo_url" 
                 no-separator
@@ -154,26 +153,26 @@ new class extends Component {
                 </x-slot:sub-value>
                 <x-slot:actions>
                     @if (auth()->user()->id != $user->id) 
-                    <x-select 
+                    <x-ui.select 
                         class="select select-ghost border-none focus:outline-none focus:ring-0"
                         :options="[['id' => 0, 'name' => __('Read only')], ['id' => 1, 'name' => __('Full access')]]"
                         wire:model.live.number="permissions.{{ $user->id }}.full_access"
                     />
                     
-                    <x-button 
+                    <x-ui.button 
                         class="btn-sm btn-ghost btn-circle" 
                         wire:click="deleteUser('{{ $user->id }}')"
                         spinner="deleteUser('{{ $user->id }}')"
                         title="{{ __('Remove Access') }}"
                     >
-                        <x-icon name="o-x-mark" class="w-4" />
-                    </x-button>      
+                        <x-ui.icon name="o-x-mark" class="w-4" />
+                    </x-ui.button>      
                     @endif
                 </x-slot:actions>
-            </x-list-item>
+            </x-ui.list-item>
         @endforeach
 
-        <x-confirmation-modal wire:model.live="confirmingAccessDeletion">
+        <x-ui.confirmation-modal wire:model.live="confirmingAccessDeletion">
             <x-slot:title>
                 {{ __('Remove Access') }}
             </x-slot:title>
@@ -183,24 +182,24 @@ new class extends Component {
             </x-slot>
     
             <x-slot name="footer">
-                <x-button class="btn-outline" wire:click="$toggle('confirmingAccessDeletion')" wire:loading.attr="disabled">
+                <x-ui.button class="btn-outline" wire:click="$toggle('confirmingAccessDeletion')" wire:loading.attr="disabled">
                     {{ __('Cancel') }}
                 </x-secondary-button>
     
-                <x-button class="ms-3 btn-error text-white" wire:click="deleteUser('{{ $this->deletingAccessFor }}', true)" spinner="deleteUser" wire:loading.attr="disabled">
+                <x-ui.button class="ms-3 btn-error text-white" wire:click="deleteUser('{{ $this->deletingAccessFor }}', true)" spinner="deleteUser" wire:loading.attr="disabled">
                     {{ __('Remove Access') }}
-                </x-button>
+                </x-ui.button>
             </x-slot>
-        </x-confirmation-modal>
+        </x-ui.confirmation-modal>
 
-        <x-ib-alpine-modal 
+        <x-ui.modal 
             key="add-user-modal"
             title="{{ __('Share Portfolio') }}"
         >
             <div class="" x-data="{  }">
-                <x-ib-form wire:submit="addUser" class="">
+                <x-ui.form wire:submit="addUser" class="">
             
-                    <x-input 
+                    <x-ui.input 
                         label="Email" 
                         icon="o-envelope" 
                         placeholder="{{ __('Type an email address to share portfolio') }}"
@@ -209,7 +208,7 @@ new class extends Component {
                         required
                     />
                 
-                    <x-toggle 
+                    <x-ui.toggle 
                         class="mt-2"
                         label="{{ __('Grant full access') }}" 
                         wire:model="fullAccess" 
@@ -219,7 +218,7 @@ new class extends Component {
                     
                     <x-slot:actions>
                     
-                        <x-button 
+                        <x-ui.button 
                             label="{{ __('Share') }}" 
                             title="{{ __('Share Portfolio') }}"
                             type="submit" 
@@ -228,14 +227,14 @@ new class extends Component {
                             spinner="addUser"
                         />
                     </x-slot:actions>
-                </x-ib-form>
+                </x-ui.form>
         
             </div>
             
-        </x-ib-alpine-modal>
+        </x-ui.modal>
 
-        <x-button class="btn-sm block mt-4" @click="$dispatch('toggle-add-user-modal')">
+        <x-ui.button class="btn-sm block mt-4" @click="$dispatch('toggle-add-user-modal')">
             {{ __('Add People') }}
-        </x-button>
+        </x-ui.button>
     </div>
 </div>

@@ -1,8 +1,8 @@
-<x-guest-layout>
-    <x-authentication-card>
+<x-layouts.guest>
+    <x-ui.authentication-card>
         <x-slot name="logo">
             <div class="w-24 mb-10">
-                <x-glyph-only-logo />
+                <x-ui.logo />
             </div>
         </x-slot>
 
@@ -11,9 +11,9 @@
         </div>
 
         @if (session('status') == 'verification-link-sent')
-            <x-alert icon="o-envelope" class="alert-success mb-4">
+            <x-ui.alert icon="o-envelope" class="alert-success mb-4">
                 {{ __('A new verification link has been sent to the email address you provided in your profile settings.') }}
-            </x-alert>
+            </x-ui.alert>
         @endif
 
         <div class="mt-4 flex items-center justify-between">
@@ -21,9 +21,9 @@
                 @csrf
 
                 <div>
-                    <x-button type="submit" type="submit" class="btn-primary">
-                        {{ __('Resend Verification Email') }}
-                    </x-button>
+                    <x-ui.button label="{{ __('Resend Verification Email') }}" type="submit" class="bg-primary hover:bg-secondary focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 focus:shadow-outline focus:outline-none" />
+                        
+                    
                 </div>
             </form>
 
@@ -43,5 +43,5 @@
                 </form>
             </div>
         </div>
-    </x-authentication-card>
-</x-guest-layout>
+    </x-ui.authentication-card>
+</x-layouts.guest>

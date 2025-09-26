@@ -2,9 +2,10 @@
 
 use App\Models\DailyChange;
 use App\Models\Portfolio;
+use Livewire\Attributes\Lazy;
 use Livewire\Volt\Component;
 
-new class extends Component
+new #[Lazy] class extends Component
 {
     // props
     public ?Portfolio $portfolio = null;
@@ -29,6 +30,13 @@ new class extends Component
     public function mount()
     {
         $this->chartSeries = $this->generatePerformanceData();
+    }
+
+    public function placeholder()
+    {
+        return <<<'HTML'
+        <div class="skeleton h-[395px] mb-5"></div>
+        HTML;
     }
 
     public function generatePerformanceData()
@@ -116,7 +124,7 @@ new class extends Component
     }
 }; ?>
 
-<x-card class="bg-slate-100 dark:bg-base-200 rounded-lg mb-6">
+<x-ui.card class="mb-6">
     <div class="flex flex-col md:flex-row md:justify-between mb-2">
                     
         <div class="flex flex-col md:flex-row items-start md:items-center">
@@ -128,15 +136,15 @@ new class extends Component
         </div>
         
         <div class="flex items-center" x-data="{ loading: false }">
-            {{-- <x-button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
+            {{-- <x-ui.button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
 
-            <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+            <x-ui.loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
 
-            <x-dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
+            <x-ui.dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
                     
                 @foreach($scopeOptions as $option)
 
-                    <x-menu-item 
+                    <x-ui.menu-item 
                         title="{{ $option['name'] }}" 
                         @click="
                             timeout = setTimeout(() => { loading = true }, 200);
@@ -156,7 +164,7 @@ new class extends Component
     <div
         class="h-[280px] mb-5"
     >
-        <x-ib-apex-chart :series-data="$chartSeries" :name="$name" />
+        <x-ui.apex-chart :series-data="$chartSeries" :name="$name" />
     </div>
 
-</x-card>
+</x-ui.card>

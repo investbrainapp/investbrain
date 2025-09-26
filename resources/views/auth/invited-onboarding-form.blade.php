@@ -6,10 +6,11 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // props
     public Portfolio $portfolio;
+
     public User $user;
 
     #[Rule('required|string')]
@@ -41,30 +42,29 @@ new class extends Component {
 
         return redirect(route('portfolio.show', ['portfolio' => $this->portfolio->id]));
     }
-
 }; ?>
 
 <x-form wire:submit="updateUserInformation" class="">
 
     <div class="mt-2">
         
-        <x-input wire:model="name" label="{{ __('Name') }}" class="block mt-1 w-full" required autofocus />
+        <x-ui.input wire:model="name" label="{{ __('Name') }}" class="block mt-1 w-full" required autofocus />
     </div>
 
     <div class="mt-2">
         
-        <x-input wire:model="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
+        <x-ui.input wire:model="password" label="{{ __('Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
     </div>
 
     <div class="mt-2">
         
-        <x-input wire:model="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
+        <x-ui.input wire:model="password_confirmation" label="{{ __('Confirm Password') }}" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
     </div>
 
     <div class="flex items-center justify-end mt-2">
 
-        <x-button class="btn-primary" type="submit">
+        <x-ui.button class="btn-primary" type="submit">
             {{ __('Get Started') }}
-        </x-button>
+        </x-ui.button>
     </div>
 </x-form>

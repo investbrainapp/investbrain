@@ -1,9 +1,9 @@
 @use('App\Models\Currency')
 
-<x-app-layout>
+<x-layouts.app>
     <div x-data>  
 
-        <x-ib-alpine-modal 
+        <x-ui.modal 
             key="create-transaction"
             title="{{ __('Create Transaction') }}"
         >
@@ -12,9 +12,9 @@
                 'symbol' => $holding->market_data->symbol, 
             ])
 
-        </x-ib-alpine-modal>
+        </x-ui.modal>
 
-        <x-ib-alpine-modal 
+        <x-ui.modal 
             key="holding-options"
             title="{{ __('Holding Options') }}"
         >
@@ -22,9 +22,9 @@
                 'holding' => $holding
             ])
 
-        </x-ib-alpine-modal>
+        </x-ui.modal>
 
-        <x-ib-toolbar>
+        <x-ui.toolbar>
             <x-slot:title>
                 <a href="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}" title="{{ __('Portfolio') }}">
                     {{ $portfolio->title }}
@@ -33,30 +33,30 @@
             </x-slot:title>
 
             @can('fullAccess', $portfolio)
-            <x-button 
+            <x-ui.button 
                 title="{{ __('Holding options') }}" 
                 icon="o-pencil" 
                 class="btn-circle btn-ghost btn-sm text-secondary" 
                 @click="$dispatch('toggle-holding-options')"
             />
             @else
-            <x-icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
+            <x-ui.icon name="o-eye" class="text-secondary w-4" title="{{ __('Read only') }}" />
             @endcan
 
-            <x-ib-flex-spacer />
+            <x-ui.flex-spacer />
             
             @can('fullAccess', $portfolio)
-            <x-button 
+            <x-ui.button 
                 label="{{ __('Create transaction') }}" 
                 class="btn-sm btn-primary whitespace-nowrap" 
                 @click="$dispatch('toggle-create-transaction')"
             />
             @endcan
-        </x-ib-toolbar>
+        </x-ui.toolbar>
 
         <div class="mt-6 grid md:grid-cols-9 gap-5">
 
-            <x-ib-card class="md:col-span-5">
+            <x-ui.card class="md:col-span-5">
                 <x-slot:title>
 
                     {{ $holding->market_data->symbol }} 
@@ -65,9 +65,9 @@
 
                 @livewire('holding-market-data', ['holding' => $holding])
 
-            </x-ib-card>
+            </x-ui.card>
 
-            <x-ib-card title="{{ __('Fundamentals') }}" class="md:col-span-4">
+            <x-ui.card title="{{ __('Fundamentals') }}" class="md:col-span-4">
 
                 @if(!empty($holding->market_data->market_cap))
                 <p>
@@ -100,7 +100,7 @@
                 <p>
                     <span class="font-bold">{{ __('52 week') }}: </span>
 
-                    <x-fifty-two-week-range :market-data="$holding->market_data" />
+                    <x-ui.fifty-two-week-range :market-data="$holding->market_data" />
                 </p>
 
                 @if(!empty($holding->market_data->dividend_yield))
@@ -120,9 +120,9 @@
                 </p>
                 @endif
                 
-            </x-ib-card>
+            </x-ui.card>
 
-            <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('Recent activity') }}" class="md:col-span-3">
 
                 @livewire('transactions-list', [
                     'portfolio' => $holding->portfolio,
@@ -130,9 +130,9 @@
                     'shouldGoToHolding' => false
                 ])
 
-            </x-ib-card>
+            </x-ui.card>
 
-            <x-ib-card title="{{ __('Dividends') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('Dividends') }}" class="md:col-span-3">
 
                 @if($holding->dividends->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -144,9 +144,9 @@
 
                 @livewire('holding-dividends-list', ['holding' => $holding])
 
-            </x-ib-card>
+            </x-ui.card>
 
-            <x-ib-card title="{{ __('Splits') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('Splits') }}" class="md:col-span-3">
 
                 @if($holding->splits->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -158,7 +158,7 @@
 
                 @foreach ($holding->splits->take(5) as $split)
 
-                    <x-list-item :item="$split">
+                    <x-ui.list-item :item="$split" no-separator>
                         <x-slot:value>
         
                         1:{{ $split->split_amount }}
@@ -167,17 +167,17 @@
                         <x-slot:sub-value>
                             <span title="{{ __('Distribution Date') }}">{{ $split->date->format('F d, Y') }}</span>
                         </x-slot:sub-value>
-                    </x-list-item>
+                    </x-ui.list-item>
                 
                 @endforeach
 
-            </x-ib-card>
+            </x-ui.card>
 
             @if(config('services.ai_chat_enabled'))
             {{-- // todo: add to system prompt:
                     // Additionally, here is some recent news about {$this->holding->symbol}:
                     // And their latest SEC filings: --}}
-            @livewire('ai-chat-window', [
+            @livewire('ui.ai-chat-window', [
                 'chatable' => $holding,
                 'suggested_prompts' => [
                     [
@@ -228,4 +228,4 @@
         </div>
 
     </div>
-</x-app-layout>
+</x-layouts.app>

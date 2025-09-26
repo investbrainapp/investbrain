@@ -2,11 +2,11 @@
 
 use App\Models\Portfolio;
 use App\Models\Transaction;
+use App\Traits\Toast;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
-use Mary\Traits\Toast;
 
-new class extends Component
+new class extends Component 
 {
     use Toast;
 
@@ -47,7 +47,7 @@ new class extends Component
 
     public function goToHolding($holding)
     {
-        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]));
+        return $this->redirect(route('holding.show', ['portfolio' => $holding['portfolio_id'], 'symbol' => $holding['symbol']]), navigate: true);
     }
 
     public function updateOffset($amount = 0)
@@ -60,7 +60,7 @@ new class extends Component
 
     @foreach($transactions->sortByDesc('date')->slice($offset)->take($perPage) as $transaction)
 
-        <x-list-item 
+        <x-ui.list-item 
             no-separator 
             :item="$transaction" 
             class="cursor-pointer"
@@ -69,7 +69,7 @@ new class extends Component
             @click="
                 if ($wire.shouldGoToHolding) {
 
-                    $wire.goToHolding({{ $transaction }})
+                    $wire.goToHolding(JSON.parse('{{ json_encode($transaction->only(['portfolio_id', 'symbol'])) }}'))
                     
                     return;
                 }
@@ -81,7 +81,7 @@ new class extends Component
             "
         >
             <x-slot:value class="flex items-center">
-                <x-badge 
+                <x-ui.badge 
                     :value="$transaction->split
                         ? 'SPLIT'
                         : ($transaction->reinvested_dividend
@@ -100,7 +100,7 @@ new class extends Component
                     $transaction->market_data?->currency
                 ) }})
 
-                <x-loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
+                <x-ui.loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
             </x-slot:value>
             <x-slot:sub-value>
                 @if($showPortfolio)
@@ -109,7 +109,7 @@ new class extends Component
                 @endif
                 <span title="{{ __('Transaction Date') }}">{{ $transaction->date->format('F j, Y') }} </span>
             </x-slot:sub-value>
-        </x-list-item>
+        </x-ui.list-item>
 
     @endforeach
 
@@ -118,30 +118,30 @@ new class extends Component
             
             <span>
                 @if($offset > 0)
-                <x-button 
+                <x-ui.button 
                     class="btn btn-sm btn-ghost text-secondary"
                     wire:click="updateOffset(-{{ $perPage }})"
                 >
                     {!! __('pagination.previous') !!}
-                </x-button>
+                </x-ui.button>
                 @endif
             </span>
 
             <span>
                 @if(count($transactions) - $offset >  $offset)
-                <x-button 
+                <x-ui.button 
                     class="btn btn-sm btn-ghost text-secondary"
                     wire:click="updateOffset({{ $perPage }})"
                 >
                     {!! __('pagination.next') !!}
-                </x-button>
+                </x-ui.button>
                 @endif
             </span>
             
         </div>
     @endif
 
-    <x-ib-alpine-modal 
+    <x-ui.modal 
         key="manage-transaction"
         title="{{ __('Manage Transaction') }}"
     >
@@ -150,5 +150,5 @@ new class extends Component
             'transaction' => $editingTransaction, 
         ], key($editingTransaction?->id.rand()))
 
-    </x-ib-alpine-modal>
+    </x-ui.modal>
 </div>
