@@ -94,7 +94,6 @@
 @source "../**/*.blade.php";
 
 /* Tool tip for apex charts */
-
 [data-theme=dark] .apexcharts-tooltip-title {
   background: #292933 !important;
   border-bottom: 1px solid #393939  !important;
@@ -103,7 +102,6 @@
   background: #20202A !important;
   border-color: #393939 !important;
 }
-
 
 /* Wiggle animation */
 @keyframes wiggle {
