@@ -141,7 +141,7 @@ class HoldingsTable extends DataTableComponent
                 ->html()
                 ->label(fn($row) => Number::currency($row->market_gain_dollars ?? 0, $row->market_data?->currency ?? '') . view('components.ui.gain-loss-arrow-badge', [
                     'costBasis' => $row->average_cost_basis,
-                    'marketValue' => $row->market_data->market_value,
+                    'marketValue' => $row->market_data?->market_value,
                     'small' => true,
                 ]))
                 ->sortable(fn (Builder $query, string $direction) => $query->orderBy('market_gain_dollars', $direction)),
