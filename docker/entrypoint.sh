@@ -15,6 +15,9 @@ mkdir -p storage/framework/cache \
           storage/app \
           storage/logs
 
+timestamp=$(date -u "+[%Y-%m-%d %H:%M:%S]")
+echo "$timestamp Investbrain starting..." >> storage/logs/laravel.log
+
 echo -e "\n > Storage directory scaffolding is OK... "
 
 # Ensure storage directory is permissioned for www-data
