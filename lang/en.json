@@ -64,6 +64,7 @@
     "API Token": "API Token",
     "Please copy your new API token. For your security, it won't be shown again.": "Please copy your new API token. For your security, it won't be shown again.",
     "Copy to clipboard": "Copy to clipboard",
+    "Successfully copied!": "Successfully copied!",
     "API Token Permissions": "API Token Permissions",
     "API tokens allow third-party services to authenticate with Investbrain on your behalf.": "API tokens allow third-party services to authenticate with Investbrain on your behalf.",
     "Delete API Token": "Delete API Token",

@@ -141,22 +141,6 @@
                 ]) }}
         ></div>
 
-        <div @click="
-                if ($refs.mobileDatePickerInput?.checkVisibility()) {
-                    $refs.mobileDatePickerInput?.showPicker()
-                    return;
-                }
-                if(datePickerOpen) {
-                    $refs.desktopDatePickerInput.focus();
-                    return;
-                }
-                datePickerOpen=!datePickerOpen;
-            "
-            class="absolute top-1/2 -translate-y-1/2 right-0 p-3 cursor-pointer text-neutral-400 hover:text-neutral-500"
-        >
-            <x-ui.icon name="o-calendar" />
-        </div>
-
         <div  
             x-show="datePickerOpen"
             x-transition:enter="ease-out duration-200"
@@ -171,7 +155,7 @@
                 max-w-lg
                 w-[17rem]
                 absolute
-                z-50
+                z-100
                 bg-base-100
                 dark:bg-base-300
                 rounded-box
@@ -239,9 +223,22 @@
         />
 
         {{-- ICON --}}
-        @if($icon)
-            <x-ui.icon :name="$icon" class="z-60 absolute top-1/2 -translate-y-1/2 start-3 text-gray-400 pointer-events-none" />
-        @endif
+        <div @click="
+                if ($refs.mobileDatePickerInput?.checkVisibility()) {
+                    $refs.mobileDatePickerInput?.showPicker()
+                    return;
+                }
+                if(datePickerOpen) {
+                    $refs.desktopDatePickerInput.focus();
+                    return;
+                }
+                datePickerOpen=!datePickerOpen;
+            "
+            class="z-60 absolute top-1/2 -translate-y-1/2 end-0 p-3 cursor-pointer text-neutral-400 hover:text-neutral-500"
+        >
+            <x-ui.icon name="o-calendar" />
+        </div>
+
 
     </div>
 

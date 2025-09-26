@@ -78,13 +78,13 @@
         ></div>
         
         {{-- MODAL CONTENT --}}
-        <div x-ref="modalContent" class="modal-box p-0 {{ $boxClass }}">
+        <div x-ref="modalContent" class="modal-box overflow-y-visible p-0 {{ $boxClass }}">
 
             @if(!$noCard)
                 <x-ui.card     
                     :title="$title"
                     :subtitle="$subtitle"
-                    expanded="true"      
+                    expanded="true"
                 >
         
                 @if (!$persistent && !$noCard)

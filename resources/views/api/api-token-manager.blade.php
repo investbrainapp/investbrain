@@ -1,11 +1,14 @@
 <?php
 
+use App\Traits\Toast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Volt\Component;
 
 new class extends Component
 {
+    use Toast;
+
     /**
      * The create API token form state.
      *
@@ -240,7 +243,7 @@ new class extends Component
                         type="text" 
                         readonly
                         :value="$plainTextToken"
-                        class="font-mono break-all"
+                        class="font-mono break-all focus:outline-none focus:ring-0"
                         autocomplete="off"
                         autocorrect="off"
                         autocapitalize="off"
@@ -253,7 +256,8 @@ new class extends Component
                                 icon="o-clipboard"
                                 @click="
                                     navigator.clipboard.writeText($wire.plainTextToken); 
-                                    $wire.$set('displayingToken', false)
+                                    $wire.$set('displayingToken', false);
+                                    $wire.success('{{ __('Successfully copied!') }}')
                                 "
                             />
                         </x-slot:suffix>

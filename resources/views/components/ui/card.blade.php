@@ -6,7 +6,7 @@
 ])
 
 <div 
-    {{ $attributes->merge()->class(['p-5', 'shadow-sm', 'rounded-lg', 'bg-base-100', 'overflow-hidden']) }} 
+    {{ $attributes->merge()->class(['p-5', 'shadow-sm', 'rounded-lg', 'bg-base-100']) }} 
 >
     @if($title)
         <h3 @class(['pb-2' => !$subTitle && !$dense, 'text-xl font-bold leading-none tracking-tight flex items-center truncate'])> {{ $title }} </h3>

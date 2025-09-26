@@ -64,6 +64,7 @@
     "API Token": "Token API",
     "Please copy your new API token. For your security, it won't be shown again.": "Por favor, copia tu nuevo token API. Por seguridad, no se mostrará nuevamente.",
     "Copy to clipboard": "Copiar al portapapeles",
+    "Successfully copied!": "Copiado con éxito!",
     "API Token Permissions": "Permisos del Token API",
     "API tokens allow third-party services to authenticate with Investbrain on your behalf.": "Los tokens API permiten que servicios de terceros se autentiquen con Investbrain en tu nombre.",
     "Delete API Token": "Eliminar Token API",
