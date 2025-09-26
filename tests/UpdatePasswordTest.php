@@ -7,7 +7,6 @@ namespace Tests;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Jetstream\Http\Livewire\UpdatePasswordForm;
 use Livewire\Livewire;
 
 class UpdatePasswordTest extends TestCase
@@ -18,7 +17,7 @@ class UpdatePasswordTest extends TestCase
     {
         $this->actingAs($user = User::factory()->create());
 
-        Livewire::test(UpdatePasswordForm::class)
+        Livewire::test('update-password-form')
             ->set('state', [
                 'current_password' => 'password',
                 'password' => 'new-password',
@@ -33,7 +32,7 @@ class UpdatePasswordTest extends TestCase
     {
         $this->actingAs($user = User::factory()->create());
 
-        Livewire::test(UpdatePasswordForm::class)
+        Livewire::test('update-password-form')
             ->set('state', [
                 'current_password' => 'wrong-password',
                 'password' => 'new-password',
@@ -49,7 +48,7 @@ class UpdatePasswordTest extends TestCase
     {
         $this->actingAs($user = User::factory()->create());
 
-        Livewire::test(UpdatePasswordForm::class)
+        Livewire::test('update-password-form')
             ->set('state', [
                 'current_password' => 'password',
                 'password' => 'new-password',

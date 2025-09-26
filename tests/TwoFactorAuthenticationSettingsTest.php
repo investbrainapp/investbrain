@@ -7,7 +7,6 @@ namespace Tests;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
-use Laravel\Jetstream\Http\Livewire\TwoFactorAuthenticationForm;
 use Livewire\Livewire;
 
 class TwoFactorAuthenticationSettingsTest extends TestCase
@@ -24,7 +23,7 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
-        Livewire::test(TwoFactorAuthenticationForm::class)
+        Livewire::test('two-factor-authentication-form')
             ->call('enableTwoFactorAuthentication');
 
         $user = $user->fresh();
@@ -43,7 +42,7 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
+        $component = Livewire::test('two-factor-authentication-form')
             ->call('enableTwoFactorAuthentication')
             ->call('regenerateRecoveryCodes');
 
@@ -65,7 +64,7 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
+        $component = Livewire::test('two-factor-authentication-form')
             ->call('enableTwoFactorAuthentication');
 
         $this->assertNotNull($user->fresh()->two_factor_secret);
