@@ -1,0 +1,1 @@
+<span {{ $attributes->class("loading loading-spinner") }}></span>

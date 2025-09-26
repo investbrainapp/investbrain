@@ -1,102 +1,84 @@
-@use('App\Models\Currency')
+<x-layouts.app>
 
-<x-app-layout>
+        <x-ui.toolbar title="{{ __('Dashboard') }}"></x-ui.toolbar>
+    
+        @livewire('portfolio-performance-chart', [
+            'name' => 'dashboard'
+        ])
 
-    @livewire('portfolio-performance-chart', [
-        'name' => 'dashboard'
-    ])
-
-    <div class="grid sm:grid-cols-5 gap-5">
-        <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-            <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Market Gain/Loss') }}</div>
-            <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_gain_dollars', 0)) }} </div>
-        </x-card>
-        
-        <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-            <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Total Cost Basis') }}</div>
-            <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_cost_basis', 0)) }} </div>
-        </x-card>
-        
-        <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-            <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Total Market Value') }}</div>
-            <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_value', 0)) }} </div>
-        </x-card>
-        
-        <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-            <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Realized Gain/Loss') }}</div>
-            <div class="font-black text-xl"> {{ Number::currency($metrics->get('realized_gain_dollars', 0)) }} </div>
-        </x-card>
-
-        <x-card class="col-span-5 sm:col-span-1 bg-slate-100 dark:bg-base-200 rounded-lg">
-            <div class="text-sm text-gray-400 whitespace-nowrap truncate">{{ __('Dividends Earned') }}</div>
-            <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_dividends_earned', 0)) }} </div>
-        </x-card>
+        <div class="grid sm:grid-cols-5 gap-5">
+            <x-ui.card dense="true" sub-title="{{ __('Market Gain/Loss') }}" class="col-span-5 sm:col-span-1">
+                <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_gain_dollars', 0)) }} </div>
+            </x-ui.card>
             
-    </div>
-
-    <div class="mt-6 grid md:grid-cols-7 gap-5">
-
-        <x-ib-card title="{{ __('My portfolios') }}" class="md:col-span-4">
-
-            @if ($user->portfolios->isEmpty())
-                <div class="flex justify-center items-center h-[100px] mb-8">
-                    
-                    <x-button label="{{ __('Import / Export Data') }}" class="btn-primary btn-outline mr-6" link="{{ route('import-export') }}" />
-                    <span>{{ __('or') }}</span>
-                    <x-button label="{{ __('Create your first portfolio!') }}" class="btn-primary ml-6" link="{{ route('portfolio.create') }}" />
-                    
-                </div>
-            @endif
+            <x-ui.card dense="true" sub-title="{{ __('Total Cost Basis') }}" class="col-span-5 sm:col-span-1">
+                <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_cost_basis', 0)) }} </div>
+            </x-ui.card>
             
-            @foreach($user->portfolios as $portfolio)
-                <x-list-item :item="$portfolio" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}">
-                    <x-slot:value>
-                        {{ $portfolio->title }}
-                        @if($portfolio->wishlist)
-                            <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-sm ml-2" />
-                        @endif
-                    </x-slot:value>
-                </x-list-item>
-            @endforeach
+            <x-ui.card dense="true" sub-title="{{ __('Total Market Value') }}" class="col-span-5 sm:col-span-1">
+                <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_market_value', 0)) }} </div>
+            </x-ui.card>
+            
+            <x-ui.card dense="true" sub-title="{{ __('Realized Gain/Loss') }}" class="col-span-5 sm:col-span-1">
+                <div class="font-black text-xl"> {{ Number::currency($metrics->get('realized_gain_dollars', 0)) }} </div>
+            </x-ui.card>
 
-        </x-ib-card>
-
-        @if (!$user->transactions->isEmpty())
-        <x-ib-card title="{{ __('Recent activity') }}" class="md:col-span-3">
+            <x-ui.card dense="true" sub-title="{{ __('Dividends Earned') }}" class="col-span-5 sm:col-span-1">
+                <div class="font-black text-xl"> {{ Number::currency($metrics->get('total_dividends_earned', 0)) }} </div>
+            </x-ui.card>
                 
-            @livewire('transactions-list', [
-                'transactions' => $user->transactions,
-                'showPortfolio' => true,
-                'paginate' => false
-            ])
+        </div>
 
-        </x-ib-card>
-        @endif
+        <div class="mt-6 grid md:grid-cols-7 gap-5">
 
-        @if (!$user->portfolios->isEmpty())
-        <x-ib-card title="{{ __('Top performers') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('My portfolios') }}" class="md:col-span-4">
 
-            @livewire('top-performers-list', [
-                'holdings' => $user->holdings
-            ])
+                @if ($user->portfolios->isEmpty())
+                    <div class="flex justify-center items-center h-[100px] mb-8">
+                        
+                        <x-ui.button label="{{ __('Import / Export Data') }}" class="btn-primary btn-outline mr-6" link="{{ route('import-export') }}" />
+                        <span>{{ __('or') }}</span>
+                        <x-ui.button label="{{ __('Create your first portfolio!') }}" class="btn-primary ml-6" link="{{ route('portfolio.create') }}" />
+                        
+                    </div>
+                @endif
+                
+                @foreach($user->portfolios as $portfolio)
+                    <x-ui.list-item no-separator :item="$portfolio" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id]) }}">
+                        <x-slot:value>
+                            {{ $portfolio->title }}
+                            @if($portfolio->wishlist)
+                                <x-ui.badge value="{{ __('Wishlist') }}" class="badge-secondary badge-outline badge-sm ml-2" />
+                            @endif
+                        </x-slot:value>
+                    </x-ui.list-item>
+                @endforeach
 
-        </x-ib-card>
-        @endif
+            </x-ui.card>
 
-        {{-- @if (!$user->portfolios->isEmpty())
-        <x-ib-card title="{{ __('Top headlines') }}" class="md:col-span-3">
-         
-            @php
-                $users = App\Models\User::take(3)->get();
-            @endphp
-            
-            @foreach($users as $user)
-                <x-list-item no-separator :item="$user" avatar="profile_photo_url" link="/docs/installation" />
-            @endforeach
+            @if (!$user->transactions->isEmpty())
+            <x-ui.card title="{{ __('Recent activity') }}" class="md:col-span-3">
+                    
+                @livewire('transactions-list', [
+                    'transactions' => $user->transactions,
+                    'showPortfolio' => true,
+                    'paginate' => false
+                ])
 
-        </x-ib-card>
-        @endif --}}
+            </x-ui.card>
+            @endif
 
+            @if (!$user->portfolios->isEmpty())
+            <x-ui.card title="{{ __('Top performers') }}" class="md:col-span-3">
+
+                @livewire('top-performers-list', [
+                    'holdings' => $user->holdings
+                ])
+
+            </x-ui.card>
+            @endif
+
+        </div>
     </div>
     
-</x-app-layout>
+</x-layouts.app>

@@ -1,17 +1,15 @@
 <?php
 
-use App\Models\Portfolio;
-use App\Models\Transaction;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // props
     public Collection $holdings;
 
     // methods
-    
+
 }; ?>
 
 <div class="">
@@ -23,7 +21,7 @@ new class extends Component {
                     ->take(5) 
         as $holding
     )
-        <x-list-item 
+        <x-ui.list-item 
             no-separator 
             :item="$holding" 
             link="{{ route('holding.show', [
@@ -36,7 +34,7 @@ new class extends Component {
 
                 {{ $holding->market_data?->name }} ({{ $holding->symbol }})
 
-                <x-gain-loss-arrow-badge 
+                <x-ui.gain-loss-arrow-badge 
                     :cost-basis="$holding->average_cost_basis"
                     :market-value="$holding->market_data->market_value"
                 />
@@ -45,6 +43,6 @@ new class extends Component {
             <x-slot:sub-value>
                 {{ $holding->portfolio->title }}
             </x-slot:sub-value>
-        </x-list-item>
+        </x-ui.list-item>
     @endforeach
 </div>

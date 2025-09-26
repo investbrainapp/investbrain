@@ -18,34 +18,31 @@ new class extends Component
     // methods
 
 }; ?>
-<div class="bg-base-100 border-base-300 border-b sticky top-0 z-10">
-    <div class="flex justify-between items-center px-7 py-3 gap-4 mx-auto">
-        <div class="flex flex-0 items-center">
-            
-            <label for="main-drawer" class="lg:hidden mr-3">
-                <x-icon name="o-bars-3" class="cursor-pointer" />
-            </label>
 
-            <div class="hidden md:block" style="height:2.5em">
-                <x-application-logo  />
-            </div>
+<nav class="z-10 p-5 ml-0 md:ml-68 md:border-0 border-b border-zinc-200 dark:border-zinc-800">
+    
+    <div class="flex flex-wrap justify-between items-center">
 
-        </div>
-        <div class="flex flex-1 justify-center" x-data>
-
-            <x-spotlight
-                shortcut="slash"
-                search-text="{{ __('Search holdings, portfolios, or anything else...') }}"
-                no-results-text="{{ __('Darn! Nothing found for that search.') }}"
+        <div class="flex">
+            <x-ui.button
+                aria-controls="drawer-navigation"
+                title="{{ __('Toggle Sidebar') }}"
+                class="btn-circle btn-ghost btn-sm block md:hidden"
+                icon="o-bars-3"
+                @click="sideBarOpen = true"
             />
-            
-            <x-button 
-                @click.stop="$dispatch('mary-search-open')"
-                class="btn-sm flex-1 justify-start md:flex-none"
+
+            <div class="ml-3 w-8 hidden sm:block md:hidden"> <x-ui.logo /> </div>
+        </div>
+    
+        <div>
+            <x-ui.button 
+                @click.stop="$dispatch('toggle-spotlight')"
+                class="btn-sm btn-ghost bg-base-300 flex-1 justify-start md:flex-none border-none"
             >
                 <x-slot:label>
                     <span class="flex items-center text-gray-400">
-                        <x-icon name="o-magnifying-glass" class="mr-2" />
+                        <x-ui.icon name="o-magnifying-glass" class="mr-2" />
                         <span class=" truncate hidden sm:block">
                             @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm">/</kbd>'])
                         </span>
@@ -54,35 +51,41 @@ new class extends Component
                         </span>
                     </span>
                 </x-slot:label>
-            </x-button>
+            </x-ui.button>
 
+            <x-ui.spotlight
+                search-text="{{ __('Search holdings, portfolios, or anything else...') }}"
+                no-results-text="{{ __('Darn! Nothing found for that search.') }}"
+            />
         </div>
+
         <div class="flex flex-0 items-center gap-4">
 
-            <x-button 
+            <x-ui.button 
                 title="{{ __('Documentation') }}"
                 icon="o-book-open"
                 class="btn-circle btn-ghost btn-sm"
                 link="https://github.com/investbrainapp/investbrain"
                 external
             >
-            </x-button>
+            </x-ui.button>
 
-            <x-button 
+            <x-ui.button 
                 title="{{ __('We\'re open source!') }}"
                 class="btn-circle btn-ghost btn-sm"
                 link="https://github.com/investbrainapp/investbrain"
                 external
             >
-                <x-github-icon />
-            </x-button>
+                <x-social.github-icon />
+            </x-ui.button>
 
-            <x-theme-toggle 
+            <x-ui.theme-selector
+                id="theme-selector"
                 title="{{ __('Toggle Theme') }}" 
                 class="btn-circle btn-ghost btn-sm" 
-                darkTheme="business" 
-                lightTheme="corporate"
             />
         </div>
     </div>
-</div>
+</nav>
+
+

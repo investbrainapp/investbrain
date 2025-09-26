@@ -54,6 +54,7 @@ new class extends Component
         // $this->js('window.location.reload();');
     }
 }; ?>
+
 <x-forms.form-section submit="updateProfileInformation">
     <x-slot name="title">
         {{ __('Locale Options') }}
@@ -66,7 +67,7 @@ new class extends Component
     <x-slot name="form">
 
         <div class="col-span-6 sm:col-span-4">
-            <x-select 
+            <x-ui.select 
                 label="{{ __('Locale') }}"
                 class="select block mt-1 w-full"
                 :options="config('app.available_locales')"
@@ -75,12 +76,13 @@ new class extends Component
                 placeholder="Choose a locale"
                 wire:model="locale"
                 id="locale"
+                required
             />
             
         </div>
 
         <div class="col-span-6 sm:col-span-4">
-            <x-select 
+            <x-ui.select 
                 label="{{ __('Display Currency') }}"
                 class="select block mt-1 w-full"
                 :options="$currencies"
@@ -89,6 +91,7 @@ new class extends Component
                 placeholder="Choose a display currency"
                 wire:model="display_currency"
                 id="display_currency"
+                required
             />
             
         </div>
@@ -100,8 +103,8 @@ new class extends Component
             {{ __('Saved.') }}
         </x-forms.action-message>
 
-        <x-button type="submit">
+        <x-ui.button type="submit">
             {{ __('Save') }}
-        </x-button>
+        </x-ui.button>
     </x-slot>
 </x-forms.form-section>

@@ -7,9 +7,8 @@ namespace Tests;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
-use Laravel\Jetstream\Features;
-use Laravel\Jetstream\Http\Livewire\ApiTokenManager;
 use Livewire\Livewire;
+use Livewire\Volt\Volt;
 
 class ApiTokenPermissionsTest extends TestCase
 {
@@ -17,10 +16,6 @@ class ApiTokenPermissionsTest extends TestCase
 
     public function test_api_tokens_can_be_deleted(): void
     {
-
-        if (! Features::hasApiFeatures()) {
-            $this->markTestSkipped('API support is not enabled.');
-        }
 
         $this->actingAs($user = User::factory()->create());
 
@@ -30,7 +25,7 @@ class ApiTokenPermissionsTest extends TestCase
             'abilities' => [],
         ]);
 
-        Livewire::test(ApiTokenManager::class)
+        Livewire::test('api-token-manager')
             ->set(['apiTokenIdBeingDeleted' => $token->id])
             ->call('deleteApiToken');
 
@@ -40,13 +35,9 @@ class ApiTokenPermissionsTest extends TestCase
     public function test_api_tokens_can_be_created(): void
     {
 
-        if (! Features::hasApiFeatures()) {
-            $this->markTestSkipped('API support is not enabled.');
-        }
-
         $this->actingAs($user = User::factory()->create());
 
-        Livewire::test(ApiTokenManager::class)
+        Livewire::test('api-token-manager')
             ->set(['createApiTokenForm' => [
                 'name' => 'Test Token',
                 'permissions' => [],
@@ -71,7 +62,7 @@ class ApiTokenPermissionsTest extends TestCase
     //         'abilities' => ['create', 'read'],
     //     ]);
 
-    //     Livewire::test(ApiTokenManager::class)
+    //     Volt::test('api-token-manager')
     //         ->set(['managingPermissionsFor' => $token])
     //         ->set(['updateApiTokenForm' => [
     //             'permissions' => [],

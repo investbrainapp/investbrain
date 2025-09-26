@@ -19,76 +19,97 @@ new class extends Component
 
 }; ?>
 
-<div class="
-    flex
-    flex-col
-    !transition-all
-    !duration-100
-    ease-out
-    overflow-x-hidden
-    overflow-y-auto
-    h-screen
-    lg:h-[calc(100vh-73px)]
-    bg-base-100
-    lg:bg-inherit
-    {{ session('mary-sidebar-collapsed') == 'true' ? 'w-[70px] [&>*_summary::after]:hidden [&_.mary-hideable]:hidden [&_.display-when-collapsed]:block [&_.hidden-when-collapsed]:hidden' : null }}
-    {{ session('mary-sidebar-collapsed') != 'true' ? 'w-[270px] [&>*_summary::after]:block [&_.mary-hideable]:block [&_.hidden-when-collapsed]:block [&_.display-when-collapsed]:hidden' : null }}
-">
-    <div class="flex-1">
-        <x-menu activate-by-route>
+<div 
+    aria-label="Sidebar"
+    style="background-image: url('{{ asset('images/noise.svg') }}')"
+    class="
+        h-full
+        bg-base-300
+        border-r
+        border-base-100
+        fixed
+        top-0
+        left-0
+        z-50
+        md:w-68
+        w-3/4
+        transition-transform
+        -translate-x-full
+        md:translate-x-0
+    " 
+    :class="{'translate-x-0': sideBarOpen, '-translate-x-full': !sideBarOpen}"
+    x-data="{
+        responsiveSidebar() {
+            if (window.innerWidth >= 768) {
+                this.sideBarOpen = true
+                return;
+            }
+            this.sideBarOpen = false
+        }
+    }"
+    @resize.window="responsiveSidebar"
+    @keyup.escape.window="sideBarOpen = false"
+>
+    <template x-teleport="body">
+        <div
+            aria-label="Overlay"
+            class="block md:hidden z-10 fixed w-screen h-screen inset-0 bg-black/20 backdrop-blur-sm"
+            x-on:click="sideBarOpen=false"
+            x-show="sideBarOpen"
+            x-cloak
+        ></div>
+    </template>
+    
+    <div class="h-full px-1 overflow-y-auto flex flex-col ">
 
-            <x-menu-item title="{{ __('Dashboard') }}" icon="o-home" link="{{ route('dashboard') }}" />
-            <x-menu-sub title="{{ __('Portfolios') }}" icon="o-document-duplicate">
-                @foreach (auth()->user()->portfolios as $portfolio)
-                <x-menu-item  icon="o-document" link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" >
-                    <x-slot:title> 
-                        {{ $portfolio->title }} 
-                        @if($portfolio->wishlist)
-                        <x-badge value="{{ __('Wishlist') }}" class="badge-secondary badge-sm ml-2" />
-                        @endif
-                    </x-slot:title>
-                    
-                </x-menu-item>
-                @endforeach
+        <div class="w-10 m-5"> <x-ui.logo /> </div>
 
-                <x-menu-item title="{{ __('Create Portfolio') }}" icon="o-document-plus" link="{{ route('portfolio.create') }}" />
-            </x-menu-sub>
-            <x-menu-item title="{{ __('Transactions') }}" icon="o-banknotes" link="{{ route('transaction.index') }}" />
-            {{-- <x-menu-item title="{{ __('Reporting') }}" icon="o-chart-bar-square" link="####" /> --}}
+        <x-ui.menu class="space-y-2 text-wrap w-full overflow-x-hidden" activate-by-route="true">
+            <x-ui.menu-item icon="o-home" title="{{ __('Dashboard') }}" link="{{ route('dashboard') }}" class="font-medium text-md" />
 
-        </x-menu>
+            @foreach (auth()->user()->portfolios as $portfolio)
+                <x-ui.menu-item 
+                    :title="$portfolio->title" 
+                    icon="o-document"
+                    :badge="$portfolio->wishlist ? __('Wishlist') : null" 
+                    badge-classes="badge-secondary badge-outline"
+                    link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" 
+                    class="font-medium text-md"
+                />
+            @endforeach
+            
+            <x-ui.menu-item icon="o-document-plus" title="{{ __('Create Portfolio') }}" link="{{ route('portfolio.create') }}" class="font-medium text-md" />
 
-    </div>
-
-    <div class="px-3">
-
-        <x-section-border />
+            <x-ui.menu-item icon="o-banknotes" title="{{ __('Transactions') }}" link="{{ route('transaction.index') }}" class="font-medium text-md" />
+       
+        </x-ui.menu>
+        <div class="flex-1"></div>
 
         @php
             $user = auth()->user();
         @endphp
 
-        <x-list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="mb-3 !-mt-3 rounded">
+        <x-ui.list-item :item="$user" avatar="profile_photo_url" value="name" sub-value="email" no-separator no-hover class="rounded mb-2">
             <x-slot:actions>
-                <x-dropdown>
+                <x-ui.dropdown>
                     <x-slot:trigger>
-                        <x-button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-xs" />
+                        <x-ui.button icon="o-cog-6-tooth" class="btn-circle btn-ghost btn-sm relative transition-transform focus:rotate-90" />
                     </x-slot:trigger>
                     
-                    <x-menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
-                    <x-menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
-                    <x-menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
+                    <x-ui.menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
+                    <x-ui.menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
+                    <x-ui.menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 
-                    <x-section-border class="py-1" />
+                    <x-ui.section-border class="py-1" />
 
-                    <x-menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
+                    <x-ui.menu-item title="{{ __('Log Out') }}" icon="o-power" onclick="event.preventDefault(); document.getElementById('logout').submit();" />
                     <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
 
-                </x-dropdown>
+                </x-ui.dropdown>
                 
             </x-slot:actions>
-        </x-list-item>
-    </div>
+        </x-ui.list-item>
+   </div>
 </div>

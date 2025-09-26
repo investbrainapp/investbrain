@@ -1,8 +1,8 @@
-<x-guest-layout>
-    <x-authentication-card>
+<x-layouts.guest>
+    <x-ui.authentication-card>
         <x-slot:logo>
             <div class="w-24 mb-10">
-                <x-glyph-only-logo />
+                <x-ui.logo />
             </div>
         </x-slot:logo>
 
@@ -14,5 +14,5 @@
             'user' => $user,
         ])
 
-    </x-authentication-card>
-</x-guest-layout>
+    </x-ui.authentication-card>
+</x-layouts.guest>
