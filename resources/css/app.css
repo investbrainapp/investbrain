@@ -11,6 +11,8 @@
   themes: light, dark --default --prefersdark;
 }
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @plugin "daisyui/theme" {
   name: "dark";
   default: true;

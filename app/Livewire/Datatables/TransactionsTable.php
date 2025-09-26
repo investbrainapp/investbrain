@@ -22,25 +22,18 @@ class TransactionsTable extends DataTableComponent
         return Transaction::query()
             ->with(['portfolio', 'market_data'])
             ->myTransactions()
-            ->addSelect('portfolio_id', 'transaction_type')
+            ->addSelect(['portfolio_id', 'transaction_type', 'split'])
             ->selectRaw('
                 CASE
                     WHEN transaction_type = \'SELL\' 
                     THEN COALESCE(transactions.sale_price - transactions.cost_basis, 0)
                     ELSE COALESCE(market_data.market_value - transactions.cost_basis, 0)
                 END AS gain_dollars');
-
-
-        // return auth()
-            // ->user()
-            // ->transactions()
-            // ->orderBy(...array_values($this->sortBy))
-            // ->paginate(10);
     }
 
     public function configure(): void
     {
-        $this->hiddenColumns = ['name', 'average_cost_basis', 'market_value', 'fifty_two_week_low', 'fifty_two_week_high'];
+        $this->hiddenColumns = ['name', 'cost_basis', 'gain_dollars'];
 
         $this->setTableWrapperAttributes([
             'default' => false, 
@@ -151,9 +144,6 @@ class TransactionsTable extends DataTableComponent
                         : 'badge-error') . ' badge-sm mr-3',
                 ]))
                 ->sortable(fn (Builder $query, string $direction) => $query->orderBy('transaction_type', $direction)),
-            Column::make(__('Split'), 'split')
-                ->format(fn($value) => $value ? 'Yes' : '')
-                ->sortable(),
             Column::make(__('Quantity'), 'quantity')
                 ->sortable(),
             Column::make(__('Cost Basis'), 'cost_basis')

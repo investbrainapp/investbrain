@@ -112,8 +112,6 @@ new class extends Component
         $this->displayingToken = true;
 
         $this->plainTextToken = explode('|', $token->plainTextToken, 2)[1];
-
-        $this->dispatch('showing-token-modal');
     }
 
     /**
@@ -225,29 +223,38 @@ new class extends Component
             @endif
 
             {{-- Token Value Modal --}}
-            <x-ui.dialog-modal key="token-display-modal" wire:model.live="displayingToken">
-                <x-slot name="title">
-                    {{ __('API Token') }}
-                </x-slot>
+            <x-ui.modal
+                persistent
+                key="token-display-modal"
+                wire:model.live="displayingToken"
+                title="{{ __('API Token') }}"
+            >
+                <div class="mt-2 text-sm text-secondary-content">
 
-                <x-slot name="content">
                     <div>
                         {{ __('Please copy your new API token. For your security, it won\'t be shown again.') }}
                     </div>
 
-                    <x-ui.input x-ref="plaintextToken" type="text" readonly :value="$plainTextToken"
+                    <x-ui.input 
+                        x-ref="plaintextToken" 
+                        type="text" 
+                        readonly
+                        :value="$plainTextToken"
                         class="mt-4 px-4 py-2 rounded font-mono text-sm w-full break-all"
-                        autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                        @showing-token-modal.window="setTimeout(() => { $el.select() }, 250)"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
                     />
-                </x-slot>
-
-                <x-slot name="footer">
+                </div>
+        
+                <div class="flex flex-row items-center justify-end mt-8 text-end">
                     <x-ui.button class="btn-outline" wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
                         {{ __('Close') }}
                     </x-ui.button>
-                </x-slot>
-            </x-ui.dialog-modal>
+                </div>
+      
+            </x-ui.modal>
 
         </x-slot>
 
@@ -281,7 +288,7 @@ new class extends Component
                     <div class="space-y-6">
                         @foreach ($this->user->tokens->sortBy('name') as $token)
                             <div class="flex items-center justify-between">
-                                <div class="break-all dark:text-white">
+                                <div class="break-all">
                                     {{ $token->name }}
                                 </div>
 

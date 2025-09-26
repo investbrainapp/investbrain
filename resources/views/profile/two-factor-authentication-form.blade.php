@@ -173,7 +173,7 @@ new class extends Component
     </x-slot>
 
     <x-slot name="content">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+        <h3 class="text-lg font-medium">
             @if ($this->enabled)
                 @if ($showingConfirmation)
                     {{ __('Finish enabling two factor authentication.') }}
@@ -185,7 +185,7 @@ new class extends Component
             @endif
         </h3>
 
-        <div class="mt-3 max-w-xl text-sm text-gray-600 dark:text-gray-400">
+        <div class="mt-3 max-w-xl text-sm">
             <p>
                 {{ __('When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone\'s Google Authenticator application.') }}
             </p>
