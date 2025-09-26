@@ -60,26 +60,27 @@ new class extends Component
         ></div>
     </template>
     
-    <div class="h-full px-1 overflow-y-auto flex flex-col">
+    <div class="h-full px-1 overflow-y-auto flex flex-col ">
 
         <div class="w-10 m-5"> <x-ui.logo /> </div>
 
-        <x-ui.menu class="space-y-2" activate-by-route="true">
-            <x-ui.menu-item title="{{ __('Dashboard') }}" link="{{ route('dashboard') }}" class="font-medium text-lg" />
+        <x-ui.menu class="space-y-2 text-wrap w-full overflow-x-hidden" activate-by-route="true">
+            <x-ui.menu-item icon="o-home" title="{{ __('Dashboard') }}" link="{{ route('dashboard') }}" class="font-medium text-md" />
 
             @foreach (auth()->user()->portfolios as $portfolio)
                 <x-ui.menu-item 
                     :title="$portfolio->title" 
+                    icon="o-document"
                     :badge="$portfolio->wishlist ? __('Wishlist') : null" 
                     badge-classes="badge-secondary badge-outline"
                     link="{{ route('portfolio.show', ['portfolio' => $portfolio->id ]) }}" 
-                    class="font-medium text-md ms-1"
+                    class="font-medium text-md"
                 />
             @endforeach
             
-            <x-ui.menu-item title="{{ __('Create Portfolio') }}" link="{{ route('portfolio.create') }}" class="font-medium text-lg" />
+            <x-ui.menu-item icon="o-document-plus" title="{{ __('Create Portfolio') }}" link="{{ route('portfolio.create') }}" class="font-medium text-md" />
 
-            <x-ui.menu-item title="{{ __('Transactions') }}" link="{{ route('transaction.index') }}" class="font-medium text-lg" />
+            <x-ui.menu-item icon="o-banknotes" title="{{ __('Transactions') }}" link="{{ route('transaction.index') }}" class="font-medium text-md" />
        
         </x-ui.menu>
         <div class="flex-1"></div>
