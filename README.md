@@ -135,7 +135,7 @@ There are several optional configurations available when installing using the re
 | ------------- | ------------- | ------------- |
 | APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
 | APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
-| APP_KEY | Encryption key for various security-related functions | `null` |
+| APP_KEY | Encryption key for various security-related functions | Set automatically during install |
 | MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `twelvedata`, `alphavantage`, `alpaca`, or `finnhub`) | yahoo |
 | ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |

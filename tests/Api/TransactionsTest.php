@@ -114,6 +114,35 @@ class TransactionsTest extends TestCase
             ->assertJsonValidationErrors(['symbol']);
     }
 
+    public function test_cannot_sell_more_than_owned()
+    {
+        Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+            '--force' => true,
+        ]);
+
+        $this->actingAs($this->user);
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory(5)->buy()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $data = [
+            'symbol' => 'AAPL',
+            'portfolio_id' => $this->portfolio->id,
+            'transaction_type' => 'SELL',
+            'quantity' => 6,
+            'currency' => 'USD',
+            'date' => now()->toDateString(),
+            'sale_price' => 150,
+        ];
+
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), $data)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['quantity']);
+    }
+
     public function test_can_show_a_transaction()
     {
         $this->actingAs($this->user);

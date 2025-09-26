@@ -68,4 +68,15 @@ class MarketDataTest extends TestCase
             'symbol' => '',
         ]);
     }
+
+    public function test_market_data_standardizes_currency_codes()
+    {
+
+        $quote = new Quote([
+            'symbol' => 'ACME',
+            'currency' => 'GBp',
+        ]);
+
+        $this->assertEquals('GBX', $quote->currency);
+    }
 }

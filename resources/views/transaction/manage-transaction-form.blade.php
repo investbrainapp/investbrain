@@ -19,7 +19,7 @@ new class extends Component
     // props
     public ?Portfolio $portfolio;
 
-    public ?Transaction $transaction;
+    public ?Transaction $transaction = null;
 
     public ?string $portfolio_id;
 
@@ -53,7 +53,7 @@ new class extends Component
                 'required',
                 'numeric',
                 'gt:0',
-                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date),
+                new QuantityValidationRule($this->portfolio, $this->symbol, $this->transaction_type, $this->date, $this->transaction),
             ],
             'currency' => ['required', 'exists:currencies,currency'],
             'cost_basis' => 'exclude_if:transaction_type,SELL|min:0|numeric',
