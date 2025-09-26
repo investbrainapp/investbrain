@@ -91,7 +91,7 @@ new class extends Component
             </x-ui.button>
         </div>
 
-        <!-- Delete User Confirmation Modal -->
+        {{-- Delete User Confirmation Modal --}}
         <x-ui.dialog-modal wire:model.live="confirmingUserDeletion">
             <x-slot name="title">
                 {{ __('Delete Account') }}

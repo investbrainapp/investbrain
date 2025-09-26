@@ -52,7 +52,7 @@
         {{ 
             $attributes->filter(
                 fn ($value, $key) => !Str::startsWith($key, 'wire:model')
-            )->class(["modal z-50"]) 
+            )->class(["modal duration-50 z-50"]) 
         }}
 
         id="{{ $key }}"

@@ -50,7 +50,7 @@
                 wire:loading.attr="disabled"
             @endif
         >
-            <!-- SPINNER -->
+            {{-- SPINNER --}}
             @if($spinner)
                 <span wire:loading wire:target="{{ $spinnerTarget }}" class="loading loading-spinner w-5 h-5"></span>
             @endif

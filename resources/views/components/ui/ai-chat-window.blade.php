@@ -234,6 +234,7 @@ new class extends Component
     <x-ui.button 
         x-show="!open"
         @click="$dispatch('toggle-ai-chat')"
+        @keyup.escape.window="open = false"
         class="flex btn btn-circle md:btn-lg btn-primary" 
     >
         <x-slot:label>
@@ -255,9 +256,9 @@ new class extends Component
         x-transition:leave-end="opacity-0 transform translate-y-full"
         x-cloak
         key="ai-chat" 
-        class="fixed bg-base-200 shadow-2xl rounded-none md:rounded-lg
-                inset-0 h-screen w-full 
-                md:inset-auto md:right-6 md:bottom-6 md:w-[32rem] md:h-[46rem]"
+        class="fixed bg-base-300 shadow-2xl rounded-none md:rounded-lg
+                inset-0 h-screen w-full md:inset-auto md:right-6 
+                md:bottom-6 md:w-[32rem] md:h-[46rem]"
     >
         <div 
             class="absolute inset-0 flex flex-col overflow-hidden p-4" 
@@ -357,7 +358,7 @@ new class extends Component
         
             {{-- prompt input --}}
             <div class="mt-3 grow-0">
-                <form submit="startCompletion" >       
+                <form submit="startCompletion">       
                     <div class="">
                         @foreach($suggested_prompts as $prompt)
                         <x-ui.button 
@@ -370,7 +371,7 @@ new class extends Component
                 
                     <div class="flex justify-between align-bottom space-x-2 mt-1">
                         
-                        <div class="w-full">
+                        <div class="w-full" >
                             
                             <x-ui.textarea
                                 wire:model="prompt"
@@ -378,7 +379,9 @@ new class extends Component
                                 placeholder="{{ __('Have a question? AI might be able to help...') }}"
                                 wire:keydown.enter.prevent="startCompletion"
                                 autofocus
+                                @toggle-ai-chat.window="setTimeout(() => $el.focus(), 250)"
                             ></x-ui.textarea>
+                            {{--  --}}
                         </div>
                         <x-ui.button
                             spinner="generateCompletion"
