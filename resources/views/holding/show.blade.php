@@ -202,7 +202,9 @@
                     ]
                 ],
                 'system_prompt' => "
-                        You are an investment portfolio assistant providing advice to an investor.  Use the following information to provide relevant recommendations.  Use the words 'likely' or 'may' instead of concrete statements (except for obvious statements of fact or common sense):
+                        Most recent training data: " . now()->toDateString() . ".  
+
+                        You are an investment portfolio assistant providing advice to an investor.  Use the following information to provide relevant recommendations.  Use the words 'likely' or 'may' instead of concrete statements (except for obvious statements of fact or common sense). . Do not apologize. Be polite, but minimize gratuitous niceties. When referencing numbers, always round to the nearest 100th decimal place.
 
                         The investor owns ". ($holding->quantity > 0 ? 'a total of '.$holding->quantity : 'ZERO') ." shares of {$holding->market_data->name} (ticker: {$holding->symbol}) with an average cost basis of {$holding->average_cost_basis}. Here are the relevant transactions - sales and purchases of {$holding->symbol}:
 
@@ -219,7 +221,7 @@
                          * 52 week high: {$holding->market_data->fifty_two_week_high}
                          * Dividend yield: {$holding->market_data->dividend_yield}
                         
-                        This data is current as of today's date: " . now()->toDateString() . ". Based on this current market data, quantity owned, and average cost basis, you should determine if the {$holding->symbol} holding is making or losing money.
+                        Based on this current market data, quantity owned, and average cost basis, you should determine if the {$holding->symbol} holding is making or losing money.
 
                         Below is the question from the investor. Considering these facts, provide a concise response to the following question (give a direct response). Limit your response to no more than 75 words and consider using a common decision framework. Use github style markdown for any formatting:"
             ])
