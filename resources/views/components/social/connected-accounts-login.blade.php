@@ -5,7 +5,7 @@
             link="{{ route('oauth.redirect', ['provider' => $provider]) }}" 
             class="btn-sm btn-block my-1 text-white" 
             style='background-color: {{ config("services.$provider.color") }}'
-            no-wire-navigate
+            external
         >
             @include("components.social.$provider-icon")
 

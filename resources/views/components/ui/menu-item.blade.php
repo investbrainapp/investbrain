@@ -6,7 +6,6 @@
     'link' => null,
     'route' => null,
     'external' => false,
-    'noWireNavigate' => false,
     'badge' => null,
     'badgeClasses' => null,
     'badge' => false,
@@ -40,7 +39,7 @@
                     target="_blank"
                 @endif
 
-                @if(!$external && !$noWireNavigate)
+                @if(!$external)
                     {{ $attributes->wire('navigate')->value() ? $attributes->wire('navigate') : 'wire:navigate' }}
                 @endif
             @endif
