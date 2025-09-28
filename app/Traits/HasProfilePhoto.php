@@ -21,12 +21,12 @@ trait HasProfilePhoto
         tap($this->profile_photo_path, function ($previous) use ($photo, $storagePath) {
             $this->forceFill([
                 'profile_photo_path' => $photo->storePublicly(
-                    $storagePath, ['disk' => 'public']
+                    $storagePath, ['disk' => $this->profilePhotoDisk()]
                 ),
             ])->save();
 
             if ($previous) {
-                Storage::disk('public')->delete($previous);
+                Storage::disk($this->profilePhotoDisk())->delete($previous);
             }
         });
     }
@@ -42,7 +42,7 @@ trait HasProfilePhoto
             return;
         }
 
-        Storage::disk('public')->delete($this->profile_photo_path);
+        Storage::disk($this->profilePhotoDisk())->delete($this->profile_photo_path);
 
         $this->forceFill([
             'profile_photo_path' => null,
@@ -56,7 +56,7 @@ trait HasProfilePhoto
     {
         return Attribute::get(function (): string {
             return $this->profile_photo_path
-                    ? Storage::disk('public')->url($this->profile_photo_path)
+                    ? Storage::disk($this->profilePhotoDisk())->url($this->profile_photo_path)
                     : $this->defaultProfilePhotoUrl();
         });
     }
@@ -73,5 +73,15 @@ trait HasProfilePhoto
         })->join(' '));
 
         return 'https://ui-avatars.com/api/?name='.urlencode($name).'&color=7F9CF5&background=EBF4FF';
+    }
+
+    /**
+     * Get the disk that profile photos should be stored on.
+     *
+     * @return string
+     */
+    protected function profilePhotoDisk()
+    {
+        return config('filesystems.default', 'local');
     }
 }
