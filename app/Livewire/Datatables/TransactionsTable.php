@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Datatables;
 
 use App\Models\Transaction;
-use Illuminate\Support\Number;
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Column;
+use Illuminate\Support\Number;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
+use Rappasoft\LaravelLivewireTables\Views\Column;
 
 class TransactionsTable extends DataTableComponent
 {
     public array $hiddenColumns = [];
 
-    public function mount (): void
+    public function mount(): void
     {
         //
     }
 
     public function builder(): Builder
-    { 
+    {
         return Transaction::query()
             ->with(['portfolio', 'market_data'])
             ->myTransactions()
@@ -36,65 +38,65 @@ class TransactionsTable extends DataTableComponent
         $this->hiddenColumns = ['name', 'cost_basis', 'gain_dollars'];
 
         $this->setTableWrapperAttributes([
-            'default' => false, 
+            'default' => false,
             'default-styling' => false,
             'default-colors' => false,
-            'class' => 'overflow-scroll'
-        ]); 
+            'class' => 'overflow-scroll',
+        ]);
         $this->setTableAttributes([
-            'default' => false, 
+            'default' => false,
             'default-styling' => false,
             'default-colors' => false,
             'class' => 'table',
         ]);
         $this->setTheadAttributes([
-            'default' => false, 
+            'default' => false,
             'default-styling' => true,
             'default-colors' => false,
         ]);
-        $this->setThAttributes(function(Column $column) {
+        $this->setThAttributes(function (Column $column) {
 
             $attributes = [
                 'default' => false,
                 'default-styling' => false,
                 'default-colors' => false,
-                'class' => 'text-xs font-medium whitespace-nowrap uppercase tracking-wider text-nowrap'
+                'class' => 'text-xs font-medium whitespace-nowrap uppercase tracking-wider text-nowrap',
             ];
 
             if (in_array($column->getField(), $this->hiddenColumns)) {
-                $attributes['class'] = $attributes['class'] . ' hidden md:table-cell';
+                $attributes['class'] = $attributes['class'].' hidden md:table-cell';
             }
 
             return $attributes;
         });
-        $this->setThSortButtonAttributes(fn() => [
+        $this->setThSortButtonAttributes(fn () => [
             'default' => false,
             'default-styling' => true,
             'default-colors' => false,
-            'class' => 'cursor-pointer'
+            'class' => 'cursor-pointer',
         ]);
         $this->setTbodyAttributes([
-            'default' => false, 
-            'default-styling' => true,
-            'default-colors' => false,
-        ]);
-        $this->setTrAttributes(fn() => [
             'default' => false,
             'default-styling' => true,
             'default-colors' => false,
-            'class' => 'cursor-pointer hover:bg-neutral/25'
         ]);
-        $this->setTdAttributes(function(Column $column) {
-            
+        $this->setTrAttributes(fn () => [
+            'default' => false,
+            'default-styling' => true,
+            'default-colors' => false,
+            'class' => 'cursor-pointer hover:bg-neutral/25',
+        ]);
+        $this->setTdAttributes(function (Column $column) {
+
             $attributes = [
                 'default' => false,
                 'default-styling' => false,
                 'default-colors' => false,
-                'class' => 'text-nowrap'
+                'class' => 'text-nowrap',
             ];
 
             if (in_array($column->getField(), $this->hiddenColumns)) {
-                $attributes['class'] = $attributes['class'] . ' hidden md:table-cell';
+                $attributes['class'] = $attributes['class'].' hidden md:table-cell';
             }
 
             return $attributes;
@@ -111,11 +113,11 @@ class TransactionsTable extends DataTableComponent
 
         $this->setPrimaryKey('id');
 
-        $this->setTableRowUrl(function($row) {
+        $this->setTableRowUrl(function ($row) {
             return route('holding.show', ['portfolio' => $row->portfolio_id, 'symbol' => $row->symbol]);
-            
-        })->setTableRowUrlTarget(function($row) {
-            
+
+        })->setTableRowUrlTarget(function ($row) {
+
             return 'navigate';
         });
     }
@@ -123,10 +125,10 @@ class TransactionsTable extends DataTableComponent
     public function columns(): array
     {
         return [
-            
+
             Column::make(__('Date'), 'date')
                 ->sortable()
-                ->format(fn($value) => \Carbon\Carbon::parse($value)->format('M d, Y') ),
+                ->format(fn ($value) => \Carbon\Carbon::parse($value)->format('M d, Y')),
             Column::make(__('Portfolio'), 'portfolio.title')
                 ->sortable(),
             Column::make(__('Symbol'), 'symbol')
@@ -134,14 +136,14 @@ class TransactionsTable extends DataTableComponent
             Column::make(__('Name'), 'market_data.name')
                 ->sortable(),
             Column::make(__('Type'), 'transaction_type')
-                ->label(fn($row) => view('components.ui.badge', [
+                ->label(fn ($row) => view('components.ui.badge', [
                     'value' => $row->split ? 'SPLIT'
                         : ($row->reinvested_dividend
-                            ? 'REINVEST' 
+                            ? 'REINVEST'
                             : $row->transaction_type),
-                    'class' => ($row->transaction_type == 'BUY' 
-                        ? 'badge-success' 
-                        : 'badge-error') . ' badge-sm mr-3',
+                    'class' => ($row->transaction_type == 'BUY'
+                        ? 'badge-success'
+                        : 'badge-error').' badge-sm mr-3',
                 ]))
                 ->sortable(fn (Builder $query, string $direction) => $query->orderBy('transaction_type', $direction)),
             Column::make(__('Quantity'), 'quantity')

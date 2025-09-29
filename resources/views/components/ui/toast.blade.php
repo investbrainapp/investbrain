@@ -6,10 +6,10 @@
     @persist('toast')
     <div
         x-cloak
-        x-data="{ show: false, timer: '', toast: ''}"
+        x-data="{ show: false, timer: '', toast: '' }"
         @toast.window="
             clearTimeout(timer);
-            toast = $event.detail.toast
+            toast = $event.detail.toast;
             setTimeout(() => show = true, 100);
             timer = setTimeout(() => show = false, $event.detail.toast.timeout);
     ">
