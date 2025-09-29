@@ -20,7 +20,7 @@ new class extends Component
 <div>
     @foreach ($holding->dividends->take(5) as $dividend)
 
-    <x-ui.list-item :item="$dividend" no-separator>
+    <x-ui.list-item :item="$dividend" no-separator no-hover>
         <x-slot:value>
         
             @php

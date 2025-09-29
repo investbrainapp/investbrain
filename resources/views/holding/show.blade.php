@@ -158,7 +158,7 @@
 
                 @foreach ($holding->splits->take(5) as $split)
 
-                    <x-ui.list-item :item="$split" no-separator>
+                    <x-ui.list-item :item="$split" no-separator no-hover>
                         <x-slot:value>
         
                         1:{{ $split->split_amount }}

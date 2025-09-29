@@ -89,7 +89,7 @@
 
         <div class="mt-6 grid md:grid-cols-7 gap-5">
 
-            <x-ui.card title="{{ __('Holdings') }}" class="md:col-span-4">
+            <x-ui.card title="{{ __('Holdings') }}" class="overflow-hidden col-span-7 md:col-span-4">
 
                 @if($portfolio->holdings->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -106,7 +106,7 @@
                 @endif
             </x-ui.card>
 
-            <x-ui.card title="{{ __('Recent activity') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('Recent activity') }}" class="col-span-7 md:col-span-3">
 
                 @if($portfolio->transactions->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -123,7 +123,7 @@
 
             </x-ui.card>
 
-            <x-ui.card title="{{ __('Top performers') }}" class="md:col-span-3">
+            <x-ui.card title="{{ __('Top performers') }}" class="col-span-7 md:col-span-3">
 
                 @if($portfolio->holdings->isEmpty())
                     <div class="flex justify-center items-center h-full pb-10 text-secondary">
@@ -139,7 +139,7 @@
 
             </x-ui.card>
 
-            {{-- <x-ui.card title="{{ __('Top headlines') }}" class="md:col-span-3">
+            {{-- <x-ui.card title="{{ __('Top headlines') }}" class="col-span-7 md:col-span-3">
             
                 @php
                     $users = App\Models\User::take(3)->get();
