@@ -24,13 +24,13 @@ class TransactionsTable extends DataTableComponent
         return Transaction::query()
             ->with(['portfolio', 'market_data'])
             ->myTransactions()
-            ->addSelect(['portfolio_id', 'transaction_type', 'split'])
+            ->addSelect(['portfolio_id', 'transaction_type', 'split', 'cost_basis'])
             ->selectRaw('
-                CASE
+                (CASE
                     WHEN transaction_type = \'SELL\' 
-                    THEN COALESCE(transactions.sale_price - transactions.cost_basis, 0)
-                    ELSE COALESCE(market_data.market_value - transactions.cost_basis, 0)
-                END AS gain_dollars');
+                    THEN COALESCE(transactions.sale_price, 0)
+                    ELSE COALESCE(market_data.market_value, 0)
+                END) - COALESCE(transactions.cost_basis, 0) AS gain_dollars');
     }
 
     public function configure(): void
