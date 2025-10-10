@@ -101,7 +101,7 @@ class AlphaVantageMarketData implements MarketDataInterface
                 return new Dividend([
                     'symbol' => $symbol,
                     'date' => Carbon::parse(Arr::get($dividend, 'ex_dividend_date')),
-                    'dividend_amount' => Arr::get($dividend, 'amount'),
+                    'dividend_amount' => (float) Arr::get($dividend, 'amount'),
                 ]);
             });
     }
@@ -121,7 +121,7 @@ class AlphaVantageMarketData implements MarketDataInterface
                 return new Split([
                     'symbol' => $symbol,
                     'date' => Carbon::parse(Arr::get($split, 'effective_date')),
-                    'split_amount' => Arr::get($split, 'split_factor'),
+                    'split_amount' => (float) Arr::get($split, 'split_factor'),
                 ]);
             });
     }
