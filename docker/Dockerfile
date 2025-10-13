@@ -39,7 +39,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     && rm -rf node_modules
 
 # Stage 2: Production stage
-FROM php:8.3-fpm-alpine
+FROM php:8.5.0RC2-fpm-alpine
 
 # Set the working directory
 WORKDIR /var/app
