@@ -71,8 +71,8 @@ RUN apk add --no-cache \
 RUN rm -rf /var/www/html \
     && ln -s /var/app /var/www/app
 
-# Create required directories for supervisord
-RUN mkdir -p /var/log/supervisor /var/run/supervisor
+# Create required directories
+RUN mkdir -p /var/log/supervisor /var/run/supervisor /var/run/nginx
 
 # Copy over configs
 COPY ./docker/nginx.conf /etc/nginx/http.d/default.conf
