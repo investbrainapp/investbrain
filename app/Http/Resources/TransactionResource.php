@@ -27,7 +27,7 @@ class TransactionResource extends JsonResource
             'sale_price' => $this->sale_price,
             'split' => $this->split,
             'reinvested_dividend' => $this->reinvested_dividend,
-            'date' => $this->date,
+            'date' => date_format($this->date, 'Y-m-d'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
