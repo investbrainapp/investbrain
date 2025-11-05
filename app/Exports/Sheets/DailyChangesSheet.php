@@ -33,7 +33,24 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
      */
     public function collection()
     {
-        return $this->empty ? collect() : DailyChange::myDailyChanges()->withDailyPerformance()->get();
+        if ($this->empty) {
+            return collect();
+        }
+
+        return DailyChange::myDailyChanges()
+            ->withDailyPerformance()
+            ->get()
+            ->map(function ($daily_change) {
+                return [
+                    'date' => date_format($daily_change->date, 'Y-m-d'),
+                    'portfolio_id' => $daily_change->portfolio_id,
+                    'total_market_value' => $daily_change->total_market_value,
+                    'total_cost_basis' => $daily_change->total_cost_basis,
+                    'realized_gains' => $daily_change->realized_gain_dollars,
+                    'total_dividends_earned' => $daily_change->total_dividends_earned,
+                    'annotation' => $daily_change->annotation,
+                ];
+            });
     }
 
     public function title(): string

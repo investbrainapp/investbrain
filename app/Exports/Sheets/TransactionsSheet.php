@@ -58,7 +58,7 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
                     'currency' => $transaction->market_data_currency,
                     'split' => $transaction->split,
                     'reinvested_dividend' => $transaction->reinvested_dividend,
-                    'date' => $transaction->date,
+                    'date' => date_format($transaction->date, 'Y-m-d'),
                     'created_at' => $transaction->created_at,
                     'updated_at' => $transaction->updated_at,
                 ];

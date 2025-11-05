@@ -121,7 +121,7 @@ class DailyChange extends Model
             ->groupBy('portfolio_id', 'date');
 
         return $query
-            ->select(['daily_change.portfolio_id', 'daily_change.date'])
+            ->select(['daily_change.date', 'daily_change.portfolio_id'])
             ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) AS total_market_value')
             ->selectRaw('SUM(COALESCE(ccb.cumulative_cost_basis, 0)) AS total_cost_basis')
             ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) 
