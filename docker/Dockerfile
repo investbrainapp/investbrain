@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM php:8.3-fpm AS builder
+FROM php:8.4-fpm AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV APP_NAME=Investbrain
@@ -39,7 +39,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     && rm -rf node_modules
 
 # Stage 2: Production stage
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Set the working directory
 WORKDIR /var/app
