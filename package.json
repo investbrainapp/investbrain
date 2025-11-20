@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@alpinejs/focus": "^3.15.0",
-        "@alpinejs/persist": "^3.14.9",
+        "@alpinejs/persist": "^3.15.1",
         "@alpinejs/resize": "^3.14.9",
         "alpinejs": "^3.14.9",
         "apexcharts": "^3.51.0"
