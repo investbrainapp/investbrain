@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Models\ChatWithConversation;
 use App\Notifications\InvitedOnboardingNotification;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -68,14 +69,10 @@ class Portfolio extends Model
         return $this->hasMany(DailyChange::class);
     }
 
-    /**
-     * Related chats for portfolio
-     *
-     * @return void
-     */
-    public function chats()
+    public function chatWithConversation(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->morphMany(AiChat::class, 'chatable')->where('user_id', auth()->user()->id);
+        return $this->morphOne(ChatWithConversation::class, 'chatable')
+            ->where('user_id', auth()->id());
     }
 
     public function scopeMyPortfolios()

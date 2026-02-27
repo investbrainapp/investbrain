@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\ChatWithConversation;
 use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -161,14 +162,10 @@ class Holding extends Model
             ->orderBy('date', 'DESC');
     }
 
-    /**
-     * Related chats for holding
-     *
-     * @return void
-     */
-    public function chats()
+    public function chatWithConversation(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->morphMany(AiChat::class, 'chatable')->where('user_id', auth()->user()->id);
+        return $this->morphOne(ChatWithConversation::class, 'chatable')
+            ->where('user_id', auth()->id());
     }
 
     public function scopeWithMarketData($query)

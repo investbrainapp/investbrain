@@ -19,6 +19,7 @@
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",
+        "laravel/ai": "^0.2.5",
         "laravel/fortify": "^1.30.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
