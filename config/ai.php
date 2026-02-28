@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -13,12 +15,18 @@ return [
     |
     */
 
-    'default' => 'openai',
+    'default' => env('CHAT_PROVIDER', 'openai'),
     'default_for_images' => 'gemini',
     'default_for_audio' => 'openai',
     'default_for_transcription' => 'openai',
     'default_for_embeddings' => 'openai',
     'default_for_reranking' => 'cohere',
+
+    'models' => [
+        'text' => [
+            'default' => env('CHAT_MODEL', null),
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------

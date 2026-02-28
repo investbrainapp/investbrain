@@ -44,7 +44,7 @@ new class extends Component
         $this->agentConversationId = $chatWith->id;
 
         $this->messages = $chatWith->messages()
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->limit(20)
             ->get(['role', 'content', 'created_at'])
             ->map(fn ($m) => ['role' => $m->role, 'content' => $m->content, 'created_at' => $m->created_at])
@@ -55,6 +55,10 @@ new class extends Component
 
     public function startCompletion(?string $suggestedPrompt = null): void
     {
+        if ($this->streaming) {
+            return;
+        }
+
         // prevent spam
         if ($this->isRateLimited()) {
             array_push($this->messages, [
@@ -304,7 +308,7 @@ new class extends Component
 
             {{-- prompt input --}}
             <div class="mt-3 grow-0">
-                <form submit="startCompletion">
+                <form wire:submit.prevent>
                     <div class="">
                         @foreach($suggested_prompts as $prompt)
                         <x-ui.button
@@ -326,15 +330,15 @@ new class extends Component
                                 wire:keydown.enter.prevent="startCompletion"
                                 autofocus
                                 @toggle-ai-chat.window="setTimeout(() => $el.focus(), 250)"
+                                x-trap="true"
                             ></x-ui.textarea>
                             
                         </div>
                         <x-ui.button
-                            spinner="generateCompletion"
-                            wire:click="startCompletion"
+                            spinner="startCompletion, generateCompletion"
+                            wire:click.prevent="startCompletion"
                             class="btn btn-ghost h-32"
                             icon="o-paper-airplane"
-              
                         ></x-ui.button>
 
                     </div>

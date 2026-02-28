@@ -64,9 +64,11 @@ Congrats! You've just installed Investbrain!
 
 Investbrain offers an AI powered chat assistant that is grounded on *your* investments. This enables you to use AI as a thought partner when making investment decisions. 
 
-When self-hosting, you can enable the chat assistant by configuring your OpenAI Secret Key and Organization ID in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file. Navigate to OpenAI to [create your keys](https://platform.openai.com/api-keys).
+Most of the major labs are currently supported (OpenAI, Anthropic, Gemini, xAI, etc). You'll need to obtain API keys from your selected provider and configure that in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file using the appropriate configurations. 
 
-If you are self-hosting your own large language models ("LLMs") that expose an OpenAI compatible API (e.g. [Ollama](https://ollama.com/blog/openai-compatibility)), you can update the `OPENAI_BASE_URI` configuration to your self-hosted instance. Ensure you also update the `OPENAI_MODEL` to an available model.
+Investbrain is also compatible with Ollama (and other OpenAI compatible APIs). If you are self-hosting your own large language models ("LLMs") that exposes an OpenAI compatible API (e.g. [Ollama](https://ollama.com/blog/openai-compatibility)). 
+
+See available options [below](#configuration).
 
 Always keep in mind the limitations of LLMs. When in doubt, consult a licensed investment advisor. 
 
@@ -74,7 +76,7 @@ Always keep in mind the limitations of LLMs. When in doubt, consult a licensed i
 
 Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as [Yahoo Finance](https://finance.yahoo.com/), [Twelve Data](https://twelvedata.com), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), [Alpaca](https://alpaca.markets/), and [Alpha Vantage](https://www.alphavantage.co/support/). The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
 
-### Configuration
+### Market Data Configuration
 
 You can specify the market data provider you want to use in your environment variables:
 
@@ -145,10 +147,12 @@ There are several optional configurations available when installing using the re
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
 | APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
 | AI_CHAT_ENABLED | Whether to enable AI chat features | `false` |
-| OPENAI_API_KEY | OpenAI secret key (required for AI chat) | `null` |
-| OPENAI_ORGANIZATION | OpenAI org id (required for AI chat) | `null` |
-| OPENAI_MODEL | The selected LLM used for AI chat | gpt-4o |
-| OPENAI_BASE_URI | The URI for your self-hosted LLM | api.openai.com/v1 |
+| CHAT_PROVIDER | Which chat provider to use (one of `openai`, `anthropic`, `gemini`, `azure`, `groq`, `xai`, `deepseek`, `mistral`, `ollama`) | `openai` |
+| CHAT_MODEL | The selected LLM used for AI chat | defaults to current smartest model from lab |
+| ANTHROPIC_API_KEY | If using Anthropic for chat | `null` |
+| OPENAI_API_KEY | If using OpenAI for chat | `null` |
+| OLLAMA_BASE_URL | If using Ollama for chat | `http://localhost:11434` |
+| OLLAMA_API_KEY | May be required if using Ollama for chat | `null` |
 | DAILY_CHANGE_TIME | The time of day to capture daily change | 23:00 |
 | REGISTRATION_ENABLED | Whether to enable registration of new users | `true` |
 

@@ -23,7 +23,7 @@ class ChatWithTest extends TestCase
     public function test_mount_creates_chat_with_conversation_record(): void
     {
         ChatWithPortfolioAgent::fake(['Test response']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs($user = User::factory()->create());
         $portfolio = Portfolio::factory()->create();
@@ -42,7 +42,7 @@ class ChatWithTest extends TestCase
     public function test_mount_reuses_existing_chat_with_conversation(): void
     {
         ChatWithPortfolioAgent::fake(['Test response']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs(User::factory()->create());
         $portfolio = Portfolio::factory()->create();
@@ -56,7 +56,7 @@ class ChatWithTest extends TestCase
     public function test_mount_loads_existing_messages(): void
     {
         ChatWithPortfolioAgent::fake(['Test response']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs($user = User::factory()->create());
         $portfolio = Portfolio::factory()->create();
@@ -86,13 +86,16 @@ class ChatWithTest extends TestCase
 
         $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio]);
 
-        $component->assertSet('messages', [['role' => 'user', 'content' => 'Previous question']]);
+        $messages = $component->get('messages');
+        $this->assertCount(1, $messages);
+        $this->assertEquals('user', $messages[0]['role']);
+        $this->assertEquals('Previous question', $messages[0]['content']);
     }
 
     public function test_start_completion_adds_user_message_and_sets_streaming(): void
     {
         ChatWithPortfolioAgent::fake(['The portfolio looks great!']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs(User::factory()->create());
         $portfolio = Portfolio::factory()->create();
@@ -107,13 +110,13 @@ class ChatWithTest extends TestCase
     public function test_generate_completion_calls_agent_and_stores_response(): void
     {
         ChatWithPortfolioAgent::fake(['The portfolio looks great!']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs(User::factory()->create());
         $portfolio = Portfolio::factory()->create();
 
         Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
-            ->set('messages', [['role' => 'user', 'content' => 'How is my portfolio doing?']])
+            ->set('messages', [['role' => 'user', 'content' => 'How is my portfolio doing?', 'created_at' => now()]])
             ->call('generateCompletion')
             ->assertSet('streaming', false);
 
@@ -128,7 +131,7 @@ class ChatWithTest extends TestCase
     public function test_empty_prompt_returns_guidance_without_calling_agent(): void
     {
         ChatWithPortfolioAgent::fake(['Test response']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs(User::factory()->create());
         $portfolio = Portfolio::factory()->create();
@@ -145,12 +148,14 @@ class ChatWithTest extends TestCase
     public function test_rate_limiting_blocks_excessive_requests(): void
     {
         ChatWithPortfolioAgent::fake(['Test response']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs($user = User::factory()->create());
         $portfolio = Portfolio::factory()->create();
 
-        RateLimiter::hit($user->id.'/'.$portfolio->id, 60, 20);
+        for ($i = 0; $i < 20; $i++) {
+            RateLimiter::hit($user->id.'/'.$portfolio->id, 60);
+        }
 
         $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
             ->set('prompt', 'Am I rate limited?')
@@ -164,7 +169,7 @@ class ChatWithTest extends TestCase
     public function test_suggested_prompt_is_used_as_prompt(): void
     {
         ChatWithPortfolioAgent::fake(['Here is the best holding!']);
-        ChatWithSuggestedPromptsAgent::fake(['suggested_prompts' => []]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
 
         $this->actingAs(User::factory()->create());
         $portfolio = Portfolio::factory()->create();
