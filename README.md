@@ -64,9 +64,9 @@ Congrats! You've just installed Investbrain!
 
 Investbrain offers an AI powered chat assistant that is grounded on *your* investments. This enables you to use AI as a thought partner when making investment decisions. 
 
-Most of the major labs are currently supported (OpenAI, Anthropic, Gemini, xAI, etc). You'll need to obtain API keys from your selected provider and configure that in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file using the appropriate configurations. 
+Most of the major labs are currently supported (OpenAI, Anthropic, Gemini, xAI, etc). You'll need to obtain API keys from your selected provider and configure that in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file using the appropriate keys. 
 
-Investbrain is also compatible with Ollama (and other OpenAI compatible APIs). If you are self-hosting your own large language models ("LLMs") that exposes an OpenAI compatible API (e.g. [Ollama](https://ollama.com/blog/openai-compatibility)). 
+Investbrain is also compatible with Ollama (and other OpenAI compatible APIs). If you are self-hosting your own large language models ("LLMs") that exposes an OpenAI compatible API (e.g. [Ollama](https://ollama.com/blog/openai-compatibility)), you'll need to configure your local endpoint in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file.
 
 See available options [below](#configuration).
 
