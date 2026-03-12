@@ -2,7 +2,6 @@
 
 use App\Ai\Agents\ChatWithHoldingAgent;
 use App\Ai\Agents\ChatWithPortfolioAgent;
-use App\Ai\Agents\ChatWithSuggestedPromptsAgent;
 use App\Models\ChatWithConversation;
 use App\Models\Holding;
 use App\Models\Portfolio;
@@ -101,7 +100,7 @@ new class extends Component
         try {
             $agent = $this->makeAgent()->continue($this->agentConversationId, auth()->user());
             $stream = $agent->stream($userPrompt);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             array_push($this->messages, ['role' => 'assistant', 'content' => $e->getMessage(), 'created_at' => now()]);
             $this->resetPrompt();
 
@@ -119,6 +118,7 @@ new class extends Component
         }
 
         array_push($this->messages, ['role' => 'assistant', 'content' => $this->answer, 'created_at' => now()]);
+
         $this->resetPrompt();
         $this->js('$wire.generateSuggestedPrompts()');
     }
@@ -129,7 +129,7 @@ new class extends Component
             $response = ChatWithSuggestedPromptsAgent::make(messages: array_slice($this->messages, -3))->prompt('');
 
             $this->suggested_prompts = $response->toArray()['suggested_prompts'] ?? [];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->suggested_prompts = [];
             $this->error($e->getMessage());
         }
@@ -321,7 +321,7 @@ new class extends Component
 
                     <div class="flex justify-between align-bottom space-x-2 mt-1">
 
-                        <div class="w-full" >
+                        <div class="w-full">
 
                             <x-ui.textarea
                                 wire:model="prompt"
