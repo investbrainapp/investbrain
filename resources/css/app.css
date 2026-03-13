@@ -109,6 +109,46 @@
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
 
+.fi-ta-ctn {
+    border-radius: 0;
+
+    background-color: transparent;
+    --tw-ring-color: transparent;
+    --tw-shadow-color: transparent;
+
+    & .fi-ta-header,
+    & .fi-ta-header-toolbar,
+    & .fi-ta-filters-above-content-ctn,
+    & .fi-ta-filters-below-content-ctn,
+    & .fi-ta-reorder-indicator,
+    & .fi-ta-selection-indicator,
+    & .fi-ta-filter-indicators,
+    & .fi-pagination {
+        border-color: transparent;
+    }
+
+    & .fi-ta-reorder-indicator,
+    & .fi-ta-selection-indicator,
+    & .fi-ta-filter-indicators {
+        background-color: transparent;
+    }
+
+    & .fi-ta-header-heading,
+    & .fi-ta-filters-heading {
+        color: transparent;
+    }
+
+    & .fi-ta-header-description {
+        color: transparent;
+    }
+
+    & .fi-ta-filters-before-content-ctn,
+    & .fi-ta-filters-after-content-ctn {
+        background-color: transparent;
+        border-color: transparent;
+    }
+}
+
 /* Tool tip for apex charts */
 [data-theme=dark] .apexcharts-tooltip-title {
   background: #292933 !important;
