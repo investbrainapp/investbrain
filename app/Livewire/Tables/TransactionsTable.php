@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Datatables;
+namespace App\Livewire\Tables;
 
 use App\Models\Transaction;
 use Carbon\Carbon;
@@ -14,9 +14,9 @@ use Filament\Support\Contracts\TranslatableContentDriver;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
-use Illuminate\View\View;
 use Livewire\Component;
 
 class TransactionsTable extends Component implements HasActions, HasSchemas, HasTable
@@ -33,6 +33,13 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
     public function table(Table $table): Table
     {
         return $table
+            ->filters([
+                SelectFilter::make('transaction_type')
+                    ->options([
+                        'BUY' => 'BUY',
+                        'SELL' => 'SELL',
+                    ]),
+            ])
             ->query(
                 Transaction::query()
                     ->with(['portfolio', 'market_data'])
@@ -86,8 +93,12 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
             ]);
     }
 
-    public function render(): View
+    public function render(): string
     {
-        return view('livewire.datatables.transactions-table');
+        return <<<'HTML'
+        <div>
+            {{ $this->table }}
+        </div>
+        HTML;
     }
 }

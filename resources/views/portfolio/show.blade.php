@@ -99,7 +99,7 @@
 
                 @else
 
-                @livewire('datatables.holdings-table', [
+                @livewire('tables.holdings-table', [
                     'portfolio' => $portfolio
                 ])
 

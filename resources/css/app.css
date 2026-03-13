@@ -2,21 +2,6 @@
 
 @import 'tailwindcss';
 
-/* Required by all components */
-@import '../../vendor/filament/support/resources/css/index.css';
-
-/* Required by actions and tables */
-@import '../../vendor/filament/actions/resources/css/index.css';
-
-/* Required by actions, forms and tables */
-@import '../../vendor/filament/forms/resources/css/index.css';
-
-/* Required by actions, infolists, forms, schemas and tables */
-@import '../../vendor/filament/schemas/resources/css/index.css';
-
-/* Required by tables */
-@import '../../vendor/filament/tables/resources/css/index.css';
-
 @plugin "@tailwindcss/typography";
 
 @theme {
@@ -105,48 +90,66 @@
   --noise: 0;
 }
 
+/* Required by all components */
+@import '../../vendor/filament/support/resources/css/index.css';
+
+/* Required by actions and tables */
+@import '../../vendor/filament/actions/resources/css/index.css';
+
+/* Required by actions, forms and tables */
+@import '../../vendor/filament/forms/resources/css/index.css';
+
+/* Required by actions, infolists, forms, schemas and tables */
+@import '../../vendor/filament/schemas/resources/css/index.css';
+
+/* Required by tables */
+@import '../../vendor/filament/tables/resources/css/index.css';
+
+
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
 
+/* table overrides */
 .fi-ta-ctn {
-    border-radius: 0;
+  @apply bg-transparent rounded-none border-none ring-0 shadow-none;
 
-    background-color: transparent;
-    --tw-ring-color: transparent;
-    --tw-shadow-color: transparent;
+  & table.fi-ta-table thead tr {
+    @apply bg-transparent;
+  }
 
-    & .fi-ta-header,
-    & .fi-ta-header-toolbar,
-    & .fi-ta-filters-above-content-ctn,
-    & .fi-ta-filters-below-content-ctn,
-    & .fi-ta-reorder-indicator,
-    & .fi-ta-selection-indicator,
-    & .fi-ta-filter-indicators,
-    & .fi-pagination {
-        border-color: transparent;
+  & table.fi-ta-table thead tr th.fi-ta-header-cell {
+    color: color-mix(in oklab,var(--color-base-content)60%,transparent) !important;
+    text-transform: uppercase;
+    letter-spacing: .05rem;
+    font-size: .725rem;
+    font-weight: normal;
+
+    & .fi-icon {
+      color: color-mix(in oklab,var(--color-base-content)60%,transparent) !important;
     }
+  }
 
-    & .fi-ta-reorder-indicator,
-    & .fi-ta-selection-indicator,
-    & .fi-ta-filter-indicators {
-        background-color: transparent;
-    }
+  & table.fi-ta-table .fi-clickable:hover {
+    background-color: color-mix(in oklab,var(--color-base-200)50%,transparent) !important;
+  }
+  & [data-theme=dark] table.fi-ta-table .fi-clickable:hover {
+    background-color: var(--color-base-100);
+  }
 
-    & .fi-ta-header-heading,
-    & .fi-ta-filters-heading {
-        color: transparent;
+  & ol.fi-pagination-items {
+    & .fi-pagination-item-label {
+      color: var(--color-base-content);
     }
+  }
 
-    & .fi-ta-header-description {
-        color: transparent;
-    }
+  & td.fi-ta-cell div.fi-ta-text {
+    color: var(--color-base-content);
+  }
 
-    & .fi-ta-filters-before-content-ctn,
-    & .fi-ta-filters-after-content-ctn {
-        background-color: transparent;
-        border-color: transparent;
-    }
+  & table.fi-ta-table.fi-ta-table-stacked-on-mobile td   {
+    padding-block: 0;
+  }
 }
 
 /* Tool tip for apex charts */

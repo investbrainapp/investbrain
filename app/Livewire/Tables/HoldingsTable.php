@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Datatables;
+namespace App\Livewire\Tables;
 
 use App\Models\Holding;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -15,7 +15,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
-use Illuminate\View\View;
 use Livewire\Component;
 
 class HoldingsTable extends Component implements HasActions, HasSchemas, HasTable
@@ -33,6 +32,7 @@ class HoldingsTable extends Component implements HasActions, HasSchemas, HasTabl
 
     public function table(Table $table): Table
     {
+
         return $table
             ->query(
                 Holding::query()
@@ -108,8 +108,12 @@ class HoldingsTable extends Component implements HasActions, HasSchemas, HasTabl
             ->stackedOnMobile();
     }
 
-    public function render(): View
+    public function render(): string
     {
-        return view('livewire.datatables.holdings-table');
+        return <<<'HTML'
+        <div>
+            {{ $this->table }}
+        </div>
+        HTML;
     }
 }
