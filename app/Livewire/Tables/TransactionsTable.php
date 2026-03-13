@@ -39,7 +39,10 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                         'BUY' => 'BUY',
                         'SELL' => 'SELL',
                     ]),
+                SelectFilter::make('portfolio')
+                    ->relationship('portfolio', 'title'),
             ])
+            ->deferFilters(false)
             ->query(
                 Transaction::query()
                     ->with(['portfolio', 'market_data'])
@@ -54,8 +57,8 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
             )
             ->defaultSort('date', 'desc')
             ->extremePaginationLinks()
-            ->paginated([15])
-            ->defaultPaginationPageOption(15)
+            ->paginated([10])
+            ->defaultPaginationPageOption(10)
             ->recordUrl(fn ($record) => route('holding.show', ['portfolio' => $record->portfolio_id, 'symbol' => $record->symbol]))
             ->columns([
                 TextColumn::make('date')

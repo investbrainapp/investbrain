@@ -150,6 +150,10 @@
   & table.fi-ta-table.fi-ta-table-stacked-on-mobile td   {
     padding-block: 0;
   }
+
+  & .fi-ta-header-toolbar {
+    border-bottom-width: 0;
+  }
 }
 
 /* Tool tip for apex charts */
