@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\ChatWithConversation;
 use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -162,7 +163,7 @@ class Holding extends Model
             ->orderBy('date', 'DESC');
     }
 
-    public function chatWithConversation(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    public function chatWithConversation(): MorphOne
     {
         return $this->morphOne(ChatWithConversation::class, 'chatable')
             ->where('user_id', auth()->id());
@@ -446,7 +447,7 @@ class Holding extends Model
         $this->save();
     }
 
-    public function qtyOwned(?\Illuminate\Support\Carbon $date = null)
+    public function qtyOwned(?Carbon $date = null)
     {
         if ($date == null) {
             $date = now();
@@ -467,8 +468,8 @@ class Holding extends Model
      * @return void
      */
     public function dailyPerformance(
-        ?\Illuminate\Support\Carbon $start_date = null,
-        ?\Illuminate\Support\Carbon $end_date = null,
+        ?Carbon $start_date = null,
+        ?Carbon $end_date = null,
     ) {
         if ($start_date == null) {
             $start_date = now();

@@ -5,167 +5,116 @@ declare(strict_types=1);
 namespace App\Livewire\Datatables;
 
 use App\Models\Holding;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Support\Contracts\TranslatableContentDriver;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Support\Number;
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
-use Rappasoft\LaravelLivewireTables\Views\Column;
+use Illuminate\View\View;
+use Livewire\Component;
 
-class HoldingsTable extends DataTableComponent
+class HoldingsTable extends Component implements HasActions, HasSchemas, HasTable
 {
+    use InteractsWithActions;
+    use InteractsWithSchemas;
+    use InteractsWithTable;
+
     public $portfolio;
 
-    public array $hiddenColumns = [];
-
-    public function mount($portfolio): void
+    public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
     {
-        //
+        return null;
     }
 
-    public function builder(): Builder
+    public function table(Table $table): Table
     {
-        return Holding::query()
-            ->portfolio($this->portfolio->id)
-            ->with(['market_data'])
-            ->withCount(['transactions as num_transactions' => function ($query) {
-                return $query->whereRaw('transactions.symbol = holdings.symbol');
-            }])
-            ->withPerformance();
+        return $table
+            ->query(
+                Holding::query()
+                    ->portfolio($this->portfolio->id)
+                    ->withMarketData()
+                    ->withCount(['transactions as num_transactions' => function ($query) {
+                        return $query->whereRaw('transactions.symbol = holdings.symbol');
+                    }])
+                    ->withPerformance()
+            )
+            ->defaultSort('symbol', 'asc')
+            ->paginated(false)
+            ->recordUrl(fn ($record) => route('holding.show', ['portfolio' => $record->portfolio_id, 'symbol' => $record->symbol]))
+            ->columns([
+                TextColumn::make('symbol')
+                    ->label(__('Symbol'))
+                    ->sortable(),
+                TextColumn::make('market_data.name')
+                    ->label(__('Name'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('quantity')
+                    ->label(__('Quantity'))
+                    ->sortable(),
+                TextColumn::make('average_cost_basis')
+                    ->label(__('Average Cost Basis'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('total_cost_basis')
+                    ->label(__('Total Cost Basis'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
+                TextColumn::make('market_data.market_value')
+                    ->label(__('Market Value'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('total_market_value')
+                    ->label(__('Total Market Value'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
+                TextColumn::make('market_gain_dollars')
+                    ->label(__('Market Gain/Loss'))
+                    ->sortable()
+                    ->html()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency).view('components.ui.gain-loss-arrow-badge', [
+                        'costBasis' => $record->average_cost_basis,
+                        'marketValue' => $record->market_data?->market_value,
+                        'small' => true,
+                    ])->render()),
+                TextColumn::make('realized_gain_dollars')
+                    ->label(__('Realized Gain/Loss'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
+                TextColumn::make('dividends_earned')
+                    ->label(__('Dividends Earned'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
+                TextColumn::make('market_data.fifty_two_week_low')
+                    ->label(__('52 week low'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('market_data.fifty_two_week_high')
+                    ->label(__('52 week high'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('num_transactions')
+                    ->label(__('Number of Transactions'))
+                    ->sortable(),
+                TextColumn::make('market_data.updated_at')
+                    ->label(__('Last Refreshed'))
+                    ->sortable()
+                    ->since(),
+            ])
+            ->stackedOnMobile();
     }
 
-    public function configure(): void
+    public function render(): View
     {
-        $this->hiddenColumns = ['name', 'average_cost_basis', 'market_value', 'fifty_two_week_low', 'fifty_two_week_high'];
-
-        $this->setTableWrapperAttributes([
-            'default' => false,
-            'default-styling' => false,
-            'default-colors' => false,
-            'class' => 'overflow-scroll',
-        ]);
-        $this->setTableAttributes([
-            'default' => false,
-            'default-styling' => false,
-            'default-colors' => false,
-            'class' => 'table',
-        ]);
-        $this->setTheadAttributes([
-            'default' => false,
-            'default-styling' => true,
-            'default-colors' => false,
-        ]);
-        $this->setThAttributes(function (Column $column) {
-
-            $attributes = [
-                'default' => false,
-                'default-styling' => false,
-                'default-colors' => false,
-                'class' => 'text-xs font-medium whitespace-nowrap uppercase tracking-wider text-nowrap',
-            ];
-
-            if (in_array($column->getField(), $this->hiddenColumns)) {
-                $attributes['class'] = $attributes['class'].' hidden md:table-cell';
-            }
-
-            return $attributes;
-        });
-        $this->setThSortButtonAttributes(fn () => [
-            'default' => false,
-            'default-styling' => true,
-            'default-colors' => false,
-            'class' => 'cursor-pointer',
-        ]);
-        $this->setTbodyAttributes([
-            'default' => false,
-            'default-styling' => true,
-            'default-colors' => false,
-        ]);
-        $this->setTrAttributes(fn () => [
-            'default' => false,
-            'default-styling' => true,
-            'default-colors' => false,
-            'class' => 'cursor-pointer hover:bg-neutral/25',
-        ]);
-        $this->setTdAttributes(function (Column $column) {
-
-            $attributes = [
-                'default' => false,
-                'default-styling' => false,
-                'default-colors' => false,
-                'class' => 'text-nowrap',
-            ];
-
-            if (in_array($column->getField(), $this->hiddenColumns)) {
-                $attributes['class'] = $attributes['class'].' hidden md:table-cell';
-            }
-
-            return $attributes;
-        });
-
-        $this->setDefaultSort('symbol', 'asc');
-
-        $this->setToolsDisabled();
-        $this->setFooterDisabled();
-        $this->setPaginationDisabled();
-        $this->setDisplayPaginationDetailsDisabled();
-
-        $this->setPrimaryKey('id');
-
-        $this->setTableRowUrl(function ($row) {
-            return route('holding.show', ['portfolio' => $row->portfolio_id, 'symbol' => $row->symbol]);
-
-        })->setTableRowUrlTarget(function ($row) {
-
-            return 'navigate';
-        });
-    }
-
-    public function columns(): array
-    {
-        return [
-            Column::make(__('Symbol'), 'symbol')
-                ->sortable(),
-            Column::make(__('Name'), 'market_data.name')
-                ->sortable(),
-            Column::make(__('Quantity'), 'quantity')
-                ->sortable(),
-            Column::make(__('Average Cost Basis'), 'average_cost_basis')
-                ->sortable()
-                ->format(fn ($value, $row) => Number::currency($value ?? 0, $row->market_data?->currency)),
-            Column::make(__('Total Cost Basis'), 'total_cost_basis')
-                ->sortable()
-                ->format(fn ($value, $row) => Number::currency($value ?? 0, $row->market_data?->currency)),
-            Column::make(__('Market Value'), 'market_data.market_value')
-                ->sortable()
-                ->format(fn ($value, $row) => Number::currency($value ?? 0, $row->market_data?->currency)),
-            Column::make(__('Total Market Value'))
-                ->sortable(fn (Builder $query, string $direction) => $query->orderBy('total_market_value', $direction))
-                ->label(fn ($row) => Number::currency($row->total_market_value ?? 0, $row->market_data?->currency)),
-            Column::make(__('Market Gain/Loss'))
-                ->html()
-                ->label(fn ($row) => Number::currency($row->market_gain_dollars ?? 0, $row->market_data?->currency).view('components.ui.gain-loss-arrow-badge', [
-                    'costBasis' => $row->average_cost_basis,
-                    'marketValue' => $row->market_data?->market_value,
-                    'small' => true,
-                ]))
-                ->sortable(fn (Builder $query, string $direction) => $query->orderBy('market_gain_dollars', $direction)),
-            Column::make(__('Realized Gain/Loss'), 'realized_gain_dollars')
-                ->sortable()
-                ->format(fn ($value, $row) => Number::currency($value ?? 0, $row->market_data?->currency)),
-            Column::make(__('Dividends Earned'), 'dividends_earned')
-                ->sortable()
-                ->format(fn ($value, $row) => Number::currency($value ?? 0, $row->market_data?->currency)),
-            Column::make(__('52 week low'), 'market_data.fifty_two_week_low')
-                ->sortable()
-                ->format(fn ($value, $row) => Number::currency($value ?? 0, $row->market_data?->currency)),
-            Column::make(__('52 week high'), 'market_data.fifty_two_week_high')
-                ->sortable()
-                ->format(fn ($value, $row) => Number::currency($value ?? 0, $row->market_data?->currency)),
-            Column::make(__('Number of Transactions'))
-                ->sortable(fn (Builder $query, string $direction) => $query->orderBy('num_transactions', $direction))
-                ->label(fn ($row) => $row->num_transactions),
-            Column::make(__('Last Refreshed'), 'market_data.updated_at')
-                ->sortable()
-                ->format(fn ($value) => \Carbon\Carbon::parse($value)->diffForHumans()),
-        ];
+        return view('livewire.datatables.holdings-table');
     }
 }

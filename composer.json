@@ -16,6 +16,7 @@
         "ext-mbstring": "*",
         "ext-zip": "*",
         "blade-ui-kit/blade-heroicons": "^2.6",
+        "filament/tables": "^5.0",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",
@@ -26,12 +27,11 @@
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.0",
-        "livewire/livewire": "^3.5",
+        "livewire/livewire": "^4.0",
         "livewire/volt": "^1.6",
         "maatwebsite/excel": "^3.1",
         "openai-php/client": "^0.10.3",
         "predis/predis": "^2.2",
-        "rappasoft/laravel-livewire-tables": "^3.7",
         "scheb/yahoo-finance-api": "^5.0",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
         "symfony/cache": "^7.3",
@@ -77,7 +77,8 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",

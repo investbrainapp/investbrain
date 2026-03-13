@@ -1,6 +1,22 @@
 @import url("https://fonts.bunny.net/css?family=Inter:400,500,600&display=swap");
 
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* Required by all components */
+@import '../../vendor/filament/support/resources/css/index.css';
+
+/* Required by actions and tables */
+@import '../../vendor/filament/actions/resources/css/index.css';
+
+/* Required by actions, forms and tables */
+@import '../../vendor/filament/forms/resources/css/index.css';
+
+/* Required by actions, infolists, forms, schemas and tables */
+@import '../../vendor/filament/schemas/resources/css/index.css';
+
+/* Required by tables */
+@import '../../vendor/filament/tables/resources/css/index.css';
+
 @plugin "@tailwindcss/typography";
 
 @theme {
