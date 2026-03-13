@@ -37,16 +37,17 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                 Transaction::query()
                     ->with(['portfolio', 'market_data'])
                     ->myTransactions()
-                    ->addSelect(['portfolio_id', 'transaction_type', 'split', 'cost_basis'])
+                    ->addSelect(['transactions.*'])
                     ->selectRaw('
                         (CASE
                             WHEN transaction_type = \'SELL\'
                             THEN COALESCE(transactions.sale_price, 0)
-                            ELSE COALESCE(market_data.market_value, 0)
+                            ELSE COALESCE((SELECT market_value FROM market_data WHERE market_data.symbol = transactions.symbol LIMIT 1), 0)
                         END) - COALESCE(transactions.cost_basis, 0) AS gain_dollars')
             )
             ->defaultSort('date', 'desc')
-            ->paginationPageOptions([10, 15, 20])
+            ->extremePaginationLinks()
+            ->paginated([15])
             ->defaultPaginationPageOption(15)
             ->recordUrl(fn ($record) => route('holding.show', ['portfolio' => $record->portfolio_id, 'symbol' => $record->symbol]))
             ->columns([
@@ -62,8 +63,7 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                     ->sortable(),
                 TextColumn::make('market_data.name')
                     ->label(__('Name'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('transaction_type')
                     ->label(__('Type'))
                     ->sortable()
@@ -78,13 +78,11 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                 TextColumn::make('cost_basis')
                     ->label(__('Cost Basis'))
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data->currency))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data->currency)),
                 TextColumn::make('gain_dollars')
                     ->label(__('Gain/Loss'))
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data->currency))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data->currency)),
             ]);
     }
 
