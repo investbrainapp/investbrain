@@ -52,16 +52,14 @@ class HoldingsTable extends Component implements HasActions, HasSchemas, HasTabl
                     ->sortable(),
                 TextColumn::make('market_data.name')
                     ->label(__('Name'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('quantity')
                     ->label(__('Quantity'))
                     ->sortable(),
                 TextColumn::make('average_cost_basis')
                     ->label(__('Average Cost Basis'))
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
                 TextColumn::make('total_cost_basis')
                     ->label(__('Total Cost Basis'))
                     ->sortable()
@@ -69,8 +67,7 @@ class HoldingsTable extends Component implements HasActions, HasSchemas, HasTabl
                 TextColumn::make('market_data.market_value')
                     ->label(__('Market Value'))
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
                 TextColumn::make('total_market_value')
                     ->label(__('Total Market Value'))
                     ->sortable()
@@ -95,13 +92,11 @@ class HoldingsTable extends Component implements HasActions, HasSchemas, HasTabl
                 TextColumn::make('market_data.fifty_two_week_low')
                     ->label(__('52 week low'))
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
                 TextColumn::make('market_data.fifty_two_week_high')
                     ->label(__('52 week high'))
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data?->currency)),
                 TextColumn::make('num_transactions')
                     ->label(__('Number of Transactions'))
                     ->sortable(),

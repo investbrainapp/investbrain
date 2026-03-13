@@ -2,6 +2,7 @@
 
 use App\Ai\Agents\ChatWithHoldingAgent;
 use App\Ai\Agents\ChatWithPortfolioAgent;
+use App\Ai\Agents\ChatWithSuggestedPromptsAgent;
 use App\Models\ChatWithConversation;
 use App\Models\Holding;
 use App\Models\Portfolio;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Streaming\Events\TextDelta;
+use Livewire\Attributes\Async;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -26,7 +28,7 @@ new class extends Component
 
     public bool $streaming = false;
 
-    public ?string $agentConversationId = null;
+    public ?string $agent_conversation_id = null;
 
     // methods
     public function mount(): void
@@ -40,7 +42,7 @@ new class extends Component
             ['title' => 'Chat with investments']
         );
 
-        $this->agentConversationId = $chatWith->id;
+        $this->agent_conversation_id = $chatWith->id;
 
         $this->messages = $chatWith->messages()
             ->orderBy('id', 'desc')
@@ -98,7 +100,7 @@ new class extends Component
         $userPrompt = end($this->messages)['content'] ?? '';
 
         try {
-            $agent = $this->makeAgent()->continue($this->agentConversationId, auth()->user());
+            $agent = $this->makeAgent()->continue($this->agent_conversation_id, auth()->user());
             $stream = $agent->stream($userPrompt);
         } catch (Exception $e) {
             array_push($this->messages, ['role' => 'assistant', 'content' => $e->getMessage(), 'created_at' => now()]);
@@ -123,8 +125,10 @@ new class extends Component
         $this->js('$wire.generateSuggestedPrompts()');
     }
 
+    #[Async]
     public function generateSuggestedPrompts(): void
     {
+
         try {
             $response = ChatWithSuggestedPromptsAgent::make(messages: array_slice($this->messages, -3))->prompt('');
 
@@ -309,6 +313,7 @@ new class extends Component
             {{-- prompt input --}}
             <div class="mt-3 grow-0">
                 <form wire:submit.prevent>
+                    
                     <div class="">
                         @foreach($suggested_prompts as $prompt)
                         <x-ui.button
@@ -318,6 +323,7 @@ new class extends Component
                         @endforeach
 
                     </div>
+                    
 
                     <div class="flex justify-between align-bottom space-x-2 mt-1">
 
