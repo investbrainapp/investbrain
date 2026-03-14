@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Interfaces\MarketData\FallbackInterface;
+use App\Interfaces\MarketData\MarketDataInterface;
+use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentColor;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Number;
@@ -18,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \App\Interfaces\MarketData\MarketDataInterface::class,
-            \App\Interfaces\MarketData\FallbackInterface::class
+            MarketDataInterface::class,
+            FallbackInterface::class
         );
     }
 
@@ -28,6 +32,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        FilamentColor::register([
+            'primary' => Color::Stone,
+            'gray' => Color::Zinc,
+            'info' => Color::Blue,
+            'success' => Color::Emerald,
+            'warning' => Color::Amber,
+            'danger' => Color::Red,
+        ]);
+
         JsonResource::withoutWrapping();
 
         Arr::macro('skipEmptyValues', function (array $array) {

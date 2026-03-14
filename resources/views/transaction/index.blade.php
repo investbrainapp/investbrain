@@ -22,6 +22,8 @@
             </div>
         </x-ui.toolbar>
 
-        @livewire('datatables.transactions-table')
+        
+        @livewire('tables.transactions-table')
+        
     </div>
 </x-layouts.app>

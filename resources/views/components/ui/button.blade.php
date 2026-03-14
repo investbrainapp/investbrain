@@ -25,7 +25,6 @@
     <button
 @endif
     {{ $attributes->whereDoesntStartWith('class')->merge(['type' => $type]) }}
-    type="button" 
     {{ $attributes->class(['btn', "!inline-flex lg:tooltip $tooltipPosition" => $tooltip]) }} 
 
     @if($link && $external)
