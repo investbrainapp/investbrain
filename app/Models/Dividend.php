@@ -157,7 +157,7 @@ class Dividend extends Model
         ")->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
             ->join('holdings', function ($join) {
                 $join->on('transactions.portfolio_id', '=', 'holdings.portfolio_id')
-                     ->on('holdings.symbol', '=', 'dividends.symbol');
+                    ->on('holdings.symbol', '=', 'dividends.symbol');
             })
             ->where('dividends.symbol', $symbol)
             ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'dividends.dividend_amount_base');
