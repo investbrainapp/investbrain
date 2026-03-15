@@ -89,4 +89,22 @@ class DividendsTest extends TestCase
         $this->assertEquals(4.95, $holdingOne->dividends_earned);
         $this->assertEquals(8, $holdingTwo->dividends_earned);
     }
+
+    public function test_dividend_earnings_not_shared_in_same_portfolio_with_multiple_symbols(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('GOOG')->create();
+
+        Dividend::refreshDividendData('ACME');
+
+        $acmeHolding = Holding::query()->portfolio($portfolio->id)->symbol('ACME')->first();
+        $googHolding = Holding::query()->portfolio($portfolio->id)->symbol('GOOG')->first();
+
+        $this->assertEquals(4.95, $acmeHolding->dividends_earned);
+
+        $this->assertEquals(0, $googHolding->dividends_earned);
+    }
 }
