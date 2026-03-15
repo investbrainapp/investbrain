@@ -27,7 +27,7 @@ RUN apt-get update && apt-get upgrade -y \
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd zip
+    && docker-php-ext-install -j$(nproc) gd zip intl
 
 # Copy application files
 COPY . .
