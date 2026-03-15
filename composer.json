@@ -16,21 +16,22 @@
         "ext-mbstring": "*",
         "ext-zip": "*",
         "blade-ui-kit/blade-heroicons": "^2.6",
+        "filament/tables": "^5.0",
         "finnhub/client": "master@dev",
         "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",
+        "laravel/ai": "^0.2.5",
         "laravel/fortify": "^1.30.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.0",
-        "livewire/livewire": "^3.5",
+        "livewire/livewire": "^4.0",
         "livewire/volt": "^1.6",
         "maatwebsite/excel": "^3.1",
         "openai-php/client": "^0.10.3",
         "predis/predis": "^2.2",
-        "rappasoft/laravel-livewire-tables": "^3.7",
         "scheb/yahoo-finance-api": "^5.0",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
         "symfony/cache": "^7.3",
@@ -38,8 +39,8 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "laravel/boost": "^1.8",
         "laravel/pint": "^1.25",
-        "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
         "phpunit/phpunit": "^11.0"
@@ -76,10 +77,12 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan boost:update --ansi; exit 0"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

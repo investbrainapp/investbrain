@@ -23,6 +23,7 @@
         @endif
         <x-ui.toast />
 
+        @filamentScripts
         @livewireScripts
     </body>
 </html>

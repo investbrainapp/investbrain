@@ -31,6 +31,6 @@
     </div>
 
     @if($dismissible)
-        <x-button icon="o-x-mark" @click="show = false" class="btn-xs btn-circle btn-ghost static self-start end-0" />
+        <x-ui.button icon="o-x-mark" @click="show = false" class="btn-xs btn-circle btn-ghost static self-start end-0" />
     @endif
 </div>

@@ -44,7 +44,7 @@ new class extends Component
     }
 }; ?>
 
-<x-form wire:submit="updateUserInformation" class="">
+<x-ui.form wire:submit="updateUserInformation" class="">
 
     <div class="mt-2">
         
@@ -67,4 +67,4 @@ new class extends Component
             {{ __('Get Started') }}
         </x-ui.button>
     </div>
-</x-form>
+</x-ui.form>
