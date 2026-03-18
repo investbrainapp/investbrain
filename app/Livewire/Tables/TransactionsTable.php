@@ -16,6 +16,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Number;
 use Livewire\Component;
 
@@ -40,7 +41,7 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                         'SELL' => 'SELL',
                     ]),
                 SelectFilter::make('portfolio')
-                    ->relationship('portfolio', 'title'),
+                    ->relationship('portfolio', 'title', fn (Builder $query) => $query->myPortfolios()),
             ])
             ->deferFilters(false)
             ->query(
