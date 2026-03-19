@@ -152,6 +152,16 @@ return [
             'flag' => '',
         ],
         [
+            'locale' => 'fr_CA',
+            'label' => 'French (Canada)',
+            'flag' => '',
+        ],
+        [
+            'locale' => 'fr_FR',
+            'label' => 'French (France)',
+            'flag' => '',
+        ],
+        [
             'locale' => 'es_419',
             'label' => 'Spanish (Latin America)',
             'flag' => '',
