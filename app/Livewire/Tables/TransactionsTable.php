@@ -41,7 +41,13 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                         'SELL' => 'SELL',
                     ]),
                 SelectFilter::make('portfolio')
-                    ->relationship('portfolio', 'title', fn (Builder $query) => $query->myPortfolios()),
+                    ->relationship('portfolio', 'title', fn (Builder $query) => $query->myPortfolios())
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['value'],
+                            fn (Builder $query, $value) => $query->portfolio($value)
+                        );
+                    }),
             ])
             ->deferFilters(false)
             ->query(
