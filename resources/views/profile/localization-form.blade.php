@@ -69,7 +69,7 @@ new class extends Component
         <div class="col-span-6 sm:col-span-4">
             <x-ui.select 
                 label="{{ __('Locale') }}"
-                class="select block mt-1 w-full"
+                class=""
                 :options="config('app.available_locales')"
                 option-value="locale"
                 option-label="label"
@@ -84,7 +84,7 @@ new class extends Component
         <div class="col-span-6 sm:col-span-4">
             <x-ui.select 
                 label="{{ __('Display Currency') }}"
-                class="select block mt-1 w-full"
+                class=""
                 :options="$currencies"
                 option-value="currency"
                 option-label="label"
