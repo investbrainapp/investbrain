@@ -99,6 +99,7 @@
 
             this.data.tooltip = {
                 enabled: true,
+                shared: false,
                 y: {
                     formatter: (value, { series, seriesIndex, dataPointIndex, w }) => {
                         const firstDataPoint = this.data.series[seriesIndex].data[0][1]

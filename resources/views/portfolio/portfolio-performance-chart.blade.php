@@ -75,9 +75,10 @@ new #[Lazy] class extends Component
 
         foreach ($dailyChange as $data) {
             $date = $data->date;
+            $marketGainData[] = [$date, round($data->total_market_gain, 2)];
             $marketValueData[] = [$date, round($data->total_market_value, 2)];
             $costBasisData[] = [$date, round($data->total_cost_basis, 2)];
-            $marketGainData[] = [$date, round($data->total_market_gain, 2)];
+
             // $dividendSeries[] = [$date, round($data->total_dividends_earned, 2)];
             // $realizedGainSeries[] = [$date, round($data->realized_gains, 2)];
         }
@@ -85,16 +86,18 @@ new #[Lazy] class extends Component
         return [
             'series' => [
                 [
+                    'name' => __('Market Gain'),
+                    'data' => $marketGainData,
+                ],
+                [
                     'name' => __('Market Value'),
                     'data' => $marketValueData,
+                    'hidden' => true,
                 ],
                 [
                     'name' => __('Cost Basis'),
                     'data' => $costBasisData,
-                ],
-                [
-                    'name' => __('Market Gain'),
-                    'data' => $marketGainData,
+                    'hidden' => true,
                 ],
 
                 // [
