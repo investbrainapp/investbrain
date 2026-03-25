@@ -26,7 +26,7 @@ class EnsureDailyChangeIsSynced
             ) {
                 defer(fn () => $model->portfolio->syncDailyChanges());
 
-                Cache::put($cacheKey, now(), now()->addMinutes(5));
+                Cache::put($cacheKey, true, now()->addMinutes(5));
             }
         }
 
