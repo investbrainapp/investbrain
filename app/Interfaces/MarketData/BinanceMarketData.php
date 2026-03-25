@@ -68,31 +68,11 @@ class BinanceMarketData implements MarketDataInterface
             }
         );
 
-        $yearLow = cache()->remember(
-            'binance-low-'.$symbol,
-            1440,
-            function () use ($symbol) {
-
-                $this->createNewClient();
-
-                $response = $this->client
-                    ->baseUrl($this->apiBaseUrl)
-                    ->withQueryParameters([
-                        'symbol' => $symbol,
-                        'interval' => '1d',
-                        'start' => now()->firstOfYear()->timestamp,
-                    ])
-                    ->get('klines');
-
-                return $response->json();
-            }
-        );
-
         return new Quote([
             'name' => $symbol,
             'symbol' => $symbol,
-            'currency' => Arr::get($fundamental, 'symbols.quoteAsset'),
-            'market_value' => Arr::get($quote, 'weightedAvgPrice'),
+            'currency' => Arr::get($fundamental, 'symbols.0.quoteAsset'),
+            'market_value' => (float) Arr::get($quote, 'weightedAvgPrice'),
         ]);
     }
 
@@ -111,7 +91,7 @@ class BinanceMarketData implements MarketDataInterface
     public function history(string $symbol, $startDate, $endDate): Collection
     {
         $startDate = Carbon::parse($startDate);
-        $endDate = Carbon::parse($endDate); // alpaca has sip data limits
+        $endDate = Carbon::parse($endDate);
 
         $allHistory = collect();
 
@@ -133,8 +113,8 @@ class BinanceMarketData implements MarketDataInterface
                 ->withQueryParameters([
                     'symbol' => $symbol,
                     'interval' => '1d',
-                    'start' => $startDate->timestamp,
-                    'end' => $chunkEnd->timestamp,
+                    'startTime' => $startDate->timestamp * 1000,
+                    'endTime' => $chunkEnd->timestamp * 1000,
                 ])->get('klines');
 
             $history = $response->json();
@@ -142,14 +122,14 @@ class BinanceMarketData implements MarketDataInterface
             throw_if(empty($history), NotFoundHttpException::class, "Symbol `{$symbol}` was not found");
 
             $chunkedHistory = collect($history)
-                ->mapWithKeys(function ($history) use ($symbol) {
+                ->mapWithKeys(function ($history_item) use ($symbol) {
 
-                    $date = Carbon::parse($history[0])->format('Y-m-d');
+                    $date = Carbon::parse($history_item[0])->format('Y-m-d');
 
                     return [$date => new Ohlc([
                         'symbol' => $symbol,
                         'date' => $date,
-                        'close' => $history[4],
+                        'close' => $history_item[4],
                     ])];
                 });
 
