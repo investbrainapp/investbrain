@@ -31,6 +31,10 @@ class HoldingResource extends JsonResource
             'total_market_value' => $this->total_market_value,
             'market_gain_dollars' => $this->market_gain_dollars,
             'market_gain_percent' => $this->market_gain_percent,
+            'market_sentiment' => $this->when(
+                $this->relationLoaded('market_sentiment') && $this->market_sentiment !== null,
+                fn (): MarketSentimentResource => MarketSentimentResource::make($this->market_sentiment)
+            ),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

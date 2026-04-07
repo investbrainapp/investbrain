@@ -29,6 +29,10 @@ class MarketDataResource extends JsonResource
             'trailing_pe' => $this->trailing_pe,
             'forward_pe' => $this->forward_pe,
             'book_value' => $this->book_value,
+            'market_sentiment' => $this->when(
+                $this->relationLoaded('market_sentiment') && $this->market_sentiment !== null,
+                fn (): MarketSentimentResource => MarketSentimentResource::make($this->market_sentiment)
+            ),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
