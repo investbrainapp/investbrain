@@ -1,4 +1,5 @@
 @use('App\Models\Currency')
+@use('Illuminate\Support\Number')
 
 <x-layouts.app>
     <div x-data>  
@@ -121,6 +122,79 @@
                 @endif
                 
             </x-ui.card>
+
+            @if(config('services.adanos.key'))
+            <x-ui.card title="{{ __('Market sentiment') }}" class="md:col-span-4">
+                @if($holding->market_sentiment)
+                <div class="space-y-3 text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="text-secondary">{{ __('Buzz') }}</div>
+                            <div class="font-semibold">{{ Number::format($holding->market_sentiment->average_buzz ?? 0, precision: 1) }}/100</div>
+                        </div>
+                        <div>
+                            <div class="text-secondary">{{ __('Bullish') }}</div>
+                            <div class="font-semibold">{{ Number::percentage(($holding->market_sentiment->average_bullish_pct ?? 0) / 100, 0) }}</div>
+                        </div>
+                        <div>
+                            <div class="text-secondary">{{ __('Coverage') }}</div>
+                            <div class="font-semibold">{{ $holding->market_sentiment->coverage }} {{ __('sources') }}</div>
+                        </div>
+                        <div>
+                            <div class="text-secondary">{{ __('Alignment') }}</div>
+                            <div class="font-semibold">{{ str($holding->market_sentiment->source_alignment)->replace('-', ' ')->title() }}</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 border-t pt-3">
+                        @if(!is_null($holding->market_sentiment->reddit_buzz))
+                        <p>
+                            <span class="font-bold">Reddit:</span>
+                            {{ __('Buzz') }} {{ Number::format($holding->market_sentiment->reddit_buzz, precision: 1) }},
+                            {{ __('Bullish') }} {{ Number::percentage(($holding->market_sentiment->reddit_bullish_pct ?? 0) / 100, 0) }},
+                            {{ __('Mentions') }} {{ Number::format($holding->market_sentiment->reddit_mentions ?? 0) }}
+                        </p>
+                        @endif
+
+                        @if(!is_null($holding->market_sentiment->x_buzz))
+                        <p>
+                            <span class="font-bold">X:</span>
+                            {{ __('Buzz') }} {{ Number::format($holding->market_sentiment->x_buzz, precision: 1) }},
+                            {{ __('Bullish') }} {{ Number::percentage(($holding->market_sentiment->x_bullish_pct ?? 0) / 100, 0) }},
+                            {{ __('Mentions') }} {{ Number::format($holding->market_sentiment->x_mentions ?? 0) }}
+                        </p>
+                        @endif
+
+                        @if(!is_null($holding->market_sentiment->news_buzz))
+                        <p>
+                            <span class="font-bold">{{ __('Finance News') }}:</span>
+                            {{ __('Buzz') }} {{ Number::format($holding->market_sentiment->news_buzz, precision: 1) }},
+                            {{ __('Bullish') }} {{ Number::percentage(($holding->market_sentiment->news_bullish_pct ?? 0) / 100, 0) }},
+                            {{ __('Mentions') }} {{ Number::format($holding->market_sentiment->news_mentions ?? 0) }}
+                        </p>
+                        @endif
+
+                        @if(!is_null($holding->market_sentiment->polymarket_buzz))
+                        <p>
+                            <span class="font-bold">Polymarket:</span>
+                            {{ __('Buzz') }} {{ Number::format($holding->market_sentiment->polymarket_buzz, precision: 1) }},
+                            {{ __('Bullish') }} {{ Number::percentage(($holding->market_sentiment->polymarket_bullish_pct ?? 0) / 100, 0) }},
+                            {{ __('Trades') }} {{ Number::format($holding->market_sentiment->polymarket_trade_count ?? 0) }}
+                        </p>
+                        @endif
+                    </div>
+
+                    <p class="text-xs text-secondary">
+                        {{ __('Updated :time', ['time' => $holding->market_sentiment->updated_at?->diffForHumans()]) }}
+                    </p>
+                </div>
+                @else
+                <div class="flex justify-center items-center h-full pb-10 text-secondary">
+                    {{ __('No market sentiment is available for :symbol right now.', ['symbol' => $holding->symbol]) }}
+                </div>
+                @endif
+            </x-ui.card>
+            @endif
 
             <x-ui.card title="{{ __('Recent activity') }}" class="md:col-span-3">
 

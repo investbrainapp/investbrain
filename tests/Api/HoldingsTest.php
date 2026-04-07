@@ -9,6 +9,7 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class HoldingsTest extends TestCase
@@ -115,5 +116,76 @@ class HoldingsTest extends TestCase
         $this->actingAs($otherUser)
             ->putJson(route('api.holding.update', ['portfolio' => $transaction->portfolio_id, 'symbol' => $transaction->symbol]), $data)
             ->assertForbidden();
+    }
+
+    public function test_holding_show_can_include_optional_market_sentiment()
+    {
+        config()->set('services.adanos.key', 'test-key');
+
+        Http::fake([
+            'https://api.adanos.org/reddit/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 55.4,
+                    'bullish_pct' => 62,
+                    'mentions' => 120,
+                ]],
+            ]),
+            'https://api.adanos.org/x/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 60.0,
+                    'bullish_pct' => 58,
+                    'mentions' => 94,
+                ]],
+            ]),
+            'https://api.adanos.org/news/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 48.0,
+                    'bullish_pct' => 61,
+                    'mentions' => 37,
+                ]],
+            ]),
+            'https://api.adanos.org/polymarket/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 50.0,
+                    'bullish_pct' => 64,
+                    'trade_count' => 512,
+                ]],
+            ]),
+        ]);
+
+        $this->actingAs($this->user);
+
+        $transaction = Transaction::factory()
+            ->buy()
+            ->symbol('AAPL')
+            ->create();
+
+        $this->getJson(route('api.holding.show', ['portfolio' => $transaction->portfolio_id, 'symbol' => 'AAPL']))
+            ->assertOk()
+            ->assertJsonPath('market_sentiment.average_buzz', 53.35)
+            ->assertJsonPath('market_sentiment.source_alignment', 'aligned')
+            ->assertJsonPath('market_sentiment.sources.news.mentions', 37);
+    }
+
+    public function test_holding_show_omits_market_sentiment_when_adanos_is_not_configured()
+    {
+        Http::fake();
+
+        $this->actingAs($this->user);
+
+        $transaction = Transaction::factory()
+            ->buy()
+            ->symbol('AAPL')
+            ->create();
+
+        $this->getJson(route('api.holding.show', ['portfolio' => $transaction->portfolio_id, 'symbol' => 'AAPL']))
+            ->assertOk()
+            ->assertJsonMissingPath('market_sentiment');
+
+        Http::assertNothingSent();
     }
 }

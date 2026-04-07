@@ -6,6 +6,7 @@ use App\Console\Commands\CaptureDailyChange;
 use App\Console\Commands\RefreshCurrencyData;
 use App\Console\Commands\RefreshDividendData;
 use App\Console\Commands\RefreshMarketData;
+use App\Console\Commands\RefreshMarketSentiment;
 use App\Console\Commands\RefreshSplitData;
 use App\Console\Commands\SyncHoldingData;
 use Illuminate\Support\Facades\Schedule;
@@ -15,6 +16,13 @@ use Illuminate\Support\Facades\Schedule;
  * Note: Update the cadence with the MARKET_DATA_REFRESH key in your env file (default: 30 minutes)
  */
 Schedule::command(RefreshMarketData::class)->weekdays()->everyMinute();
+
+/**
+ * Refreshes optional Adanos market sentiment snapshots for tracked holdings
+ */
+Schedule::command(RefreshMarketSentiment::class)
+    ->everySixHours()
+    ->when(fn () => filled(config('services.adanos.key')));
 
 /**
  * This scheduled job records daily changes to your portfolios every weekday

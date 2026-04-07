@@ -117,6 +117,26 @@ MARKET_DATA_PROVIDER=yahoo,alphavantage,custom_provider
 
 Feel free to submit a PR with any custom providers you create.
 
+### Optional market sentiment overlay
+
+Investbrain can also show an optional market sentiment summary for holdings and asset detail pages. This is a separate overlay and does **not** replace your configured market data provider.
+
+To enable it, set an Adanos API key:
+
+```bash
+ADANOS_API_KEY=your_api_key
+```
+
+Optional tuning:
+
+```bash
+ADANOS_MARKET_SENTIMENT_REFRESH=360
+ADANOS_MARKET_SENTIMENT_DAYS=7
+ADANOS_MARKET_SENTIMENT_SOURCES=reddit,x,news,polymarket
+```
+
+When `ADANOS_API_KEY` is not configured, Investbrain will skip all sentiment requests and the UI/API will continue to work without sentiment data.
+
 ## Import / Export
 
 Investbrain includes a convenient feature which allows you to maintain the portability of your portfolios and transaction data. 
@@ -145,6 +165,10 @@ There are several optional configurations available when installing using the re
 | ALPACA_API_SECRET | If using the Alpaca provider | `null` |
 | TWELVEDATA_API_SECRET | If using the Twelve Data provider | `null` |
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
+| ADANOS_API_KEY | Enables the optional Adanos market sentiment overlay for holdings and asset detail pages | `null` |
+| ADANOS_MARKET_SENTIMENT_REFRESH | Cadence to refresh cached market sentiment snapshots in minutes | 360 |
+| ADANOS_MARKET_SENTIMENT_DAYS | Lookback window passed to Adanos sentiment requests | 7 |
+| ADANOS_MARKET_SENTIMENT_SOURCES | Comma-separated sentiment sources to request (`reddit,x,news,polymarket`) | `reddit,x,news,polymarket` |
 | APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
 | AI_CHAT_ENABLED | Whether to enable AI chat features | `false` |
 | CHAT_PROVIDER | Which chat provider to use (one of `openai`, `anthropic`, `gemini`, `azure`, `groq`, `xai`, `deepseek`, `mistral`, `ollama`) | `openai` |
@@ -201,6 +225,7 @@ If you need more details on what the command does, you can take a look at the op
 | Command      | Description      |
 | ------------- | ------------- |
 | refresh:market-data | Refreshes market data with your configured market data provider. |
+| refresh:market-sentiment | Refreshes optional Adanos market sentiment snapshots for tracked holding symbols. |
 | refresh:dividend-data | Refreshes dividend data with your configured market data provider. Will also re-calculate your total dividends earned for each holding. |
 | refresh:split-data | Refreshes splits data with your configured market data provider. Will also create new transactions to account for any splits. |
 | refresh:currency-data | Grabs the latest daily currency exchange rate data and persists to the database. |
