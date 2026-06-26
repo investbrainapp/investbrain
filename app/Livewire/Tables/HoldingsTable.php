@@ -7,13 +7,18 @@ namespace App\Livewire\Tables;
 use App\Models\Holding;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\QueryBuilder\Constraints\NumberConstraint;
+use Filament\QueryBuilder\Constraints\TextConstraint;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Number;
 use Livewire\Component;
 
@@ -34,6 +39,22 @@ class HoldingsTable extends Component implements HasActions, HasSchemas, HasTabl
     {
 
         return $table
+            ->filters([
+
+                Filter::make('quantity')
+                    ->label('Open positions')
+                    ->baseQuery(fn (Builder $query) => $query->where('quantity', '>', 0))
+                    ->toggle()
+                    ->default(),
+
+                QueryBuilder::make()
+                    ->constraints([
+                        TextConstraint::make('symbol'),
+                        TextConstraint::make('market_data.name'),
+                        NumberConstraint::make('market_data.market_value'),
+                    ]),
+            ])
+            ->deferFilters(false)
             ->query(
                 Holding::query()
                     ->portfolio($this->portfolio->id)
