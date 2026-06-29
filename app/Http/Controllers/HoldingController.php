@@ -17,6 +17,7 @@ class HoldingController extends Controller
     {
         $holding = Holding::with([
             'market_data',
+            'market_sentiment',
             'transactions' => function ($query) use ($symbol) {
                 $query->where('transactions.symbol', $symbol);
             },
@@ -24,6 +25,8 @@ class HoldingController extends Controller
         ->symbol($symbol)
         ->portfolio($portfolio->id)
         ->firstOrFail();
+
+        $holding->loadMarketSentiment();
 
         $formattedTransactions = $holding->getFormattedTransactions();
 

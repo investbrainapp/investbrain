@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Actions\CopyToBaseCurrency;
 use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Traits\HasMarketSentiment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Pipeline;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Pipeline;
 class MarketData extends Model
 {
     use HasFactory;
+    use HasMarketSentiment;
 
     protected $primaryKey = 'symbol';
 

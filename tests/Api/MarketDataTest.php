@@ -7,6 +7,7 @@ namespace Tests\Api;
 use App\Models\MarketData;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class MarketDataTest extends TestCase
@@ -71,5 +72,71 @@ class MarketDataTest extends TestCase
     public function test_cannot_access_market_data_when_unauthenticated(): void
     {
         $this->getJson(route('api.market-data.show', ['symbol' => 'AAPL']))->assertUnauthorized();
+    }
+
+    public function test_market_data_can_include_optional_market_sentiment(): void
+    {
+        config()->set('services.adanos.key', 'test-key');
+
+        MarketData::getMarketData('AAPL');
+
+        Http::fake([
+            'https://api.adanos.org/reddit/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 55.4,
+                    'bullish_pct' => 62,
+                    'mentions' => 120,
+                ]],
+            ]),
+            'https://api.adanos.org/x/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 60.0,
+                    'bullish_pct' => 58,
+                    'mentions' => 94,
+                ]],
+            ]),
+            'https://api.adanos.org/news/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 48.0,
+                    'bullish_pct' => 61,
+                    'mentions' => 37,
+                ]],
+            ]),
+            'https://api.adanos.org/polymarket/stocks/v1/compare*' => Http::response([
+                'stocks' => [[
+                    'ticker' => 'AAPL',
+                    'buzz_score' => 50.0,
+                    'bullish_pct' => 64,
+                    'trade_count' => 512,
+                ]],
+            ]),
+        ]);
+
+        $this->actingAs($this->user)
+            ->getJson(route('api.market-data.show', ['symbol' => 'AAPL']))
+            ->assertOk()
+            ->assertJsonPath('market_sentiment.average_buzz', 53.35)
+            ->assertJsonPath('market_sentiment.average_bullish_pct', 61.25)
+            ->assertJsonPath('market_sentiment.coverage', 4)
+            ->assertJsonPath('market_sentiment.source_alignment', 'aligned')
+            ->assertJsonPath('market_sentiment.sources.reddit.mentions', 120)
+            ->assertJsonPath('market_sentiment.sources.polymarket.trade_count', 512);
+    }
+
+    public function test_market_data_omits_market_sentiment_when_adanos_is_not_configured(): void
+    {
+        MarketData::getMarketData('AAPL');
+
+        Http::fake();
+
+        $this->actingAs($this->user)
+            ->getJson(route('api.market-data.show', ['symbol' => 'AAPL']))
+            ->assertOk()
+            ->assertJsonMissingPath('market_sentiment');
+
+        Http::assertNothingSent();
     }
 }

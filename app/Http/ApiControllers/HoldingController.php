@@ -19,7 +19,7 @@ class HoldingController extends ApiController
 
         $filters->setQuery(Holding::query());
         $filters->setScopes(['myHoldings']);
-        $filters->setEagerRelations(['market_data', 'transactions']);
+        $filters->setEagerRelations(['market_data', 'market_sentiment', 'transactions']);
         $filters->setSearchableColumns(['symbol']);
 
         return HoldingResource::collection($filters->paginated());
@@ -31,6 +31,7 @@ class HoldingController extends ApiController
         Gate::authorize('readOnly', $portfolio);
 
         $holding = $portfolio->holdings()->symbol($symbol)->firstOrFail();
+        $holding->loadMarketSentiment();
 
         return HoldingResource::make($holding);
     }

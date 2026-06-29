@@ -30,6 +30,14 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    'adanos' => [
+        'key' => env('ADANOS_API_KEY'),
+        'base_url' => 'https://api.adanos.org',
+        'market_sentiment_refresh' => (int) env('ADANOS_MARKET_SENTIMENT_REFRESH', 360),
+        'market_sentiment_days' => (int) env('ADANOS_MARKET_SENTIMENT_DAYS', 7),
+        'market_sentiment_sources' => env('ADANOS_MARKET_SENTIMENT_SOURCES', 'reddit,x,news,polymarket'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
