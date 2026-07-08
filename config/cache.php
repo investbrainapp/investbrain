@@ -122,6 +122,7 @@ return [
     'serializable_classes' => [
         Illuminate\Database\Eloquent\Collection::class,
         Collection::class,
+        stdClass::class,
     ],
 
 ];
