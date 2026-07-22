@@ -47,6 +47,11 @@ class FallbackInterface
             return false;
         }
 
+        // search should soft-fail with an empty result set
+        if ($method == 'search') {
+            return collect();
+        }
+
         throw new \Exception("Could not get market data calling method {$method}: {$this->latest_error}");
     }
 }
