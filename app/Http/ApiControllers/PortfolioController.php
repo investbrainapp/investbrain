@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\ApiControllers;
 
+use App\Actions\Portfolio\CreatePortfolio;
+use App\Actions\Portfolio\DeletePortfolio;
+use App\Actions\Portfolio\UpdatePortfolio;
 use App\Http\ApiControllers\Controller as ApiController;
-use App\Http\Requests\PortfolioRequest;
 use App\Http\Resources\PortfolioResource;
 use App\Models\Portfolio;
 use HackerEsq\FilterModels\FilterModels;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PortfolioController extends ApiController
@@ -24,11 +27,9 @@ class PortfolioController extends ApiController
         return PortfolioResource::collection($filters->paginated());
     }
 
-    public function store(PortfolioRequest $request)
+    public function store(Request $request, CreatePortfolio $action)
     {
-        $portfolio = Portfolio::create($request->validated());
-
-        return PortfolioResource::make($portfolio);
+        return PortfolioResource::make($action->handle($request->all()));
     }
 
     public function show(Portfolio $portfolio)
@@ -38,20 +39,14 @@ class PortfolioController extends ApiController
         return PortfolioResource::make($portfolio);
     }
 
-    public function update(PortfolioRequest $request, Portfolio $portfolio)
+    public function update(Request $request, Portfolio $portfolio, UpdatePortfolio $action)
     {
-        Gate::authorize('fullAccess', $portfolio);
-
-        $portfolio->update($request->validated());
-
-        return PortfolioResource::make($portfolio);
+        return PortfolioResource::make($action->handle($portfolio, $request->all()));
     }
 
-    public function destroy(Portfolio $portfolio)
+    public function destroy(Portfolio $portfolio, DeletePortfolio $action)
     {
-        Gate::authorize('fullAccess', $portfolio);
-
-        $portfolio->delete();
+        $action->handle($portfolio);
 
         return response()->noContent();
     }

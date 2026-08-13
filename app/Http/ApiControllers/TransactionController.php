@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\ApiControllers;
 
+use App\Actions\Transaction\CreateTransaction;
+use App\Actions\Transaction\DeleteTransaction;
+use App\Actions\Transaction\UpdateTransaction;
 use App\Http\ApiControllers\Controller as ApiController;
-use App\Http\Requests\TransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use HackerEsq\FilterModels\FilterModels;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends ApiController
@@ -24,13 +27,9 @@ class TransactionController extends ApiController
         return TransactionResource::collection($filters->paginated());
     }
 
-    public function store(TransactionRequest $request)
+    public function store(Request $request, CreateTransaction $action)
     {
-        Gate::authorize('fullAccess', $request->portfolio);
-
-        $transaction = Transaction::create($request->validated());
-
-        return TransactionResource::make($transaction);
+        return TransactionResource::make($action->handle($request->all()));
     }
 
     public function show(Transaction $transaction)
@@ -40,20 +39,14 @@ class TransactionController extends ApiController
         return TransactionResource::make($transaction);
     }
 
-    public function update(TransactionRequest $request, Transaction $transaction)
+    public function update(Request $request, Transaction $transaction, UpdateTransaction $action)
     {
-        Gate::authorize('fullAccess', $transaction->portfolio);
-
-        $transaction->update($request->validated());
-
-        return TransactionResource::make($transaction);
+        return TransactionResource::make($action->handle($transaction, $request->all()));
     }
 
-    public function destroy(Transaction $transaction)
+    public function destroy(Transaction $transaction, DeleteTransaction $action)
     {
-        Gate::authorize('fullAccess', $transaction->portfolio);
-
-        $transaction->delete();
+        $action->handle($transaction);
 
         return response()->noContent();
     }
