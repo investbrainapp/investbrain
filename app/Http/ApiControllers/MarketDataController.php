@@ -15,11 +15,9 @@ class MarketDataController extends ApiController
     {
 
         try {
-            $marketData = MarketData::getMarketData($symbol);
-            $marketData->loadMarketSentiment();
 
             return MarketDataResource::make(
-                $marketData
+                MarketData::getMarketData($symbol)
             );
         } catch (\Throwable $e) {
 
