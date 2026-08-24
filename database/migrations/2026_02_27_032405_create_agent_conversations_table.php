@@ -14,6 +14,8 @@ return new class extends AiMigration
      */
     public function up(): void
     {
+        Schema::dropIfExists('ai_chats');
+
         Schema::create('agent_conversations', function (Blueprint $table) {
             $table->string('id', 36)->primary();
             $table->foreignIdFor(User::class, 'user_id')->constrained()->onDelete('cascade')->nullable();

@@ -99,7 +99,7 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                 TextColumn::make('gain_dollars')
                     ->label(__('Gain/Loss'))
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => Number::currency($state ?? 0, $record->market_data->currency)),
+                    ->formatStateUsing(fn ($state, $record) => Number::currency($state * $record->quantity ?? 0, $record->market_data->currency)),
             ]);
     }
 
