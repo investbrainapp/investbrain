@@ -117,6 +117,19 @@ MARKET_DATA_PROVIDER=yahoo,alphavantage,custom_provider
 
 Feel free to submit a PR with any custom providers you create.
 
+### Market sentiment providers
+
+Investbrain can optionally enrich holding pages with market sentiment from a separate, pluggable provider. To use [Adanos](https://adanos.org/), set:
+
+```bash
+MARKET_SENTIMENT_PROVIDER=adanos
+ADANOS_API_KEY=your_api_key
+```
+
+Adanos sentiment is loaded from Reddit, X / FinTwit, News, and Polymarket and cached for 30 minutes. If the provider is not configured or temporarily unavailable, holding pages continue without sentiment data.
+
+Additional sentiment providers can implement [MarketSentimentInterface](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketSentiment/MarketSentimentInterface.php) and be registered under `sentiment_interfaces` in `config/investbrain.php`.
+
 ## Import / Export
 
 Investbrain includes a convenient feature which allows you to maintain the portability of your portfolios and transaction data. 
@@ -143,6 +156,8 @@ There are several optional configurations available when installing using the re
 | FINNHUB_API_KEY | If using the Finnhub provider | `null` |
 | ALPACA_API_KEY | If using the Alpaca provider | `null` |
 | ALPACA_API_SECRET | If using the Alpaca provider | `null` |
+| MARKET_SENTIMENT_PROVIDER | Optional market sentiment provider (`adanos`) | `null` |
+| ADANOS_API_KEY | If using the Adanos sentiment provider | `null` |
 | TWELVEDATA_API_SECRET | If using the Twelve Data provider | `null` |
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
 | APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
