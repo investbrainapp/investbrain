@@ -15,6 +15,11 @@ interface MarketDataInterface
     public function exists(string $symbol): bool;
 
     /**
+     * Search for symbols matching a query
+     */
+    public function search(string $query): Collection;
+
+    /**
      * Get quote data
      */
     public function quote(string $symbol): Quote;

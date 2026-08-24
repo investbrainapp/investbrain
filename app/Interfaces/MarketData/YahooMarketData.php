@@ -7,6 +7,7 @@ namespace App\Interfaces\MarketData;
 use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\Types\SearchResult;
 use App\Interfaces\MarketData\Types\Split;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -31,6 +32,21 @@ class YahooMarketData implements MarketDataInterface
     {
 
         return (bool) $this->quote($symbol);
+    }
+
+    public function search(string $query): Collection
+    {
+        return collect($this->client->search($query))
+            ->map(function ($result) {
+                return new SearchResult([
+                    'symbol' => $result->getSymbol(),
+                    'name' => $result->getName(),
+                    'type' => $result->getTypeDisp() ?? $result->getType(),
+                    'exchange' => $result->getExchDisp() ?? $result->getExch(),
+                ]);
+            })
+            ->filter(fn (SearchResult $result) => filled($result->getSymbol()))
+            ->values();
     }
 
     public function quote(string $symbol): Quote
