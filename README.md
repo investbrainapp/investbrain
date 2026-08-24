@@ -161,25 +161,20 @@ There are several optional configurations available when installing using the re
 
 ## Updating
 
-To update Investbrain using the recommended [Docker installation](#self-hosting) method, you just need to stop the running containers:
+To update Investbrain using the recommended [Docker installation](#self-hosting) method, you just need to pull the latest container image and recreate the running containers:
 
-```bash
-docker compose stop
+```sh
+docker compose pull app
+docker compose up app -d --force-recreate
 ```
 
-Then pull the latest Docker image:
+Or, if preferring to stop containers first:
 
-```bash
-docker image pull investbrainapp/investbrain:latest
+```sh
+docker compose down app
+docker compose pull app
+docker compose up -d app
 ```
-
-Finally bring the containers back up!
-
-```bash
-docker compose up
-```
-
-Easy as that!
 
 ## Command line utilities
 
