@@ -122,6 +122,21 @@
                 
             </x-ui.card>
 
+            @if($marketSentiment->isNotEmpty())
+            <x-ui.card title="{{ __('Market sentiment') }}" class="md:col-span-3">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    @foreach($marketSentiment as $source => $sentiment)
+                    <div>
+                        <div class="font-bold">{{ str($source)->title() }}</div>
+                        <div>{{ __('Buzz') }}: {{ Number::format($sentiment['buzz_score'], precision: 1) }}/100</div>
+                        <div>{{ __('Bullish') }}: {{ Number::percentage($sentiment['bullish_pct'], 0) }}</div>
+                        <div>{{ str($sentiment['activity_label'])->title() }}: {{ Number::format($sentiment['activity']) }}</div>
+                    </div>
+                    @endforeach
+                </div>
+            </x-ui.card>
+            @endif
+
             <x-ui.card title="{{ __('Recent activity') }}" class="md:col-span-3">
 
                 @livewire('transactions-list', [
