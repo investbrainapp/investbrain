@@ -44,7 +44,7 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
 
         $dailyChanges->chunk($this->batchSize())->each(function ($chunk, $index) use ($totalBatches) {
 
-            $this->validatePortfolioAccess($chunk);
+            $this->validatePortfolioAccess($chunk->pluck('portfolio_id'));
 
             $this->backupImport->update([
                 'message' => __('Importing daily changes (Batch :currentBatch of :totalBatches)...', ['currentBatch' => $index + 1, 'totalBatches' => $totalBatches]),

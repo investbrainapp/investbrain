@@ -60,7 +60,13 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                 'message' => __('Importing transactions (Batch :currentBatch of :totalBatches)...', ['currentBatch' => $index + 1, 'totalBatches' => $totalBatches]),
             ]);
 
-            $this->validatePortfolioAccess($chunk);
+            $this->validatePortfolioAccess($chunk->pluck('portfolio_id'));
+
+            $this->validatePortfolioAccess(
+                Transaction::query()
+                    ->whereIn('id', $chunk->pluck('transaction_id')->filter()->unique())
+                    ->pluck('portfolio_id')
+            );
 
             // have to cast to native values
             $chunk = $chunk->map(function ($transaction) {
