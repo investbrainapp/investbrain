@@ -17,6 +17,12 @@ return [
         'fake' => App\Interfaces\MarketData\FakeMarketData::class,
     ],
 
+    'sentiment_provider' => env('MARKET_SENTIMENT_PROVIDER'),
+
+    'sentiment_interfaces' => [
+        'adanos' => App\Interfaces\MarketSentiment\AdanosMarketSentiment::class,
+    ],
+
     'self_hosted' => env('SELF_HOSTED', true),
 
     'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00'),

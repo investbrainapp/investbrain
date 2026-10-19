@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Interfaces\MarketSentiment\MarketSentimentInterface;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -25,6 +26,15 @@ class AppServiceProvider extends ServiceProvider
             MarketDataInterface::class,
             FallbackInterface::class
         );
+
+        $this->app->bind(MarketSentimentInterface::class, function ($app) {
+            $provider = config('investbrain.sentiment_provider');
+            $providerClass = config("investbrain.sentiment_interfaces.{$provider}");
+
+            throw_if(blank($providerClass), \RuntimeException::class, "Provider [{$provider}] is not a valid market sentiment interface.");
+
+            return $app->make($providerClass);
+        });
     }
 
     /**
