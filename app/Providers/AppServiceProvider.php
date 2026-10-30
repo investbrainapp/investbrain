@@ -12,6 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 use NumberFormatter;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,6 +43,12 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         JsonResource::withoutWrapping();
+
+        Passport::authorizationView('oauth.authorize');
+
+        Passport::tokensCan([
+            'mcp:use' => __('View and manage your portfolios, transactions, and holdings'),
+        ]);
 
         Arr::macro('skipEmptyValues', function (array $array) {
 

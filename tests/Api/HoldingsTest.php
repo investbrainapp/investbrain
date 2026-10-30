@@ -9,9 +9,8 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class HoldingsTest extends TestCase
+class HoldingsTest extends ApiTestCase
 {
     use RefreshDatabase;
 

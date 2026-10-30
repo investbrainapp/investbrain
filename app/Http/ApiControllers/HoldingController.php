@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\ApiControllers;
 
+use App\Actions\Holding\UpdateHolding;
 use App\Http\ApiControllers\Controller as ApiController;
-use App\Http\Requests\HoldingRequest;
 use App\Http\Resources\HoldingResource;
 use App\Models\Holding;
 use App\Models\Portfolio;
 use HackerEsq\FilterModels\FilterModels;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class HoldingController extends ApiController
@@ -35,15 +36,10 @@ class HoldingController extends ApiController
         return HoldingResource::make($holding);
     }
 
-    public function update(HoldingRequest $request, Portfolio $portfolio, string $symbol)
+    public function update(Request $request, Portfolio $portfolio, string $symbol, UpdateHolding $action)
     {
-
-        Gate::authorize('fullAccess', $portfolio);
-
         $holding = $portfolio->holdings()->symbol($symbol)->firstOrFail();
 
-        $holding->update($request->validated());
-
-        return HoldingResource::make($holding);
+        return HoldingResource::make($action->handle($holding, $request->all()));
     }
 }

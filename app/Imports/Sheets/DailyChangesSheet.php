@@ -38,7 +38,7 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
         ];
     }
 
-    public function collection(Collection $dailyChanges)
+    public function collection(Collection $dailyChanges): void
     {
         $totalBatches = count($dailyChanges) / $this->batchSize();
 

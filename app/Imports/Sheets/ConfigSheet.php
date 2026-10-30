@@ -34,7 +34,7 @@ class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadi
         ];
     }
 
-    public function collection(Collection $configs)
+    public function collection(Collection $configs): void
     {
         foreach ($configs as $config) {
 

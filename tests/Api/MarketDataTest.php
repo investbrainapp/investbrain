@@ -7,9 +7,8 @@ namespace Tests\Api;
 use App\Models\MarketData;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class MarketDataTest extends TestCase
+class MarketDataTest extends ApiTestCase
 {
     use RefreshDatabase;
 

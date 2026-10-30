@@ -2,30 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests;
+namespace App\Actions\Transaction;
 
 use App\Models\Portfolio;
+use App\Models\Transaction;
 use App\Rules\QuantityValidationRule;
 use App\Rules\SymbolValidationRule;
 
-class TransactionRequest extends FormRequest
+class TransactionRules
 {
-    protected function prepareForValidation(): void
-    {
-
-        $this->merge([
-            'portfolio' => Portfolio::find($this->requestOrModelValue('portfolio_id', 'transaction')),
-        ]);
-    }
-
     /**
-     * Get the validation rules that apply to the request.
+     * Build the validation rules for creating or updating a transaction. Shared by
+     * CreateTransaction and UpdateTransaction so both enforce identical rules.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @param  array<string, mixed>  $data
+     * @return array<string, array<int, mixed>>
      */
-    public function rules(): array
+    public function build(array $data, ?Portfolio $portfolio, ?Transaction $transaction = null): array
     {
-
         $rules = [
             'portfolio_id' => ['required', 'exists:portfolios,id'],
             'symbol' => ['required', 'string', new SymbolValidationRule],
@@ -36,11 +30,11 @@ class TransactionRequest extends FormRequest
                 'numeric',
                 'gt:0',
                 new QuantityValidationRule(
-                    $this->input('portfolio'),
-                    $this->requestOrModelValue('symbol', 'transaction'),
-                    $this->requestOrModelValue('transaction_type', 'transaction'),
-                    $this->requestOrModelValue('date', 'transaction'),
-                    $this->transaction
+                    $portfolio,
+                    $data['symbol'] ?? $transaction?->symbol,
+                    $data['transaction_type'] ?? $transaction?->transaction_type,
+                    $data['date'] ?? $transaction?->date,
+                    $transaction,
                 ),
             ],
             'currency' => ['required', 'exists:currencies,currency'],
@@ -48,7 +42,7 @@ class TransactionRequest extends FormRequest
             'sale_price' => ['exclude_if:transaction_type,BUY', 'min:0', 'numeric'],
         ];
 
-        if (! is_null($this->transaction)) {
+        if ($transaction !== null) {
             $rules['portfolio_id'][0] = 'sometimes';
             $rules['symbol'][0] = 'sometimes';
             $rules['transaction_type'][0] = 'sometimes';
@@ -56,15 +50,11 @@ class TransactionRequest extends FormRequest
             $rules['date'][0] = 'sometimes';
             $rules['quantity'][0] = 'sometimes';
 
-            if (
-                $this->requestOrModelValue('transaction_type', 'transaction') == 'SELL'
-                && $this->requestOrModelValue('sale_price', 'transaction') == null
-            ) {
+            $transactionType = $data['transaction_type'] ?? $transaction->transaction_type;
+
+            if ($transactionType === 'SELL' && ($data['sale_price'] ?? $transaction->sale_price) === null) {
                 $rules['sale_price'][0] = 'required';
-            } elseif (
-                $this->requestOrModelValue('transaction_type', 'transaction') == 'BUY'
-                && $this->requestOrModelValue('cost_basis', 'transaction') == null
-            ) {
+            } elseif ($transactionType === 'BUY' && ($data['cost_basis'] ?? $transaction->cost_basis) === null) {
                 $rules['cost_basis'][0] = 'required';
             }
         }

@@ -15,6 +15,7 @@ use App\Imports\Sheets\TransactionsSheet;
 use App\Models\BackupImport as BackupImportModel;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
+use Maatwebsite\Excel\Concerns\Import;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -22,7 +23,7 @@ use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Events\BeforeImport;
 use Maatwebsite\Excel\Events\ImportFailed;
 
-class BackupImport implements WithEvents, WithMultipleSheets
+class BackupImport implements Import, WithEvents, WithMultipleSheets
 {
     use Importable;
 
