@@ -34,7 +34,7 @@ class PortfoliosSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithH
         ];
     }
 
-    public function collection(Collection $portfolios)
+    public function collection(Collection $portfolios): void
     {
         foreach ($portfolios as $index => $portfolio) {
 

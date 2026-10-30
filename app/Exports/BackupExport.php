@@ -8,10 +8,11 @@ use App\Exports\Sheets\ConfigSheet;
 use App\Exports\Sheets\DailyChangesSheet;
 use App\Exports\Sheets\PortfoliosSheet;
 use App\Exports\Sheets\TransactionsSheet;
+use Maatwebsite\Excel\Concerns\Export;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class BackupExport implements WithMultipleSheets
+class BackupExport implements Export, WithMultipleSheets
 {
     use Exportable;
 

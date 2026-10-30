@@ -42,7 +42,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
         ];
     }
 
-    public function collection(Collection $transactions)
+    public function collection(Collection $transactions): void
     {
 
         // if has any transactions not in base currency, need to sync timeseries conversion rates
