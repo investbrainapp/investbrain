@@ -94,7 +94,9 @@ new class extends Component
     }
 
     /**
-     * Get the user's active (unrevoked and unexpired) API tokens.
+     * Get the user's active (unrevoked and unexpired) personal access tokens.
+     *
+     * Tokens issued to OAuth clients (e.g. MCP clients) are excluded.
      *
      * @return \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Token>
      */
@@ -106,7 +108,9 @@ new class extends Component
             ->where(function ($query) {
                 $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
-            ->get();
+            ->get()
+            ->filter(fn ($token) => $token->client?->hasGrantType('personal_access'))
+            ->values();
     }
 
     /**

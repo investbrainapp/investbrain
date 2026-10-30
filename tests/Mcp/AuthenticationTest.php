@@ -190,7 +190,7 @@ class AuthenticationTest extends TestCase
             ->assertOk()
             ->assertSee('Test MCP Client')
             ->assertSee($this->user->email)
-            ->assertSee('View and manage your portfolios, transactions and holdings');
+            ->assertSee('View and manage your portfolios, transactions, and holdings');
 
         $authToken = session('authToken');
         $this->assertNotEmpty($authToken);

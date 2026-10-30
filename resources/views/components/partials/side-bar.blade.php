@@ -97,6 +97,7 @@ new class extends Component
                     </x-slot:trigger>
                     
                     <x-ui.menu-item title="{{ __('Manage Profile') }}" icon="o-user" link="{{ @route('profile.show') }}" />
+                    <x-ui.menu-item title="{{ __('Connections') }}" icon="o-link" link="{{ @route('connections.index') }}" />
                     <x-ui.menu-item title="{{ __('API Tokens') }}" icon="o-command-line" link="{{ @route('api-tokens.index') }}" />
                     <x-ui.menu-item title="{{ __('Import / Export Data') }}" icon="o-cloud-arrow-down" link="{{ @route('import-export') }}" />                                    
 

@@ -8,6 +8,7 @@ use App\Models\ConnectedAccount;
 use App\Models\User;
 use App\Notifications\VerifyConnectedAccountNotification;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\MessageBag;
@@ -40,6 +41,12 @@ class ConnectedAccountController extends Controller
 
             return redirect(route('login'))
                 ->with('errors', new MessageBag([__('Could not login using :provider. Try again later.', ['provider' => config("services.$provider.name")])]));
+        }
+
+        // signed-in users are linking an account, not logging in
+        if (Auth::check()) {
+
+            return $this->linkToCurrentUser($provider, $providerUser);
         }
 
         // check if this account is already linked
@@ -96,6 +103,61 @@ class ConnectedAccountController extends Controller
             ));
     }
 
+    /**
+     * Link the provider account to the signed-in user.
+     */
+    protected function linkToCurrentUser(string $provider, mixed $providerUser): RedirectResponse
+    {
+        $user = Auth::user();
+        $providerName = config("services.$provider.name");
+
+        $connected_account = ConnectedAccount::firstOrNew([
+            'provider' => $provider,
+            'provider_id' => $providerUser->id,
+        ], [
+            'token' => $providerUser->token,
+            'secret' => $providerUser->tokenSecret,
+            'refresh_token' => $providerUser->refreshToken,
+            'expires_at' => $providerUser->expiresIn,
+        ]);
+
+        if ($connected_account->exists && ! $user->ownsConnectedAccount($connected_account)) {
+
+            return $this->redirectWithToast(
+                route('connections.index'),
+                __('That :provider account is already connected to another user.', ['provider' => $providerName]),
+                'alert-error',
+                'o-x-circle',
+            );
+        }
+
+        $connected_account->user_id = $user->id;
+        $connected_account->verified_at ??= now();
+        $connected_account->save();
+
+        return $this->redirectWithToast(
+            route('connections.index'),
+            __('Your :provider account has been connected.', ['provider' => $providerName]),
+        );
+    }
+
+    /**
+     * Redirect to the given URL and flash a toast notification.
+     */
+    protected function redirectWithToast(string $url, string $title, string $css = 'alert-success', string $icon = 'o-check-circle'): RedirectResponse
+    {
+        return redirect($url)->with('toast', json_encode([
+            'toast' => [
+                'title' => $title,
+                'description' => null,
+                'css' => $css,
+                'icon' => Blade::render("<x-ui.icon class='w-7 h-7' name='$icon' />"),
+                'position' => 'toast-top toast-end',
+                'timeout' => '5000',
+            ],
+        ]));
+    }
+
     protected function validateProvider($provider): void
     {
         if (! in_array($provider, explode(',', config('services.enabled_login_providers')))) {
@@ -119,15 +181,9 @@ class ConnectedAccountController extends Controller
             Auth::login($connected_account->user, true);
         }
 
-        return redirect(route('dashboard'))->with('toast', json_encode([
-            'toast' => [
-                'title' => __('Your :provider account has been connected.', ['provider' => config("services.{$connected_account->provider}.name")]),
-                'description' => null,
-                'css' => 'alert-success',
-                'icon' => Blade::render("<x-ui.icon class='w-7 h-7' name='o-check-circle' />"),
-                'position' => 'toast-top toast-end',
-                'timeout' => '5000',
-            ],
-        ]));
+        return $this->redirectWithToast(
+            route('dashboard'),
+            __('Your :provider account has been connected.', ['provider' => config("services.{$connected_account->provider}.name")]),
+        );
     }
 }

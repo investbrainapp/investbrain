@@ -9,6 +9,7 @@ use App\Models\ConnectedAccount;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Socialite\Facades\Socialite;
 
 class ConnectedAccountTest extends TestCase
@@ -21,6 +22,7 @@ class ConnectedAccountTest extends TestCase
     {
         parent::setUp();
         $this->controller = new ConnectedAccountController;
+        Notification::fake();
     }
 
     public function test_handle_provider_callback_with_already_connected_account()
@@ -164,5 +166,91 @@ class ConnectedAccountTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('toast');
+    }
+
+    public function test_signed_in_user_can_link_a_provider_account(): void
+    {
+        config(['services.enabled_login_providers' => 'github,google']);
+        $user = User::factory()->create(['email' => 'me@example.com']);
+        $this->mockProviderUser('github', $this->providerUser('777', 'someone-else@example.com'));
+
+        $response = $this->actingAs($user)->get(route('oauth.callback', ['provider' => 'github']));
+
+        $response->assertRedirect(route('connections.index'));
+        $response->assertSessionHas('toast');
+
+        $connectedAccount = $user->connectedAccounts()->first();
+        $this->assertNotNull($connectedAccount);
+        $this->assertEquals('777', $connectedAccount->provider_id);
+        $this->assertNotNull($connectedAccount->verified_at);
+
+        $this->assertEquals($user->id, Auth::id());
+        $this->assertEquals(1, User::count());
+        Notification::assertNothingSent();
+    }
+
+    public function test_signed_in_user_can_verify_their_own_pending_account(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $user = User::factory()->create();
+        $pending = ConnectedAccount::forceCreate([
+            'provider' => 'github',
+            'provider_id' => '777',
+            'user_id' => $user->id,
+            'token' => 'old-token',
+            'verified_at' => null,
+        ]);
+        $this->mockProviderUser('github', $this->providerUser('777', $user->email));
+
+        $this->actingAs($user)->get(route('oauth.callback', ['provider' => 'github']))
+            ->assertRedirect(route('connections.index'));
+
+        $this->assertEquals(1, ConnectedAccount::count());
+        $this->assertNotNull($pending->fresh()->verified_at);
+    }
+
+    public function test_signed_in_user_cannot_link_an_account_owned_by_another_user(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $owner = User::factory()->create();
+        $account = ConnectedAccount::forceCreate([
+            'provider' => 'github',
+            'provider_id' => '777',
+            'user_id' => $owner->id,
+            'token' => 'token',
+            'verified_at' => now(),
+        ]);
+        $user = User::factory()->create();
+        $this->mockProviderUser('github', $this->providerUser('777', $owner->email));
+
+        $response = $this->actingAs($user)->get(route('oauth.callback', ['provider' => 'github']));
+
+        $response->assertRedirect(route('connections.index'));
+        $this->assertStringContainsString('already connected to another user', session('toast'));
+        $this->assertEquals($owner->id, $account->fresh()->user_id);
+        $this->assertEquals($user->id, Auth::id());
+        $this->assertCount(0, $user->connectedAccounts);
+    }
+
+    protected function providerUser(string $id, string $email): object
+    {
+        return (object) [
+            'id' => $id,
+            'name' => 'Provider User',
+            'email' => $email,
+            'token' => 'token',
+            'tokenSecret' => null,
+            'refreshToken' => null,
+            'expiresIn' => null,
+        ];
+    }
+
+    protected function mockProviderUser(string $provider, object $providerUser): void
+    {
+        Socialite::shouldReceive('driver')
+            ->with($provider)
+            ->andReturnSelf()
+            ->shouldReceive('user')
+            ->andReturn($providerUser);
     }
 }

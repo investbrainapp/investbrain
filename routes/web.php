@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\ConnectedAccountController;
+use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\InvitedOnboardingController;
@@ -48,6 +49,12 @@ Route::middleware(['auth', 'web'])->group(function () {
     })->name('spotlight');
 
     Route::get('/user/profile', [UserProfileController::class, 'show'])->name('profile.show');
+
+    Route::get('/user/connections', [ConnectionController::class, 'index'])
+        ->name('connections.index')
+        ->when(! config('investbrain.self_hosted'), function ($route) {
+            return $route->middleware('verified');
+        });
 
     Route::get('/user/api-tokens', [ApiTokenController::class, 'index'])
         ->name('api-tokens.index')

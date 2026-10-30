@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Tests;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Laravel\Passport\Passport;
 use Livewire\Livewire;
 
 class ApiTokenPermissionsTest extends TestCase
@@ -75,6 +76,29 @@ class ApiTokenPermissionsTest extends TestCase
         Livewire::test('api-token-manager')->assertDontSee('Listed Token');
     }
 
+    public function test_oauth_client_tokens_are_not_listed(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $user->createToken('Personal Token');
+
+        $client = Passport::client()->factory()->create(['name' => 'Third Party App']);
+
+        Passport::token()->forceCreate([
+            'id' => Str::random(80),
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'name' => null,
+            'scopes' => [],
+            'revoked' => false,
+            'expires_at' => now()->addDay(),
+        ]);
+
+        Livewire::test('api-token-manager')
+            ->assertSee('Personal Token')
+            ->assertDontSee('Third Party App');
+    }
+
     public function test_cannot_delete_another_users_token(): void
     {
         $otherUser = User::factory()->create();
@@ -82,10 +106,11 @@ class ApiTokenPermissionsTest extends TestCase
 
         $this->actingAs(User::factory()->create());
 
-        $this->expectException(ModelNotFoundException::class);
-
         Livewire::test('api-token-manager')
             ->set(['apiTokenIdBeingDeleted' => $otherToken->id])
-            ->call('deleteApiToken');
+            ->call('deleteApiToken')
+            ->assertStatus(404);
+
+        $this->assertFalse($otherToken->fresh()->revoked);
     }
 }

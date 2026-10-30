@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
         Passport::authorizationView('oauth.authorize');
 
         Passport::tokensCan([
-            'mcp:use' => __('View and manage your portfolios, transactions and holdings'),
+            'mcp:use' => __('View and manage your portfolios, transactions, and holdings'),
         ]);
 
         Arr::macro('skipEmptyValues', function (array $array) {
