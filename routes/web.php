@@ -26,7 +26,7 @@ Route::get('/', function () {
     return redirect(route('dashboard'));
 });
 
-Route::middleware(['auth:sanctum', 'web'])->group(function () {
+Route::middleware(['auth', 'web'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
 

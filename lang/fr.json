@@ -59,6 +59,7 @@
     "Manage API Tokens": "Gérer les jetons API",
     "Create API Token": "Créer un jeton API",
     "You may delete any of your existing tokens if they are no longer needed.": "Vous pouvez supprimer tout jeton existant s'il n'est plus nécessaire.",
+    "Created": "Créé",
     "Last used": "Dernière utilisation",
     "Delete": "Supprimer",
     "API Token": "Jeton API",

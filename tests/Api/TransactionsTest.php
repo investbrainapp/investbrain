@@ -10,9 +10,8 @@ use App\Models\User;
 use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
-use Tests\TestCase;
 
-class TransactionsTest extends TestCase
+class TransactionsTest extends ApiTestCase
 {
     use RefreshDatabase;
 

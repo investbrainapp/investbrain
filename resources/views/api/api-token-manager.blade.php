@@ -16,7 +16,6 @@ new class extends Component
      */
     public $createApiTokenForm = [
         'name' => '',
-        'permissions' => [],
     ];
 
     /**
@@ -34,29 +33,6 @@ new class extends Component
     public $plainTextToken;
 
     /**
-     * Indicates if the user is currently managing an API token's permissions.
-     *
-     * @var bool
-     */
-    public $managingApiTokenPermissions = false;
-
-    /**
-     * The token that is currently having its permissions managed.
-     *
-     * @var \Laravel\Sanctum\PersonalAccessToken|null
-     */
-    public $managingPermissionsFor;
-
-    /**
-     * The update API token form state.
-     *
-     * @var array
-     */
-    public $updateApiTokenForm = [
-        'permissions' => [],
-    ];
-
-    /**
      * Indicates if the application is confirming if an API token should be deleted.
      *
      * @var bool
@@ -66,7 +42,7 @@ new class extends Component
     /**
      * The ID of the API token being deleted.
      *
-     * @var int
+     * @var string|null
      */
     public $apiTokenIdBeingDeleted;
 
@@ -107,51 +83,36 @@ new class extends Component
     /**
      * Display the token value to the user.
      *
-     * @param  \Laravel\Sanctum\NewAccessToken  $token
+     * @param  \Laravel\Passport\PersonalAccessTokenResult  $token
      * @return void
      */
     protected function displayTokenValue($token)
     {
         $this->displayingToken = true;
 
-        $this->plainTextToken = explode('|', $token->plainTextToken, 2)[1];
+        $this->plainTextToken = $token->accessToken;
     }
 
     /**
-     * Allow the given token's permissions to be managed.
+     * Get the user's active (unrevoked and unexpired) API tokens.
      *
-     * @param  int  $tokenId
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Token>
      */
-    public function manageApiTokenPermissions($tokenId)
+    public function activeTokens()
     {
-        $this->managingApiTokenPermissions = true;
-
-        $this->managingPermissionsFor = $this->user->tokens()->where(
-            'id', $tokenId
-        )->firstOrFail();
-
-        $this->updateApiTokenForm['permissions'] = $this->managingPermissionsFor->abilities;
-    }
-
-    /**
-     * Update the API token's permissions.
-     *
-     * @return void
-     */
-    public function updateApiToken()
-    {
-        $this->managingPermissionsFor->forceFill([
-            'abilities' => [],
-        ])->save();
-
-        $this->managingApiTokenPermissions = false;
+        return $this->user->tokens()
+            ->with('client')
+            ->where('revoked', false)
+            ->where(function ($query) {
+                $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->get();
     }
 
     /**
      * Confirm that the given API token should be deleted.
      *
-     * @param  int  $tokenId
+     * @param  string  $tokenId
      * @return void
      */
     public function confirmApiTokenDeletion($tokenId)
@@ -162,19 +123,17 @@ new class extends Component
     }
 
     /**
-     * Delete the API token.
+     * Revoke the API token.
      *
      * @return void
      */
     public function deleteApiToken()
     {
-        $this->user->tokens()->where('id', $this->apiTokenIdBeingDeleted)->first()->delete();
-
-        $this->user->load('tokens');
+        $this->user->tokens()->whereKey($this->apiTokenIdBeingDeleted)->firstOrFail()->revoke();
 
         $this->confirmingApiTokenDeletion = false;
 
-        $this->managingPermissionsFor = null;
+        $this->apiTokenIdBeingDeleted = null;
     }
 
     /**
@@ -204,26 +163,6 @@ new class extends Component
             <div class="col-span-6 sm:col-span-4">
                 <x-ui.input id="name" label="{{ __('Token Name') }}" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
             </div>
-
-            {{-- Token Permissions --}}
-            @if (false)
-                <div class="col-span-6">
-                    <label class="pt-0 label label-text font-semibold">
-                        <span>
-                            {{ __('Permissions') }}
-                        </span>
-                    </span>
-
-                    <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach ([] as $label => $permission)
-                            <label class="flex items-center">
-                                <x-ui.checkbox wire:model="createApiTokenForm.permissions" :value="$permission"/>
-                                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ $label }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
 
             {{-- Token Value Modal --}}
             <x-ui.modal
@@ -285,7 +224,9 @@ new class extends Component
         </x-slot>
     </x-forms.form-section>
 
-    @if ($this->user->tokens->isNotEmpty())
+    @php($tokens = $this->activeTokens())
+
+    @if ($tokens->isNotEmpty())
         <x-ui.section-border hide-on-mobile />
 
         {{-- Manage API Tokens --}}
@@ -302,26 +243,18 @@ new class extends Component
                 {{-- API Token List --}}
                 <x-slot name="content">
                     <div class="space-y-6">
-                        @foreach ($this->user->tokens->sortBy('name') as $token)
-                            <div class="flex items-center justify-between">
+                        @foreach ($tokens->sortBy('name') as $token)
+                            <div class="flex items-center justify-between" wire:key="token-{{ $token->id }}">
                                 <div class="break-all">
-                                    {{ $token->name }}
+                                    {{ $token->name ?? $token->client?->name }}
                                 </div>
 
                                 <div class="flex items-center ms-2">
-                                    @if ($token->last_used_at)
-                                        <div class="text-sm text-gray-400">
-                                            {{ __('Last used') }} {{ $token->last_used_at->diffForHumans() }}
-                                        </div>
-                                    @endif
+                                    <div class="text-sm text-gray-400">
+                                        {{ __('Created') }} {{ $token->created_at->diffForHumans() }}
+                                    </div>
 
-                                    @if (false)
-                                        <button class="cursor-pointer ms-6 text-sm text-gray-400 underline" wire:click="manageApiTokenPermissions({{ $token->id }})">
-                                            {{ __('Permissions') }}
-                                        </button>
-                                    @endif
-
-                                    <button class="cursor-pointer ms-6 text-sm text-red-500" wire:click="confirmApiTokenDeletion({{ $token->id }})">
+                                    <button class="cursor-pointer ms-6 text-sm text-red-500" wire:click="confirmApiTokenDeletion('{{ $token->id }}')">
                                         {{ __('Delete') }}
                                     </button>
                                 </div>
@@ -332,34 +265,6 @@ new class extends Component
             </x-forms.action-section>
         </div>
     @endif
-
-    {{-- API Token Permissions Modal --}}
-    <x-ui.dialog-modal key="manage-permission-modal" wire:model.live="managingApiTokenPermissions">
-        <x-slot name="title">
-            {{ __('API Token Permissions') }}
-        </x-slot>
-
-        <x-slot name="content">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach ([] as $label => $permission)
-                    <label class="flex items-center">
-                        <x-ui.checkbox wire:model="updateApiTokenForm.permissions" :value="$permission"/>
-                        <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ $label }}</span>
-                    </label>
-                @endforeach
-            </div>
-        </x-slot>
-
-        <x-slot name="footer">
-            <x-ui.button class="btn-outline" wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
-                {{ __('Cancel') }}
-            </x-ui.button>
-
-            <x-ui.button type="submit" class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
-                {{ __('Save') }}
-            </x-ui.button>
-        </x-slot>
-    </x-ui.dialog-modal>
 
     {{-- Delete Token Confirmation Modal --}}
     <x-ui.confirmation-modal key="confirm-deletion-modal" wire:model.live="confirmingApiTokenDeletion">

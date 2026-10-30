@@ -24,7 +24,7 @@
         "laravel/fortify": "^1.30.0",
         "laravel/framework": "^13.0",
         "laravel/mcp": "^0.8.2",
-        "laravel/sanctum": "^4.0",
+        "laravel/passport": "^13.7",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
