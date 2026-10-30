@@ -383,5 +383,10 @@
     "Locale Options": "Locale Options",
     "Adjust localization options for your preferred region.": "Adjust localization options for your preferred region.",
     "Locale": "Locale",
-    "Display Currency": "Display Currency"
+    "Display Currency": "Display Currency",
+    "Authorize :client": "Authorize :client",
+    ":client would like permission to access your Investbrain account (:email).": ":client would like permission to access your Investbrain account (:email).",
+    "This application will be able to:": "This application will be able to:",
+    "Authorize": "Authorize",
+    "View and manage your portfolios, transactions and holdings": "View and manage your portfolios, transactions and holdings"
 }
