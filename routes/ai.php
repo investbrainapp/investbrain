@@ -8,5 +8,5 @@ use Laravel\Passport\Http\Middleware\CheckToken;
 
 Mcp::oauthRoutes();
 
-Mcp::web('/mcp/investbrain', InvestbrainServer::class)
+Mcp::web('/mcp', InvestbrainServer::class)
     ->middleware(['auth:api', CheckToken::using('mcp:use')]);
