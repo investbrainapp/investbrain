@@ -7,6 +7,7 @@ namespace Tests\Mcp;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -75,14 +76,41 @@ class AuthenticationTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function test_can_reach_mcp_server_with_personal_access_token(): void
+    public function test_cannot_reach_mcp_server_with_token_lacking_mcp_scope(): void
     {
-        $token = $this->user->createToken('MCP Token')->accessToken;
+        $token = $this->user->createToken('API Token')->accessToken;
+
+        $this->withToken($token)
+            ->postJson(self::MCP_PATH, $this->initializePayload(), $this->mcpHeaders())
+            ->assertForbidden();
+    }
+
+    public function test_can_reach_mcp_server_with_token_that_has_mcp_scope(): void
+    {
+        $token = $this->user->createToken('MCP Token', ['mcp:use'])->accessToken;
 
         $this->withToken($token)
             ->postJson(self::MCP_PATH, $this->initializePayload(), $this->mcpHeaders())
             ->assertOk()
             ->assertJsonPath('result.serverInfo.name', 'Investbrain Server');
+    }
+
+    public function test_api_tokens_created_from_settings_cannot_reach_mcp_server(): void
+    {
+        $this->actingAs($this->user);
+
+        $plainTextToken = Livewire::test('api-token-manager')
+            ->set(['createApiTokenForm' => ['name' => 'Settings Token']])
+            ->call('createApiToken')
+            ->get('plainTextToken');
+
+        $this->assertSame([], $this->user->tokens()->firstOrFail()->scopes);
+
+        $this->app['auth']->forgetGuards();
+
+        $this->withToken($plainTextToken)
+            ->postJson(self::MCP_PATH, $this->initializePayload(), $this->mcpHeaders())
+            ->assertForbidden();
     }
 
     public function test_cannot_reach_mcp_server_with_revoked_token(): void
