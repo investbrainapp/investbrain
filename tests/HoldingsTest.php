@@ -9,6 +9,8 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Livewire\Livewire;
 
 class HoldingsTest extends TestCase
 {
@@ -73,5 +75,39 @@ class HoldingsTest extends TestCase
         $transaction->delete();
 
         $this->assertDatabaseEmpty('holdings');
+    }
+
+    public function test_non_member_cannot_view_holding_page(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $this->actingAs(User::factory()->create())
+            ->get(route('holding.show', ['portfolio' => $portfolio->id, 'symbol' => 'AAPL']))
+            ->assertForbidden();
+    }
+
+    public function test_read_only_member_cannot_change_holding_options(): void
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('AAPL')->firstOrFail();
+
+        $readOnly = User::factory()->create();
+        $portfolio->share($readOnly->email);
+
+        Livewire::actingAs($readOnly)
+            ->test('holding-options-form', ['holding' => $holding])
+            ->set('reinvest_dividends', true)
+            ->call('save')
+            ->assertForbidden();
+
+        $this->assertFalse((bool) $holding->fresh()->reinvest_dividends);
     }
 }

@@ -107,4 +107,20 @@ class DividendsTest extends TestCase
 
         $this->assertEquals(0, $googHolding->dividends_earned);
     }
+
+    public function test_dividends_are_calculated_for_symbols_containing_quotes(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $symbol = "AC'ME";
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol($symbol)->create();
+
+        Dividend::refreshDividendData($symbol);
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol($symbol)->first();
+
+        $this->assertEquals(4.95, $holding->dividends_earned);
+    }
 }

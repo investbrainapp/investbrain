@@ -58,13 +58,22 @@ new class extends Component
         })->toArray();
     }
 
-    public function updatedPermissions()
+    public function updatedPermissions(mixed $value, ?string $key = null)
     {
         $this->authorize('fullAccess', $this->portfolio);
 
-        $this->portfolio->users()->sync($this->permissions);
+        [$userId, $attribute] = array_pad(explode('.', (string) $key, 2), 2, null);
+
+        $member = $this->portfolio->users()->find($userId);
+
+        // only a shared user's full access can change here, never ownership
+        abort_unless($attribute === 'full_access' && $member && ! $member->pivot->owner, 403);
+
+        $this->portfolio->users()->updateExistingPivot($userId, ['full_access' => (bool) $value]);
 
         $this->portfolio->refresh();
+
+        $this->loadPermissions();
 
         $this->success(__('Updated user\'s access permission to portfolio'));
     }
@@ -72,6 +81,8 @@ new class extends Component
     public function deleteUser(string $userId, bool $confirmed = false)
     {
         $this->authorize('fullAccess', $this->portfolio);
+
+        abort_if($this->portfolio->owner_id === $userId, 403);
 
         if (! $confirmed) {
             $this->deletingAccessFor = $userId;

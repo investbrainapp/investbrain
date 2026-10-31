@@ -30,6 +30,8 @@ new class extends Component
 
     public function save()
     {
+        $this->authorize('fullAccess', $this->holding->portfolio);
+
         $this->holding->update($this->validate());
 
         $this->success(__('Holding options saved'));

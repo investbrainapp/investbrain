@@ -73,59 +73,59 @@ class Holding extends Model
             ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'BUY'
                         AND transactions.symbol = dividends.symbol
-                        AND transactions.portfolio_id = '$this->portfolio_id'
+                        AND transactions.portfolio_id = ?
                         AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
                     ELSE 0 END
-                ) AS purchased")
+                ) AS purchased", [$this->portfolio_id])
             ->selectRaw("SUM(
                     CASE WHEN transaction_type = 'SELL'
                         AND transactions.symbol = dividends.symbol
-                        AND transactions.portfolio_id = '$this->portfolio_id'
+                        AND transactions.portfolio_id = ?
                         AND date(dividends.date) >= date(transactions.date)
                     THEN transactions.quantity
                     ELSE 0 END
-                ) AS sold")
+                ) AS sold", [$this->portfolio_id])
             ->selectRaw("SUM(
                     (CASE WHEN transaction_type = 'BUY'
                         AND transactions.symbol = dividends.symbol
-                        AND transactions.portfolio_id = '$this->portfolio_id'
+                        AND transactions.portfolio_id = ?
                         AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END
                     - CASE WHEN transaction_type = 'SELL'
                         AND transactions.symbol = dividends.symbol
-                        AND transactions.portfolio_id = '$this->portfolio_id'
+                        AND transactions.portfolio_id = ?
                         AND date(transactions.date) <= date(dividends.date)
                         THEN transactions.quantity ELSE 0 END)
                     * dividends.dividend_amount
-                ) AS total_received")
+                ) AS total_received", [$this->portfolio_id, $this->portfolio_id])
             ->selectRaw("SUM(
                 (CASE WHEN transaction_type = 'BUY'
                     AND transactions.symbol = dividends.symbol
-                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.portfolio_id = ?
                     AND date(transactions.date) <= date(dividends.date)
                     THEN transactions.quantity ELSE 0 END
                 - CASE WHEN transaction_type = 'SELL'
                     AND transactions.symbol = dividends.symbol
-                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.portfolio_id = ?
                     AND date(transactions.date) <= date(dividends.date)
                     THEN transactions.quantity ELSE 0 END)
                 * dividends.dividend_amount_base
-            ) AS total_received_base")
+            ) AS total_received_base", [$this->portfolio_id, $this->portfolio_id])
             ->join('transactions', 'transactions.symbol', 'dividends.symbol')
             ->groupBy(['dividends.symbol', 'dividends.date', 'dividends.dividend_amount', 'dividends.dividend_amount_base'])
             ->orderBy('dividends.date', 'DESC')
             ->where('dividends.date', '>=', function ($query) {
                 $query->selectRaw('min(transactions.date)')
                     ->from('transactions')
-                    ->whereRaw("transactions.portfolio_id = '$this->portfolio_id'")
-                    ->whereRaw("transactions.symbol = '$this->symbol'");
+                    ->where('transactions.portfolio_id', $this->portfolio_id)
+                    ->where('transactions.symbol', $this->symbol);
             })
             ->havingRaw("SUM(
                 (CASE 
                     WHEN transaction_type = 'BUY'
                     AND transactions.symbol = dividends.symbol
-                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.portfolio_id = ?
                     AND transactions.date <= dividends.date
                 THEN transactions.quantity 
                 ELSE 0 
@@ -134,12 +134,12 @@ class Holding extends Model
                 (CASE 
                     WHEN transaction_type = 'SELL'
                     AND transactions.symbol = dividends.symbol
-                    AND transactions.portfolio_id = '$this->portfolio_id'
+                    AND transactions.portfolio_id = ?
                     AND transactions.date <= dividends.date
                 THEN transactions.quantity 
                 ELSE 0 
                 END)
-            ) * dividends.dividend_amount_base > 0");
+            ) * dividends.dividend_amount_base > 0", [$this->portfolio_id, $this->portfolio_id]);
     }
 
     /**
