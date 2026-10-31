@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Events\MarketDataCallCompleted;
 use App\Interfaces\MarketData\AlphaVantageMarketData;
 use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\Types\Quote;
 use App\Interfaces\MarketData\YahooMarketData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
@@ -89,6 +91,81 @@ class FallbackInterfaceTest extends TestCase
 
         Log::shouldHaveReceived('error')->with('Failed calling method quote for AAPL (yahoo): Yahoo failed');
         Log::shouldHaveReceived('error')->with('Failed calling method quote for AAPL (alpha): Alpha failed');
+    }
+
+    public function test_dispatches_call_completed_event_for_each_provider_attempt(): void
+    {
+        Event::fake([MarketDataCallCompleted::class]);
+
+        config()->set('investbrain.provider', 'yahoo,alphavantage');
+        config()->set('investbrain.interfaces', [
+            'yahoo' => YahooMarketData::class,
+            'alphavantage' => AlphaVantageMarketData::class,
+        ]);
+
+        $yahooMock = Mockery::mock(YahooMarketData::class);
+        $yahooMock->shouldReceive('quote')->andThrow(new \Exception('Yahoo failed'));
+
+        $alphaMock = Mockery::mock(AlphaVantageMarketData::class);
+        $alphaMock->shouldReceive('quote')->andReturn(new Quote([
+            'name' => 'Test Quote',
+            'symbol' => 'ACME',
+            'currency' => 'USD',
+            'market_value' => 10,
+        ]));
+
+        $this->app->instance(YahooMarketData::class, $yahooMock);
+        $this->app->instance(AlphaVantageMarketData::class, $alphaMock);
+
+        (new FallbackInterface)->quote('ACME');
+
+        Event::assertDispatchedTimes(MarketDataCallCompleted::class, 2);
+
+        Event::assertDispatched(MarketDataCallCompleted::class, fn (MarketDataCallCompleted $event) => $event->provider === 'yahoo'
+            && $event->method === 'quote'
+            && $event->symbol === 'ACME'
+            && $event->successful === false
+            && $event->attempt === 0
+            && $event->error === 'Yahoo failed');
+
+        Event::assertDispatched(MarketDataCallCompleted::class, fn (MarketDataCallCompleted $event) => $event->provider === 'alphavantage'
+            && $event->successful === true
+            && $event->attempt === 1
+            && $event->error === null
+            && $event->durationMs >= 0);
+    }
+
+    public function test_listener_exception_on_success_does_not_fall_back_to_next_provider(): void
+    {
+        Event::listen(MarketDataCallCompleted::class, function (MarketDataCallCompleted $event) {
+            if ($event->successful) {
+                throw new \RuntimeException('Listener failed');
+            }
+        });
+
+        config()->set('investbrain.provider', 'yahoo,alphavantage');
+        config()->set('investbrain.interfaces', [
+            'yahoo' => YahooMarketData::class,
+            'alphavantage' => AlphaVantageMarketData::class,
+        ]);
+
+        $yahooMock = Mockery::mock(YahooMarketData::class);
+        $yahooMock->shouldReceive('quote')->once()->andReturn(new Quote([
+            'name' => 'Test Quote',
+            'symbol' => 'ACME',
+            'currency' => 'USD',
+            'market_value' => 10,
+        ]));
+
+        $alphaMock = Mockery::mock(AlphaVantageMarketData::class);
+        $alphaMock->shouldNotReceive('quote');
+
+        $this->app->instance(YahooMarketData::class, $yahooMock);
+        $this->app->instance(AlphaVantageMarketData::class, $alphaMock);
+
+        $this->expectExceptionMessage('Listener failed');
+
+        (new FallbackInterface)->quote('ACME');
     }
 
     public function test_exists_method_fails_without_exception()
