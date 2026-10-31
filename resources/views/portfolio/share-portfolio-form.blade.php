@@ -51,8 +51,8 @@ new class extends Component
         $this->permissions = collect($this->portfolio->users)->mapWithKeys(function ($user) {
             return [
                 $user->id => [
-                    'owner' => $user->pivot->owner ?? 0,
-                    'full_access' => $user->pivot->full_access ?? 0,
+                    'owner' => (int) $user->pivot->owner,
+                    'full_access' => (int) $user->pivot->full_access,
                 ],
             ];
         })->toArray();

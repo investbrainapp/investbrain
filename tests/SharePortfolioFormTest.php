@@ -38,7 +38,7 @@ class SharePortfolioFormTest extends TestCase
 
         $friend = User::where('email', 'friend@example.net')->firstOrFail();
 
-        $this->assertTrue((bool) $component->get("permissions.{$friend->id}.full_access"));
+        $this->assertSame(1, $component->get("permissions.{$friend->id}.full_access"));
         $this->assertTrue((bool) $portfolio->users()->find($friend->id)->pivot->full_access);
     }
 
@@ -55,7 +55,7 @@ class SharePortfolioFormTest extends TestCase
 
         $friend = User::where('email', 'friend@example.net')->firstOrFail();
 
-        $this->assertFalse((bool) $component->get("permissions.{$friend->id}.full_access"));
+        $this->assertSame(0, $component->get("permissions.{$friend->id}.full_access"));
         $this->assertFalse((bool) $portfolio->users()->find($friend->id)->pivot->full_access);
     }
 
@@ -93,7 +93,31 @@ class SharePortfolioFormTest extends TestCase
             ->set('fullAccess', true)
             ->call('addUser');
 
-        $this->assertTrue((bool) $component->get("permissions.{$friend->id}.full_access"));
+        $this->assertSame(1, $component->get("permissions.{$friend->id}.full_access"));
+    }
+
+    public function test_boolean_pivot_values_load_as_select_option_values(): void
+    {
+        $this->actingAs($owner = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $fullAccess = User::factory()->create();
+        $readOnly = User::factory()->create();
+        $portfolio->share($fullAccess->email, true);
+        $portfolio->share($readOnly->email);
+
+        $portfolio = $portfolio->fresh();
+
+        // PostgreSQL returns boolean pivot columns as true/false rather than 1/0
+        $portfolio->users->each(function (User $user) {
+            $user->pivot->owner = (bool) $user->pivot->owner;
+            $user->pivot->full_access = (bool) $user->pivot->full_access;
+        });
+
+        Livewire::test('share-portfolio-form', ['portfolio' => $portfolio])
+            ->assertSet("permissions.{$owner->id}.owner", 1, strict: true)
+            ->assertSet("permissions.{$fullAccess->id}.full_access", 1, strict: true)
+            ->assertSet("permissions.{$readOnly->id}.full_access", 0, strict: true);
     }
 
     public function test_read_only_user_cannot_share_portfolio(): void
