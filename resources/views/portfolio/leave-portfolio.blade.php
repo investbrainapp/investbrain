@@ -38,20 +38,23 @@ new class extends Component
 
     <x-ui.modal
         key="portfolio-access"
-        :title="$portfolio->title"
-        box-class="max-w-md"
+        title="{{ __('Portfolio shared with you') }}"
     >
-        <div class="space-y-1 text-sm">
-            <p>{{ __('Shared by :name', ['name' => $portfolio->owner->name]) }}</p>
-            <p>{{ __('Access') }}: {{ auth()->user()->can('fullAccess', $portfolio) ? __('Full access') : __('Read only') }}</p>
+        <div class="mt-2 text-sm text-secondary-content space-y-1">
+            <div class="font-bold text-base-content">{{ $portfolio->title }}</div>
+            <div>{{ __('Shared by :name', ['name' => $portfolio->owner->name]) }}</div>
+            <div>{{ __('Access') }}: {{ auth()->user()->can('fullAccess', $portfolio) ? __('Full access') : __('Read only') }}</div>
         </div>
 
-        <div class="flex justify-end mt-6">
+        <x-ui.section-border class="my-3" />
+
+        <div class="flex justify-end gap-3">
             <x-ui.button
-                class="btn-ghost text-error"
-                icon="o-arrow-right-start-on-rectangle"
-                label="{{ __('Leave Portfolio') }}"
                 @click="$dispatch('toggle-portfolio-access'); $wire.set('confirmingLeavePortfolio', true)"
+                wire:loading.attr="disabled"
+                class="btn text-error"
+                title="{{ __('Leave Portfolio') }}"
+                label="{{ __('Leave Portfolio') }}"
             />
         </div>
     </x-ui.modal>

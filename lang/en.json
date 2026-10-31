@@ -412,5 +412,6 @@
     "Are you sure you want to leave this portfolio? You will lose access until the owner shares it with you again.": "Are you sure you want to leave this portfolio? You will lose access until the owner shares it with you again.",
     "You have left the portfolio": "You have left the portfolio",
     "Shared by :name": "Shared by :name",
-    "Access": "Access"
+    "Access": "Access",
+    "Portfolio shared with you": "Portfolio shared with you"
 }

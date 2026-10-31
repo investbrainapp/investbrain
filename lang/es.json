@@ -412,5 +412,6 @@
     "Are you sure you want to leave this portfolio? You will lose access until the owner shares it with you again.": "¿Estás seguro de que quieres abandonar este portafolio? Perderás el acceso hasta que el propietario vuelva a compartirlo contigo.",
     "You have left the portfolio": "Has abandonado el portafolio",
     "Shared by :name": "Compartido por :name",
-    "Access": "Acceso"
+    "Access": "Acceso",
+    "Portfolio shared with you": "Portafolio compartido contigo"
 }
