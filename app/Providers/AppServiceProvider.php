@@ -6,10 +6,12 @@ namespace App\Providers;
 
 use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Models\User;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
@@ -43,6 +45,8 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         JsonResource::withoutWrapping();
+
+        Gate::define('admin', fn (User $user): bool => (bool) $user->admin);
 
         Passport::authorizationView('oauth.authorize');
 

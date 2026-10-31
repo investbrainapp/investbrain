@@ -38,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
 
     protected $hidden = [
         'admin',
+        'last_login_ip',
         'password',
         'remember_token',
         'two_factor_recovery_codes',
@@ -52,6 +53,8 @@ class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'last_seen_at' => 'datetime',
             'password' => 'hashed',
             'admin' => 'boolean',
             'options' => 'json',
