@@ -138,6 +138,42 @@ class SharePortfolioFormTest extends TestCase
         $this->assertNull(User::where('email', 'friend@example.net')->first());
     }
 
+    public function test_full_access_member_cannot_make_themselves_owner(): void
+    {
+        [$owner, $portfolio, $member] = $this->createPortfolioWithFullAccessMember();
+
+        Livewire::actingAs($member)
+            ->test('share-portfolio-form', ['portfolio' => $portfolio])
+            ->set("permissions.{$member->id}.owner", 1)
+            ->assertForbidden();
+
+        $this->assertFalse((bool) $portfolio->users()->find($member->id)->pivot->owner);
+    }
+
+    public function test_full_access_member_cannot_replace_the_whole_permission_list(): void
+    {
+        [$owner, $portfolio, $member] = $this->createPortfolioWithFullAccessMember();
+
+        Livewire::actingAs($member)
+            ->test('share-portfolio-form', ['portfolio' => $portfolio])
+            ->set('permissions', [$member->id => ['owner' => 1, 'full_access' => 1]])
+            ->assertForbidden();
+
+        $this->assertTrue((bool) $portfolio->users()->find($owner->id)?->pivot->owner);
+    }
+
+    public function test_full_access_member_cannot_remove_the_owner(): void
+    {
+        [$owner, $portfolio, $member] = $this->createPortfolioWithFullAccessMember();
+
+        Livewire::actingAs($member)
+            ->test('share-portfolio-form', ['portfolio' => $portfolio])
+            ->call('deleteUser', $owner->id, true)
+            ->assertForbidden();
+
+        $this->assertNotNull($portfolio->users()->find($owner->id));
+    }
+
     public function test_sharing_requires_a_valid_email(): void
     {
         $this->actingAs(User::factory()->create());
@@ -149,5 +185,19 @@ class SharePortfolioFormTest extends TestCase
             ->call('addUser')
             ->assertHasErrors(['emailAddress'])
             ->assertNotDispatched('toggle-add-user-modal');
+    }
+
+    /**
+     * @return array{0: User, 1: Portfolio, 2: User}
+     */
+    private function createPortfolioWithFullAccessMember(): array
+    {
+        $this->actingAs($owner = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        $member = User::factory()->create();
+        $portfolio->share($member->email, true);
+
+        return [$owner, $portfolio, $member];
     }
 }
