@@ -9,7 +9,7 @@
 
     {{ $slot }}
 
-    @if ($actions)
+    @if (isset($actions))
         @if(!$noSeparator)
             <x-ui.section-border class="my-3" />
         @endif
