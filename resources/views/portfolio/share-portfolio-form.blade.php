@@ -18,7 +18,7 @@ new class extends Component
     public string $emailAddress;
 
     #[Rule('sometimes|boolean')]
-    public int $fullAccess = 0;
+    public bool $fullAccess = false;
 
     public array $permissions;
 
@@ -39,15 +39,23 @@ new class extends Component
 
         } else {
 
-            $this->permissions = collect($this->portfolio->users)->mapWithKeys(function ($user) {
-                return [
-                    $user->id => [
-                        'owner' => $user->pivot->owner ?? 0,
-                        'full_access' => $user->pivot->full_access ?? 0,
-                    ],
-                ];
-            })->toArray();
+            $this->loadPermissions();
         }
+    }
+
+    /**
+     * Rebuild the permissions state from the portfolio's current pivot data
+     */
+    protected function loadPermissions(): void
+    {
+        $this->permissions = collect($this->portfolio->users)->mapWithKeys(function ($user) {
+            return [
+                $user->id => [
+                    'owner' => (int) $user->pivot->owner,
+                    'full_access' => (int) $user->pivot->full_access,
+                ],
+            ];
+        })->toArray();
     }
 
     public function updatedPermissions()
@@ -96,6 +104,8 @@ new class extends Component
         $this->success(__('Shared portfolio with user'));
         $this->portfolio->refresh();
 
+        $this->loadPermissions();
+
         $this->dispatch('toggle-add-user-modal');
 
         $this->emailAddress = '';
@@ -131,6 +141,7 @@ new class extends Component
         </x-ui.list-item>
         @endif
 
+        <div>
         @foreach (collect($portfolio?->users)->where('pivot.owner', '!=', 1) as $user)
             <x-ui.list-item 
                 :item="$user" 
@@ -138,6 +149,7 @@ new class extends Component
                 no-separator
                 class="!-my-2 rounded"
                 x-data="{ loading: false, timeout: null }"
+                wire:key="shared-user-{{ $user->id }}"
             >
 
                 <x-slot:value>
@@ -171,6 +183,7 @@ new class extends Component
                 </x-slot:actions>
             </x-ui.list-item>
         @endforeach
+        </div>
 
         <x-ui.confirmation-modal wire:model.live="confirmingAccessDeletion">
             <x-slot:title>
