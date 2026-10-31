@@ -13,7 +13,9 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class ImportExportTest extends TestCase
 {
@@ -158,6 +160,33 @@ class ImportExportTest extends TestCase
         ]));
 
         $this->assertEquals($portfolio->id, Transaction::find($newId)->portfolio_id);
+    }
+
+    #[TestWith(["X' OR SLEEP(9) OR '"])]
+    #[TestWith(['AAPL; DROP TABLE users'])]
+    #[TestWith(['ABCDEFGHIJKLMNOPQRSTUVWXYZ'])]
+    public function test_import_rejects_malformed_symbols(string $symbol): void
+    {
+        $sheet = $this->makeTransactionsSheet(User::factory()->create());
+
+        $validator = Validator::make(['symbol' => $symbol], ['symbol' => $sheet->rules()['symbol']]);
+
+        $this->assertTrue($validator->fails());
+    }
+
+    #[TestWith(['AAPL'])]
+    #[TestWith(['BRK.B'])]
+    #[TestWith(['BTC-USD'])]
+    #[TestWith(['BTC/USD'])]
+    #[TestWith(['^GSPC'])]
+    #[TestWith(['EURUSD=X'])]
+    public function test_import_accepts_common_symbol_formats(string $symbol): void
+    {
+        $sheet = $this->makeTransactionsSheet(User::factory()->create());
+
+        $validator = Validator::make(['symbol' => $symbol], ['symbol' => $sheet->rules()['symbol']]);
+
+        $this->assertFalse($validator->fails());
     }
 
     /**

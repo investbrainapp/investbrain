@@ -140,7 +140,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
     {
         return [
             'transaction_id' => ['sometimes', 'nullable', 'uuid'],
-            'symbol' => ['required', 'string'],
+            'symbol' => ['required', 'string', 'max:25', 'regex:/^[A-Za-z0-9.\-^=:\/_]+$/'],
             'portfolio_id' => ['required', 'uuid'],
             'quantity' => ['required', 'min:0', 'numeric'],
             'transaction_type' => ['required', 'in:BUY,SELL'],
