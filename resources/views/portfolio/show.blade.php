@@ -31,7 +31,7 @@
             @endif
 
             @if(auth()->user()->id !== $portfolio->owner_id)
-            <x-ui.badge value="{{ $portfolio->owner->name }}" title="{{ __('Owner').': '.$portfolio->owner->name }}" class="badge-secondary badge-outline mr-3" />
+            @livewire('leave-portfolio', ['portfolio' => $portfolio])
             @endif
 
             @can('fullAccess', $portfolio)

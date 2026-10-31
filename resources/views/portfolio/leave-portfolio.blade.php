@@ -1,0 +1,86 @@
+<?php
+
+use App\Models\Portfolio;
+use App\Traits\Toast;
+use Livewire\Volt\Component;
+
+new class extends Component
+{
+    use Toast;
+
+    // props
+    public Portfolio $portfolio;
+
+    public bool $confirmingLeavePortfolio = false;
+
+    // methods
+    public function leave()
+    {
+        $this->authorize('readOnly', $this->portfolio);
+
+        abort_if(auth()->user()->can('owner', $this->portfolio), 403);
+
+        $this->portfolio->unShare(auth()->user()->id);
+
+        $this->success(__('You have left the portfolio'), redirectTo: route('dashboard'));
+    }
+}; ?>
+
+<div class="mr-3">
+    <button
+        type="button"
+        class="badge badge-secondary badge-outline select-none cursor-pointer"
+        title="{{ __('Owner').': '.$portfolio->owner->name }}"
+        @click="$dispatch('toggle-portfolio-access')"
+    >
+        {{ $portfolio->owner->name }}
+    </button>
+
+    <x-ui.modal
+        key="portfolio-access"
+        title="{{ __('Shared Portfolio') }}"
+    >
+        <div class="mt-2 text-sm text-secondary-content">
+            {{ __('Shared by :name', ['name' => $portfolio->owner->name]) }}
+            <span class="inline-flex items-center">
+                @can('fullAccess', $portfolio)
+                    ({{ __('Full access') }}<x-ui.icon name="o-pencil" class="w-4 ml-1" />)
+                @else
+                    ({{ __('Read only') }}<x-ui.icon name="o-eye" class="w-4 ml-1" />)
+                @endcan
+            </span>
+        </div>
+
+        <x-ui.section-border class="my-3" />
+
+        <div class="flex justify-end gap-3">
+            <x-ui.button
+                @click="$dispatch('toggle-portfolio-access'); $wire.set('confirmingLeavePortfolio', true)"
+                wire:loading.attr="disabled"
+                class="btn text-error"
+                title="{{ __('Leave Portfolio') }}"
+                label="{{ __('Leave Portfolio') }}"
+            />
+        </div>
+    </x-ui.modal>
+
+    <x-ui.confirmation-modal wire:model.live="confirmingLeavePortfolio">
+        <x-slot name="title">
+            {{ __('Leave Portfolio') }}
+        </x-slot>
+
+        <x-slot name="content">
+            {{ __('Are you sure you want to leave this portfolio? You will lose access until the owner shares it with you again.') }}
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-ui.button class="btn-outline" wire:click="$toggle('confirmingLeavePortfolio')" wire:loading.attr="disabled">
+                {{ __('Cancel') }}
+            </x-ui.button>
+
+            <x-ui.button class="ms-3 btn-error text-white" wire:click="leave" wire:loading.attr="disabled">
+                {{ __('Leave Portfolio') }}
+            </x-ui.button>
+        </x-slot>
+    </x-ui.confirmation-modal>
+</div>
