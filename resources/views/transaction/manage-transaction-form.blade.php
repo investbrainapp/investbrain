@@ -93,9 +93,14 @@ new class extends Component
 
     public function update()
     {
-        $this->authorize('fullAccess', $this->portfolio);
+        $this->authorize('fullAccess', $this->transaction->portfolio);
 
-        $this->transaction->update($this->validate());
+        $validated = $this->validate();
+
+        // moving a transaction also requires full access to the destination portfolio
+        $this->authorize('fullAccess', Portfolio::find($validated['portfolio_id']));
+
+        $this->transaction->update($validated);
         $this->transaction->save();
 
         $this->success(__('Transaction updated'));
@@ -124,7 +129,7 @@ new class extends Component
 
     public function delete()
     {
-        $this->authorize('fullAccess', $this->portfolio);
+        $this->authorize('fullAccess', $this->transaction->portfolio);
 
         $this->transaction->delete();
 

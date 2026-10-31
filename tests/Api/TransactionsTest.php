@@ -216,6 +216,25 @@ class TransactionsTest extends ApiTestCase
             ->assertForbidden();
     }
 
+    public function test_cannot_move_transaction_into_portfolio_without_full_access()
+    {
+        $this->actingAs($this->user);
+        $transaction = Transaction::factory()->create();
+
+        $readOnlyPortfolio = Portfolio::factory()->makeOne();
+        $readOnlyPortfolio->setOwnerIdAttribute(User::factory()->create()->id);
+        $readOnlyPortfolio->save();
+        $readOnlyPortfolio->users()->syncWithoutDetaching([
+            $this->user->id => ['full_access' => false, 'owner' => false],
+        ]);
+
+        $this->actingAs($this->user)
+            ->putJson(route('api.transaction.update', $transaction), ['portfolio_id' => $readOnlyPortfolio->id])
+            ->assertForbidden();
+
+        $this->assertEquals($transaction->portfolio_id, $transaction->fresh()->portfolio_id);
+    }
+
     public function test_can_delete_a_transaction()
     {
         $this->actingAs($this->user);

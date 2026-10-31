@@ -9,7 +9,11 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Rules\QuantityValidationRule;
+use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Notification;
+use Livewire\Livewire;
 
 class TransactionsTest extends TestCase
 {
@@ -87,5 +91,64 @@ class TransactionsTest extends TestCase
         });
 
         $this->assertTrue(true);
+    }
+
+    public function test_transactions_list_cannot_open_a_transaction_from_another_portfolio(): void
+    {
+        [$member, $ownPortfolio, $readOnlyTransaction] = $this->createReadOnlyMemberWithOwnPortfolio();
+
+        Livewire::actingAs($member)
+            ->test('transactions-list', ['portfolio' => $ownPortfolio, 'transactions' => $ownPortfolio->transactions])
+            ->call('showTransactionDialog', $readOnlyTransaction->id)
+            ->assertNotFound();
+    }
+
+    public function test_cannot_delete_a_read_only_transaction_through_own_portfolio_form(): void
+    {
+        [$member, $ownPortfolio, $readOnlyTransaction] = $this->createReadOnlyMemberWithOwnPortfolio();
+
+        Livewire::actingAs($member)
+            ->test('manage-transaction-form', ['portfolio' => $ownPortfolio, 'transaction' => $readOnlyTransaction])
+            ->call('delete')
+            ->assertForbidden();
+
+        $this->assertModelExists($readOnlyTransaction);
+    }
+
+    public function test_cannot_move_a_transaction_into_a_read_only_portfolio_through_the_form(): void
+    {
+        Artisan::call('db:seed', ['--class' => CurrencySeeder::class, '--force' => true]);
+
+        [$member, $ownPortfolio, $readOnlyTransaction] = $this->createReadOnlyMemberWithOwnPortfolio();
+
+        $ownTransaction = Transaction::factory()->buy()->lastYear()->portfolio($ownPortfolio->id)->symbol('AAPL')->create();
+
+        Livewire::actingAs($member)
+            ->test('manage-transaction-form', ['portfolio' => $ownPortfolio, 'transaction' => $ownTransaction])
+            ->set('portfolio_id', $readOnlyTransaction->portfolio_id)
+            ->call('update')
+            ->assertForbidden();
+
+        $this->assertEquals($ownPortfolio->id, $ownTransaction->fresh()->portfolio_id);
+    }
+
+    /**
+     * Create a user who has read-only access to someone else's portfolio and owns a portfolio of their own.
+     *
+     * @return array{0: User, 1: Portfolio, 2: Transaction}
+     */
+    private function createReadOnlyMemberWithOwnPortfolio(): array
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create());
+        $readOnlyPortfolio = Portfolio::factory()->create();
+        $readOnlyTransaction = Transaction::factory()->buy()->lastYear()->portfolio($readOnlyPortfolio->id)->symbol('AAPL')->create();
+
+        $this->actingAs($member = User::factory()->create());
+        $readOnlyPortfolio->share($member->email);
+        $ownPortfolio = Portfolio::factory()->create();
+
+        return [$member, $ownPortfolio, $readOnlyTransaction];
     }
 }

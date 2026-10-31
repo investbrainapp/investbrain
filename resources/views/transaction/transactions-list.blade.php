@@ -41,7 +41,7 @@ new class extends Component
             return;
         }
 
-        $this->editingTransaction = Transaction::findOrFail($transactionId);
+        $this->editingTransaction = $this->portfolio->transactions()->findOrFail($transactionId);
         $this->dispatch('toggle-manage-transaction');
     }
 

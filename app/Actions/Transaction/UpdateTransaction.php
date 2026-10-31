@@ -29,6 +29,9 @@ class UpdateTransaction
 
         Gate::authorize('fullAccess', $transaction->portfolio);
 
+        // moving a transaction also requires full access to the destination portfolio
+        Gate::authorize('fullAccess', $portfolio);
+
         $transaction->update($validated);
 
         return $transaction;
