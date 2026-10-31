@@ -38,15 +38,17 @@ new class extends Component
 
     <x-ui.modal
         key="portfolio-access"
-        title="{{ __('Portfolio shared with you') }}"
+        title="{{ __('Shared Portfolio') }}"
     >
         <div class="mt-2 text-sm text-secondary-content">
             {{ __('Shared by :name', ['name' => $portfolio->owner->name]) }}
-            @can('fullAccess', $portfolio)
-                ({{ __('Full access') }} <x-ui.icon name="o-pencil" class="w-4" />)
-            @else
-                ({{ __('Read only') }} <x-ui.icon name="o-eye" class="w-4" />)
-            @endcan
+            <span class="inline-flex items-center">
+                @can('fullAccess', $portfolio)
+                    ({{ __('Full access') }}<x-ui.icon name="o-pencil" class="w-4 ml-1" />)
+                @else
+                    ({{ __('Read only') }}<x-ui.icon name="o-eye" class="w-4 ml-1" />)
+                @endcan
+            </span>
         </div>
 
         <x-ui.section-border class="my-3" />

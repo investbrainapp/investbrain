@@ -72,7 +72,7 @@ class LeavePortfolioTest extends TestCase
 
         $this->get(route('portfolio.show', $this->portfolio))
             ->assertOk()
-            ->assertSee(__('Portfolio shared with you'))
+            ->assertSee(__('Shared Portfolio'))
             ->assertSee(__('Shared by :name', ['name' => $this->owner->name]))
             ->assertSee('('.__('Read only'))
             ->assertSee(__('Leave Portfolio'));
