@@ -14,7 +14,7 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected const MCP_PATH = '/mcp/investbrain';
+    protected const MCP_PATH = '/mcp';
 
     protected const REDIRECT_URI = 'http://localhost:3000/callback';
 
