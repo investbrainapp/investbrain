@@ -8,6 +8,7 @@ use App\Console\Commands\RefreshDividendData;
 use App\Console\Commands\RefreshMarketData;
 use App\Console\Commands\RefreshSplitData;
 use App\Console\Commands\SyncHoldingData;
+use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Support\Facades\Schedule;
 
 /**
@@ -41,3 +42,8 @@ Schedule::command(SyncHoldingData::class)->yearly();
  * Refreshes currency exchange data daily
  */
 Schedule::command(RefreshCurrencyData::class)->daily();
+
+/**
+ * Prunes old records from prunable models (e.g. market data provider failures)
+ */
+Schedule::command(PruneCommand::class)->daily();

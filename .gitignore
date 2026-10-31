@@ -6,7 +6,8 @@
 /public/storage
 /public/css/filament
 /public/fonts/filament
-/public/js/filament/
+/public/js/filament/filament
+/public/js/filament/widgets
 /storage/*.key
 /vendor
 .env
