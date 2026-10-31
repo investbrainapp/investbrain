@@ -24,7 +24,7 @@
             open: false,
             close() {
                 this.open = false;
-                this.$el.close()
+                this.$refs.dialog.close()
             },
             cancel() {
                 @if($persistent)
@@ -39,9 +39,9 @@
             show() {
                 this.open = true;
                 @if($persistent)
-                    this.$el.showModal();
+                    this.$refs.dialog.showModal();
                 @else
-                    this.$el.show();
+                    this.$refs.dialog.show();
                 @endif
             }
         }"
@@ -56,6 +56,7 @@
         }}
 
         id="{{ $key }}"
+        x-ref="dialog"
 
         x-on:toggle-{{ $key }}.window="open ? close() : show();"
 
