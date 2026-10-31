@@ -7,6 +7,7 @@ namespace Tests;
 use App\Http\Controllers\ConnectedAccountController;
 use App\Models\ConnectedAccount;
 use App\Models\User;
+use App\Notifications\VerifyConnectedAccountNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
@@ -157,7 +158,9 @@ class ConnectedAccountTest extends TestCase
 
         $this->assertNull($connectedAccount->verified_at);
 
-        $response = $this->get(route('oauth.verify_connected_account', ['connected_account' => $connectedAccount->id]));
+        $verificationUrl = (new VerifyConnectedAccountNotification($connectedAccount->id))->toMail($user)->actionUrl;
+
+        $response = $this->get($verificationUrl);
 
         $connectedAccount->refresh();
 
@@ -166,6 +169,44 @@ class ConnectedAccountTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('toast');
+    }
+
+    public function test_verify_connected_account_requires_a_signed_link()
+    {
+        $user = User::factory()->create();
+        $connectedAccount = ConnectedAccount::forceCreate([
+            'provider' => 'github',
+            'provider_id' => '12345',
+            'token' => '0283523',
+            'user_id' => $user->id,
+            'verified_at' => null,
+        ]);
+
+        $this->get(route('oauth.verify_connected_account', ['connected_account' => $connectedAccount->id]))
+            ->assertForbidden();
+
+        $this->assertNull($connectedAccount->fresh()->verified_at);
+        $this->assertGuest();
+    }
+
+    public function test_verify_connected_account_link_expires_after_seven_days()
+    {
+        $user = User::factory()->create();
+        $connectedAccount = ConnectedAccount::forceCreate([
+            'provider' => 'github',
+            'provider_id' => '12345',
+            'token' => '0283523',
+            'user_id' => $user->id,
+            'verified_at' => null,
+        ]);
+
+        $verificationUrl = (new VerifyConnectedAccountNotification($connectedAccount->id))->toMail($user)->actionUrl;
+
+        $this->travel(8)->days();
+
+        $this->get($verificationUrl)->assertForbidden();
+
+        $this->assertNull($connectedAccount->fresh()->verified_at);
     }
 
     public function test_signed_in_user_can_link_a_provider_account(): void
