@@ -1,5 +1,6 @@
 <?php
 
+use App\Interfaces\MarketData\MarketDataInterface;
 use App\Models\Currency;
 use App\Models\MarketData;
 use App\Models\Portfolio;
@@ -23,7 +24,7 @@ new class extends Component
 
     public ?string $portfolio_id;
 
-    public string $symbol;
+    public string $symbol = '';
 
     public string $transaction_type;
 
@@ -40,6 +41,10 @@ new class extends Component
     public Collection $currencies;
 
     public string $currency;
+
+    public array $symbolSuggestions = [];
+
+    public bool $skipSymbolSearch = false;
 
     // methods
     public function rules()
@@ -80,7 +85,7 @@ new class extends Component
 
         } else {
 
-            if (isset($this->symbol)) {
+            if (isset($this->symbol) && $this->symbol !== '') {
 
                 $this->currency = MarketData::getMarketData($this->symbol)?->currency;
             }
@@ -89,6 +94,44 @@ new class extends Component
             $this->portfolio_id = isset($this->portfolio) ? $this->portfolio->id : '';
             $this->date = now()->toDateString();
         }
+    }
+
+    public function updatedSymbol(string $value): void
+    {
+        if ($this->skipSymbolSearch) {
+            $this->skipSymbolSearch = false;
+
+            return;
+        }
+
+        $query = trim($value);
+
+        if (strlen($query) < 2) {
+            $this->symbolSuggestions = [];
+
+            return;
+        }
+
+        $this->symbolSuggestions = app(MarketDataInterface::class)
+            ->search($query)
+            ->take(8)
+            ->map(fn ($result) => [
+                'symbol' => $result->getSymbol(),
+                'name' => $result->getName(),
+                'type' => $result->getType(),
+                'exchange' => $result->getExchange(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    public function selectSymbol(string $symbol): void
+    {
+        $this->skipSymbolSearch = true;
+        $this->symbol = $symbol;
+        $this->symbolSuggestions = [];
+
+        $this->currency = MarketData::getMarketData($symbol)?->currency ?? $this->currency;
     }
 
     public function update()
@@ -147,7 +190,55 @@ new class extends Component
             />
         @endif
 
-        <x-ui.input label="{{ __('Symbol') }}" wire:model="symbol" required />
+        <div
+            class="relative"
+            x-data="{ open: false }"
+            @click.outside="open = false"
+            @keydown.escape.window="open = false"
+        >
+            <x-ui.input
+                label="{{ __('Symbol') }}"
+                wire:model.live.debounce.300ms="symbol"
+                required
+                autocomplete="off"
+                @focus="open = true"
+                @input="open = true"
+            />
+
+            <div
+                x-show="open && $wire.symbolSuggestions.length"
+                x-cloak
+                class="absolute z-50 mt-1 w-full overflow-hidden rounded-lg border border-base-300 bg-base-100 shadow-lg"
+            >
+                <ul class="max-h-72 overflow-y-auto py-1">
+                    @foreach ($symbolSuggestions as $suggestion)
+                        <li wire:key="symbol-suggestion-{{ $suggestion['symbol'] }}-{{ $loop->index }}">
+                            <button
+                                type="button"
+                                class="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-base-200"
+                                wire:click="selectSymbol(@js($suggestion['symbol']))"
+                                @click="open = false"
+                            >
+                                <div class="avatar avatar-placeholder">
+                                    <div class="w-9 rounded-full bg-neutral text-neutral-content">
+                                        <span class="text-xs">{{ strtoupper(substr($suggestion['symbol'], 0, 2)) }}</span>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="truncate font-semibold">{{ $suggestion['name'] ?: $suggestion['symbol'] }}</div>
+                                    <div class="flex items-center gap-2 text-sm text-base-content/50">
+                                        <span>{{ $suggestion['symbol'] }}</span>
+                                        @if(!empty($suggestion['type']))
+                                            <x-ui.badge class="badge-sm badge-ghost" :value="$suggestion['type']" />
+                                        @endif
+                                    </div>
+                                </div>
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
 
         <x-ui.select label="{{ __('Transaction Type') }}" :options="[
             ['id' => 'BUY', 'name' => 'Buy'], 
