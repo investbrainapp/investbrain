@@ -2,9 +2,23 @@
     "agents": [
         "claude_code"
     ],
-    "editors": [
-        "claude_code",
-        "vscode"
+    "cloud": true,
+    "guidelines": true,
+    "packages": [
+        "maatwebsite/excel"
     ],
-    "guidelines": true
+    "skills": [
+        "infer-conventions",
+        "ai-sdk-development",
+        "fortify-development",
+        "laravel-best-practices",
+        "testing-best-practices",
+        "mcp-development",
+        "passport-development",
+        "socialite-development",
+        "livewire-development",
+        "volt-development",
+        "tailwindcss-development",
+        "laravel-excel"
+    ]
 }
