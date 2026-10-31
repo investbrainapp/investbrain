@@ -74,4 +74,16 @@ class HoldingsTest extends TestCase
 
         $this->assertDatabaseEmpty('holdings');
     }
+
+    public function test_non_member_cannot_view_holding_page(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $this->actingAs(User::factory()->create())
+            ->get(route('holding.show', ['portfolio' => $portfolio->id, 'symbol' => 'AAPL']))
+            ->assertForbidden();
+    }
 }
