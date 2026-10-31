@@ -6,6 +6,5 @@
         "claude_code",
         "vscode"
     ],
-    "guidelines": [],
-    "herd_mcp": true
+    "guidelines": true
 }
