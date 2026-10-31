@@ -109,6 +109,10 @@ MARKET_DATA_PROVIDER=yahoo,alphavantage
 
 In the above example, Yahoo Finance will be attempted first. If Yahoo Finance fails to retrieve market data, the application will automatically try Alpha Vantage.
 
+### Monitoring providers
+
+Health data for market data providers is automatically captured to support troubleshooting. Captured data includes: call volume, success rate, how often a fallback was used, and average response time for the last 24 hours, 7 days or 30 days, along with the most recent failures and their error messages. By default, the first user created will have access to this screen.
+
 ### Custom providers
 
 If you wish to create your own market data provider, you can create your own implementation of the [MarketDataInterface](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/MarketDataInterface.php). You can refer to any existing market data implementation as an example.

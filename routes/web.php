@@ -44,6 +44,10 @@ Route::middleware(['auth', 'web'])->group(function () {
 
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
 
+    Route::view('/provider-health', 'provider-health.index')
+        ->middleware('can:admin')
+        ->name('provider-health');
+
     Route::get('/spotlight', function (Request $request) {
         return app()->make(Spotlight::class)->search($request);
     })->name('spotlight');

@@ -1,4 +1,4 @@
-@props(['seriesData' => [], 'name' => 'apex-chart' ])
+@props(['seriesData' => [], 'name' => 'apex-chart', 'currency' => true ])
 
 @php
     $seriesData = array_merge([
@@ -93,6 +93,7 @@
                 } --}}
             }
 
+            @if ($currency)
             this.data.yaxis.labels.formatter = function (value) {
               return `{{ Number::currencySymbol(auth()->user()->getCurrency()) }}${value}`
             }
@@ -108,6 +109,7 @@
                     }
                 },
             }
+            @endif
 
             var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
 

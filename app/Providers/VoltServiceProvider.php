@@ -32,6 +32,7 @@ class VoltServiceProvider extends ServiceProvider
             resource_path('views/transaction'),
             resource_path('views/portfolio'),
             resource_path('views/import-export'),
+            resource_path('views/provider-health'),
             resource_path('views/auth'),
         ]);
     }
