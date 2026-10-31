@@ -2,7 +2,6 @@
     "agents": [
         "claude_code"
     ],
-    "cloud": true,
     "guidelines": true,
     "packages": [
         "maatwebsite/excel"

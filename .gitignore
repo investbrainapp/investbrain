@@ -22,3 +22,4 @@ yarn-error.log
 .DS_Store
 vapor.yml
 .vapor
+.claude
