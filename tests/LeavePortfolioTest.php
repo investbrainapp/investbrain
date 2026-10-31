@@ -72,7 +72,19 @@ class LeavePortfolioTest extends TestCase
 
         $this->get(route('portfolio.show', $this->portfolio))
             ->assertOk()
+            ->assertSee(__('Shared by :name', ['name' => $this->owner->name]))
+            ->assertSee(__('Access').': '.__('Read only'))
             ->assertSee(__('Leave Portfolio'));
+    }
+
+    public function test_full_access_user_sees_full_access_in_dialog(): void
+    {
+        $this->portfolio->users()->updateExistingPivot($this->user->id, ['full_access' => true]);
+
+        $this->actingAs($this->user);
+
+        Livewire::test('leave-portfolio', ['portfolio' => $this->portfolio])
+            ->assertSee(__('Access').': '.__('Full access'));
     }
 
     public function test_owner_does_not_see_leave_option_on_portfolio_page(): void

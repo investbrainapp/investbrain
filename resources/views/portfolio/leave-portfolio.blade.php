@@ -27,25 +27,34 @@ new class extends Component
 }; ?>
 
 <div class="mr-3">
-    <div class="dropdown dropdown-hover">
-        <div
-            tabindex="0"
-            role="button"
-            class="badge badge-secondary badge-outline select-none cursor-pointer"
-            title="{{ __('Owner').': '.$portfolio->owner->name }}"
-        >
-            {{ $portfolio->owner->name }}
+    <button
+        type="button"
+        class="badge badge-secondary badge-outline select-none cursor-pointer"
+        title="{{ __('Owner').': '.$portfolio->owner->name }}"
+        @click="$dispatch('toggle-portfolio-access')"
+    >
+        {{ $portfolio->owner->name }}
+    </button>
+
+    <x-ui.modal
+        key="portfolio-access"
+        :title="$portfolio->title"
+        box-class="max-w-md"
+    >
+        <div class="space-y-1 text-sm">
+            <p>{{ __('Shared by :name', ['name' => $portfolio->owner->name]) }}</p>
+            <p>{{ __('Access') }}: {{ auth()->user()->can('fullAccess', $portfolio) ? __('Full access') : __('Read only') }}</p>
         </div>
 
-        <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg z-50 bg-base-100 rounded-box w-auto min-w-max">
-            <x-ui.menu-item
-                title="{{ __('Leave Portfolio') }}"
+        <div class="flex justify-end mt-6">
+            <x-ui.button
+                class="btn-ghost text-error"
                 icon="o-arrow-right-start-on-rectangle"
-                class="text-error"
-                wire:click="$toggle('confirmingLeavePortfolio')"
+                label="{{ __('Leave Portfolio') }}"
+                @click="$dispatch('toggle-portfolio-access'); $wire.set('confirmingLeavePortfolio', true)"
             />
-        </ul>
-    </div>
+        </div>
+    </x-ui.modal>
 
     <x-ui.confirmation-modal wire:model.live="confirmingLeavePortfolio">
         <x-slot name="title">

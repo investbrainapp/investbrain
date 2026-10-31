@@ -410,5 +410,7 @@
     "View and manage your portfolios, transactions, and holdings": "Consulter et gérer vos portefeuilles, transactions et positions",
     "Leave Portfolio": "Quitter le portefeuille",
     "Are you sure you want to leave this portfolio? You will lose access until the owner shares it with you again.": "Êtes-vous sûr de vouloir quitter ce portefeuille ? Vous perdrez l'accès jusqu'à ce que le propriétaire le partage à nouveau avec vous.",
-    "You have left the portfolio": "Vous avez quitté le portefeuille"
+    "You have left the portfolio": "Vous avez quitté le portefeuille",
+    "Shared by :name": "Partagé par :name",
+    "Access": "Accès"
 }
