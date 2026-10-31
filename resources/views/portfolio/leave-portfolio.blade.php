@@ -40,10 +40,13 @@ new class extends Component
         key="portfolio-access"
         title="{{ __('Portfolio shared with you') }}"
     >
-        <div class="mt-2 text-sm text-secondary-content space-y-1">
-            <div class="font-bold text-base-content">{{ $portfolio->title }}</div>
-            <div>{{ __('Shared by :name', ['name' => $portfolio->owner->name]) }}</div>
-            <div>{{ __('Access') }}: {{ auth()->user()->can('fullAccess', $portfolio) ? __('Full access') : __('Read only') }}</div>
+        <div class="mt-2 text-sm text-secondary-content">
+            {{ __('Shared by :name', ['name' => $portfolio->owner->name]) }}
+            @can('fullAccess', $portfolio)
+                ({{ __('Full access') }} <x-ui.icon name="o-pencil" class="w-4" />)
+            @else
+                ({{ __('Read only') }} <x-ui.icon name="o-eye" class="w-4" />)
+            @endcan
         </div>
 
         <x-ui.section-border class="my-3" />
