@@ -1415,10 +1415,6 @@
   ],
   "servers": [
     {
-      "url": "https://virtserver.swaggerhub.com/investbrain/investbrain/1.0.0",
-      "description": "API Auto Mocking"
-    },
-    {
       "url": "https://investbra.in/api",
       "description": "Investbrain Cloud API"
     },
