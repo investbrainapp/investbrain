@@ -10,21 +10,30 @@ use App\Actions\Portfolio\UpdatePortfolio;
 use App\Http\ApiControllers\Controller as ApiController;
 use App\Http\Resources\PortfolioResource;
 use App\Models\Portfolio;
-use HackerEsq\FilterModels\FilterModels;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class PortfolioController extends ApiController
 {
-    public function index(FilterModels $filters)
+    public function index(Request $request)
     {
-        $filters->setQuery(Portfolio::query());
-        $filters->setScopes(['myPortfolios']);
-        $filters->setEagerRelations(['users', 'transactions', 'holdings']);
-        $filters->setFilterableRelations(['holdings.symbol']);
-        $filters->setSearchableColumns(['title', 'notes']);
+        $query = Portfolio::myPortfolios()->with(['users', 'transactions', 'holdings'])
+            ->tap($this->search($request, ['title', 'notes']));
 
-        return PortfolioResource::collection($filters->paginated());
+        $portfolios = QueryBuilder::for($query, $request)
+            ->allowedFilters(
+                AllowedFilter::exact('title'),
+                AllowedFilter::exact('wishlist'),
+                AllowedFilter::exact('holdings.symbol'),
+            )
+            ->allowedSorts('title', 'wishlist', 'created_at', 'updated_at')
+            ->orderBy('portfolios.id')
+            ->paginate($this->itemsPerPage($request))
+            ->withQueryString();
+
+        return PortfolioResource::collection($portfolios);
     }
 
     public function store(Request $request, CreatePortfolio $action)

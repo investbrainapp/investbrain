@@ -9,21 +9,30 @@ use App\Http\ApiControllers\Controller as ApiController;
 use App\Http\Resources\HoldingResource;
 use App\Models\Holding;
 use App\Models\Portfolio;
-use HackerEsq\FilterModels\FilterModels;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class HoldingController extends ApiController
 {
-    public function index(FilterModels $filters)
+    public function index(Request $request)
     {
+        $query = Holding::myHoldings()->with(['market_data', 'transactions'])
+            ->tap($this->search($request, ['symbol']));
 
-        $filters->setQuery(Holding::query());
-        $filters->setScopes(['myHoldings']);
-        $filters->setEagerRelations(['market_data', 'transactions']);
-        $filters->setSearchableColumns(['symbol']);
+        $holdings = QueryBuilder::for($query, $request)
+            ->allowedFilters(
+                AllowedFilter::exact('symbol'),
+                AllowedFilter::exact('portfolio_id'),
+                AllowedFilter::exact('reinvest_dividends'),
+            )
+            ->allowedSorts('symbol', 'quantity', 'average_cost_basis', 'total_cost_basis', 'realized_gain_dollars', 'dividends_earned', 'created_at', 'updated_at')
+            ->orderBy('holdings.id')
+            ->paginate($this->itemsPerPage($request))
+            ->withQueryString();
 
-        return HoldingResource::collection($filters->paginated());
+        return HoldingResource::collection($holdings);
     }
 
     public function show(Portfolio $portfolio, string $symbol)

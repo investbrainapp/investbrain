@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Api;
 
 use App\Models\Portfolio;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -58,6 +59,62 @@ class PortfoliosTest extends ApiTestCase
     public function test_cannot_access_portfolios_when_unauthenticated()
     {
         $this->getJson(route('api.portfolio.index'))->assertUnauthorized();
+    }
+
+    public function test_can_filter_portfolios_by_holding_symbol()
+    {
+        $this->actingAs($this->user);
+        $applePortfolio = Portfolio::factory()->create();
+        $googlePortfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->symbol('AAPL')->portfolio($applePortfolio->id)->create();
+        Transaction::factory()->buy()->symbol('GOOG')->portfolio($googlePortfolio->id)->create();
+
+        $response = $this->getJson(route('api.portfolio.index', ['filter' => ['holdings.symbol' => 'AAPL']]));
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $applePortfolio->id);
+    }
+
+    public function test_can_filter_portfolios_by_boolean_column()
+    {
+        $this->actingAs($this->user);
+        Portfolio::factory()->create(['wishlist' => false]);
+        $wishlist = Portfolio::factory()->create(['wishlist' => true]);
+
+        $response = $this->getJson(route('api.portfolio.index', ['filter' => ['wishlist' => 'true']]));
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $wishlist->id);
+    }
+
+    public function test_can_search_portfolios_across_title_and_notes()
+    {
+        $this->actingAs($this->user);
+        $byTitle = Portfolio::factory()->create(['title' => 'Retirement', 'notes' => null]);
+        $byNotes = Portfolio::factory()->create(['title' => 'Brokerage', 'notes' => 'saving for retirement']);
+        Portfolio::factory()->create(['title' => 'Crypto', 'notes' => 'speculative']);
+
+        $response = $this->getJson(route('api.portfolio.index', ['search' => 'RETIRE', 'sort' => 'title']));
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.id', $byNotes->id)
+            ->assertJsonPath('data.1.id', $byTitle->id);
+    }
+
+    public function test_can_sort_portfolios_by_title()
+    {
+        $this->actingAs($this->user);
+        Portfolio::factory()->create(['title' => 'Bravo']);
+        Portfolio::factory()->create(['title' => 'Charlie']);
+        Portfolio::factory()->create(['title' => 'Alpha']);
+
+        $response = $this->getJson(route('api.portfolio.index', ['sort' => 'title']));
+
+        $response->assertOk();
+        $this->assertSame(['Alpha', 'Bravo', 'Charlie'], array_column($response->json('data'), 'title'));
     }
 
     public function test_can_create_a_portfolio()
