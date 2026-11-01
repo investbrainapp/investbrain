@@ -80,7 +80,7 @@ When you see Supervisor start, Investbrain is ready.
 
 Visit `http://localhost:8000/register` (or your `APP_URL` followed by `/register`) and create an account.
 
-**The first account registered becomes the administrator.** Only administrators can see the [Provider Health](#monitoring-market-data-providers) page.
+**Register your own account first.** The first account registered is the only one that can see the [Provider Health](#monitoring-market-data-providers) page.
 
 **5. Optional: turn off registration**
 
@@ -322,7 +322,7 @@ Developers can add a provider by implementing [`MarketDataInterface`](../app/Int
 
 ## Monitoring market data providers
 
-Administrators can open **Provider Health** from the user menu. For the last 24 hours, 7 days, or 30 days it shows:
+Open **Provider Health** from the user menu. For the last 24 hours, 7 days, or 30 days it shows:
 
 - Total calls, success rate, how often a fallback provider was used, and average response time
 - A chart of calls and failures over time
@@ -334,7 +334,7 @@ Administrators can open **Provider Health** from the user menu. For the last 24 
 
 Use it to spot a provider that's failing or rate limiting you. Old failure records are cleaned up automatically.
 
-The first registered user is the administrator. To make another user an administrator, set their `admin` flag in the database:
+Provider Health is only shown to the first account registered on your instance. To give another account access, set its `admin` flag in the database:
 
 ```bash
 docker exec -it investbrain-pgsql psql -U investbrain -d investbrain \
@@ -469,7 +469,7 @@ There are two complementary ways to back up.
 
 Each user can download a full backup of their own data from [Import / Export](import-export.md). This is portable between instances and versions but doesn't include passwords, 2FA settings, API tokens, or other users.
 
-**Full instance backup (administrators)**
+**Full instance backup**
 
 Back up both the database and the storage volume.
 

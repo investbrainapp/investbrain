@@ -31,9 +31,9 @@ Market data (prices, 52-week ranges, fundamentals), dividends, and splits are pu
 
 ## Creating an account and signing in
 
-Open `/register` on your Investbrain instance to create an account with your name, email, and a password. If your administrator has turned off registration, ask them to share a portfolio with you instead: sharing sends you an invitation email with a link to set your password (see [Sharing portfolios](#sharing-portfolios)).
+Open `/register` on your Investbrain instance to create an account with your name, email, and a password. If you've [turned off registration](self-hosting.md#installation), you can still add people by [sharing a portfolio](#sharing-portfolios) with them: they get an invitation email with a link to set their password.
 
-If your instance has social logins enabled, the login page shows a **Login with ...** button for each provider (GitHub, Google, Facebook, or LinkedIn). See [Social logins](account-settings.md#social-logins) for how linking works.
+If you've [set up social login](self-hosting.md#social-login), the login page shows a **Login with ...** button for each provider (GitHub, Google, Facebook, or LinkedIn). See [Social logins](account-settings.md#social-logins) for how linking works.
 
 Other sign-in features:
 
@@ -78,7 +78,7 @@ Each portfolio has its own page with:
 - A **Holdings** table (see [Holdings](#holdings))
 - **Recent activity** for the portfolio
 - **Top performers** within the portfolio
-- An **AI chat** window, if your instance has AI chat enabled
+- An **AI chat** window, if you've [enabled AI chat](self-hosting.md#ai-chat)
 
 <!-- SCREENSHOT: A portfolio page showing the toolbar (title, pencil icon, Create Transaction), chart, summary cards, Holdings table, and Recent activity. -->
 <!-- ![A portfolio page with its chart, summary cards, and holdings table](images/user-guide-portfolio-page.png) -->
@@ -220,7 +220,7 @@ Each holding has a page with:
 - **Recent activity** - every transaction for this symbol in this portfolio
 - **Dividends** - dividends paid while you held the position, with the amount you received
 - **Splits** - stock splits since you started holding it
-- **AI chat**, if enabled on your instance
+- **AI chat**, if you've [enabled it](self-hosting.md#ai-chat)
 
 <!-- SCREENSHOT: A holding page for a dividend-paying stock so the Market data, Fundamentals, Recent activity, Dividends, and Splits cards all have content. -->
 <!-- ![A holding page with market data, fundamentals, activity, dividends, and splits](images/user-guide-holding-page.png) -->
@@ -259,7 +259,7 @@ The dashboard and every portfolio page include a performance chart built from a 
 
 - Choose the time range from the drop-down: 1 month, 3 months, year to date, 1 year, 3 years, or all time.
 - The chart shows **Market Gain** by default. Click **Market Value** or **Cost Basis** in the legend to show those lines too.
-- Snapshots are captured every weekday at the time configured by your administrator (11 PM by default).
+- Snapshots are captured every weekday at the time set by `DAILY_CHANGE_TIME` (11 PM by default, see [Configuration](self-hosting.md#options)).
 - When you add or change a transaction dated in the past, the portfolio's history is rebuilt from the market data provider so the chart stays accurate.
 
 ## Search
@@ -271,7 +271,7 @@ Press `/` anywhere in the app, or click the search box in the top bar, to search
 
 ## AI chat
 
-If your administrator has enabled AI chat, every portfolio and holding page shows an **AI Chat** window. The assistant is given the details of that portfolio or holding (quantities, cost basis, market value, gains, and dividends) so you can ask questions like:
+Once you've [enabled AI chat](self-hosting.md#ai-chat), every portfolio and holding page shows an **AI Chat** window. The assistant is given the details of that portfolio or holding (quantities, cost basis, market value, gains, and dividends) so you can ask questions like:
 
 - "Which holding is most successful in this portfolio?"
 - "Is my portfolio diverse enough?"
@@ -283,8 +283,6 @@ Suggested prompts are shown to get you started. Your conversation for each portf
 <!-- ![The AI chat window on a portfolio page](images/user-guide-ai-chat.png) -->
 
 AI-generated advice can be wrong. Treat it as a thought partner, not a recommendation, and consult a licensed investment advisor before making decisions.
-
-Administrators: see [AI chat configuration](self-hosting.md#ai-chat) for setup.
 
 ## Appearance and language
 

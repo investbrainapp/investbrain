@@ -120,7 +120,7 @@ Your market data provider doesn't recognize the symbol. Check the format your pr
 
 - Prices refresh on **weekdays only**, and a symbol is only refreshed once its price is older than `MARKET_DATA_REFRESH` minutes (30 by default).
 - Only symbols with open positions (quantity above zero) are refreshed automatically.
-- Check **Provider Health** (administrators) for failures or rate limiting. Free tiers of Alpha Vantage, Finnhub, and Twelve Data have low limits; add a [fallback provider](self-hosting.md#fallback) to spread the load.
+- Check **Provider Health** for failures or rate limiting. Free tiers of Alpha Vantage, Finnhub, and Twelve Data have low limits; add a [fallback provider](self-hosting.md#fallback) to spread the load.
 - Check that the scheduler is running: `docker compose logs app` should show scheduled commands running every minute.
 
 ### The performance chart is empty or has gaps
@@ -176,7 +176,7 @@ To send real email, [configure SMTP](self-hosting.md#email). If you've configure
 
 ### Locked out by two-factor authentication
 
-First try one of your recovery codes on the 2FA prompt. If you've lost those too, an administrator can turn off 2FA for the account directly in the database:
+First try one of your recovery codes on the 2FA prompt. If you've lost those too, turn off 2FA for the account directly in the database:
 
 ```bash
 docker exec -it investbrain-pgsql psql -U investbrain -d investbrain -c \
@@ -185,7 +185,7 @@ docker exec -it investbrain-pgsql psql -U investbrain -d investbrain -c \
 
 The user can then sign in with just their password and set up 2FA again.
 
-### Forgot the administrator password and email doesn't work
+### Forgot your password and email doesn't work
 
 Reset the password from the command line:
 

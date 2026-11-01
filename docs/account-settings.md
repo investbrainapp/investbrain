@@ -6,7 +6,7 @@ Open the user menu at the bottom of the sidebar to reach your account settings:
 - **Connections** - social logins and authorized apps
 - **API Tokens** - personal access tokens for the [REST API](api.md)
 - **Import / Export Data** - see [Import and export](import-export.md)
-- **Provider Health** - administrators only, see [Monitoring market data providers](self-hosting.md#monitoring-market-data-providers)
+- **Provider Health** - only shown to the first account registered on your instance, see [Monitoring market data providers](self-hosting.md#monitoring-market-data-providers)
 
 ## Profile information
 
@@ -63,11 +63,11 @@ With 2FA turned on, click **Show Recovery Codes** to view your remaining codes, 
 
 Click **Disable** and confirm your password.
 
-If you've lost both your authenticator and your recovery codes, your instance administrator can reset 2FA for you. See [Locked out by two-factor authentication](troubleshooting.md#locked-out-by-two-factor-authentication).
+If you've lost both your authenticator and your recovery codes, you can reset 2FA from the command line. See [Locked out by two-factor authentication](troubleshooting.md#locked-out-by-two-factor-authentication).
 
 ## Social logins
 
-If your administrator has enabled social logins, you can sign in with GitHub, Google, Facebook, or LinkedIn instead of (or as well as) your password.
+Once you've [set up social login](self-hosting.md#social-login) on your instance, you can sign in with GitHub, Google, Facebook, or LinkedIn instead of (or as well as) your password.
 
 <!-- SCREENSHOT: Connections page Social Logins section with one connected provider and one with a Connect button. -->
 <!-- ![The Social Logins section of the Connections page](images/account-settings-social-logins.png) -->
@@ -90,8 +90,6 @@ If you click **Login with ...** on the login page without having connected that 
 ### Disconnecting an account
 
 Click **Disconnect** next to the provider and confirm. You can reconnect at any time. Make sure you have a password set (or another provider connected) before disconnecting your only way to sign in.
-
-Administrators: see [Social login](self-hosting.md#social-login) for setup.
 
 ## Authorized apps
 

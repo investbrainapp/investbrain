@@ -36,7 +36,7 @@ Where the assistant runs matters:
 - **Cloud assistants** (Claude on the web, desktop, or mobile, and ChatGPT) connect from the provider's servers. Your Investbrain instance must be reachable from the public internet over HTTPS.
 - **Local assistants** (Claude Code, Cursor, VS Code, and other tools running on your own computer) connect from your machine, so a local address such as `http://localhost:8000/mcp` works.
 
-If you self-host, your administrator must set `APP_URL` to the public address. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
+You also need to set `APP_URL` to that public address. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
 
 ## Connecting an assistant
 
@@ -171,7 +171,7 @@ Go to **Connections** in the Investbrain user menu. Every assistant you've autho
 
 ## How authentication works
 
-This section is for developers and administrators.
+This section covers the technical details, in case you're debugging a client or building your own.
 
 - The MCP endpoint is protected by OAuth 2.1 (Laravel Passport). Requests need a bearer access token that carries the `mcp:use` scope.
 - Clients discover the authorization server automatically through standard metadata at `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. An unauthenticated request to `/mcp` returns `401` with a `WWW-Authenticate` header pointing at the resource metadata.
