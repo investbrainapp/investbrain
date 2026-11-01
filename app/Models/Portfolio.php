@@ -25,6 +25,7 @@ class Portfolio extends Model
         'title',
         'notes',
         'wishlist',
+        'default_reinvest_dividends',
     ];
 
     public static ?string $owner_id = null;
@@ -43,6 +44,7 @@ class Portfolio extends Model
 
     protected $casts = [
         'wishlist' => 'boolean',
+        'default_reinvest_dividends' => 'boolean',
     ];
 
     protected $with = ['users', 'transactions'];
