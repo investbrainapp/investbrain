@@ -94,6 +94,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                     'sale_price_base' => $sale_price_base,
                     'split' => boolval($transaction['split']) ? 1 : 0,
                     'reinvested_dividend' => boolval($transaction['reinvested_dividend']) ? 1 : 0,
+                    'notes' => $transaction['notes'] ?? null,
                     'date' => $date,
                 ];
             });
@@ -111,6 +112,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                     'sale_price',
                     'split',
                     'reinvested_dividend',
+                    'notes',
                     'date',
                 ]
             );
@@ -151,6 +153,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             'reinvested_dividend' => ['sometimes', 'nullable', 'boolean'],
             'cost_basis' => ['sometimes', 'nullable', 'min:0', 'numeric'],
             'sale_price' => ['sometimes', 'nullable', 'min:0', 'numeric'],
+            'notes' => ['sometimes', 'nullable', 'string'],
         ];
     }
 }

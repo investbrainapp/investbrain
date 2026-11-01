@@ -41,6 +41,8 @@ new class extends Component
 
     public string $currency;
 
+    public ?string $notes = null;
+
     // methods
     public function rules()
     {
@@ -58,6 +60,7 @@ new class extends Component
             'currency' => ['required', 'exists:currencies,currency'],
             'cost_basis' => 'exclude_if:transaction_type,SELL|min:0|numeric',
             'sale_price' => 'exclude_if:transaction_type,BUY|min:0|numeric',
+            'notes' => ['sometimes', 'nullable', 'string'],
         ];
     }
 
@@ -77,6 +80,7 @@ new class extends Component
             $this->quantity = $this->transaction->quantity;
             $this->cost_basis = $this->transaction->cost_basis;
             $this->sale_price = $this->transaction->sale_price;
+            $this->notes = $this->transaction->notes;
 
         } else {
 
@@ -137,7 +141,7 @@ new class extends Component
     }
 }; ?>
 
-<div class="" x-data="{ transaction_type: @entangle('transaction_type') }">
+<div class="" x-data="{ transaction_type: @entangle('transaction_type'), showAdvanced: {{ filled($notes) ? 'true' : 'false' }} }">
     <x-ui.form wire:submit="{{ $transaction ? 'update' : 'save' }}" class="">
 
         @if(empty($portfolio))
@@ -207,6 +211,24 @@ new class extends Component
              
             </x-ui.input>
         @endif
+
+        <button
+            type="button"
+            class="btn btn-ghost btn-sm px-0"
+            @click="showAdvanced = !showAdvanced"
+        >
+            <span x-text="showAdvanced ? '{{ __('Hide advanced') }}' : '{{ __('Advanced') }}'"></span>
+        </button>
+
+        <div x-show="showAdvanced" x-cloak class="space-y-4">
+            <x-ui.textarea
+                class="mt-1"
+                label="{{ __('Notes') }}"
+                wire:model="notes"
+                rows="3"
+                placeholder="{{ __('Optional notes for this transaction') }}"
+            />
+        </div>
 
         <x-slot:actions>
             @if ($transaction)

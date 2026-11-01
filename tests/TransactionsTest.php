@@ -169,6 +169,20 @@ class TransactionsTest extends TestCase
         $this->assertEquals($ownPortfolio->id, $ownTransaction->fresh()->portfolio_id);
     }
 
+    public function test_transaction_can_store_optional_notes(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $transaction = Transaction::factory()->buy()->create([
+            'notes' => 'Bought after earnings dip',
+        ]);
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $transaction->id,
+            'notes' => 'Bought after earnings dip',
+        ]);
+    }
+
     /**
      * Create a user who has read-only access to someone else's portfolio and owns a portfolio of their own.
      *

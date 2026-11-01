@@ -108,6 +108,10 @@ new class extends Component
                 &middot;
                 @endif
                 <span title="{{ __('Transaction Date') }}">{{ $transaction->date->format('F j, Y') }} </span>
+                @if(filled($transaction->notes))
+                &middot;
+                <span title="{{ __('Notes') }}">{{ \Illuminate\Support\Str::limit($transaction->notes, 60) }}</span>
+                @endif
             </x-slot:sub-value>
         </x-ui.list-item>
 

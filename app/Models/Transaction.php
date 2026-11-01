@@ -36,6 +36,7 @@ class Transaction extends Model
         'sale_price',
         'split',
         'reinvested_dividend',
+        'notes',
     ];
 
     protected $hidden = [];
