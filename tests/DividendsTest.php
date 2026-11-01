@@ -11,6 +11,7 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class DividendsTest extends TestCase
 {
@@ -32,6 +33,59 @@ class DividendsTest extends TestCase
         $holding->refresh();
 
         $this->assertEquals(4.95, $holding->dividends_earned);
+    }
+
+    public function test_new_holding_inherits_portfolio_default_reinvest_dividends(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create([
+            'default_reinvest_dividends' => true,
+        ]);
+
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('ACME')->first();
+
+        $this->assertTrue((bool) $holding->reinvest_dividends);
+
+        // Existing holdings should not flip when the portfolio default changes later.
+        $portfolio->update(['default_reinvest_dividends' => false]);
+        Transaction::factory()->buy()->lastYear()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        $this->assertTrue((bool) $holding->fresh()->reinvest_dividends);
+    }
+
+    public function test_new_holding_defaults_reinvest_dividends_to_false(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create([
+            'default_reinvest_dividends' => false,
+        ]);
+
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('ACME')->first();
+
+        $this->assertFalse((bool) $holding->reinvest_dividends);
+    }
+
+    public function test_portfolio_form_can_set_default_reinvest_dividends(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create([
+            'title' => 'Growth Portfolio',
+            'default_reinvest_dividends' => false,
+        ]);
+
+        Livewire::test('manage-portfolio-form', ['portfolio' => $portfolio])
+            ->set('default_reinvest_dividends', true)
+            ->call('update')
+            ->assertHasNoErrors();
+
+        $this->assertTrue((bool) $portfolio->fresh()->default_reinvest_dividends);
     }
 
     public function test_new_dividends_are_reinvested(): void

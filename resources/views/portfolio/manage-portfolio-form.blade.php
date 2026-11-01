@@ -25,6 +25,9 @@ new class extends Component
     #[Rule('sometimes|nullable|boolean')]
     public bool $wishlist = false;
 
+    #[Rule('sometimes|nullable|boolean')]
+    public bool $default_reinvest_dividends = false;
+
     public bool $confirmingPortfolioDeletion = false;
 
     // methods
@@ -34,7 +37,8 @@ new class extends Component
 
             $this->title = $this->portfolio->title;
             $this->notes = $this->portfolio->notes;
-            $this->wishlist = $this->portfolio->wishlist;
+            $this->wishlist = (bool) $this->portfolio->wishlist;
+            $this->default_reinvest_dividends = (bool) $this->portfolio->default_reinvest_dividends;
         }
     }
 
@@ -81,6 +85,12 @@ new class extends Component
         <x-ui.toggle label="{{ __('Wishlist') }}" wire:model="wishlist" >
             <x-slot:hint>
                 {{ __('Treat this portfolio as a "wishlist" (holdings will be excluded from realized gains, unrealized gains, and dividends)') }}
+            </x-slot:hint>
+        </x-ui.toggle>
+
+        <x-ui.toggle label="{{ __('Default Reinvest Dividends') }}" wire:model="default_reinvest_dividends">
+            <x-slot:hint>
+                {{ __('When enabled, new holdings added to this portfolio will reinvest dividends by default. Existing holdings are unchanged.') }}
             </x-slot:hint>
         </x-ui.toggle>
 

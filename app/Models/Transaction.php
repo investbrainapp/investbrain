@@ -179,6 +179,8 @@ class Transaction extends Model
             'average_cost_basis' => $this->cost_basis_base,
             'total_cost_basis' => $this->quantity * $this->cost_basis_base,
             'splits_synced_at' => now(),
+            'reinvest_dividends' => (bool) ($this->portfolio?->default_reinvest_dividends
+                ?? Portfolio::query()->whereKey($this->portfolio_id)->value('default_reinvest_dividends')),
         ])->syncTransactionsAndDividends();
     }
 }

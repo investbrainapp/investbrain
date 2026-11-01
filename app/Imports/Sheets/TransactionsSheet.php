@@ -9,6 +9,7 @@ use App\Models\BackupImport;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
 use App\Models\Holding;
+use App\Models\Portfolio;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -118,6 +119,9 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             // get unique symbol/portfolio id combination and stub out related holdings
             $chunk->unique(fn ($item) => $item['symbol'].$item['portfolio_id'])
                 ->each(function ($holding) {
+                    $defaultReinvest = (bool) Portfolio::query()
+                        ->whereKey($holding['portfolio_id'])
+                        ->value('default_reinvest_dividends');
 
                     Holding::firstOrCreate([
                         'symbol' => $holding['symbol'],
@@ -126,6 +130,7 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
                         'quantity' => 0,
                         'average_cost_basis' => 0,
                         'splits_synced_at' => now(),
+                        'reinvest_dividends' => $defaultReinvest,
                     ]);
                 });
         });
