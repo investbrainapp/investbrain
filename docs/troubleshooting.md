@@ -78,6 +78,9 @@ Also make sure you're using either the `environment` block or an env file, not b
 
 The page is loading without its CSS, usually because the browser can't fetch the assets from the address Investbrain is generating. This typically happens when you reach Investbrain through a domain name or a reverse proxy.
 
+<!-- SCREENSHOT: What the app looks like when CSS fails to load (for example with ASSET_URL set to a wrong address), so readers can recognize the problem. -->
+<!-- ![Investbrain with missing styles, showing oversized images and unstyled text](images/troubleshooting-broken-styling.png) -->
+
 - Set `ASSET_URL` (and `APP_URL`) to the exact address you type into the browser, including `https://` and any port.
 - If you use HTTPS through a proxy, make sure the proxy sends `X-Forwarded-Proto: https`. Without it, Investbrain generates `http://` asset links, and the browser blocks them as mixed content.
 - Check the browser's developer console for the URL that failed to load. It tells you which address Investbrain thinks it's on.

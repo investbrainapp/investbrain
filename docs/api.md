@@ -18,6 +18,9 @@ The API authenticates with personal access tokens.
 3. Click **Create**.
 4. Copy the token from the dialog. **It's only shown once.** If you lose it, delete it and create a new one.
 
+<!-- SCREENSHOT: API Tokens page with the new-token dialog open. Use a token you revoke right after, or blur most of it. -->
+<!-- ![The API Token dialog shown after creating a token](images/api-token-created.png) -->
+
 The token acts as you: it can see and change everything your account can, across every portfolio you have access to. Keep it secret and don't commit it to source control.
 
 ### Managing tokens

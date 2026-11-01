@@ -53,6 +53,9 @@ The dashboard is the first thing you see after signing in. It rolls up every por
 
 A brand new account shows two shortcuts: **Import / Export Data** and **Create your first portfolio!**
 
+<!-- SCREENSHOT: Dashboard with a few portfolios: performance chart, the five summary cards, My portfolios, Recent activity, and Top performers. -->
+<!-- ![The Investbrain dashboard](images/user-guide-dashboard.png) -->
+
 ## Portfolios
 
 ### Creating a portfolio
@@ -76,6 +79,9 @@ Each portfolio has its own page with:
 - **Recent activity** for the portfolio
 - **Top performers** within the portfolio
 - An **AI chat** window, if your instance has AI chat enabled
+
+<!-- SCREENSHOT: A portfolio page showing the toolbar (title, pencil icon, Create Transaction), chart, summary cards, Holdings table, and Recent activity. -->
+<!-- ![A portfolio page with its chart, summary cards, and holdings table](images/user-guide-portfolio-page.png) -->
 
 ### Editing or deleting a portfolio
 
@@ -101,6 +107,9 @@ You can share a portfolio with anyone by email, which is handy for a spouse, a f
 3. Enter the person's email address.
 4. Optionally turn on **Grant full access**.
 5. Click **Share**.
+
+<!-- SCREENSHOT: Manage Portfolio drawer with People with access (owner plus one read-only and one full-access user) and the Share Portfolio dialog open. -->
+<!-- ![The Share Portfolio dialog and the People with access list](images/user-guide-portfolio-sharing.png) -->
 
 The person receives an email invitation. If they don't have an Investbrain account yet, one is created for them and the invitation link lets them set a password. Your instance needs working email for invitations to arrive.
 
@@ -141,6 +150,9 @@ You can create a transaction from:
 | Sale Price | Sells only. The price received **per share**. |
 | Currency | The currency you paid or received, picked from the drop-down next to the price. Defaults to your display currency (or, on a holding page, the security's trading currency). See [Multiple currencies](#multiple-currencies). |
 
+<!-- SCREENSHOT: Create Transaction dialog for a Buy, with symbol, date, quantity, cost basis filled in and the currency drop-down visible. -->
+<!-- ![The Create Transaction form](images/user-guide-transaction-create.png) -->
+
 When you save a buy or sell, Investbrain:
 
 - Creates the holding if this is the first transaction for that symbol in the portfolio
@@ -165,6 +177,9 @@ After an edit or delete, the affected holding (or holdings, if you changed the s
 - Sort by any column
 - Filter by transaction type (buy or sell) and by portfolio
 - Click a row to jump to that holding
+
+<!-- SCREENSHOT: Transactions page with the filter panel open and at least one SPLIT or REINVEST badge visible in the Type column. -->
+<!-- ![The Transactions page with filters](images/user-guide-transactions-page.png) -->
 
 The **Type** column shows **BUY** and **SELL**, plus two special labels for transactions Investbrain created for you:
 
@@ -193,6 +208,9 @@ Values in this table are shown in each security's own trading currency.
 
 By default the table only shows **open positions** (quantity above zero). Turn off the **Open positions** filter to include holdings you've completely sold. You can also build custom filters on the symbol, name, or market value, and sort by any column. Click a row to open the holding.
 
+<!-- SCREENSHOT: Holdings table with several rows, showing gain/loss badges and the Open positions filter. -->
+<!-- ![The holdings table on a portfolio page](images/user-guide-holdings-table.png) -->
+
 ### The holding page
 
 Each holding has a page with:
@@ -203,6 +221,9 @@ Each holding has a page with:
 - **Dividends** - dividends paid while you held the position, with the amount you received
 - **Splits** - stock splits since you started holding it
 - **AI chat**, if enabled on your instance
+
+<!-- SCREENSHOT: A holding page for a dividend-paying stock so the Market data, Fundamentals, Recent activity, Dividends, and Splits cards all have content. -->
+<!-- ![A holding page with market data, fundamentals, activity, dividends, and splits](images/user-guide-holding-page.png) -->
 
 ### Holding options
 
@@ -245,6 +266,9 @@ The dashboard and every portfolio page include a performance chart built from a 
 
 Press `/` anywhere in the app, or click the search box in the top bar, to search your portfolios by title and your open holdings by symbol or company name. Use the arrow keys to move through results and Enter to open one.
 
+<!-- SCREENSHOT: Search dialog open with a query that returns both a portfolio and a holding. -->
+<!-- ![The search dialog showing portfolio and holding results](images/user-guide-search.png) -->
+
 ## AI chat
 
 If your administrator has enabled AI chat, every portfolio and holding page shows an **AI Chat** window. The assistant is given the details of that portfolio or holding (quantities, cost basis, market value, gains, and dividends) so you can ask questions like:
@@ -254,6 +278,9 @@ If your administrator has enabled AI chat, every portfolio and holding page show
 - "What are the key risks for this holding?"
 
 Suggested prompts are shown to get you started. Your conversation for each portfolio or holding is saved for you, and other people with access to the same portfolio can't see it.
+
+<!-- SCREENSHOT: AI chat window on a portfolio page with the suggested prompts and one short question and answer. -->
+<!-- ![The AI chat window on a portfolio page](images/user-guide-ai-chat.png) -->
 
 AI-generated advice can be wrong. Treat it as a thought partner, not a recommendation, and consult a licensed investment advisor before making decisions.
 

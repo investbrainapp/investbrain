@@ -116,6 +116,9 @@ When you connect, your assistant sends you to Investbrain in the browser:
 2. Investbrain shows a consent screen: **Authorize _client name_**, with the email of the account being shared and a list of what the app will be able to do (**View and manage your portfolios, transactions, and holdings**).
 3. Click **Authorize** to grant access, or **Cancel** to refuse.
 
+<!-- SCREENSHOT: The Authorize consent screen for an MCP client such as Claude, showing the client name, account email, and permission list. -->
+<!-- ![The Investbrain authorization screen for an MCP client](images/mcp-consent-screen.png) -->
+
 You're then sent back to your assistant, which can start using the tools.
 
 Check the email on the consent screen before authorizing. If you have more than one Investbrain account, make sure you're signed in to the right one.
@@ -162,6 +165,9 @@ Tools are annotated as read-only, idempotent, or destructive so assistants can d
 ## Revoking access
 
 Go to **Connections** in the Investbrain user menu. Every assistant you've authorized is listed under **Authorized Apps** with what it can do and when you authorized it. Click **Revoke** to cut off access immediately. The assistant will need to go through authorization again to reconnect.
+
+<!-- SCREENSHOT: Reuses the Authorized Apps screenshot from account-settings.md. No separate capture needed. -->
+<!-- ![The Authorized Apps section listing a connected AI assistant](images/account-settings-authorized-apps.png) -->
 
 ## How authentication works
 

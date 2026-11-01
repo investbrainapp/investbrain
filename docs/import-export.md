@@ -9,6 +9,9 @@ Investbrain can export everything in your account to a single Excel workbook and
 
 Open **Import / Export Data** from the user menu to get started.
 
+<!-- SCREENSHOT: The Import / Export page showing the Import section (with the Download import template link) and the Export section. -->
+<!-- ![The Import / Export page](images/import-export-page.png) -->
+
 ## Exporting your data
 
 Click **Download Export**. You'll get a file named like `2026_11_01_investbrain_backup.xlsx` containing:
@@ -23,6 +26,9 @@ You can export up to three times per minute.
 ## The workbook format
 
 The easiest way to build an import file from scratch is to click **Download import template** on the Import / Export page. It gives you an empty workbook with the right sheets and column headings.
+
+<!-- SCREENSHOT: The downloaded template open in Excel or LibreOffice with the Transactions sheet selected and the Portfolios, Transactions, Daily Changes, and Config tabs visible. -->
+<!-- ![The import template opened in a spreadsheet app, showing its four sheets](images/import-export-template-workbook.png) -->
 
 The workbook has four sheets. Sheet names and column headings must match exactly. You can leave out a sheet you don't need, and empty rows are skipped.
 
@@ -73,6 +79,9 @@ Two columns, **Key** and **Value**. Recognized keys are `name`, `locale`, `displ
 2. Click **Import**.
 
 A progress dialog shows each stage: portfolios, transactions, then daily changes. The import runs in the background, so you can click **Dismiss** and keep using Investbrain. You'll also receive an email when it succeeds or fails (if your instance has email configured).
+
+<!-- SCREENSHOT: Import progress dialog part-way through, for example while importing transactions. -->
+<!-- ![The import progress dialog](images/import-export-progress.png) -->
 
 After the import finishes, Investbrain automatically refreshes market data and dividends for your holdings, recalculates every holding, and rebuilds the daily history for each portfolio. On a large import this can take several minutes, so charts and totals may fill in gradually.
 

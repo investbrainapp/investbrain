@@ -21,6 +21,9 @@ The **Locale Options** section on **Manage Profile** controls how Investbrain lo
 | **Locale** | Sets the interface language (English, French, or Spanish) and the regional format for numbers, dates, and currency symbols. For example, **English (United Kingdom)** and **English (United States)** use the same language but format numbers differently. |
 | **Display Currency** | The currency used for dashboard and portfolio totals, summary cards, and performance charts. Amounts are converted from each security's trading currency using daily exchange rates. |
 
+<!-- SCREENSHOT: Locale Options section of Manage Profile with the Display Currency drop-down open. -->
+<!-- ![The Locale Options section with Locale and Display Currency](images/account-settings-locale-currency.png) -->
+
 Changing your display currency doesn't change any stored data. It only changes how totals are presented to you, so you can switch back and forth freely. Individual holdings in the holdings table keep showing their own trading currency. See [Multiple currencies](user-guide.md#multiple-currencies) for the full picture.
 
 Your display currency is also the default currency when you create a new transaction from the Transactions page or a portfolio page.
@@ -43,6 +46,9 @@ Two-factor authentication (2FA) adds a one-time code from your phone to the sign
 4. Enter the 6-digit code from your app in the **Code** field and click **Confirm**.
 5. Investbrain shows a list of **recovery codes**. Store them somewhere safe, such as a password manager.
 
+<!-- SCREENSHOT: The 2FA setup step with QR code, setup key, and Code field. Use a throwaway account; never publish a real QR code or setup key. -->
+<!-- ![Two-factor authentication setup with QR code and confirmation code field](images/account-settings-2fa-setup.png) -->
+
 2FA isn't active until you confirm a code in step 4. If you leave the page before confirming, setup is cancelled and you can start again.
 
 ### Signing in with 2FA
@@ -62,6 +68,9 @@ If you've lost both your authenticator and your recovery codes, your instance ad
 ## Social logins
 
 If your administrator has enabled social logins, you can sign in with GitHub, Google, Facebook, or LinkedIn instead of (or as well as) your password.
+
+<!-- SCREENSHOT: Connections page Social Logins section with one connected provider and one with a Connect button. -->
+<!-- ![The Social Logins section of the Connections page](images/account-settings-social-logins.png) -->
 
 ### Connecting an account
 
@@ -87,6 +96,9 @@ Administrators: see [Social login](self-hosting.md#social-login) for setup.
 ## Authorized apps
 
 The **Authorized Apps** section on the **Connections** page lists every app and AI assistant you've given access to your account through OAuth, such as an AI assistant connected through the [MCP server](mcp.md). For each one you'll see its name, what it's allowed to do, and when you first authorized it.
+
+<!-- SCREENSHOT: Authorized Apps section with at least one MCP client (for example Claude) listed with its scope and Revoke link. -->
+<!-- ![The Authorized Apps section listing a connected AI assistant](images/account-settings-authorized-apps.png) -->
 
 Click **Revoke** to cut off an app's access immediately. The app will need to ask for your permission again to reconnect.
 

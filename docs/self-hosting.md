@@ -329,6 +329,9 @@ Administrators can open **Provider Health** from the user menu. For the last 24 
 - A breakdown per provider and method, with the last failure
 - The most recent failures with the symbol and error message
 
+<!-- SCREENSHOT: Provider Health page with some traffic: summary cards, calls-over-time chart, and the Providers table. -->
+<!-- ![The Provider Health page](images/self-hosting-provider-health.png) -->
+
 Use it to spot a provider that's failing or rate limiting you. Old failure records are cleaned up automatically.
 
 The first registered user is the administrator. To make another user an administrator, set their `admin` flag in the database:
