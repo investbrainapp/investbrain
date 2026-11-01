@@ -82,9 +82,6 @@
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/InvalidQueryError"
-          },
           "401": {
             "$ref": "#/components/responses/UnauthenticatedError"
           },
@@ -296,9 +293,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/InvalidQueryError"
           },
           "401": {
             "$ref": "#/components/responses/UnauthenticatedError"
@@ -535,9 +529,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/InvalidQueryError"
           },
           "401": {
             "$ref": "#/components/responses/UnauthenticatedError"
@@ -1133,24 +1124,8 @@
       "ServerError": {
         "description": "Server error"
       },
-      "InvalidQueryError": {
-        "description": "A requested filter or sort is not allowed",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string",
-                  "example": "Requested sort(s) `notes` is not allowed. Allowed sort(s) are `title, wishlist, created_at, updated_at`."
-                }
-              }
-            }
-          }
-        }
-      },
       "ValidationError": {
-        "description": "One or more pagination or search parameters are invalid",
+        "description": "One or more query parameters are invalid",
         "content": {
           "application/json": {
             "schema": {
@@ -1158,7 +1133,7 @@
               "properties": {
                 "message": {
                   "type": "string",
-                  "example": "The items per page field must not be greater than 100."
+                  "example": "The sort field may only contain: title, wishlist, created_at, updated_at."
                 },
                 "errors": {
                   "type": "object",
@@ -1169,8 +1144,8 @@
                     }
                   },
                   "example": {
-                    "itemsPerPage": [
-                      "The items per page field must not be greater than 100."
+                    "sort": [
+                      "The sort field may only contain: title, wishlist, created_at, updated_at."
                     ]
                   }
                 }
@@ -1229,7 +1204,7 @@
             ]
           }
         },
-        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 400 error."
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
       },
       "portfolioFilter": {
         "in": "query",
@@ -1253,7 +1228,7 @@
             }
           }
         },
-        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 400 error."
+        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 422 validation error."
       },
       "transactionSort": {
         "in": "query",
@@ -1284,7 +1259,7 @@
             ]
           }
         },
-        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 400 error."
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
       },
       "transactionFilter": {
         "in": "query",
@@ -1322,7 +1297,7 @@
             }
           }
         },
-        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 400 error."
+        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 422 validation error."
       },
       "holdingSort": {
         "in": "query",
@@ -1353,7 +1328,7 @@
             ]
           }
         },
-        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 400 error."
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
       },
       "holdingFilter": {
         "in": "query",
@@ -1377,7 +1352,7 @@
             }
           }
         },
-        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 400 error."
+        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 422 validation error."
       },
       "portfolioSearch": {
         "in": "query",

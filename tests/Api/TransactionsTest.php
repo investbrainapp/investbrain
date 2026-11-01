@@ -144,8 +144,8 @@ class TransactionsTest extends ApiTestCase
         $response = $this->actingAs($this->user)
             ->getJson(route('api.transaction.index', ['sort' => $sort]));
 
-        $response->assertBadRequest()
-            ->assertJsonPath('message', "Requested sort(s) `{$sort}` is not allowed. Allowed sort(s) are `symbol, transaction_type, quantity, cost_basis, sale_price, date, created_at, updated_at`.");
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['sort' => 'The sort field may only contain: symbol, transaction_type, quantity, cost_basis, sale_price, date, created_at, updated_at.']);
     }
 
     public function test_rejects_filtering_by_a_column_that_is_not_filterable()
@@ -153,8 +153,8 @@ class TransactionsTest extends ApiTestCase
         $response = $this->actingAs($this->user)
             ->getJson(route('api.transaction.index', ['filter' => ['cost_basis' => '100']]));
 
-        $response->assertBadRequest()
-            ->assertJsonPath('message', 'Requested filter(s) `cost_basis` are not allowed. Allowed filter(s) are `symbol, portfolio_id, transaction_type, currency, split, reinvested_dividend`.');
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['filter' => 'The filter field may only contain: symbol, portfolio_id, transaction_type, currency, split, reinvested_dividend.']);
     }
 
     public function test_rejects_search_that_is_not_a_string()
