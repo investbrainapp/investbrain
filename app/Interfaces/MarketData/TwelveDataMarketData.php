@@ -44,6 +44,11 @@ class TwelveDataMarketData implements MarketDataInterface
         return (bool) $this->quote($symbol);
     }
 
+    public function search(string $query): Collection
+    {
+        throw new \Exception('Symbol search is not supported by Twelve Data');
+    }
+
     public function quote(string $symbol): Quote
     {
 
