@@ -213,7 +213,7 @@ class DailyChangeTest extends TestCase
 
         $first_date = DailyChange::min('date');
 
-        $this->assertEquals($transactions->min('date')->next(Carbon::MONDAY)->startOfDay()->toDateString(), $first_date);
+        $this->assertEquals($this->firstWeekdayOnOrAfter($transactions->min('date')), $first_date);
 
         // 2. test daily change will fill when new transaction pre-dates earliest daily change
         config()->set('app.env', 'local');
@@ -230,7 +230,7 @@ class DailyChangeTest extends TestCase
 
         $second_date = DailyChange::min('date');
 
-        $this->assertEquals($second_transaction->date->next(Carbon::MONDAY)->toDateString(), $second_date);
+        $this->assertEquals($this->firstWeekdayOnOrAfter($second_transaction->date), $second_date);
 
         // 3. test daily change will fill when new transaction is between earliest daily change and earliest transaction
         $third_transaction = Transaction::create([
@@ -248,5 +248,14 @@ class DailyChangeTest extends TestCase
         $this->assertNotNull($daily_change_day_after);
         $this->assertNotNull($daily_change_day_before);
         $this->assertEquals(39.89, $daily_change_day_after->total_cost_basis - $daily_change_day_before->total_cost_basis);
+    }
+
+    /**
+     * Daily changes are only recorded on weekdays, so the first one lands on
+     * the given date when it is a weekday, otherwise on the following Monday.
+     */
+    private function firstWeekdayOnOrAfter(Carbon $date): string
+    {
+        return ($date->isWeekday() ? $date->copy() : $date->copy()->nextWeekday())->toDateString();
     }
 }
