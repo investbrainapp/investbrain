@@ -73,4 +73,5 @@ return [
     //
     'enabled_login_providers' => env('ENABLED_LOGIN_PROVIDERS', ''),
     'ai_chat_enabled' => env('AI_CHAT_ENABLED', false),
+    'mcp_server_enabled' => env('MCP_SERVER_ENABLED', true),
 ];
