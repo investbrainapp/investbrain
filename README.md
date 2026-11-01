@@ -87,6 +87,8 @@ Authentication uses OAuth. Your assistant will discover and register itself auto
 
 > Note: Set `APP_URL` to the public URL your assistant can reach (HTTPS for most hosted assistants). The default of `http://localhost:8000` only works for local assistants.
 
+The MCP server is enabled by default. To turn it off, set `MCP_SERVER_ENABLED=false`.
+
 ## Market data providers
 
 Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as [Yahoo Finance](https://finance.yahoo.com/), [Twelve Data](https://twelvedata.com), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), [Alpaca](https://alpaca.markets/), and [Alpha Vantage](https://www.alphavantage.co/support/). The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
@@ -166,6 +168,7 @@ There are several optional configurations available when installing using the re
 | MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
 | APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
 | AI_CHAT_ENABLED | Whether to enable AI chat features | `false` |
+| MCP_SERVER_ENABLED | Whether to enable the built-in MCP server | `true` |
 | CHAT_PROVIDER | Which chat provider to use (one of `openai`, `anthropic`, `gemini`, `azure`, `groq`, `xai`, `deepseek`, `mistral`, `ollama`) | `openai` |
 | CHAT_MODEL | The selected LLM used for AI chat | defaults to current smartest model from lab |
 | ANTHROPIC_API_KEY | If using Anthropic for chat | `null` |
