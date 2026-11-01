@@ -14,7 +14,12 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 
 <p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/screenshot.png" width="100%" alt="Investbrain Screenshot"></a></p>
 
+## Documentation
+
+Full documentation lives in the [docs](docs/README.md) folder, including the [user guide](docs/user-guide.md), [account settings](docs/account-settings.md), [import / export](docs/import-export.md), the [REST API](docs/api.md), the [MCP server](docs/mcp.md), [self-hosting](docs/self-hosting.md), and [troubleshooting](docs/troubleshooting.md).
+
 ## Table of contents
+- [Documentation](#documentation)
 - [Under the hood](#under-the-hood)
 - [Install (self hosting)](#self-hosting)
 - [Chat with your holdings](#chat-with-your-holdings)
