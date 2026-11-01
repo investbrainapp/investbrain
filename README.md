@@ -20,6 +20,7 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 - [Chat with your holdings](#chat-with-your-holdings)
 - [Connect AI assistants (MCP)](#connect-ai-assistants-mcp)
 - [Market data providers](#market-data-providers)
+- [Custom currencies](#custom-currencies)
 - [Import / Export](#import--export)
 - [Configuration](#configuration)
 - [Updating](#updating)
@@ -137,6 +138,37 @@ MARKET_DATA_PROVIDER=yahoo,alphavantage,custom_provider
 ```
 
 Feel free to submit a PR with any custom providers you create.
+
+## Custom currencies
+
+Investbrain ships with a seeded list of common currencies and pulls FX rates from [Frankfurter](https://www.frankfurter.app/). You can add any other ISO 4217 currency that Frankfurter supports by inserting a row into the `currencies` table. There is no UI for this yet.
+
+**1. Confirm the currency is on Frankfurter**
+
+Check the [Frankfurter currencies list](https://api.frankfurter.app/currencies) (for example `PLN` for Polish złoty).
+
+**2. Insert the currency**
+
+Using the Docker Compose stack:
+
+```bash
+docker exec -it investbrain-pgsql psql -U investbrain -d investbrain -c \
+  "INSERT INTO currencies (currency, label, created_at, updated_at) VALUES ('PLN', 'Polish Złoty', NOW(), NOW()) ON CONFLICT (currency) DO NOTHING;"
+```
+
+Or via Tinker:
+
+```bash
+docker exec -it investbrain-app php artisan tinker --execute="App\Models\Currency::firstOrCreate(['currency' => 'PLN'], ['label' => 'Polish Złoty']);"
+```
+
+**3. Refresh exchange rates**
+
+```bash
+docker exec -it investbrain-app php artisan refresh:currency-data
+```
+
+After that, the new currency appears in default-currency settings and on the create-transaction form. You can also `DELETE` unused rows from `currencies` if you only want a smaller list. Currency aliases (e.g. `GBX` → `GBP`) are configured separately in `config/investbrain.php` under `currency_aliases`.
 
 ## Import / Export
 
