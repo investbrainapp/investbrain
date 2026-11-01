@@ -10,6 +10,7 @@ use App\Models\User;
 use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class TransactionsTest extends ApiTestCase
 {
@@ -66,6 +67,112 @@ class TransactionsTest extends ApiTestCase
     public function test_cannot_access_transactions_when_unauthenticated()
     {
         $this->getJson(route('api.transaction.index'))->assertUnauthorized();
+    }
+
+    public function test_can_filter_transactions_by_column()
+    {
+        $this->actingAs($this->user);
+        Transaction::factory(2)->buy()->symbol('AAPL')->portfolio($this->portfolio->id)->create();
+        Transaction::factory()->buy()->symbol('GOOG')->portfolio($this->portfolio->id)->create();
+
+        $response = $this->getJson(route('api.transaction.index', ['filter' => ['symbol' => 'AAPL']]));
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.symbol', 'AAPL')
+            ->assertJsonPath('data.1.symbol', 'AAPL');
+    }
+
+    public function test_filter_with_comma_separated_values_matches_any_value()
+    {
+        $this->actingAs($this->user);
+        Transaction::factory()->buy()->symbol('AAPL')->portfolio($this->portfolio->id)->create();
+        Transaction::factory()->buy()->symbol('GOOG')->portfolio($this->portfolio->id)->create();
+        Transaction::factory()->buy()->symbol('AMZN')->portfolio($this->portfolio->id)->create();
+
+        $response = $this->getJson(route('api.transaction.index', ['filter' => ['symbol' => 'AAPL,GOOG'], 'sort' => 'symbol']));
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.symbol', 'AAPL')
+            ->assertJsonPath('data.1.symbol', 'GOOG');
+    }
+
+    public function test_filtering_by_another_users_portfolio_returns_no_transactions()
+    {
+        $otherUser = User::factory()->create();
+        $this->actingAs($otherUser);
+        $otherTransaction = Transaction::factory()->buy()->create();
+
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.transaction.index', ['filter' => ['portfolio_id' => $otherTransaction->portfolio_id]]));
+
+        $response->assertOk()->assertJsonCount(0, 'data');
+    }
+
+    public function test_can_search_transactions()
+    {
+        $this->actingAs($this->user);
+        Transaction::factory()->buy()->symbol('AAPL')->portfolio($this->portfolio->id)->create();
+        Transaction::factory()->buy()->symbol('GOOG')->portfolio($this->portfolio->id)->create();
+
+        $response = $this->getJson(route('api.transaction.index', ['search' => 'AP']));
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.symbol', 'AAPL');
+    }
+
+    public function test_can_sort_transactions_descending()
+    {
+        $this->actingAs($this->user);
+        Transaction::factory()->buy(3)->symbol('AAPL')->portfolio($this->portfolio->id)->create();
+        Transaction::factory()->buy(1)->symbol('AAPL')->portfolio($this->portfolio->id)->create();
+        Transaction::factory()->buy(2)->symbol('AAPL')->portfolio($this->portfolio->id)->create();
+
+        $response = $this->getJson(route('api.transaction.index', ['sort' => '-quantity']));
+
+        $response->assertOk();
+        $this->assertSame([3, 2, 1], array_map('intval', array_column($response->json('data'), 'quantity')));
+    }
+
+    #[TestWith(['portfolio_id'])]
+    #[TestWith(['symbol; DROP TABLE transactions'])]
+    #[TestWith(['market_data.name'])]
+    public function test_rejects_sorting_by_a_column_that_is_not_sortable(string $sort)
+    {
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.transaction.index', ['sort' => $sort]));
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['sort' => 'The sort field may only contain: symbol, transaction_type, quantity, cost_basis, sale_price, date, created_at, updated_at.']);
+    }
+
+    public function test_rejects_filtering_by_a_column_that_is_not_filterable()
+    {
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.transaction.index', ['filter' => ['cost_basis' => '100']]));
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['filter' => 'The filter field may only contain: symbol, portfolio_id, transaction_type, currency, split, reinvested_dividend.']);
+    }
+
+    public function test_rejects_search_that_is_not_a_string()
+    {
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.transaction.index', ['search' => ['AAPL']]));
+
+        $response->assertUnprocessable()->assertJsonValidationErrors(['search']);
+    }
+
+    #[TestWith(['101'])]
+    #[TestWith(['-1'])]
+    public function test_rejects_items_per_page_outside_allowed_range(string $itemsPerPage)
+    {
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.transaction.index', ['itemsPerPage' => $itemsPerPage]));
+
+        $response->assertUnprocessable()->assertJsonValidationErrors(['itemsPerPage']);
     }
 
     public function test_can_create_transaction()

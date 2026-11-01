@@ -1,0 +1,1407 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "2.0.0",
+    "title": "Investbrain API",
+    "description": "Investbrain is a smart open-source investment tracker that consolidates and monitors market performance across your different brokerages.",
+    "termsOfService": "https://investbra.in/terms",
+    "contact": {
+      "url": "https://github.com/investbrainapp/investbrain",
+      "name": "GitHub"
+    }
+  },
+  "tags": [
+    {
+      "name": "Portfolios",
+      "description": ""
+    },
+    {
+      "name": "Transactions",
+      "description": ""
+    },
+    {
+      "name": "Holdings",
+      "description": ""
+    },
+    {
+      "name": "Market Data",
+      "description": ""
+    },
+    {
+      "name": "User",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/portfolio": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/itemsPerPage"
+          },
+          {
+            "$ref": "#/components/parameters/portfolioSort"
+          },
+          {
+            "$ref": "#/components/parameters/portfolioSearch"
+          },
+          {
+            "$ref": "#/components/parameters/portfolioFilter"
+          }
+        ],
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Retrieve a paginated list of your portfolios",
+        "responses": {
+          "200": {
+            "description": "List of portfolios matching the provided filter criteria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Paginated"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Portfolio"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Create a new portfolio",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Portfolio"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "title"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returns the newly created portfolio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/portfolio/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Unique ID of the portfolio",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Retrieve a single portfolio",
+        "responses": {
+          "200": {
+            "description": "Portfolio matching the provided ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Update a portfolio",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Portfolio"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the updated portfolio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Delete a portfolio",
+        "responses": {
+          "204": {
+            "description": "Portfolio successfully deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/transaction": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/itemsPerPage"
+          },
+          {
+            "$ref": "#/components/parameters/transactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/transactionSearch"
+          },
+          {
+            "$ref": "#/components/parameters/transactionFilter"
+          }
+        ],
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Retrieve a paginated list of your transactions",
+        "responses": {
+          "200": {
+            "description": "List of transactions matching the provided filter criteria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Paginated"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Transaction"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Create a new transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Transaction"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "symbol",
+                      "portfolio_id",
+                      "transaction_type",
+                      "quantity",
+                      "date"
+                    ],
+                    "oneOf": [
+                      {
+                        "properties": {
+                          "cost_basis": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "sale_price": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returns the newly created transaction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/transaction/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Unique ID of the transaction",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Retrieve a single transaction",
+        "responses": {
+          "200": {
+            "description": "Transaction matching the provided ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Update a transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transaction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the updated transaction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Delete a transaction",
+        "responses": {
+          "204": {
+            "description": "Transaction successfully deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/holding": {
+      "get": {
+        "tags": [
+          "Holdings"
+        ],
+        "summary": "Retrieve a paginated list of your holdings",
+        "description": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/itemsPerPage"
+          },
+          {
+            "$ref": "#/components/parameters/holdingSort"
+          },
+          {
+            "$ref": "#/components/parameters/holdingSearch"
+          },
+          {
+            "$ref": "#/components/parameters/holdingFilter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of holdings matching the provided filter criteria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Paginated"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Holding"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/holding/{portfolio-id}/{symbol}": {
+      "parameters": [
+        {
+          "name": "portfolio-id",
+          "in": "path",
+          "required": true,
+          "description": "Unique ID of the portfolio",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "symbol",
+          "in": "path",
+          "required": true,
+          "description": "Ticker symbol",
+          "schema": {
+            "type": "string",
+            "example": "AAPL"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Holdings"
+        ],
+        "summary": "Retrieve a specific holding",
+        "responses": {
+          "200": {
+            "description": "Returns the holding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Holding"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Holdings"
+        ],
+        "summary": "Configure options for a specific holding",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Holding"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the updated holding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Holding"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/market-data/{symbol}": {
+      "parameters": [
+        {
+          "name": "symbol",
+          "in": "path",
+          "required": true,
+          "description": "Ticker symbol",
+          "schema": {
+            "type": "string",
+            "example": "AAPL"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Market Data"
+        ],
+        "summary": "Get latest market data for symbol",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Latest market data for the provided symbol",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketData"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Currently authenticated user's profile information",
+        "responses": {
+          "200": {
+            "description": "User's profile information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "example": "John Q. Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "profile_photo_url": {
+            "type": "string",
+            "format": "url",
+            "example": "https://...",
+            "readOnly": true
+          },
+          "options": {
+            "type": "object",
+            "properties": {
+              "display_currency": {
+                "type": "string",
+                "example": "USD"
+              },
+              "locale": {
+                "type": "string",
+                "example": "en_US"
+              }
+            },
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "Portfolio": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "title": {
+            "type": "string",
+            "example": "My Investments"
+          },
+          "notes": {
+            "type": "string",
+            "example": ""
+          },
+          "wishlist": {
+            "type": "boolean"
+          },
+          "owner": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              },
+              {
+                "type": "object",
+                "readOnly": true
+              }
+            ]
+          },
+          "transactions": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          },
+          "holdings": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Holding"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "symbol": {
+            "type": "string",
+            "example": "AAPL"
+          },
+          "portfolio_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "transaction_type": {
+            "type": "string",
+            "enum": [
+              "BUY",
+              "SELL"
+            ]
+          },
+          "quantity": {
+            "type": "number",
+            "format": "float",
+            "example": 5
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "cost_basis": {
+            "type": "number",
+            "format": "float",
+            "example": 200
+          },
+          "sale_price": {
+            "type": "number"
+          },
+          "split": {
+            "type": "boolean",
+            "example": false
+          },
+          "reinvested_dividend": {
+            "type": "boolean",
+            "example": false
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "Holding": {
+        "type": "object",
+        "readOnly": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "portfolio_id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "symbol": {
+            "type": "string",
+            "example": "AAPL",
+            "readOnly": true
+          },
+          "quantity": {
+            "type": "number",
+            "example": 5,
+            "readOnly": true
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD",
+            "readOnly": true
+          },
+          "reinvest_dividends": {
+            "type": "boolean",
+            "example": false
+          },
+          "average_cost_basis": {
+            "type": "number",
+            "format": "float",
+            "example": 238.92,
+            "readOnly": true
+          },
+          "total_cost_basis": {
+            "type": "number",
+            "format": "float",
+            "example": 1194.6,
+            "readOnly": true
+          },
+          "realized_gain_dollars": {
+            "type": "number",
+            "example": 0,
+            "readOnly": true
+          },
+          "dividends_earned": {
+            "type": "number",
+            "format": "float",
+            "example": 1.4,
+            "readOnly": true
+          },
+          "splits_synced_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "total_market_value": {
+            "type": "number",
+            "format": "float",
+            "example": 9072.36,
+            "readOnly": true
+          },
+          "market_gain_dollars": {
+            "type": "number",
+            "format": "float",
+            "example": 7877.76,
+            "readOnly": true
+          },
+          "market_gain_percent": {
+            "type": "number",
+            "format": "float",
+            "example": 85.75,
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "MarketData": {
+        "type": "object",
+        "readOnly": true,
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "example": "AAPL",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "example": "Apple Inc.",
+            "readOnly": true
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD",
+            "readOnly": true
+          },
+          "market_value": {
+            "type": "number",
+            "format": "float",
+            "example": 221.46,
+            "readOnly": true
+          },
+          "fifty_two_week_low": {
+            "type": "number",
+            "format": "float",
+            "example": 164.08,
+            "readOnly": true
+          },
+          "fifty_two_week_high": {
+            "type": "number",
+            "format": "float",
+            "example": 260.1,
+            "readOnly": true
+          },
+          "last_dividend_date": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "last_dividend_amount": {
+            "type": "number",
+            "format": "float",
+            "example": 0.25,
+            "readOnly": true
+          },
+          "dividend_yield": {
+            "type": "number",
+            "format": "float",
+            "example": 0.426124,
+            "readOnly": true
+          },
+          "market_cap": {
+            "type": "integer",
+            "example": 3330293366784,
+            "readOnly": true
+          },
+          "trailing_pe": {
+            "type": "number",
+            "format": "float",
+            "example": 36.4843,
+            "readOnly": true
+          },
+          "forward_pe": {
+            "type": "number",
+            "format": "float",
+            "example": 26.6498,
+            "readOnly": true
+          },
+          "book_value": {
+            "type": "number",
+            "format": "float",
+            "example": 3.767,
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "Paginated": {
+        "x-internal": true,
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {}
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "first": {
+                "type": "string",
+                "format": "url",
+                "example": "https://..."
+              },
+              "last": {
+                "type": "string",
+                "format": "url",
+                "example": "https://..."
+              },
+              "next": {
+                "type": "string",
+                "format": "url",
+                "example": "https://..."
+              },
+              "prev": {
+                "type": "string",
+                "format": "url",
+                "example": "https://..."
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "format": "url",
+                "example": "https://..."
+              },
+              "current_page": {
+                "type": "integer",
+                "example": 1
+              },
+              "last_page": {
+                "type": "integer",
+                "example": 5
+              },
+              "per_page": {
+                "type": "integer",
+                "example": 10
+              },
+              "total": {
+                "type": "integer",
+                "example": 50
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "UnauthenticatedError": {
+        "description": "Token not provided or invalid"
+      },
+      "UnauthorizedError": {
+        "description": "Action not permitted"
+      },
+      "NotFoundError": {
+        "description": "Resource not found"
+      },
+      "ServerError": {
+        "description": "Server error"
+      },
+      "ValidationError": {
+        "description": "One or more query parameters are invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "The sort field may only contain: title, wishlist, created_at, updated_at."
+                },
+                "errors": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "sort": [
+                      "The sort field may only contain: title, wishlist, created_at, updated_at."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api_token": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "parameters": {
+      "page": {
+        "in": "query",
+        "name": "page",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "description": "The requested page number"
+      },
+      "itemsPerPage": {
+        "in": "query",
+        "name": "itemsPerPage",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 15
+        },
+        "description": "The number of items to include per page (maximum 100)"
+      },
+      "portfolioSort": {
+        "in": "query",
+        "name": "sort",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "title",
+              "-title",
+              "wishlist",
+              "-wishlist",
+              "created_at",
+              "-created_at",
+              "updated_at",
+              "-updated_at"
+            ]
+          }
+        },
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
+      },
+      "portfolioFilter": {
+        "in": "query",
+        "name": "filter",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "wishlist": {
+              "type": "boolean"
+            },
+            "holdings.symbol": {
+              "type": "string",
+              "description": "Portfolios holding any of the given ticker symbols",
+              "example": "AAPL,MSFT"
+            }
+          }
+        },
+        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 422 validation error."
+      },
+      "transactionSort": {
+        "in": "query",
+        "name": "sort",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "symbol",
+              "-symbol",
+              "transaction_type",
+              "-transaction_type",
+              "quantity",
+              "-quantity",
+              "cost_basis",
+              "-cost_basis",
+              "sale_price",
+              "-sale_price",
+              "date",
+              "-date",
+              "created_at",
+              "-created_at",
+              "updated_at",
+              "-updated_at"
+            ]
+          }
+        },
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
+      },
+      "transactionFilter": {
+        "in": "query",
+        "name": "filter",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "example": "AAPL"
+            },
+            "portfolio_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "transaction_type": {
+              "type": "string",
+              "enum": [
+                "BUY",
+                "SELL"
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "example": "USD"
+            },
+            "split": {
+              "type": "boolean"
+            },
+            "reinvested_dividend": {
+              "type": "boolean"
+            }
+          }
+        },
+        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 422 validation error."
+      },
+      "holdingSort": {
+        "in": "query",
+        "name": "sort",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "symbol",
+              "-symbol",
+              "quantity",
+              "-quantity",
+              "average_cost_basis",
+              "-average_cost_basis",
+              "total_cost_basis",
+              "-total_cost_basis",
+              "realized_gain_dollars",
+              "-realized_gain_dollars",
+              "dividends_earned",
+              "-dividends_earned",
+              "created_at",
+              "-created_at",
+              "updated_at",
+              "-updated_at"
+            ]
+          }
+        },
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
+      },
+      "holdingFilter": {
+        "in": "query",
+        "name": "filter",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "example": "AAPL"
+            },
+            "portfolio_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "reinvest_dividends": {
+              "type": "boolean"
+            }
+          }
+        },
+        "description": "Filter the results using `filter[name]=value`. Separate multiple values with commas to match any of them (e.g. `filter[symbol]=AAPL,MSFT`). Unsupported filter names return a 422 validation error."
+      },
+      "portfolioSearch": {
+        "in": "query",
+        "name": "search",
+        "schema": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": "Case-insensitive partial match against `title`, `notes`"
+      },
+      "transactionSearch": {
+        "in": "query",
+        "name": "search",
+        "schema": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": "Case-insensitive partial match against `symbol`"
+      },
+      "holdingSearch": {
+        "in": "query",
+        "name": "search",
+        "schema": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": "Case-insensitive partial match against `symbol`"
+      }
+    }
+  },
+  "security": [
+    {
+      "api_token": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://investbra.in/api",
+      "description": "Investbrain Cloud API"
+    },
+    {
+      "url": "https://{base_url}/api",
+      "description": "Self-hosted Investbrain API",
+      "variables": {
+        "base_url": {
+          "default": "localhost:8000",
+          "description": "Location of your self-hosted Investbrain instance"
+        }
+      }
+    }
+  ]
+}

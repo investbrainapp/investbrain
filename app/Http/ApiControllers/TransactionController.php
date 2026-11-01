@@ -10,21 +10,33 @@ use App\Actions\Transaction\UpdateTransaction;
 use App\Http\ApiControllers\Controller as ApiController;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
-use HackerEsq\FilterModels\FilterModels;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class TransactionController extends ApiController
 {
-    public function index(FilterModels $filters)
+    public function index(Request $request)
     {
+        $query = Transaction::myTransactions()->with(['market_data'])
+            ->tap($this->search($request, ['symbol']));
 
-        $filters->setQuery(Transaction::query());
-        $filters->setScopes(['myTransactions']);
-        $filters->setEagerRelations(['market_data']);
-        $filters->setSearchableColumns(['symbol']);
+        $transactions = QueryBuilder::for($query, $request)
+            ->allowedFilters(
+                AllowedFilter::exact('symbol'),
+                AllowedFilter::exact('portfolio_id'),
+                AllowedFilter::exact('transaction_type'),
+                AllowedFilter::exact('currency'),
+                AllowedFilter::exact('split'),
+                AllowedFilter::exact('reinvested_dividend'),
+            )
+            ->allowedSorts('symbol', 'transaction_type', 'quantity', 'cost_basis', 'sale_price', 'date', 'created_at', 'updated_at')
+            ->orderBy('transactions.id')
+            ->paginate($this->itemsPerPage($request))
+            ->withQueryString();
 
-        return TransactionResource::collection($filters->paginated());
+        return TransactionResource::collection($transactions);
     }
 
     public function store(Request $request, CreateTransaction $action)

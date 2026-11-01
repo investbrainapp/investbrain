@@ -62,6 +62,19 @@ class HoldingsTest extends ApiTestCase
         $this->getJson(route('api.holding.index'))->assertUnauthorized();
     }
 
+    public function test_can_filter_holdings_by_portfolio()
+    {
+        $this->actingAs($this->user);
+        $transaction = Transaction::factory()->buy()->symbol('AAPL')->create();
+        Transaction::factory()->buy()->symbol('AAPL')->create();
+
+        $response = $this->getJson(route('api.holding.index', ['filter' => ['portfolio_id' => $transaction->portfolio_id]]));
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.portfolio_id', $transaction->portfolio_id);
+    }
+
     public function test_can_show_a_holding()
     {
         $this->actingAs($this->user);

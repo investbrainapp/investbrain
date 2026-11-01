@@ -10,7 +10,7 @@
     ],
     "license": "CC-BY-NC 4.0",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
@@ -18,7 +18,6 @@
         "blade-ui-kit/blade-heroicons": "^2.6",
         "filament/tables": "^5.0",
         "finnhub/client": "master@dev",
-        "hackeresq/filter-models": "dev-main",
         "investbrainapp/frankfurter-client": "dev-main",
         "laravel/ai": "^0.2.5",
         "laravel/fortify": "^1.30.0",
@@ -35,6 +34,7 @@
         "phpoffice/phpspreadsheet": "^5.10",
         "predis/predis": "^2.2",
         "scheb/yahoo-finance-api": "^5.0",
+        "spatie/laravel-query-builder": "^7.3",
         "staudenmeir/eloquent-has-many-deep": "^1.20",
         "symfony/cache": "^7.3",
         "tschucki/alphavantage-laravel": "^0.0"
@@ -48,11 +48,6 @@
         "phpunit/phpunit": "^12.0"
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "no-api": true,
-            "url": "https://github.com/hackeresq/filter-models"
-        },
         {
             "type": "vcs",
             "no-api": true,

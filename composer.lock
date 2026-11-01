@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33a61842cc9ff3f474dd687190b5a7bc",
+    "content-hash": "684382af49898f19e26f418e8975c9c7",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2472,50 +2472,6 @@
                 }
             ],
             "time": "2026-08-24T17:13:02+00:00"
-        },
-        {
-            "name": "hackeresq/filter-models",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hackeresq/filter-models",
-                "reference": "73589f07e605b6da362437c29491140b127a6dcd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hackeresq/filter-models/zipball/73589f07e605b6da362437c29491140b127a6dcd",
-                "reference": "73589f07e605b6da362437c29491140b127a6dcd",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^11.0||^12.0||^13.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^9.9",
-                "phpunit/phpunit": "^10.0||^11.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "HackerEsq\\FilterModels\\FilterModelsServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "HackerEsq\\FilterModels\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "HackerESQ\\FilterModels\\Tests\\": "tests"
-                }
-            },
-            "description": "Simple package to filter your Laravel models with query parameters",
-            "time": "2026-03-24T18:50:25+00:00"
         },
         {
             "name": "investbrainapp/frankfurter-client",
@@ -8009,6 +7965,81 @@
                 }
             ],
             "time": "2026-09-28T07:16:50+00:00"
+        },
+        {
+            "name": "spatie/laravel-query-builder",
+            "version": "7.3.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-query-builder.git",
+                "reference": "99cad9ffaabe626f430c8f4e4d8e10c86c77fd25"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-query-builder/zipball/99cad9ffaabe626f430c8f4e4d8e10c86c77fd25",
+                "reference": "99cad9ffaabe626f430c8f4e4d8e10c86c77fd25",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^12.0|^13.0",
+                "illuminate/http": "^12.0|^13.0",
+                "illuminate/support": "^12.0|^13.0",
+                "php": "^8.4",
+                "spatie/laravel-package-tools": "^1.11"
+            },
+            "require-dev": {
+                "ext-json": "*",
+                "larastan/larastan": "^3.3",
+                "mockery/mockery": "^1.4",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^4.7|^5.3",
+                "phpunit/phpunit": "^12.5|^13.4",
+                "spatie/invade": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\QueryBuilder\\QueryBuilderServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\QueryBuilder\\": "src",
+                    "Spatie\\QueryBuilder\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alex Vanderbist",
+                    "email": "alex@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Easily build Eloquent queries from API requests",
+            "homepage": "https://github.com/spatie/laravel-query-builder",
+            "keywords": [
+                "laravel-query-builder",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-query-builder/issues",
+                "source": "https://github.com/spatie/laravel-query-builder"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                }
+            ],
+            "time": "2026-10-26T11:47:01+00:00",
+            "published-time": "2026-10-26T12:23:56+00:00"
         },
         {
             "name": "spatie/shiki-php",
@@ -14930,13 +14961,12 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "finnhub/client": 20,
-        "hackeresq/filter-models": 20,
         "investbrainapp/frankfurter-client": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.3",
+        "php": "^8.4",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
