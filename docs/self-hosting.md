@@ -318,7 +318,7 @@ Here Yahoo Finance is tried first, then Finnhub if Yahoo fails, then Alpha Vanta
 
 ### Custom providers
 
-Developers can add a provider by implementing [`MarketDataInterface`](../app/Interfaces/MarketData/MarketDataInterface.php) (use one of the existing implementations in the same folder as a guide), registering it under `interfaces` in [`config/investbrain.php`](../config/investbrain.php), and adding its key to `MARKET_DATA_PROVIDER`. Pull requests for new providers are welcome.
+You can add support for another data source by writing a provider class. See [Developing market data providers](market-data-providers.md) for the interface, a complete example, testing, and how to contribute it. Pull requests for new providers are welcome.
 
 ## Monitoring market data providers
 

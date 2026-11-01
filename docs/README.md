@@ -20,6 +20,11 @@ This folder documents everything Investbrain can do, from day-to-day use to runn
 - [Self-hosting](self-hosting.md) - installing with the supported Docker Compose file, configuration, reverse proxies, updates, backups, and command line utilities
 - [Troubleshooting](troubleshooting.md) - fixes for the most common problems
 
+## Developing Investbrain
+
+- [Contributing](contributing.md) - how the project is built, setting up a development environment, coding conventions, and making pull requests
+- [Developing market data providers](market-data-providers.md) - writing, testing, and contributing a new market data provider
+
 ## Getting help
 
 If something isn't covered here, search the [GitHub issues](https://github.com/investbrainapp/investbrain/issues) or open a new one. Security issues should be reported privately through [GitHub security advisories](https://github.com/investbrainapp/investbrain/security/advisories/new).

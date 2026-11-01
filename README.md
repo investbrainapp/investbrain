@@ -16,7 +16,7 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 
 ## Documentation
 
-Full documentation lives in the [docs](docs/README.md) folder, including the [user guide](docs/user-guide.md), [account settings](docs/account-settings.md), [import / export](docs/import-export.md), the [REST API](docs/api.md), the [MCP server](docs/mcp.md), [self-hosting](docs/self-hosting.md), and [troubleshooting](docs/troubleshooting.md).
+Full documentation lives in the [docs](docs/README.md) folder, including the [user guide](docs/user-guide.md), [account settings](docs/account-settings.md), [import / export](docs/import-export.md), the [REST API](docs/api.md), the [MCP server](docs/mcp.md), [self-hosting](docs/self-hosting.md), [troubleshooting](docs/troubleshooting.md), [contributing](docs/contributing.md), and [developing market data providers](docs/market-data-providers.md).
 
 ## Table of contents
 - [Documentation](#documentation)
@@ -284,7 +284,7 @@ We appreciate any contributions to Investbrain! Please open a pull request on ou
 - Additional translations
 - Fix bugs
 
-When you submit a contribution, don't forget to include passing tests with your PR!
+When you submit a contribution, don't forget to include passing tests with your PR! See the [contributing guide](docs/contributing.md) for how to set up a development environment and what we look for in a pull request, and [developing market data providers](docs/market-data-providers.md) if you're adding a provider.
 
 ## Code of Conduct
 
