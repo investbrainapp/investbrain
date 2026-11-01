@@ -569,33 +569,14 @@ class MultiCurrencyTest extends TestCase
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
         $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_market_gain, 0.01);
 
-        // add currency rates
-        $rates = collect([[
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => $fiveWeeksAgo,
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => $fiveDaysAgo,
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => $monthAgo,
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => now()->subDay()->toDateString(),
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => now()->toDateString(),
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => now()->addDay()->toDateString(),
-        ]]);
-        $rates->each(fn ($rate) => CurrencyRate::create($rate));
+        // add a rate for every calendar day, as the daily currency refresh does in production
+        foreach (CarbonPeriod::create($fiveWeeksAgo, now()->addDay()) as $date) {
+            CurrencyRate::create([
+                'currency' => 'GBP',
+                'rate' => .88,
+                'date' => $date->toDateString(),
+            ]);
+        }
 
         // switch user display currency
         $user->options = array_merge($user->options ?? [], [
