@@ -30,19 +30,19 @@ new class extends Component
             ]) }}"
         >
 
-            <x-slot:value class="flex items-center">
-
+            <x-slot:value>
                 {{ $holding->market_data?->name }} ({{ $holding->symbol }})
-
-                <x-ui.gain-loss-arrow-badge 
-                    :cost-basis="$holding->average_cost_basis"
-                    :market-value="$holding->market_data->market_value"
-                />
-                
             </x-slot:value>
             <x-slot:sub-value>
                 {{ $holding->portfolio->title }}
             </x-slot:sub-value>
+            {{-- Keep the % badge outside the truncated name so long titles don't hide performance --}}
+            <x-slot:actions>
+                <x-ui.gain-loss-arrow-badge
+                    :cost-basis="$holding->average_cost_basis"
+                    :market-value="$holding->market_data->market_value"
+                />
+            </x-slot:actions>
         </x-ui.list-item>
     @endforeach
 </div>
