@@ -38,6 +38,8 @@ Where the assistant runs matters:
 
 You also need to set `APP_URL` to that public address. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
 
+The MCP server is on by default. If you've set `MCP_SERVER_ENABLED` to `false`, set it back to `true` first (see [Turning off the MCP server](self-hosting.md#turning-off-the-mcp-server)).
+
 ## Connecting an assistant
 
 Menus change between versions, so check your assistant's documentation if a step doesn't match exactly. In every case you only need the endpoint URL: there's no API key to paste, because sign-in happens through OAuth in your browser.
@@ -183,6 +185,9 @@ This section covers the technical details, in case you're debugging a client or 
 
 **The assistant can't reach the server, or authorization fails partway through.**
 For cloud assistants, your instance must be on the public internet over HTTPS, and `APP_URL` must be set to that public HTTPS address. The OAuth metadata is built from `APP_URL`, so a wrong value sends the assistant to an address it can't reach. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
+
+**`404 Not Found` from `/mcp`.**
+The MCP server is turned off. Set `MCP_SERVER_ENABLED` to `true` and [apply the change](self-hosting.md#applying-configuration-changes).
 
 **`403 Forbidden` from `/mcp`.**
 The token doesn't have the `mcp:use` scope. This happens if you paste a personal API token into the client. Remove any manual token or header and let the client use OAuth.

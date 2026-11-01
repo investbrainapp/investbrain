@@ -150,6 +150,12 @@ docker compose up -d
 | --- | --- | --- |
 | `BASE_CURRENCY` | The currency Investbrain stores converted values in internally. See [Currency](#currency) before changing it. | `USD` |
 
+**MCP server**
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `MCP_SERVER_ENABLED` | Turn the built-in [MCP server](mcp.md) for AI assistants on or off. See [Turning off the MCP server](#turning-off-the-mcp-server). | `true` |
+
 **AI chat**
 
 | Option | Description | Default |
@@ -289,6 +295,22 @@ curl https://investbrain.example.com/.well-known/oauth-authorization-server
 ```
 
 Every URL in the response should start with your public HTTPS address.
+
+### Turning off the MCP server
+
+The MCP server is on by default. If you don't want AI assistants to be able to connect to your instance, turn it off:
+
+```yaml
+      MCP_SERVER_ENABLED: false
+```
+
+Then [apply the change](#applying-configuration-changes). With the MCP server off:
+
+- `/mcp` returns `404 Not Found`, so assistants can't connect or use any tools.
+- The MCP discovery endpoints (`/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`) and client registration (`/oauth/register`) are turned off too, so new assistants can't register themselves.
+- The [REST API](api.md) and API tokens keep working.
+
+Assistants that were authorized before you turned it off still appear under **Connections > Authorized Apps**. They can't reach your data while the server is off, but they can reconnect without signing in again if you turn it back on, as long as their access hasn't expired. Revoke them there if you want them to sign in again.
 
 ## Market data providers
 

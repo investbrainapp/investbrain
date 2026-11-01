@@ -38,7 +38,7 @@ Investbrain is a [Laravel](https://laravel.com) application.
 
 | Area | Technology |
 | --- | --- |
-| Language | PHP 8.4+ with `declare(strict_types=1)` everywhere |
+| Language | PHP 8.4 (the version the Docker image runs) with `declare(strict_types=1)` everywhere |
 | Framework | Laravel 13 |
 | Interface | [Livewire 4](https://livewire.laravel.com) with [Volt](https://livewire.laravel.com/docs/volt) single-file components, [Alpine.js](https://alpinejs.dev), and [Filament Tables](https://filamentphp.com/docs/tables) for data tables |
 | Styling | [Tailwind CSS 4](https://tailwindcss.com) and [daisyUI 5](https://daisyui.com), built with [Vite](https://vitejs.dev) |
@@ -81,13 +81,13 @@ These steps run the app directly on your machine with PHP, and use Docker only f
 
 ### Prerequisites
 
-- **PHP 8.4 or newer** with the `gd`, `intl`, `mbstring`, `zip`, `pdo_pgsql`, and `pdo_sqlite` extensions
+- **PHP 8.4** with the `gd`, `intl`, `mbstring`, `zip`, `pdo_pgsql`, and `pdo_sqlite` extensions. This is the version the official Docker image uses, so developing on it avoids surprises when your change runs in the container.
 - **[Composer](https://getcomposer.org)**
 - **Node.js 20 or newer** and npm
 - **[Docker](https://docs.docker.com/engine/install/)**, for PostgreSQL and Redis (or install them locally if you prefer)
 - **Git**
 
-On macOS, [Laravel Herd](https://herd.laravel.com) installs PHP, Composer, and Node for you. On Linux, install PHP and the extensions from your distribution's packages.
+On macOS, [Laravel Herd](https://herd.laravel.com) installs PHP, Composer, and Node for you (choose PHP 8.4 in its settings). On Linux, install PHP and the extensions from your distribution's packages.
 
 ### 1. Fork and clone
 

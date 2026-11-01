@@ -246,6 +246,7 @@ You used a filter or sort column that isn't supported for that endpoint. The err
 
 ## MCP clients can't connect
 
+- **`404 Not Found` from `/mcp`** (or from the `/.well-known/oauth-...` discovery URLs) means the MCP server is turned off. Set `MCP_SERVER_ENABLED` to `true` and [apply the change](self-hosting.md#applying-configuration-changes). See [Turning off the MCP server](self-hosting.md#turning-off-the-mcp-server).
 - **Cloud assistants (Claude, ChatGPT)** need your instance on the public internet over HTTPS with a valid certificate. A `localhost` or LAN address only works for assistants running on your own machine.
 - **Check the OAuth metadata** from outside your network:
 
