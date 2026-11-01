@@ -20,6 +20,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Investbrain\Frankfurter\Frankfurter;
+use Investbrain\Frankfurter\FrankfurterClient;
 use Mockery;
 
 class MultiCurrencyTest extends TestCase
@@ -38,7 +39,7 @@ class MultiCurrencyTest extends TestCase
 
     public function test_perists_rates_that_after_historic_lookup()
     {
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
+        $mockClient = Mockery::mock(FrankfurterClient::class);
 
         Frankfurter::shouldReceive('setSymbols')
             ->andReturn($mockClient);
@@ -174,7 +175,7 @@ class MultiCurrencyTest extends TestCase
     public function test_can_get_historic_exchange_rates()
     {
 
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
+        $mockClient = Mockery::mock(FrankfurterClient::class);
 
         Frankfurter::shouldReceive('setSymbols')
             ->andReturn($mockClient);
@@ -320,7 +321,7 @@ class MultiCurrencyTest extends TestCase
 
     public function test_can_handle_aliases_for_historic_rates()
     {
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
+        $mockClient = Mockery::mock(FrankfurterClient::class);
 
         Frankfurter::shouldReceive('setSymbols')
             ->andReturn($mockClient);
