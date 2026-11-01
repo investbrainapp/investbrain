@@ -87,7 +87,7 @@ Authentication uses OAuth. Your assistant will discover and register itself auto
 
 > Note: Set `APP_URL` to the public URL your assistant can reach (HTTPS for most hosted assistants). The default of `http://localhost:8000` only works for local assistants.
 
-The MCP server is enabled by default. To turn it off, set `MCP_SERVER_ENABLED=false`.
+The MCP server is enabled by default. To turn it off, set `MCP_SERVER_ENABLED=false` (see [Configuration](#configuration)).
 
 ## Market data providers
 
