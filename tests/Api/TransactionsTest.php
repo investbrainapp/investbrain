@@ -229,9 +229,7 @@ class TransactionsTest extends ApiTestCase
 
         $this->actingAs($this->user);
 
-        $portfolio = Portfolio::factory()->create();
-
-        Transaction::factory(5)->buy()->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory(5)->buy()->lastYear()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
 
         $data = [
             'symbol' => 'AAPL',
@@ -247,6 +245,46 @@ class TransactionsTest extends ApiTestCase
             ->postJson(route('api.transaction.store'), $data)
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['quantity']);
+    }
+
+    public function test_can_sell_shares_bought_on_the_same_day()
+    {
+        Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+            '--force' => true,
+        ]);
+
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), [
+                'symbol' => 'AAPL',
+                'portfolio_id' => $this->portfolio->id,
+                'transaction_type' => 'BUY',
+                'quantity' => 1,
+                'currency' => 'USD',
+                'date' => '2026-04-10',
+                'cost_basis' => 100,
+            ])
+            ->assertCreated();
+
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), [
+                'symbol' => 'AAPL',
+                'portfolio_id' => $this->portfolio->id,
+                'transaction_type' => 'SELL',
+                'quantity' => 1,
+                'currency' => 'USD',
+                'date' => '2026-04-10',
+                'sale_price' => 105,
+            ])
+            ->assertCreated()
+            ->assertJsonPath('transaction_type', 'SELL');
+
+        $this->assertDatabaseHas('transactions', [
+            'portfolio_id' => $this->portfolio->id,
+            'symbol' => 'AAPL',
+            'transaction_type' => 'SELL',
+            'quantity' => 1,
+        ]);
     }
 
     public function test_can_show_a_transaction()

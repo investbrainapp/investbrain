@@ -86,11 +86,48 @@ class TransactionsTest extends TestCase
 
         $rule = new QuantityValidationRule($portfolio, $sale_transaction->symbol, 'SELL', $sale_transaction->date, $sale_transaction);
 
-        $rule->validate('quantity', $sale_transaction->quantity, function () {
-            $this->assertFalse(false, 'Not permitted to sell more than owned.');
+        $failed = false;
+        $rule->validate('quantity', $sale_transaction->quantity, function () use (&$failed) {
+            $failed = true;
         });
 
-        $this->assertTrue(true);
+        $this->assertTrue($failed, 'Not permitted to sell more than owned.');
+    }
+
+    public function test_can_sell_shares_bought_on_the_same_day(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(5)->date('2026-04-10')->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $rule = new QuantityValidationRule($portfolio, 'AAPL', 'SELL', '2026-04-10', null);
+
+        $failed = false;
+        $rule->validate('quantity', 5, function () use (&$failed) {
+            $failed = true;
+        });
+
+        $this->assertFalse($failed, 'Same-day purchases should count toward the available quantity.');
+    }
+
+    public function test_cannot_sell_more_than_bought_on_the_same_day(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(5)->date('2026-04-10')->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $rule = new QuantityValidationRule($portfolio, 'AAPL', 'SELL', '2026-04-10', null);
+
+        $failed = false;
+        $rule->validate('quantity', 6, function () use (&$failed) {
+            $failed = true;
+        });
+
+        $this->assertTrue($failed, 'Not permitted to sell more than owned.');
     }
 
     public function test_transactions_list_cannot_open_a_transaction_from_another_portfolio(): void
