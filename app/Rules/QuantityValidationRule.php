@@ -39,14 +39,14 @@ class QuantityValidationRule implements ValidationRule
             $purchase_qty = (float) $this->portfolio->transactions()
                 ->symbol($this->symbol)
                 ->buy()
-                ->whereDate('date', '<', $this->date)
+                ->beforeDate($this->date)
                 ->sum('quantity');
 
             $sales_qty = (float) $this->portfolio->transactions()
                 ->where('id', '!=', $this->transaction?->id)
                 ->symbol($this->symbol)
                 ->sell()
-                ->whereDate('date', '<', $this->date)
+                ->beforeDate($this->date)
                 ->sum('quantity');
 
             $maxQuantity = $purchase_qty - $sales_qty;
