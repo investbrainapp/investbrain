@@ -23,90 +23,128 @@ Click **Download Export**. You'll get a file named like `2026_11_01_investbrain_
 
 You can export up to three times per minute.
 
-## The workbook format
+## Importing into Investbrain
 
-The easiest way to build an import file from scratch is to click **Download import template** on the Import / Export page. It gives you an empty workbook with the right sheets and column headings.
+Investbrain imports `.xlsx` workbooks of up to 2 MB. The easiest starting point is the import template: click **Download import template** on the Import / Export page to get an empty workbook with the right sheets and headings. An Investbrain export uses the same format, so you can also add rows to an existing export and import it again.
 
 <!-- SCREENSHOT: The downloaded template open in Excel or LibreOffice with the Transactions sheet selected and the Portfolios, Transactions, Daily Changes, and Config tabs visible. -->
 <!-- ![The import template opened in a spreadsheet app, showing its four sheets](images/import-export-template-workbook.png) -->
 
-The workbook has four sheets. Sheet names and column headings must match exactly. You can leave out a sheet you don't need, and empty rows are skipped.
+### Running an import
 
-### Portfolios
-
-| Column | Required | Notes |
-| --- | --- | --- |
-| Portfolio ID | No | A UUID. If it matches a portfolio you have full access to, that portfolio is updated. If it's blank or new, a portfolio is created. |
-| Title | Yes | |
-| Notes | No | |
-| Wishlist | No | `TRUE`/`FALSE` or `1`/`0`. Defaults to false. |
-| Created, Updated | No | Included in exports for reference. Ignored on import. |
-
-### Transactions
-
-| Column | Required | Notes |
-| --- | --- | --- |
-| Transaction ID | No | A UUID. If it matches an existing transaction, that transaction is updated. If blank, a new transaction is created. |
-| Symbol | Yes | Ticker symbol, up to 25 characters (letters, numbers, and `. - ^ = : / _`). Converted to upper case. |
-| Portfolio ID | Yes | The UUID of the portfolio the transaction belongs to. You need full access to it. |
-| Transaction Type | Yes | `BUY` or `SELL`. |
-| Quantity | Yes | Number of shares, zero or more. |
-| Cost Basis | No | Price paid per share (for buys). |
-| Sale Price | No | Price received per share (for sells). |
-| Currency | Yes | Three-letter currency code of the cost basis or sale price, for example `USD`. |
-| Split | No | `TRUE` if this transaction represents a stock split. |
-| Reinvested Dividend | No | `TRUE` if this transaction represents a reinvested dividend. |
-| Date | Yes | The trade date, for example `2024-03-15`. |
-| Created, Updated | No | Included in exports for reference. Ignored on import. |
-
-### Daily Changes
-
-This sheet carries the annotations on your daily history. Market values are recalculated after import, so only these columns are read:
-
-| Column | Required | Notes |
-| --- | --- | --- |
-| Date | Yes | |
-| Portfolio ID | Yes | You need full access to the portfolio. |
-| Annotation | No | |
-
-### Config
-
-Two columns, **Key** and **Value**. Recognized keys are `name`, `locale`, `display_currency`, and `reinvested_dividends` (a JSON list of `{"portfolio_id": "...", "symbol": "..."}` entries). Unrecognized keys are ignored.
-
-## Importing data
-
-1. Click **Select a file** and choose your `.xlsx` workbook (2 MB maximum).
+1. Click **Select a file** and choose your workbook.
 2. Click **Import**.
 
-A progress dialog shows each stage: portfolios, transactions, then daily changes. The import runs in the background, so you can click **Dismiss** and keep using Investbrain. You'll also receive an email when it succeeds or fails (if your instance has email configured).
+A progress dialog shows each stage: portfolios, transactions, then daily changes. The import runs in the background, so you can click **Dismiss** and keep using Investbrain. You'll also get an email when it succeeds or fails, if you've [set up email](self-hosting.md#email).
 
 <!-- SCREENSHOT: Import progress dialog part-way through, for example while importing transactions. -->
 <!-- ![The import progress dialog](images/import-export-progress.png) -->
 
-After the import finishes, Investbrain automatically refreshes market data and dividends for your holdings, recalculates every holding, and rebuilds the daily history for each portfolio. On a large import this can take several minutes, so charts and totals may fill in gradually.
+After the import finishes, Investbrain refreshes market data and dividends for your holdings, recalculates every holding, and rebuilds the daily history for each portfolio. On a large import this can take several minutes, so charts and totals may fill in gradually.
 
 You can start up to three imports per minute.
 
-### How records are matched (upserts)
+### How imports work
 
-Imports are "upserted": rows with an ID that already exists update that record, and rows without a matching ID create a new one. This means you can:
+- **Keep all four sheets, but only fill in the ones you need.** The workbook must contain the Portfolios, Transactions, Daily Changes, and Config sheets, but a sheet can be empty below its heading row. Most people only need the Transactions sheet. The Portfolios sheet is useful when you want the import to create or update portfolios. The Daily Changes and Config sheets are only needed to restore a backup.
+- **Keep the sheet names and the heading row as they are.** Columns are matched by their heading, so their order doesn't matter and extra columns are ignored.
+- **Rows are created or updated.** A row with a blank ID is created as a new record. A row whose ID matches an existing record updates that record. Importing never deletes anything, so rows you remove from the spreadsheet stay in Investbrain.
+- **Each sheet is checked before it's saved.** Sheets are imported in order: Portfolios, then Transactions, then Daily Changes, then Config. If any row on a sheet has a problem, nothing from that sheet is saved, the import stops, and the progress dialog shows the error with its row number. Fix the spreadsheet and click **Try again**.
+- **Sheets imported before the failure are kept.** For example, if the Transactions sheet has an error, the Portfolios sheet has already been saved. Re-importing updates rows that have an ID instead of duplicating them, but portfolio rows with a blank Portfolio ID are created again. Before you retry, either delete the portfolios the failed import created, or copy their new IDs into the Portfolios sheet.
 
-- **Restore a backup** - import an export file and every portfolio and transaction is recreated with its original ID.
-- **Bulk edit** - export, change values in the spreadsheet, and import it again. Matching rows are updated in place.
-- **Add new history** - add rows with a blank Transaction ID and they're created as new transactions.
+## Portfolios sheet
 
-Importing never deletes anything. Rows you remove from the spreadsheet stay in Investbrain.
+| Column | Required | Description |
+| --- | --- | --- |
+| Portfolio ID | Optional | Leave blank to create a new portfolio. Use an existing ID to update that portfolio. You can also enter a new UUID of your own, so that the Transactions sheet can refer to the portfolio (see [Referring to portfolios](#referring-to-portfolios)). |
+| Title | Required | The name of the portfolio. |
+| Notes | Optional | Free text. |
+| Wishlist | Optional | `TRUE` or `FALSE`. Defaults to `FALSE`. |
+| Created, Updated | Optional | Included in exports for reference. Ignored on import. |
 
-### Bulk-loading transactions into a new portfolio
+## Transactions sheet
 
-Every transaction row needs a Portfolio ID, so the portfolio has to have an ID before its transactions can reference it. Either:
+| Column | Required | Description |
+| --- | --- | --- |
+| Transaction ID | Optional | Leave blank to add a new transaction. Use an existing ID to update that transaction. |
+| Symbol | Required | The ticker as your market data provider lists it, such as `AAPL`, `BRK-B`, or `VOD.L`. Converted to upper case. |
+| Portfolio ID | Required | The ID of a portfolio in your account, or in the Portfolios sheet of the same file. |
+| Transaction Type | Required | `BUY` or `SELL`, in upper case. |
+| Quantity | Required | Number of shares. Can't be negative. |
+| Cost Basis | Optional | Price paid per share. Use `0` for shares you received for free, such as from a split. |
+| Sale Price | Optional | Price received per share. Only used for `SELL` rows. |
+| Currency | Required | Three-letter code of the currency the prices are in, such as `USD`. Use the currency the symbol trades in (see [Currencies](#currencies)). |
+| Split | Optional | `TRUE` if the row records extra shares from a stock split. Defaults to `FALSE`. |
+| Reinvested Dividend | Optional | `TRUE` if the row is a `BUY` paid for with a dividend. Defaults to `FALSE`. |
+| Date | Required | Trade date as text, such as `2024-03-15`. |
+| Created, Updated | Optional | Included in exports for reference. Ignored on import. |
 
-- Create the portfolio in Investbrain first, then copy its ID from the address bar (`/portfolio/<id>`) into your Transactions sheet, or
-- Generate a UUID yourself (for example with an online UUID generator or `uuidgen`), put it in the **Portfolio ID** column on the Portfolios sheet, and use the same value on the Transactions sheet.
+Imported transactions are saved as they are. Unlike transactions you enter in the app, they aren't checked against your market data provider or your available shares, so the sections below explain what to double-check.
 
-### Things to know
+### Referring to portfolios
 
-- Transaction imports are trusted as-is. Unlike transactions entered in the app, imported rows aren't checked against your market data provider for valid symbols or against your available quantity for sells. Double-check sells in your spreadsheet.
-- If any row fails validation or references a portfolio you don't have full access to, the import stops and the progress dialog shows the error. Fix the spreadsheet and click **Try again**.
-- If a transaction's currency differs from the instance's base currency, Investbrain downloads the historical exchange rates for the date range in the file before importing.
-- Imports run on the background queue. On a self-hosted instance, the queue worker runs inside the Investbrain container automatically.
+The Portfolio ID column must contain a portfolio's ID (a UUID such as `9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f`). Portfolio titles aren't accepted. To get an ID:
+
+- **For an existing portfolio**, open it in Investbrain and copy the ID from the address bar (`/portfolio/<id>`), or take it from an export.
+- **For a new portfolio**, generate a UUID yourself (for example with `uuidgen` or an online UUID generator). Put it in the Portfolio ID column on the Portfolios sheet, and use the same value on the Transactions sheet.
+
+You can only import into portfolios that you own or that have been shared with you with full access.
+
+### Currencies
+
+Enter prices in the currency the symbol trades in, and put that currency in the Currency column. For example, use `USD` for `AAPL` and `GBX` (pence) for most London-listed shares. Unlike the transaction form in the app, imports don't convert a price from another currency into the trading currency, so a price entered in the wrong currency shows up with the wrong value.
+
+### Reinvested dividends
+
+Record a reinvested dividend as a `BUY` row with Reinvested Dividend set to `TRUE`. Set Quantity to the number of shares bought and Cost Basis to the price paid per share.
+
+You don't need rows for cash dividends. Investbrain works out dividends earned from your market data provider's dividend history and the shares you held on each date.
+
+### Stock splits
+
+Record a split as a `BUY` row with Split set to `TRUE` and a Cost Basis of `0`. Set Quantity to the number of extra shares you received. For example, a 2-for-1 split of 10 shares is a split row with a Quantity of 10.
+
+Include rows for every split that happened while you held the shares. Investbrain detects splits automatically only for dates after the import, so it won't add earlier ones for you.
+
+Reverse splits (which reduce the number of shares you hold) can't be imported as split rows, because quantities can't be negative. Instead, enter your purchases from before the split with the split-adjusted quantity and price. For example, for a 1-for-10 reverse split, 100 shares bought at $2 become 10 shares at $20.
+
+### Sales
+
+Imports don't check that a `SELL` row sells only shares the portfolio held on that date, so check your sales before importing.
+
+If you leave Cost Basis blank on a `SELL` row, it's saved as `0`, which makes the realized gain wrong. After importing, recalculate the cost basis of your sales from your average purchase cost:
+
+```bash
+docker exec -it investbrain-app php artisan fix:cost-basis-for-sales --portfolio=<portfolio_id>
+```
+
+### Symbols
+
+Symbols can contain letters, numbers, and `. - ^ = : / _`, with no spaces, up to 25 characters. They aren't checked against your market data provider during the import, so a mistyped symbol creates a holding with no price. After importing, check that every holding shows a name and a market value.
+
+## Daily Changes sheet
+
+This sheet stores your portfolios' daily history and is only needed to restore a backup. Market values are recalculated after the import, so only these columns are read:
+
+| Column | Required | Description |
+| --- | --- | --- |
+| Date | Required | The day the row describes. |
+| Portfolio ID | Required | The ID of the portfolio. You need full access to it. |
+| Annotation | Optional | A note for that day. |
+
+## Config sheet
+
+This sheet stores your account settings and is only needed to restore a backup.
+
+| Column | Required | Description |
+| --- | --- | --- |
+| Key | Required | One of `name`, `locale`, `display_currency`, or `reinvested_dividends`. Other keys are ignored. |
+| Value | Required | The value for that setting. For `reinvested_dividends`, a JSON list of holdings, such as `[{"portfolio_id": "...", "symbol": "SCHD"}]`. |
+
+## Formatting tips
+
+- Type dates as text in `YYYY-MM-DD` format, such as `2024-03-15`, which is what exports use. If your spreadsheet app turns them into date cells, set the column's format to Text before typing.
+- Write `BUY` and `SELL` in upper case.
+- For true/false columns, use `TRUE`/`FALSE` or `1`/`0`. A blank cell means `FALSE`.
+- Enter prices and quantities as plain numbers, without currency symbols such as `$` or `€` and without thousands separators.
+- To be safe, convert formulas to plain values before importing (copy the cells, then paste values only).

@@ -213,9 +213,12 @@ Logins are limited to five attempts per minute for each email and IP address. Wa
 The progress dialog shows the error. Common causes:
 
 - **The file isn't `.xlsx` or is larger than 2 MB.** Save it as an Excel workbook, or split it into several smaller files.
-- **A validation error on a row**, such as a missing symbol, a transaction type other than `BUY` or `SELL`, or a non-UUID ID. Check the columns against the [workbook format](import-export.md#the-workbook-format). Using **Download import template** is the easiest way to get the headings right.
-- **"You do not have access to that portfolio."** A row references a portfolio ID that doesn't exist yet or that you don't have full access to. Add the portfolio to the Portfolios sheet or [create it first](import-export.md#bulk-loading-transactions-into-a-new-portfolio).
+- **A validation error on a row**, such as a missing symbol, a lower-case `buy` or `sell`, a price with a currency symbol, or a portfolio title where an ID belongs. The error includes the row number. Check the columns against the [Transactions sheet](import-export.md#transactions-sheet) and the [formatting tips](import-export.md#formatting-tips).
+- **A sheet is missing or renamed.** The workbook needs all four sheets (Portfolios, Transactions, Daily Changes, and Config), even if some are empty. Using **Download import template** is the easiest way to get the sheets and headings right.
+- **"You do not have access to that portfolio."** A row references a portfolio ID that doesn't exist yet or that you don't have full access to. Add the portfolio to the Portfolios sheet or create it first (see [Referring to portfolios](import-export.md#referring-to-portfolios)).
 - **"Hang on! You're doing that too much."** You can start three imports or exports per minute. Wait and try again.
+
+Before you retry, check whether sheets imported before the error created any portfolios. Portfolio rows with a blank ID are created again on every import, so delete the extras or copy their IDs into the Portfolios sheet. See [How imports work](import-export.md#how-imports-work).
 
 ### The import finished but totals and charts are empty
 
