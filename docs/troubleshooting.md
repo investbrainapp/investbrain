@@ -216,19 +216,30 @@ Logins are limited to five attempts per minute for each email and IP address. Wa
 
 ### My import failed
 
-The progress dialog shows the error. Common causes:
+When an import fails, nothing is saved. The import page lists every problem with its sheet, row, column, and value, so fix them all in your spreadsheet and upload it again. Common problems:
 
 - **The file isn't `.xlsx` or is larger than 2 MB.** Save it as an Excel workbook, or split it into several smaller files.
-- **A validation error on a row**, such as a missing symbol, a lower-case `buy` or `sell`, a price with a currency symbol, or a portfolio title where an ID belongs. The error includes the row number. Check the columns against the [Transactions sheet](import-export.md#transactions-sheet) and the [formatting tips](import-export.md#formatting-tips).
-- **A sheet is missing or renamed.** The workbook needs all four sheets (Portfolios, Transactions, Daily Changes, and Config), even if some are empty. Using **Download import template** is the easiest way to get the sheets and headings right.
-- **"You do not have access to that portfolio."** A row references a portfolio ID that doesn't exist yet or that you don't have full access to. Add the portfolio to the Portfolios sheet or create it first (see [Referring to portfolios](import-export.md#referring-to-portfolios)).
-- **"Hang on! You're doing that too much."** You can start three imports or exports per minute. Wait and try again.
-
-Before you retry, check whether sheets imported before the error created any portfolios. Portfolio rows with a blank ID are created again on every import, so delete the extras or copy their IDs into the Portfolios sheet. See [How imports work](import-export.md#how-imports-work).
+- **"No data found. Check the sheet names and headings."** None of the sheets is named Portfolios, Transactions, Daily Changes, or Config, or they have no rows. Using **Download import template** is the easiest way to get the names and headings right.
+- **"The Transactions sheet is missing the ... column."** A required heading is missing or misspelled. Compare the heading row with the [Transactions sheet](import-export.md#transactions-sheet) columns.
+- **"No portfolio with this ID was found in the Portfolios sheet or in your account."** The Portfolio ID doesn't match any portfolio, often because a title was entered instead of an ID. See [Referring to portfolios](import-export.md#referring-to-portfolios).
+- **"You do not have access to that portfolio."** The portfolio, or the existing transaction a row updates, belongs to a portfolio you don't have full access to.
+- **"Could not find symbol."** Your market data provider doesn't recognize the symbol. Check its spelling and exchange suffix (for example `VOD.L`), and see [Market data doesn't load](#market-data-doesnt-load-on-a-fresh-install) if every symbol fails.
+- **"You cannot sell ... because only ... are held in that portfolio on that date."** A sale is larger than the shares held on its date. Check the sale's date and quantity, and that the purchases before it are in the file or already in your account.
+- **A value isn't accepted**, such as a date in the future, a thousands separator in a price (`1,000`), or a Quantity of zero. See the [formatting tips](import-export.md#formatting-tips).
+- **"Hang on! You're doing that too much."** You can start three imports per minute. Wait and try again.
 
 ### The import finished but totals and charts are empty
 
-After an import, Investbrain refreshes market data, dividends, and holdings, then rebuilds each portfolio's history in the background. On a large import this can take a while. Watch progress with `docker compose logs -f app`. If nothing happens, make sure the queue workers are running (they appear in the log as `queue-worker` processes).
+After an import, Investbrain refreshes dividends, recalculates holdings, and rebuilds each portfolio's history in the background. On a large import this can take a while. On a self-hosted instance, watch progress with `docker compose logs -f app`. If nothing happens, make sure the queue workers are running (they appear in the log as `queue-worker` processes).
+
+### My export is stuck on "Preparing your export"
+
+Exports are built in the background. A large account can take a few minutes, and you can leave the page in the meantime. On a self-hosted instance, an export that never finishes usually means the queue workers aren't running; check `docker compose logs -f app` for `queue-worker` processes and errors.
+
+### My export failed, or the download link stopped working
+
+- **"Something went wrong while preparing your export."** Click **Try again**. On a self-hosted instance, the reason is in `storage/logs/laravel.log`.
+- **The download link returns "Not Found".** Exports can be downloaded for 24 hours, and generating a new export replaces the previous one. Generate a new export and download that.
 
 ## API
 
