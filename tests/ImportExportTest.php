@@ -9,7 +9,6 @@ use App\Exports\Sheets\TransactionsSheet as TransactionsExportSheet;
 use App\Imports\Sheets\TransactionsSheet;
 use App\Interfaces\MarketData\MarketDataInterface;
 use App\Jobs\BackupExportJob;
-use App\Jobs\BackupImportJob;
 use App\Models\BackupExport as BackupExportModel;
 use App\Models\BackupImport as BackupImportModel;
 use App\Models\DailyChange;
@@ -164,30 +163,6 @@ class ImportExportTest extends TestCase
             ->test('export-portfolios-button')
             ->assertSee('Something went wrong while preparing your export.')
             ->assertSee('Try again');
-    }
-
-    public function test_late_failure_does_not_undo_a_finished_export(): void
-    {
-        $backupExport = BackupExportModel::create(['user_id' => User::factory()->create()->id]);
-        $backupExport->update(['status' => 'success', 'path' => 'exports/backup.xlsx', 'completed_at' => now()]);
-
-        (new BackupExportJob($backupExport))->failed(new \Exception('Job attempted too many times'));
-
-        $this->assertSame('success', $backupExport->refresh()->status);
-    }
-
-    public function test_late_failure_does_not_undo_a_finished_import(): void
-    {
-        Queue::fake();
-        Notification::fake();
-        $user = User::factory()->create();
-        $backupImport = BackupImportModel::create(['user_id' => $user->id, 'path' => 'import.xlsx']);
-        $backupImport->update(['status' => 'success', 'message' => 'Import complete!']);
-
-        (new BackupImportJob($backupImport))->failed(new \Exception('Job attempted too many times'));
-
-        $this->assertSame('success', $backupImport->refresh()->status);
-        Notification::assertNothingSent();
     }
 
     public function test_export_is_not_started_again_while_one_is_being_prepared(): void

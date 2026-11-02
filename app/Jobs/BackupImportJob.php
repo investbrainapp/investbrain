@@ -92,11 +92,6 @@ class BackupImportJob implements ShouldQueue
      */
     public function failed(?Throwable $e): void
     {
-        // a duplicate run of a job that already finished shouldn't undo it
-        if ($this->backupImport->fresh()?->status == 'success') {
-            return;
-        }
-
         $this->markAsFailed(__('Something went wrong while importing your file. Nothing was imported.'), [[
             'sheet' => null,
             'row' => null,
