@@ -389,7 +389,7 @@
     "Create Export": "Create Export",
     "Create new export": "Create new export",
     "Preparing your export. You can leave this page and come back when it's ready.": "Preparing your export. You can leave this page and come back when it's ready.",
-    "Created :time. Available for :hours hours.": "Created :time. Available for :hours hours.",
+    "Created :time.": "Created :time.",
     "Something went wrong while preparing your export.": "Something went wrong while preparing your export.",
     "Fix these problems in your spreadsheet and upload it again.": "Fix these problems in your spreadsheet and upload it again.",
     "Sheet": "Sheet",

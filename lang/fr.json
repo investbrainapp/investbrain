@@ -389,7 +389,7 @@
     "Create Export": "Créer un export",
     "Create new export": "Créer un nouvel export",
     "Preparing your export. You can leave this page and come back when it's ready.": "Préparation de votre export. Vous pouvez quitter cette page et revenir quand il sera prêt.",
-    "Created :time. Available for :hours hours.": "Créé :time. Disponible pendant :hours heures.",
+    "Created :time.": "Créé :time.",
     "Something went wrong while preparing your export.": "Une erreur s'est produite lors de la préparation de votre export.",
     "Fix these problems in your spreadsheet and upload it again.": "Corrigez ces problèmes dans votre tableur puis importez-le à nouveau.",
     "Sheet": "Feuille",

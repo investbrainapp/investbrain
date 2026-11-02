@@ -67,7 +67,7 @@ new class extends Component
         </div>
 
         <p class="mt-2 text-xs text-secondary-content">
-            {{ __('Created :time. Available for :hours hours.', ['time' => $backupExport->completed_at->diffForHumans(), 'hours' => BackupExportModel::RETENTION_HOURS]) }}
+            {{ __('Created :time.', ['time' => $backupExport->completed_at->diffForHumans()]) }}
         </p>
 
     @else
