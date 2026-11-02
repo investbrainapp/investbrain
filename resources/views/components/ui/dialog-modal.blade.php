@@ -1,8 +1,8 @@
-@props(['key' => 'dialog'])
+@props(['key' => 'dialog', 'boxClass' => 'max-w-xl'])
 
 <x-ui.modal
     :key="$key"
-    box-class="max-w-xl"
+    box-class="{{ $boxClass }}"
     persistent="true"
     no-card="true"
     {{ $attributes }}

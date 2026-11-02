@@ -603,6 +603,11 @@ class MultiCurrencyTest extends TestCase
     {
         $this->actingAs($user = User::factory()->create());
 
+        Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+            '--force' => true,
+        ]);
+
         Frankfurter::expects('setSymbols')
             ->zeroOrMoreTimes()
             ->andReturnSelf();

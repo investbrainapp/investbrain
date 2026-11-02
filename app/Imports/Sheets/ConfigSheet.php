@@ -4,62 +4,95 @@ declare(strict_types=1);
 
 namespace App\Imports\Sheets;
 
+use App\Imports\ReadsSheetRows;
 use App\Models\BackupImport;
 use App\Models\Holding;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\SkipsUnknownSheets;
+use Maatwebsite\Excel\Concerns\ToArray;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Events\BeforeSheet;
 
-class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadingRow, WithValidation
+class ConfigSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, WithCalculatedFormulas, WithHeadingRow, WithValidation
 {
-    public function __construct(
-        public BackupImport $backupImport
-    ) {}
+    use ReadsSheetRows;
 
-    public function registerEvents(): array
+    public function title(): string
+    {
+        return 'Config';
+    }
+
+    /**
+     * @return array<string, array{label: string, required: bool}>
+     */
+    public static function columns(): array
     {
         return [
-            BeforeSheet::class => function (BeforeSheet $event) {
-                DB::commit();
-                $this->backupImport->update([
-                    'message' => __('Importing configurations...'),
-                ]);
-                DB::beginTransaction();
-            },
+            'key' => [
+                'label' => 'Key',
+                'required' => true,
+            ],
+            'value' => [
+                'label' => 'Value',
+                'required' => true,
+            ],
         ];
     }
 
-    public function collection(Collection $configs): void
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>
+     */
+    public function normalize(array $row): array
     {
-        foreach ($configs as $config) {
+        $value = $this->text($row['value'] ?? null);
+
+        return [
+            'key' => $this->string($row['key'] ?? null),
+            'value' => is_scalar($value) ? (string) $value : $value,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    public function rowRules(array $row): array
+    {
+        return [
+            'key' => ['required', 'string'],
+            'value' => ['required', 'string'],
+        ];
+    }
+
+    public function persist(BackupImport $backupImport): void
+    {
+        $user = $backupImport->user;
+
+        foreach ($this->rows as $config) {
 
             switch ($config['key']) {
                 case 'name':
-                    $this->backupImport->user->setAttribute('name', $config['value']);
-                    $this->backupImport->user->save();
+                    $user->setAttribute('name', $config['value']);
+                    $user->save();
                     break;
 
                 case 'locale':
-                    $this->backupImport->user->setOption('locale', $config['value']);
-                    $this->backupImport->user->save();
+                    $user->setOption('locale', $config['value']);
+                    $user->save();
                     break;
 
                 case 'display_currency':
-                    $this->backupImport->user->setOption('display_currency', $config['value']);
-                    $this->backupImport->user->save();
+                    $user->setOption('display_currency', $config['value']);
+                    $user->save();
                     break;
 
                 case 'reinvested_dividends':
                     if (json_validate($config['value'])) {
                         foreach (json_decode($config['value'], true) as $reinvest) {
-                            Holding::myHoldings($this->backupImport->user->id)
-                                ->where('portfolio_id', $reinvest['portfolio_id'])
-                                ->where('symbol', $reinvest['symbol'])
+                            Holding::myHoldings($user->id)
+                                ->where('portfolio_id', $reinvest['portfolio_id'] ?? null)
+                                ->where('symbol', $reinvest['symbol'] ?? null)
                                 ->update([
                                     'reinvest_dividends' => true,
                                 ]);
@@ -71,13 +104,5 @@ class ConfigSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadi
                     break;
             }
         }
-    }
-
-    public function rules(): array
-    {
-        return [
-            'key' => ['required', 'string'],
-            'value' => ['required', 'string'],
-        ];
     }
 }

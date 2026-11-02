@@ -8,6 +8,7 @@ use App\Exports\Sheets\ConfigSheet;
 use App\Exports\Sheets\DailyChangesSheet;
 use App\Exports\Sheets\PortfoliosSheet;
 use App\Exports\Sheets\TransactionsSheet;
+use App\Models\BackupExport as BackupExportModel;
 use Maatwebsite\Excel\Concerns\Export;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -16,8 +17,12 @@ class BackupExport implements Export, WithMultipleSheets
 {
     use Exportable;
 
+    /**
+     * @param  BackupExportModel|null  $backupExport  an export whose performance figures were calculated ahead of time
+     */
     public function __construct(
-        public bool $empty = false
+        public bool $empty = false,
+        public ?BackupExportModel $backupExport = null
     ) {}
 
     public function sheets(): array
@@ -25,7 +30,7 @@ class BackupExport implements Export, WithMultipleSheets
         return [
             new PortfoliosSheet($this->empty),
             new TransactionsSheet($this->empty),
-            new DailyChangesSheet($this->empty),
+            new DailyChangesSheet($this->empty, $this->backupExport),
             new ConfigSheet($this->empty),
         ];
     }

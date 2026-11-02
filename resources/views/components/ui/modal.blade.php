@@ -18,6 +18,10 @@
             @if (!empty($attributes->whereStartsWith('wire:model')->first()))
                 init(){
                     this.$watch('wireModelValue', value => value ? this.show() : this.close())
+
+                    if (this.wireModelValue) {
+                        this.$nextTick(() => this.show())
+                    }
                 },
                 wireModelValue: $wire.entangle('{{ $attributes->whereStartsWith('wire:model')->first() }}').live,
             @endif

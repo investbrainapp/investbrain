@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\ConnectedAccountController;
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportDownloadController;
 use App\Http\Controllers\HoldingController;
 use App\Http\Controllers\InvitedOnboardingController;
 use App\Http\Controllers\PortfolioController;
@@ -36,6 +37,9 @@ Route::middleware(['auth', 'web'])->group(function () {
         ->when(! config('investbrain.self_hosted'), function ($route) {
             return $route->middleware('verified');
         });
+
+    Route::get('/import-export/exports/{backupExport}', ExportDownloadController::class)
+        ->name('import-export.download');
 
     Route::get('/portfolio/create', [PortfolioController::class, 'create'])->name('portfolio.create');
     Route::get('/portfolio/{portfolio}', [PortfolioController::class, 'show'])->name('portfolio.show');

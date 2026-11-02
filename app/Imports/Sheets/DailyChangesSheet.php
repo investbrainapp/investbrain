@@ -4,64 +4,76 @@ declare(strict_types=1);
 
 namespace App\Imports\Sheets;
 
-use App\Imports\ValidatesPortfolioAccess;
-use App\Models\BackupImport;
+use App\Imports\ReadsSheetRows;
 use App\Models\DailyChange;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\SkipsUnknownSheets;
+use Maatwebsite\Excel\Concerns\ToArray;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Events\BeforeSheet;
 
-class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadingRow, WithValidation
+class DailyChangesSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, WithCalculatedFormulas, WithHeadingRow, WithValidation
 {
-    use ValidatesPortfolioAccess;
+    use ReadsSheetRows;
 
-    public function __construct(
-        public BackupImport $backupImport
-    ) {}
+    public function title(): string
+    {
+        return 'Daily Changes';
+    }
 
-    public function registerEvents(): array
+    /**
+     * @return array<string, array{label: string, required: bool}>
+     */
+    public static function columns(): array
     {
         return [
-            BeforeSheet::class => function (BeforeSheet $event) {
-                DB::commit();
-                $this->backupImport->update([
-                    'message' => __('Preparing to import daily changes...'),
-                ]);
-                DB::beginTransaction();
-            },
+            'date' => [
+                'label' => 'Date',
+                'required' => true,
+            ],
+            'portfolio_id' => [
+                'label' => 'Portfolio ID',
+                'required' => true,
+            ],
+            'annotation' => [
+                'label' => 'Annotation',
+                'required' => false,
+            ],
         ];
     }
 
-    public function collection(Collection $dailyChanges): void
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>
+     */
+    public function normalize(array $row): array
     {
-        $totalBatches = count($dailyChanges) / $this->batchSize();
+        return [
+            'portfolio_id' => $this->string($row['portfolio_id'] ?? null),
+            'date' => $this->date($row['date'] ?? null),
+            'annotation' => $this->string($row['annotation'] ?? null),
+        ];
+    }
 
-        $dailyChanges->chunk($this->batchSize())->each(function ($chunk, $index) use ($totalBatches) {
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    public function rowRules(array $row): array
+    {
+        return [
+            'portfolio_id' => ['required', 'uuid'],
+            'date' => ['required', 'date'],
+            'annotation' => ['nullable', 'string'],
+        ];
+    }
 
-            $this->validatePortfolioAccess($chunk->pluck('portfolio_id'));
-
-            $this->backupImport->update([
-                'message' => __('Importing daily changes (Batch :currentBatch of :totalBatches)...', ['currentBatch' => $index + 1, 'totalBatches' => $totalBatches]),
-            ]);
-
-            // have to cast to native values
-            $chunk = $chunk->map(function ($dailyChange) {
-
-                return [
-                    'annotation' => $dailyChange['annotation'],
-                    'portfolio_id' => $dailyChange['portfolio_id'],
-                    'date' => Carbon::parse($dailyChange['date'])->toDateString(),
-                ];
-            });
+    public function persist(): void
+    {
+        collect($this->rows)->chunk($this->batchSize())->each(function ($chunk) {
 
             DailyChange::upsert(
-                $chunk->toArray(),
+                $chunk->values()->toArray(),
                 ['portfolio_id', 'date'],
                 [
                     'annotation',
@@ -75,14 +87,5 @@ class DailyChangesSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
     public function batchSize(): int
     {
         return 500;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'portfolio_id' => ['required', 'uuid'],
-            'date' => ['required', 'date'],
-            'annotation' => ['sometimes', 'nullable', 'string'],
-        ];
     }
 }
