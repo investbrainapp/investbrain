@@ -65,7 +65,11 @@ new class extends Component
     @elseif($backupExport?->status == 'success')
 
         <div class="flex flex-wrap items-center gap-3">
-            <a href="{{ route('import-export.download', $backupExport) }}" class="btn btn-primary">
+            <a
+                href="{{ route('import-export.download', $backupExport) }}"
+                class="btn btn-primary !inline-flex lg:tooltip lg:tooltip-top"
+                data-tip="{{ __('Created :time.', ['time' => $backupExport->completed_at->diffForHumans()]) }}"
+            >
                 <x-ui.icon name="o-arrow-down-tray" class="w-5 h-5" />
                 {{ __('Download Export') }}
             </a>
@@ -74,10 +78,6 @@ new class extends Component
                 {{ __('Generate new export') }}
             </x-ui.button>
         </div>
-
-        <p class="mt-2 text-xs text-secondary-content">
-            {{ __('Created :time.', ['time' => $backupExport->completed_at->diffForHumans()]) }}
-        </p>
 
     @else
 
