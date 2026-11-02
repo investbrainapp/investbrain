@@ -2,12 +2,36 @@
 
 Investbrain has a JSON REST API for reading and managing your portfolios, transactions, and holdings, and for looking up market data. Use it to build scripts, sync data from a brokerage, feed a spreadsheet, or integrate with other tools.
 
+- [API versions](#api-versions)
 - [Creating an API token](#creating-an-api-token)
 - [Making requests](#making-requests)
 - [Pagination, sorting, filtering, and search](#pagination-sorting-filtering-and-search)
 - [Endpoints](#endpoints)
 - [Errors](#errors)
 - [OpenAPI specification](#openapi-specification)
+
+## API versions
+
+This page documents **version 2** of the API. Version 1 is kept for reference.
+
+| Version | Used by | Specification |
+| --- | --- | --- |
+| **v2** | Investbrain releases after v1.3.2 | [`openapi.json`](../openapi.json) |
+| **v1** | Investbrain v1.3.2 and earlier | [`docs/openapi-v1.json`](openapi-v1.json) (archived) |
+
+If you self-host, the version is printed at the top of the `app` container's log when it starts (`docker compose logs app`).
+
+The two versions have the same endpoints, request bodies, and response formats, and use the same API tokens. Only the query parameters for sorting, filtering, and paging through the list endpoints (`GET /portfolio`, `GET /transaction`, and `GET /holding`) changed:
+
+| | v1 | v2 |
+| --- | --- | --- |
+| Sorting | `sortBy=date&sortDesc=true` | `sort=-date` (several columns allowed, such as `sort=-date,symbol`) |
+| Filtering | `filter[column]=value` on any column | `filter[column]=value` on [documented columns](#endpoints) only; separate values with commas to match any of them |
+| Unsupported sort or filter | Not checked | Rejected with `422` |
+| Page size | `itemsPerPage`, default 10 | `itemsPerPage`, default 15, maximum 100 |
+| Search | `search` | `search`, a case-insensitive partial match on documented columns |
+
+**Updating a v1 script for v2:** replace `sortBy` and `sortDesc` with `sort`, and check that each `filter[...]` column is in the list for its endpoint. A v2 instance ignores `sortBy` and `sortDesc` instead of rejecting them, so results come back unsorted rather than failing. If your script relies on the page size, set `itemsPerPage` explicitly.
 
 ## Creating an API token
 
@@ -378,4 +402,4 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-A machine-readable OpenAPI 3 description of the API is kept in the repository at [`openapi.json`](../openapi.json). Import it into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. The spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host. If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).
+A machine-readable OpenAPI 3 description of the API is kept in the repository at [`openapi.json`](../openapi.json). The archived v1 specification is at [`docs/openapi-v1.json`](openapi-v1.json) (see [API versions](#api-versions)). Import it into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. The spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host. If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).
