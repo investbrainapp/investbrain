@@ -24,14 +24,19 @@ new class extends Component
 
     public function mount(): void
     {
-        // pick back up an import that is still running (e.g. after navigating away)
-        $this->backupImport = BackupImportModel::where('user_id', auth()->id())
-            ->whereIn('status', ['pending', 'in_progress'])
+        $latestImport = BackupImportModel::where('user_id', auth()->id())
             ->where('created_at', '>=', now()->subHour())
             ->latest()
             ->first();
 
-        $this->importStatusDialog = ! is_null($this->backupImport);
+        // pick back up an import that is still running, or that failed while the user was away
+        $isUnseenFailure = $latestImport?->status == 'failed'
+            && session('dismissed_import_id') != $latestImport->id;
+
+        if ($latestImport && (! $latestImport->isFinished() || $isUnseenFailure)) {
+            $this->backupImport = $latestImport;
+            $this->importStatusDialog = true;
+        }
     }
 
     // methods
@@ -63,6 +68,9 @@ new class extends Component
         if ($this->backupImport?->status == 'failed') {
 
             $this->reset('file');
+
+            // reopen the dialog in case it was dismissed while the import was running
+            $this->importStatusDialog = true;
         }
 
         if ($this->backupImport?->status == 'success') {
@@ -78,6 +86,10 @@ new class extends Component
     public function closeImportStatus()
     {
         $this->importStatusDialog = false;
+
+        if ($this->backupImport?->status == 'failed') {
+            session()->put('dismissed_import_id', $this->backupImport->id);
+        }
 
         if ($this->backupImport?->isFinished()) {
             $this->backupImport = null;
@@ -174,7 +186,7 @@ new class extends Component
 
                     <x-ui.button wire:click="closeImportStatus"> {{ __('Try again') }} </x-ui.button>
                 @else
-                    <div @if($backupImport && ! $backupImport->isFinished()) wire:poll.2s="checkImportStatus" @endif class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
+                    <div @if($backupImport && ! $backupImport->isFinished()) wire:poll.2s.keep-alive="checkImportStatus" @endif class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
                     <x-ui.flex-spacer />
                     <x-ui.button wire:click="closeImportStatus"> {{ __('Dismiss') }} </x-ui.button>
                 @endif

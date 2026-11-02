@@ -21,6 +21,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -436,6 +437,43 @@ class ImportExportTest extends TestCase
             ->assertSee('This field must be a number.');
     }
 
+    public function test_import_page_reopens_dialog_when_a_dismissed_import_fails(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $backupImport = BackupImportModel::create(['user_id' => $user->id, 'path' => 'import.xlsx']);
+
+        $component = Livewire::actingAs($user)
+            ->test('import-portfolios-field')
+            ->assertSet('importStatusDialog', true)
+            ->call('closeImportStatus')
+            ->assertSet('importStatusDialog', false);
+
+        $this->markImportFailed($backupImport);
+
+        $component->call('checkImportStatus')
+            ->assertSet('importStatusDialog', true)
+            ->assertSee('This field must be BUY or SELL.');
+    }
+
+    public function test_import_page_shows_a_failure_that_happened_while_away_until_dismissed(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $this->markImportFailed(BackupImportModel::create(['user_id' => $user->id, 'path' => 'import.xlsx']));
+
+        Livewire::actingAs($user)
+            ->test('import-portfolios-field')
+            ->assertSet('importStatusDialog', true)
+            ->assertSee('This field must be BUY or SELL.')
+            ->call('closeImportStatus');
+
+        Livewire::actingAs($user)
+            ->test('import-portfolios-field')
+            ->assertSet('importStatusDialog', false)
+            ->assertSet('backupImport', null);
+    }
+
     /**
      * @return array{0: User, 1: Portfolio, 2: Transaction}
      */
@@ -457,6 +495,19 @@ class ImportExportTest extends TestCase
         Auth::logout();
 
         return [$owner, $portfolio, $transaction];
+    }
+
+    private function markImportFailed(BackupImportModel $backupImport): void
+    {
+        $backupImport->update([
+            'status' => 'failed',
+            'message' => 'We found 1 problem in your file. Nothing was imported.',
+            'has_errors' => true,
+            'error_count' => 1,
+            'errors' => [
+                ['sheet' => 'Transactions', 'row' => 2, 'column' => 'Transaction Type', 'value' => 'BUYS', 'message' => 'This field must be BUY or SELL.'],
+            ],
+        ]);
     }
 
     private function portfolioOwnedBy(User $user): Portfolio
