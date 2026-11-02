@@ -369,7 +369,7 @@
     "Saving your portfolios and transactions...": "Guardando tus portafolios y transacciones...",
     "Import complete! Portfolios: :portfolios, transactions: :transactions.": "¡Importación completada! Portafolios: :portfolios, transacciones: :transactions.",
     "Something went wrong while importing your file. Nothing was imported.": "Algo salió mal al importar tu archivo. No se importó nada.",
-    "{1} We found :count problem in your file. Nothing was imported.|[2,*] We found :count problems in your file. Nothing was imported.": "{1} Encontramos :count problema en tu archivo. No se importó nada.|[2,*] Encontramos :count problemas en tu archivo. No se importó nada.",
+    "We found a problem in your file. Nothing was imported.|We found problems in your file. Nothing was imported.": "Encontramos un problema en tu archivo. No se importó nada.|Encontramos problemas en tu archivo. No se importó nada.",
     "No data found. Check the sheet names and headings.": "No se encontraron datos. Revisa los nombres de las hojas y los encabezados.",
     "The :sheet sheet is missing the :column column. Check the heading row matches the import template.": "A la hoja :sheet le falta la columna :column. Verifica que la fila de encabezados coincida con la plantilla de importación.",
     "This Portfolio ID is used more than once in the Portfolios sheet.": "Este Portfolio ID se usa más de una vez en la hoja Portfolios.",

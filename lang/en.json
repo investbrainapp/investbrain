@@ -369,7 +369,7 @@
     "Saving your portfolios and transactions...": "Saving your portfolios and transactions...",
     "Import complete! Portfolios: :portfolios, transactions: :transactions.": "Import complete! Portfolios: :portfolios, transactions: :transactions.",
     "Something went wrong while importing your file. Nothing was imported.": "Something went wrong while importing your file. Nothing was imported.",
-    "{1} We found :count problem in your file. Nothing was imported.|[2,*] We found :count problems in your file. Nothing was imported.": "{1} We found :count problem in your file. Nothing was imported.|[2,*] We found :count problems in your file. Nothing was imported.",
+    "We found a problem in your file. Nothing was imported.|We found problems in your file. Nothing was imported.": "We found a problem in your file. Nothing was imported.|We found problems in your file. Nothing was imported.",
     "No data found. Check the sheet names and headings.": "No data found. Check the sheet names and headings.",
     "The :sheet sheet is missing the :column column. Check the heading row matches the import template.": "The :sheet sheet is missing the :column column. Check the heading row matches the import template.",
     "This Portfolio ID is used more than once in the Portfolios sheet.": "This Portfolio ID is used more than once in the Portfolios sheet.",

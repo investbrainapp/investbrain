@@ -15,9 +15,8 @@ class ImportValidationException extends Exception
         public readonly array $errors
     ) {
         parent::__construct(trans_choice(
-            '{1} We found :count problem in your file. Nothing was imported.|[2,*] We found :count problems in your file. Nothing was imported.',
-            count($errors),
-            ['count' => count($errors)]
+            'We found a problem in your file. Nothing was imported.|We found problems in your file. Nothing was imported.',
+            count($errors)
         ));
     }
 }

@@ -173,7 +173,7 @@ class ImportExportTest extends TestCase
         ]);
 
         $this->assertSame('failed', $import->status);
-        $this->assertSame('We found 2 problems in your file. Nothing was imported.', $import->message);
+        $this->assertSame('We found problems in your file. Nothing was imported.', $import->message);
         $this->assertSame(2, $import->error_count);
         $this->assertSame([
             ['sheet' => 'Transactions', 'row' => 2, 'column' => 'Quantity', 'value' => 'ten', 'message' => 'This field must be a number.'],
@@ -433,7 +433,7 @@ class ImportExportTest extends TestCase
             ->test('import-portfolios-field')
             ->set('file', UploadedFile::fake()->createWithContent('import.xlsx', file_get_contents($path)))
             ->call('import')
-            ->assertSee('We found 1 problem in your file. Nothing was imported.')
+            ->assertSee('We found a problem in your file. Nothing was imported.')
             ->assertSee('This field must be a number.');
     }
 
@@ -501,7 +501,7 @@ class ImportExportTest extends TestCase
     {
         $backupImport->update([
             'status' => 'failed',
-            'message' => 'We found 1 problem in your file. Nothing was imported.',
+            'message' => 'We found a problem in your file. Nothing was imported.',
             'has_errors' => true,
             'error_count' => 1,
             'errors' => [
