@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Imports\Sheets;
 
+use App\Actions\EnsureCostBasisAddedToSale;
 use App\Imports\ReadsSheetRows;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
@@ -94,11 +95,11 @@ class TransactionsSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, 
             'transaction_id' => $this->string($row['transaction_id'] ?? null),
             'symbol' => $this->upper($row['symbol'] ?? null),
             'portfolio_id' => $this->string($row['portfolio_id'] ?? null),
-            'transaction_type' => $this->string($row['transaction_type'] ?? null),
-            'quantity' => $this->text($row['quantity'] ?? null),
-            'cost_basis' => $this->text($row['cost_basis'] ?? null),
-            'sale_price' => $this->text($row['sale_price'] ?? null),
-            'currency' => $this->string($row['currency'] ?? null),
+            'transaction_type' => $this->upper($row['transaction_type'] ?? null),
+            'quantity' => $this->number($row['quantity'] ?? null),
+            'cost_basis' => $this->number($row['cost_basis'] ?? null),
+            'sale_price' => $this->number($row['sale_price'] ?? null),
+            'currency' => $this->upper($row['currency'] ?? null),
             'split' => $this->boolean($row['split'] ?? null),
             'reinvested_dividend' => $this->boolean($row['reinvested_dividend'] ?? null),
             'date' => $this->date($row['date'] ?? null),
@@ -204,11 +205,43 @@ class TransactionsSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, 
                 ]
             );
         });
+
+        $this->addCostBasisToSales($transactions, $baseCurrency);
     }
 
     public function batchSize(): int
     {
         return 500;
+    }
+
+    /**
+     * Sales need a cost basis to calculate realized gains. When the file leaves it blank,
+     * use the average cost of the shares bought up to the sale (like the transaction form).
+     */
+    protected function addCostBasisToSales(Collection $transactions, string $baseCurrency): void
+    {
+        $transactions
+            ->where('transaction_type', 'SELL')
+            ->whereNull('cost_basis')
+            ->each(function ($transaction) use ($baseCurrency) {
+
+                $sale = (new EnsureCostBasisAddedToSale)(
+                    new Transaction([
+                        'portfolio_id' => $transaction['portfolio_id'],
+                        'symbol' => $transaction['symbol'],
+                        'transaction_type' => 'SELL',
+                        'date' => $transaction['date'],
+                    ]),
+                    fn (Transaction $sale) => $sale
+                );
+
+                Transaction::whereKey($transaction['transaction_id'])->update([
+                    'cost_basis' => $sale->cost_basis,
+                    'cost_basis_base' => $transaction['currency'] == $baseCurrency
+                        ? $sale->cost_basis
+                        : Currency::convert($sale->cost_basis, $transaction['currency'], date: $transaction['date']),
+                ]);
+            });
     }
 
     /**

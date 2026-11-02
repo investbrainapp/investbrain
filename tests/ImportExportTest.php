@@ -218,6 +218,28 @@ class ImportExportTest extends TestCase
         $this->assertSame('No data found. Check the sheet names and headings.', $import->errors[0]['message']);
     }
 
+    public function test_spreadsheet_formatted_values_are_accepted(): void
+    {
+        $user = User::factory()->create();
+        $portfolio = $this->portfolioOwnedBy($user);
+
+        $this->importWorkbook($user, [
+            'Transactions' => [
+                self::TRANSACTION_HEADINGS,
+                // Excel date serial, lower case type, text booleans and a currency symbol
+                [null, 'aapl', $portfolio->id, 'buy', 2, '$150.50', null, 'usd', 'no', 'yes', 45292],
+            ],
+        ]);
+
+        $transaction = Transaction::sole();
+        $this->assertSame('AAPL', $transaction->symbol);
+        $this->assertSame('BUY', $transaction->transaction_type);
+        $this->assertSame(150.5, $transaction->cost_basis);
+        $this->assertSame('2024-01-01', $transaction->date->toDateString());
+        $this->assertFalse($transaction->split);
+        $this->assertTrue($transaction->reinvested_dividend);
+    }
+
     public function test_currency_defaults_to_the_currency_the_symbol_trades_in(): void
     {
         $user = User::factory()->create();
@@ -288,6 +310,26 @@ class ImportExportTest extends TestCase
         ]);
 
         $this->assertSame('success', $import->status);
+    }
+
+    public function test_sale_without_cost_basis_uses_the_average_cost_of_shares_bought_before_it(): void
+    {
+        $user = User::factory()->create();
+        $portfolio = $this->portfolioOwnedBy($user);
+
+        $this->importWorkbook($user, [
+            'Transactions' => [
+                self::TRANSACTION_HEADINGS,
+                [null, 'AAPL', $portfolio->id, 'BUY', 1, 100, null, 'USD', null, null, '2024-01-01'],
+                [null, 'AAPL', $portfolio->id, 'BUY', 1, 300, null, 'USD', null, null, '2024-01-02'],
+                [null, 'AAPL', $portfolio->id, 'SELL', 1, null, 250, 'USD', null, null, '2024-01-03'],
+                [null, 'AAPL', $portfolio->id, 'BUY', 1, 1000, null, 'USD', null, null, '2024-01-04'],
+            ],
+        ]);
+
+        $sale = Transaction::where('transaction_type', 'SELL')->sole();
+        $this->assertSame(200.0, $sale->cost_basis);
+        $this->assertSame(50.0, Holding::sole()->realized_gain_dollars);
     }
 
     public function test_reverse_split_rows_with_negative_quantity_are_accepted(): void

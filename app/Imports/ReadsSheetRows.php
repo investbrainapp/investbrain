@@ -6,6 +6,7 @@ namespace App\Imports;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use Throwable;
 
 /**
@@ -162,37 +163,59 @@ trait ReadsSheetRows
     }
 
     /**
-     * Blank cells are false. Values the boolean rule accepts (TRUE, FALSE, 1, 0) become real
-     * booleans, anything else is returned untouched so validation can report it.
+     * Accept real booleans plus the usual spreadsheet spellings (TRUE, Yes, 1...). Blank cells
+     * are false, unrecognised values are returned untouched so validation can report them.
      */
     protected function boolean(mixed $value): mixed
     {
         $value = $this->text($value);
 
-        return match (true) {
-            is_null($value), in_array($value, [false, 0, '0'], true) => false,
-            in_array($value, [true, 1, '1'], true) => true,
-            default => $value,
-        };
+        if (is_null($value)) {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $value;
     }
 
     /**
-     * Return date strings as Y-m-d. Anything else (including numbers) is returned untouched
-     * so validation can report it.
+     * Accept Excel date cells (which are read as serial numbers) as well as date strings and
+     * return them as Y-m-d. Unparseable values are returned untouched so validation can report them.
      */
     protected function date(mixed $value): mixed
     {
         $value = $this->text($value);
 
-        if (! is_string($value)) {
-            return $value;
+        if (is_null($value)) {
+            return null;
         }
 
         try {
+            if (is_numeric($value)) {
+
+                return Carbon::instance(ExcelDate::excelToDateTimeObject((float) $value))->toDateString();
+            }
+
             return Carbon::parse($value)->toDateString();
         } catch (Throwable) {
 
             return $value;
         }
+    }
+
+    /**
+     * Strip currency symbols and spaces that sneak in when numbers are pasted as text. Commas
+     * are left alone because they are decimal separators in many locales.
+     */
+    protected function number(mixed $value): mixed
+    {
+        $value = $this->text($value);
+
+        if (is_string($value)) {
+            $stripped = preg_replace('/[\s$€£¥]/u', '', $value);
+
+            return is_numeric($stripped) ? (float) $stripped : $value;
+        }
+
+        return $value;
     }
 }
