@@ -1,6 +1,6 @@
 # User Guide
 
-This guide covers the core of Investbrain: portfolios, transactions, and holdings, plus the features built on top of them.
+This guide covers the core of Investbrain: portfolios, transactions, and holdings, plus the features built on top of them. It applies to both [Investbrain Cloud](https://investbra.in) and self-hosted instances; the few differences are called out where they come up.
 
 - [Key concepts](#key-concepts)
 - [Creating an account and signing in](#creating-an-account-and-signing-in)
@@ -27,17 +27,20 @@ Investbrain is built around three things:
 | **Transaction** | A single buy or sell of a security on a given date. Transactions are the source of truth for everything else. |
 | **Holding** | A position in one security within one portfolio. Holdings are created and updated automatically from your transactions. You never create a holding by hand. |
 
-Market data (prices, 52-week ranges, fundamentals), dividends, and splits are pulled from the market data provider configured for your instance and applied to your holdings automatically.
+Market data (prices, 52-week ranges, fundamentals), dividends, and splits are pulled from a market data provider and applied to your holdings automatically. Investbrain Cloud takes care of this for you. On a self-hosted instance, you [choose the provider](self-hosting.md#market-data-providers).
 
 ## Creating an account and signing in
 
-Open `/register` on your Investbrain instance to create an account with your name, email, and a password. If you've [turned off registration](self-hosting.md#installation), you can still add people by [sharing a portfolio](#sharing-portfolios) with them: they get an invitation email with a link to set their password.
+Create an account with your name, email, and a password:
 
-If you've [set up social login](self-hosting.md#social-login), the login page shows a **Login with ...** button for each provider (GitHub, Google, Facebook, or LinkedIn). See [Social logins](account-settings.md#social-logins) for how linking works.
+- **Investbrain Cloud** - sign up at [investbra.in/register](https://investbra.in/register). You'll be asked to agree to the Terms of Service and Privacy Policy, and to verify your email address. Until your email is verified, the Import / Export, Connections, and API Tokens pages aren't available. If the verification email doesn't arrive, request a new one from the verification page or from **Manage Profile**.
+- **Self-hosted** - open `/register` on your instance. The first account you create is the only one that can see [Provider Health](self-hosting.md#monitoring-market-data-providers). If you've [turned off registration](self-hosting.md#installation), you can still add people by [sharing a portfolio](#sharing-portfolios) with them: they get an invitation email with a link to set their password.
+
+When social logins are available, the login page shows a **Login with ...** button for each provider (GitHub, Google, Facebook, or LinkedIn). On a self-hosted instance they appear once you've [set them up](self-hosting.md#social-login). See [Social logins](account-settings.md#social-logins) for how linking works.
 
 Other sign-in features:
 
-- **Forgot password** - request a reset link from the login page. Your instance must have email configured for the link to be delivered.
+- **Forgot password** - request a reset link from the login page. On a self-hosted instance, you need to [set up email](self-hosting.md#email) for the link to be delivered.
 - **Two-factor authentication** - if you have turned it on, you'll be asked for a code from your authenticator app (or a recovery code) after entering your password. See [Two-factor authentication](account-settings.md#two-factor-authentication).
 - Login attempts are limited to five per minute for each email and IP address.
 
@@ -78,7 +81,7 @@ Each portfolio has its own page with:
 - A **Holdings** table (see [Holdings](#holdings))
 - **Recent activity** for the portfolio
 - **Top performers** within the portfolio
-- An **AI chat** window, if you've [enabled AI chat](self-hosting.md#ai-chat)
+- An **AI chat** window, when [AI chat](#ai-chat) is available
 
 <!-- SCREENSHOT: A portfolio page showing the toolbar (title, pencil icon, Create Transaction), chart, summary cards, Holdings table, and Recent activity. -->
 <!-- ![A portfolio page with its chart, summary cards, and holdings table](images/user-guide-portfolio-page.png) -->
@@ -111,7 +114,7 @@ You can share a portfolio with anyone by email, which is handy for a spouse, a f
 <!-- SCREENSHOT: Manage Portfolio drawer with People with access (owner plus one read-only and one full-access user) and the Share Portfolio dialog open. -->
 <!-- ![The Share Portfolio dialog and the People with access list](images/user-guide-portfolio-sharing.png) -->
 
-The person receives an email invitation. If they don't have an Investbrain account yet, one is created for them and the invitation link lets them set a password. Your instance needs working email for invitations to arrive.
+The person receives an email invitation. If they don't have an Investbrain account yet, one is created for them and the invitation link lets them set a password. On a self-hosted instance, invitations only arrive once you've [set up email](self-hosting.md#email).
 
 ### Access levels
 
@@ -220,7 +223,7 @@ Each holding has a page with:
 - **Recent activity** - every transaction for this symbol in this portfolio
 - **Dividends** - dividends paid while you held the position, with the amount you received
 - **Splits** - stock splits since you started holding it
-- **AI chat**, if you've [enabled it](self-hosting.md#ai-chat)
+- **AI chat**, when [AI chat](#ai-chat) is available
 
 <!-- SCREENSHOT: A holding page for a dividend-paying stock so the Market data, Fundamentals, Recent activity, Dividends, and Splits cards all have content. -->
 <!-- ![A holding page with market data, fundamentals, activity, dividends, and splits](images/user-guide-holding-page.png) -->
@@ -259,7 +262,7 @@ The dashboard and every portfolio page include a performance chart built from a 
 
 - Choose the time range from the drop-down: 1 month, 3 months, year to date, 1 year, 3 years, or all time.
 - The chart shows **Market Gain** by default. Click **Market Value** or **Cost Basis** in the legend to show those lines too.
-- Snapshots are captured every weekday at the time set by `DAILY_CHANGE_TIME` (11 PM by default, see [Configuration](self-hosting.md#options)).
+- Snapshots are captured once every weekday. On a self-hosted instance the time is set by `DAILY_CHANGE_TIME` (11 PM by default, see [Configuration](self-hosting.md#options)).
 - When you add or change a transaction dated in the past, the portfolio's history is rebuilt from the market data provider so the chart stays accurate.
 
 ## Search
@@ -271,7 +274,7 @@ Press `/` anywhere in the app, or click the search box in the top bar, to search
 
 ## AI chat
 
-Once you've [enabled AI chat](self-hosting.md#ai-chat), every portfolio and holding page shows an **AI Chat** window. The assistant is given the details of that portfolio or holding (quantities, cost basis, market value, gains, and dividends) so you can ask questions like:
+When AI chat is available, every portfolio and holding page shows an **AI Chat** window. On a self-hosted instance it's off until you [enable it and choose an AI provider](self-hosting.md#ai-chat). The assistant is given the details of that portfolio or holding (quantities, cost basis, market value, gains, and dividends) so you can ask questions like:
 
 - "Which holding is most successful in this portfolio?"
 - "Is my portfolio diverse enough?"

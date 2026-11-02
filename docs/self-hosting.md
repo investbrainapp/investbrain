@@ -2,6 +2,8 @@
 
 The supported way to run Investbrain is with the official Docker image and the [`docker-compose.yml`](../docker-compose.yml) file in this repository. It bundles everything you need: the web app, a background queue, a task scheduler, PostgreSQL, and Redis.
 
+If you'd rather not run a server, [Investbrain Cloud](https://investbra.in) runs the same app with nothing to install. You can start on one and move to the other later by [exporting and importing your data](import-export.md).
+
 - [Requirements](#requirements)
 - [What's in the compose file](#whats-in-the-compose-file)
 - [Installation](#installation)
@@ -284,7 +286,7 @@ If the proxy runs as another container, you can attach it to the `investbrain-ne
 
 The [MCP server](mcp.md) uses OAuth so AI assistants can connect without a pasted key. For that to work:
 
-- **Use a public HTTPS address for cloud assistants.** Claude (web, desktop, and mobile) and ChatGPT connect from their providers' servers, so `https://your-host/mcp` must be reachable from the internet with a valid certificate. Local assistants such as Claude Code, Cursor, and VS Code can use `http://localhost:8000/mcp`.
+- **Use a public HTTPS address for hosted assistants.** Claude (web, desktop, and mobile) and ChatGPT connect from their providers' servers, so `https://your-host/mcp` must be reachable from the internet with a valid certificate. Local assistants such as Claude Code, Cursor, and VS Code can use `http://localhost:8000/mcp`.
 - **Set `APP_URL` to that public address** and make sure your proxy forwards `Host` and `X-Forwarded-Proto` (see above). The OAuth discovery metadata tells clients where to send users to sign in. If it points at an internal or `http://` address, authorization fails.
 - **Keep the storage volume.** The OAuth signing keys are created on first start and stored in `storage`. If they're lost, every API token and authorized assistant stops working and users have to reconnect.
 

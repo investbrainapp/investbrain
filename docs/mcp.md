@@ -27,22 +27,23 @@ It can only see portfolios you have access to, and it can only change portfolios
 
 You need the address of your MCP endpoint. It's your Investbrain address followed by `/mcp`:
 
-```
-https://<your-investbrain-host>/mcp
-```
+| Where you use Investbrain | MCP endpoint |
+| --- | --- |
+| Investbrain Cloud | `https://investbra.in/mcp` |
+| Self-hosted | `https://<your-investbrain-host>/mcp` |
 
-Where the assistant runs matters:
+**On Investbrain Cloud, there's nothing to set up.** The endpoint is public, uses HTTPS, and works with every assistant listed below. Skip ahead to [Connecting an assistant](#connecting-an-assistant).
 
-- **Cloud assistants** (Claude on the web, desktop, or mobile, and ChatGPT) connect from the provider's servers. Your Investbrain instance must be reachable from the public internet over HTTPS.
+**If you self-host**, where the assistant runs matters:
+
+- **Hosted assistants** (Claude on the web, desktop, or mobile, and ChatGPT) connect from their providers' servers. Your instance must be reachable from the public internet over HTTPS, and `APP_URL` must be set to that public address. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
 - **Local assistants** (Claude Code, Cursor, VS Code, and other tools running on your own computer) connect from your machine, so a local address such as `http://localhost:8000/mcp` works.
 
-You also need to set `APP_URL` to that public address. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
-
-The MCP server is on by default. If you've set `MCP_SERVER_ENABLED` to `false`, set it back to `true` first (see [Turning off the MCP server](self-hosting.md#turning-off-the-mcp-server)).
+The MCP server is on by default on self-hosted instances. If you've set `MCP_SERVER_ENABLED` to `false`, set it back to `true` first (see [Turning off the MCP server](self-hosting.md#turning-off-the-mcp-server)).
 
 ## Connecting an assistant
 
-Menus change between versions, so check your assistant's documentation if a step doesn't match exactly. In every case you only need the endpoint URL: there's no API key to paste, because sign-in happens through OAuth in your browser.
+The examples below use the Investbrain Cloud endpoint, `https://investbra.in/mcp`. If you self-host, use your own endpoint instead. Menus change between versions, so check your assistant's documentation if a step doesn't match exactly. In every case you only need the endpoint URL: there's no API key to paste, because sign-in happens through OAuth in your browser.
 
 ### Claude (web, desktop, and mobile)
 
@@ -56,7 +57,7 @@ On Team and Enterprise plans, an organization owner may need to add the connecto
 ### Claude Code
 
 ```bash
-claude mcp add --transport http investbrain https://investbrain.example.com/mcp
+claude mcp add --transport http investbrain https://investbra.in/mcp
 ```
 
 Then run `/mcp` inside Claude Code, select **investbrain**, and choose to authenticate. Your browser opens so you can authorize access.
@@ -73,7 +74,7 @@ Add the server to `~/.cursor/mcp.json` (for all projects) or `.cursor/mcp.json` 
 {
   "mcpServers": {
     "investbrain": {
-      "url": "https://investbrain.example.com/mcp"
+      "url": "https://investbra.in/mcp"
     }
   }
 }
@@ -90,7 +91,7 @@ Add the server to `.vscode/mcp.json` in your workspace, or to your user configur
   "servers": {
     "investbrain": {
       "type": "http",
-      "url": "https://investbrain.example.com/mcp"
+      "url": "https://investbra.in/mcp"
     }
   }
 }
@@ -179,15 +180,15 @@ This section covers the technical details, in case you're debugging a client or 
 - Clients discover the authorization server automatically through standard metadata at `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. An unauthenticated request to `/mcp` returns `401` with a `WWW-Authenticate` header pointing at the resource metadata.
 - Clients register themselves using dynamic client registration at `/oauth/register`, then use the authorization code flow with PKCE (`S256`).
 - Personal access tokens from the **API Tokens** page don't carry the `mcp:use` scope, so they're rejected by the MCP endpoint with `403 Forbidden`. Use OAuth for MCP and API tokens for the REST API.
-- Signing keys for OAuth tokens are generated automatically on first start of the Docker container and stored in the `storage` volume.
+- On a self-hosted instance, signing keys for OAuth tokens are generated automatically on first start of the Docker container and stored in the `storage` volume.
 
 ## Troubleshooting
 
 **The assistant can't reach the server, or authorization fails partway through.**
-For cloud assistants, your instance must be on the public internet over HTTPS, and `APP_URL` must be set to that public HTTPS address. The OAuth metadata is built from `APP_URL`, so a wrong value sends the assistant to an address it can't reach. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
+On Investbrain Cloud, check that the endpoint is exactly `https://investbra.in/mcp` and that you signed in to the right account on the consent screen. If you self-host, hosted assistants need your instance on the public internet over HTTPS, and `APP_URL` must be set to that public HTTPS address. The OAuth metadata is built from `APP_URL`, so a wrong value sends the assistant to an address it can't reach. See [MCP and OAuth requirements](self-hosting.md#mcp-and-oauth-requirements).
 
 **`404 Not Found` from `/mcp`.**
-The MCP server is turned off. Set `MCP_SERVER_ENABLED` to `true` and [apply the change](self-hosting.md#applying-configuration-changes).
+On a self-hosted instance, this means the MCP server is turned off. Set `MCP_SERVER_ENABLED` to `true` and [apply the change](self-hosting.md#applying-configuration-changes).
 
 **`403 Forbidden` from `/mcp`.**
 The token doesn't have the `mcp:use` scope. This happens if you paste a personal API token into the client. Remove any manual token or header and let the client use OAuth.
@@ -198,4 +199,4 @@ Access may have been revoked under **Authorized Apps**, or the token expired and
 **The assistant says it doesn't have permission to change a portfolio.**
 You have read-only access to that portfolio. Ask the owner for full access.
 
-For more, see [Troubleshooting](troubleshooting.md#mcp-clients-cant-connect).
+For more, see [Troubleshooting](troubleshooting.md#mcp-clients-cant-connect). For problems connecting to Investbrain Cloud that these steps don't fix, [contact Investbrain](https://investbra.in/contact).

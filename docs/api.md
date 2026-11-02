@@ -13,7 +13,7 @@ Investbrain has a JSON REST API for reading and managing your portfolios, transa
 
 The API authenticates with personal access tokens.
 
-1. Sign in to Investbrain and open **API Tokens** from the user menu (or go to `/user/api-tokens`).
+1. Sign in to Investbrain and open **API Tokens** from the user menu (or go to `/user/api-tokens`). On Investbrain Cloud, you need to verify your email address before this page is available.
 2. Under **Create API Token**, enter a **Token Name** that reminds you what it's for, such as "Home spreadsheet" or "Brokerage sync script".
 3. Click **Create**.
 4. Copy the token from the dialog. **It's only shown once.** If you lose it, delete it and create a new one.
@@ -33,11 +33,12 @@ API tokens work only with the REST API. They can't be used with the [MCP server]
 
 **Base URL**
 
-```
-https://<your-investbrain-host>/api
-```
+| Where you use Investbrain | Base URL |
+| --- | --- |
+| Investbrain Cloud | `https://investbra.in/api` |
+| Self-hosted | `https://<your-investbrain-host>/api` (for a default local install, `http://localhost:8000/api`) |
 
-For a default local install that's `http://localhost:8000/api`.
+The examples on this page use Investbrain Cloud. If you self-host, replace `https://investbra.in` with your own address.
 
 **Headers**
 
@@ -53,7 +54,7 @@ Send request bodies as JSON with `Content-Type: application/json`.
 **Example: check that your token works**
 
 ```bash
-curl https://investbrain.example.com/api/me \
+curl https://investbra.in/api/me \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
   -H "Accept: application/json"
 ```
@@ -95,10 +96,10 @@ List responses look like this:
 {
   "data": [ { "...": "..." } ],
   "links": {
-    "first": "https://investbrain.example.com/api/transaction?page=1",
-    "last": "https://investbrain.example.com/api/transaction?page=4",
+    "first": "https://investbra.in/api/transaction?page=1",
+    "last": "https://investbra.in/api/transaction?page=4",
     "prev": null,
-    "next": "https://investbrain.example.com/api/transaction?page=2"
+    "next": "https://investbra.in/api/transaction?page=2"
   },
   "meta": {
     "current_page": 1,
@@ -144,7 +145,7 @@ Returns portfolios you own or that are shared with you, each including its owner
 - Search: title and notes
 
 ```bash
-curl "https://investbrain.example.com/api/portfolio?filter[wishlist]=0&sort=title" \
+curl "https://investbra.in/api/portfolio?filter[wishlist]=0&sort=title" \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
   -H "Accept: application/json"
 ```
@@ -158,7 +159,7 @@ curl "https://investbrain.example.com/api/portfolio?filter[wishlist]=0&sort=titl
 | `wishlist` | boolean | No | Defaults to `false` |
 
 ```bash
-curl -X POST https://investbrain.example.com/api/portfolio \
+curl -X POST https://investbra.in/api/portfolio \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -197,7 +198,7 @@ Returns transactions across all portfolios you have access to.
 
 ```bash
 # All AAPL sells in one portfolio, newest first
-curl "https://investbrain.example.com/api/transaction?filter[portfolio_id]=9d6c1f3e-...&filter[symbol]=AAPL&filter[transaction_type]=SELL&sort=-date" \
+curl "https://investbra.in/api/transaction?filter[portfolio_id]=9d6c1f3e-...&filter[symbol]=AAPL&filter[transaction_type]=SELL&sort=-date" \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
   -H "Accept: application/json"
 ```
@@ -207,7 +208,7 @@ curl "https://investbrain.example.com/api/transaction?filter[portfolio_id]=9d6c1
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `portfolio_id` | UUID | Yes | You need full access to this portfolio. |
-| `symbol` | string | Yes | Must be recognized by the instance's market data provider. |
+| `symbol` | string | Yes | Must be recognized by Investbrain's market data provider. |
 | `transaction_type` | string | Yes | `BUY` or `SELL` |
 | `date` | string | Yes | `YYYY-MM-DD`, not in the future |
 | `quantity` | number | Yes | Greater than 0. For sells, can't exceed the shares owned on that date. |
@@ -218,7 +219,7 @@ curl "https://investbrain.example.com/api/transaction?filter[portfolio_id]=9d6c1
 For sells, the cost basis is calculated for you from the average cost of earlier buys. Any `cost_basis` you send with a sell is ignored.
 
 ```bash
-curl -X POST https://investbrain.example.com/api/transaction \
+curl -X POST https://investbra.in/api/transaction \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -276,7 +277,7 @@ The list includes fully sold positions (quantity `0`). Sort or check `quantity` 
 **Get** `GET /holding/{portfolio_id}/{symbol}`
 
 ```bash
-curl https://investbrain.example.com/api/holding/9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f/VOO \
+curl https://investbra.in/api/holding/9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f/VOO \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
   -H "Accept: application/json"
 ```
@@ -312,7 +313,7 @@ curl https://investbrain.example.com/api/holding/9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3
 
 **Get** `GET /market-data/{symbol}`
 
-Returns the latest market data for any symbol your instance's provider recognizes, whether or not you hold it. Returns `404` if the symbol can't be found.
+Returns the latest market data for any symbol Investbrain's market data provider recognizes, whether or not you hold it. Returns `404` if the symbol can't be found.
 
 ```json
 {
@@ -359,4 +360,4 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-A machine-readable OpenAPI 3 description of the API is kept in the repository at [`openapi.json`](../openapi.json). Import it into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. The spec defines a server for self-hosted instances where you can fill in your own host.
+A machine-readable OpenAPI 3 description of the API is kept in the repository at [`openapi.json`](../openapi.json). Import it into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. The spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host.

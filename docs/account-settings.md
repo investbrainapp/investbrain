@@ -6,11 +6,15 @@ Open the user menu at the bottom of the sidebar to reach your account settings:
 - **Connections** - social logins and authorized apps
 - **API Tokens** - personal access tokens for the [REST API](api.md)
 - **Import / Export Data** - see [Import and export](import-export.md)
-- **Provider Health** - only shown to the first account registered on your instance, see [Monitoring market data providers](self-hosting.md#monitoring-market-data-providers)
+- **Provider Health** - self-hosted instances only, and only for the first account registered, see [Monitoring market data providers](self-hosting.md#monitoring-market-data-providers)
+
+On Investbrain Cloud, **Connections**, **API Tokens**, and **Import / Export Data** become available once you've verified your email address.
 
 ## Profile information
 
 Under **Manage Profile** you can change your name and email address and upload a profile photo (or remove the current one). Click **Save** when you're done.
+
+If you change your email address, Investbrain sends a verification link to the new address. On Investbrain Cloud, the Connections, API Tokens, and Import / Export pages are unavailable until you click it. If it doesn't arrive, use **Click here to re-send the verification email** under the email field.
 
 ## Locale and display currency
 
@@ -63,11 +67,14 @@ With 2FA turned on, click **Show Recovery Codes** to view your remaining codes, 
 
 Click **Disable** and confirm your password.
 
-If you've lost both your authenticator and your recovery codes, you can reset 2FA from the command line. See [Locked out by two-factor authentication](troubleshooting.md#locked-out-by-two-factor-authentication).
+If you've lost both your authenticator and your recovery codes:
+
+- **Investbrain Cloud** - [contact Investbrain](https://investbra.in/contact) for help recovering your account.
+- **Self-hosted** - reset 2FA from the command line. See [Locked out by two-factor authentication](troubleshooting.md#locked-out-by-two-factor-authentication).
 
 ## Social logins
 
-Once you've [set up social login](self-hosting.md#social-login) on your instance, you can sign in with GitHub, Google, Facebook, or LinkedIn instead of (or as well as) your password.
+Social logins let you sign in with GitHub, Google, Facebook, or LinkedIn instead of (or as well as) your password. The **Social Logins** section on the Connections page lists the providers that are available. On a self-hosted instance, providers appear once you've [set them up](self-hosting.md#social-login).
 
 <!-- SCREENSHOT: Connections page Social Logins section with one connected provider and one with a Connect button. -->
 <!-- ![The Social Logins section of the Connections page](images/account-settings-social-logins.png) -->

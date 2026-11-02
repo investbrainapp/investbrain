@@ -1,6 +1,8 @@
 # Troubleshooting
 
-Start with the logs. Most problems leave a clear message in one of them.
+This page is mostly for self-hosted instances. If you use Investbrain Cloud, the server, email, and market data are managed for you, so you can skip the installation, configuration, and logs sections. The sections on [accounts](#accounts-and-email), [import and export](#import-and-export), the [API](#api), and [MCP clients](#mcp-clients-cant-connect) apply to both. For anything else on Investbrain Cloud, [contact Investbrain](https://investbra.in/contact).
+
+On a self-hosted instance, start with the logs. Most problems leave a clear message in one of them.
 
 ```bash
 # Container startup, scheduler, and queue worker output
@@ -164,7 +166,9 @@ docker exec -it investbrain-app php artisan fix:cost-basis-for-sales --portfolio
 
 ### Password reset, invitation, or verification emails never arrive
 
-By default `MAIL_MAILER` is `log`, so emails are written to the log instead of being sent. In a pinch you can find the link at the end of the log right after triggering the email:
+On Investbrain Cloud, check your spam folder and request the email again. If it still doesn't arrive, [contact Investbrain](https://investbra.in/contact).
+
+On a self-hosted instance, `MAIL_MAILER` is `log` by default, so emails are written to the log instead of being sent. In a pinch you can find the link at the end of the log right after triggering the email:
 
 ```bash
 docker exec -it investbrain-app tail -n 150 storage/logs/laravel.log
@@ -176,7 +180,7 @@ To send real email, [configure SMTP](self-hosting.md#email). If you've configure
 
 ### Locked out by two-factor authentication
 
-First try one of your recovery codes on the 2FA prompt. If you've lost those too, turn off 2FA for the account directly in the database:
+First try one of your recovery codes on the 2FA prompt. If you've lost those too and you use Investbrain Cloud, [contact Investbrain](https://investbra.in/contact). On a self-hosted instance, turn off 2FA for the account directly in the database:
 
 ```bash
 docker exec -it investbrain-pgsql psql -U investbrain -d investbrain -c \
@@ -187,7 +191,9 @@ The user can then sign in with just their password and set up 2FA again.
 
 ### Forgot your password and email doesn't work
 
-Reset the password from the command line:
+On Investbrain Cloud, use **Forgot your password?** on the login page. If the reset email doesn't arrive, see the section above.
+
+On a self-hosted instance, reset the password from the command line:
 
 ```bash
 docker exec -it investbrain-app php artisan tinker --execute \
@@ -246,8 +252,9 @@ You used a filter or sort column that isn't supported for that endpoint. The err
 
 ## MCP clients can't connect
 
+- **Investbrain Cloud** users should use `https://investbra.in/mcp` exactly and check they signed in to the right account on the consent screen. The rest of this section is for self-hosted instances.
 - **`404 Not Found` from `/mcp`** (or from the `/.well-known/oauth-...` discovery URLs) means the MCP server is turned off. Set `MCP_SERVER_ENABLED` to `true` and [apply the change](self-hosting.md#applying-configuration-changes). See [Turning off the MCP server](self-hosting.md#turning-off-the-mcp-server).
-- **Cloud assistants (Claude, ChatGPT)** need your instance on the public internet over HTTPS with a valid certificate. A `localhost` or LAN address only works for assistants running on your own machine.
+- **Hosted assistants (Claude, ChatGPT)** need your instance on the public internet over HTTPS with a valid certificate. A `localhost` or LAN address only works for assistants running on your own machine.
 - **Check the OAuth metadata** from outside your network:
 
   ```bash
@@ -275,7 +282,9 @@ Set `AI_CHAT_ENABLED: true` and [apply the change](self-hosting.md#applying-conf
 
 ## Still stuck?
 
-Search the [GitHub issues](https://github.com/investbrainapp/investbrain/issues) or open a new one. Include:
+For problems with your Investbrain Cloud account, [contact Investbrain](https://investbra.in/contact).
+
+For self-hosted instances and bugs in the app, search the [GitHub issues](https://github.com/investbrainapp/investbrain/issues) or open a new one. Include:
 
 - What you were doing and what happened
 - The relevant lines from `docker compose logs app` and `storage/logs/laravel.log` (remove any secrets)

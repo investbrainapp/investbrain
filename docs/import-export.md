@@ -3,11 +3,11 @@
 Investbrain can export everything in your account to a single Excel workbook and import that workbook back. Use it to:
 
 - Keep regular backups of your portfolios and transactions
-- Move your data from one Investbrain instance to another
+- Move your data between Investbrain Cloud and a self-hosted instance (in either direction), or from one self-hosted instance to another
 - Bulk-load years of transaction history from a spreadsheet instead of typing it in
 - Make bulk edits to existing transactions
 
-Open **Import / Export Data** from the user menu to get started.
+Open **Import / Export Data** from the user menu to get started. On Investbrain Cloud, you need to verify your email address before this page is available.
 
 <!-- SCREENSHOT: The Import / Export page showing the Import section (with the Download import template link) and the Export section. -->
 <!-- ![The Import / Export page](images/import-export-page.png) -->
@@ -35,7 +35,7 @@ Investbrain imports `.xlsx` workbooks of up to 2 MB. The easiest starting point 
 1. Click **Select a file** and choose your workbook.
 2. Click **Import**.
 
-A progress dialog shows each stage: portfolios, transactions, then daily changes. The import runs in the background, so you can click **Dismiss** and keep using Investbrain. You'll also get an email when it succeeds or fails, if you've [set up email](self-hosting.md#email).
+A progress dialog shows each stage: portfolios, transactions, then daily changes. The import runs in the background, so you can click **Dismiss** and keep using Investbrain. You'll also get an email when it succeeds or fails. On a self-hosted instance, that email is only sent once you've [set up email](self-hosting.md#email).
 
 <!-- SCREENSHOT: Import progress dialog part-way through, for example while importing transactions. -->
 <!-- ![The import progress dialog](images/import-export-progress.png) -->
@@ -112,11 +112,14 @@ Reverse splits (which reduce the number of shares you hold) can't be imported as
 
 Imports don't check that a `SELL` row sells only shares the portfolio held on that date, so check your sales before importing.
 
-If you leave Cost Basis blank on a `SELL` row, it's saved as `0`, which makes the realized gain wrong. After importing, recalculate the cost basis of your sales from your average purchase cost:
+If you leave Cost Basis blank on a `SELL` row, it's saved as `0`, which makes the realized gain wrong. To recalculate it from your average purchase cost after importing:
 
-```bash
-docker exec -it investbrain-app php artisan fix:cost-basis-for-sales --portfolio=<portfolio_id>
-```
+- **Any instance, including Investbrain Cloud** - open the holding, click the sale in **Recent activity**, and click **Update** without changing anything. Saving a sale recalculates its cost basis.
+- **Self-hosted, many sales at once** - run:
+
+  ```bash
+  docker exec -it investbrain-app php artisan fix:cost-basis-for-sales --portfolio=<portfolio_id>
+  ```
 
 ### Symbols
 
