@@ -132,6 +132,9 @@
           "401": {
             "$ref": "#/components/responses/UnauthenticatedError"
           },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -215,6 +218,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
           },
           "500": {
             "$ref": "#/components/responses/ServerError"
@@ -322,28 +328,14 @@
                   {
                     "type": "object",
                     "required": [
-                      "symbol",
                       "portfolio_id",
+                      "symbol",
                       "transaction_type",
+                      "date",
                       "quantity",
-                      "date"
+                      "currency"
                     ],
-                    "oneOf": [
-                      {
-                        "properties": {
-                          "cost_basis": {
-                            "type": "number"
-                          }
-                        }
-                      },
-                      {
-                        "properties": {
-                          "sale_price": {
-                            "type": "number"
-                          }
-                        }
-                      }
-                    ]
+                    "description": "Send `cost_basis` with a `BUY` and `sale_price` with a `SELL`."
                   }
                 ]
               }
@@ -366,6 +358,9 @@
           },
           "403": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
           },
           "500": {
             "$ref": "#/components/responses/ServerError"
@@ -450,6 +445,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
           },
           "500": {
             "$ref": "#/components/responses/ServerError"
@@ -558,7 +556,7 @@
           "name": "symbol",
           "in": "path",
           "required": true,
-          "description": "Ticker symbol",
+          "description": "Ticker symbol, in upper case (for example `AAPL`)",
           "schema": {
             "type": "string",
             "example": "AAPL"
@@ -583,6 +581,9 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
@@ -627,6 +628,9 @@
           "404": {
             "$ref": "#/components/responses/NotFoundError"
           },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -639,7 +643,7 @@
           "name": "symbol",
           "in": "path",
           "required": true,
-          "description": "Ticker symbol",
+          "description": "Ticker symbol, in upper case (for example `AAPL`)",
           "schema": {
             "type": "string",
             "example": "AAPL"
@@ -665,6 +669,9 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
             "$ref": "#/components/responses/ServerError"
@@ -791,7 +798,8 @@
             "readOnly": true,
             "items": {
               "$ref": "#/components/schemas/Holding"
-            }
+            },
+            "description": "Included in `GET /portfolio` list results only. Not returned when fetching, creating, or updating a single portfolio."
           },
           "created_at": {
             "type": "string",
@@ -815,7 +823,8 @@
           },
           "symbol": {
             "type": "string",
-            "example": "AAPL"
+            "example": "AAPL",
+            "description": "Ticker symbol. Must be recognized by Investbrain's market data provider. Stored in upper case."
           },
           "portfolio_id": {
             "type": "string",
@@ -831,31 +840,41 @@
           "quantity": {
             "type": "number",
             "format": "float",
-            "example": 5
+            "example": 5,
+            "description": "Number of shares. Must be greater than 0. A `SELL` cannot exceed the shares held on its date."
           },
           "currency": {
             "type": "string",
-            "example": "USD"
+            "example": "USD",
+            "description": "In requests, the currency of `cost_basis` or `sale_price`; it is converted to the symbol's trading currency if different. Accepted codes: AUD, BRL, CAD, CHF, CNY, CZK, DKK, EUR, GBP, HKD, INR, JPY, KRW, NOK, NZD, SEK, SGD, USD, ZAR. In responses, always the symbol's trading currency."
           },
           "cost_basis": {
             "type": "number",
             "format": "float",
-            "example": 200
+            "example": 200,
+            "description": "Price paid per share. Send it with every `BUY`. Ignored on `SELL`, where it is calculated from the average cost of earlier purchases."
           },
           "sale_price": {
-            "type": "number"
+            "type": "number",
+            "description": "Price received per share. Send it with every `SELL`. Ignored on `BUY`."
           },
           "split": {
             "type": "boolean",
-            "example": false
+            "example": false,
+            "readOnly": true,
+            "description": "`true` for transactions Investbrain created to account for a stock split. Set automatically."
           },
           "reinvested_dividend": {
             "type": "boolean",
-            "example": false
+            "example": false,
+            "readOnly": true,
+            "description": "`true` for transactions Investbrain created by reinvesting a dividend. Set automatically."
           },
           "date": {
             "type": "string",
-            "format": "date-time"
+            "format": "date",
+            "example": "2024-03-15",
+            "description": "Trade date (`YYYY-MM-DD`). Cannot be in the future."
           },
           "created_at": {
             "type": "string",
@@ -934,19 +953,25 @@
             "type": "number",
             "format": "float",
             "example": 9072.36,
-            "readOnly": true
+            "readOnly": true,
+            "nullable": true,
+            "description": "Included when fetching a single holding, and in the holdings of `GET /portfolio` list results. Currently `null` in `GET /holding` list results."
           },
           "market_gain_dollars": {
             "type": "number",
             "format": "float",
             "example": 7877.76,
-            "readOnly": true
+            "readOnly": true,
+            "nullable": true,
+            "description": "Included when fetching a single holding, and in the holdings of `GET /portfolio` list results. Currently `null` in `GET /holding` list results."
           },
           "market_gain_percent": {
             "type": "number",
             "format": "float",
             "example": 85.75,
-            "readOnly": true
+            "readOnly": true,
+            "nullable": true,
+            "description": "Included when fetching a single holding, and in the holdings of `GET /portfolio` list results. Currently `null` in `GET /holding` list results."
           },
           "created_at": {
             "type": "string",
@@ -972,11 +997,6 @@
           "name": {
             "type": "string",
             "example": "Apple Inc.",
-            "readOnly": true
-          },
-          "currency": {
-            "type": "string",
-            "example": "USD",
             "readOnly": true
           },
           "market_value": {
@@ -1125,7 +1145,7 @@
         "description": "Server error"
       },
       "ValidationError": {
-        "description": "One or more query parameters are invalid",
+        "description": "The query parameters or request body failed validation",
         "content": {
           "application/json": {
             "schema": {
@@ -1204,7 +1224,7 @@
             ]
           }
         },
-        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error. Without `sort`, results come back in no particular order, so pass `sort` if you need a stable order across pages."
       },
       "portfolioFilter": {
         "in": "query",
@@ -1259,7 +1279,7 @@
             ]
           }
         },
-        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error. Without `sort`, results come back in no particular order, so pass `sort` if you need a stable order across pages."
       },
       "transactionFilter": {
         "in": "query",
@@ -1284,10 +1304,6 @@
                 "BUY",
                 "SELL"
               ]
-            },
-            "currency": {
-              "type": "string",
-              "example": "USD"
             },
             "split": {
               "type": "boolean"
@@ -1328,7 +1344,7 @@
             ]
           }
         },
-        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error."
+        "description": "Comma-separated columns to sort by. Prefix a column with `-` to sort it in descending order (e.g. `sort=-date,symbol`). Unsupported columns return a 422 validation error. Without `sort`, results come back in no particular order, so pass `sort` if you need a stable order across pages."
       },
       "holdingFilter": {
         "in": "query",

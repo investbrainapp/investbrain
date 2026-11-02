@@ -85,12 +85,14 @@ The three list endpoints (`GET /portfolio`, `GET /transaction`, and `GET /holdin
 | `page` | `page=2` | Page number, starting at 1. |
 | `itemsPerPage` | `itemsPerPage=50` | Results per page. Default 15, maximum 100. |
 | `sort` | `sort=-date,symbol` | Comma-separated columns. Prefix with `-` for descending. |
-| `filter[<name>]` | `filter[symbol]=AAPL,MSFT` | Exact match. Separate values with commas to match any of them. |
+| `filter[<name>]` | `filter[symbol]=AAPL,MSFT` | Exact match. Separate values with commas to match any of them. For true/false filters, use `true`/`false` or `1`/`0`. |
 | `search` | `search=apple` | Case-insensitive partial match on the endpoint's search columns. |
 
 Using a sort or filter that isn't supported for that endpoint returns a `422` validation error listing the allowed values.
 
-List responses look like this:
+Without `sort`, results come back in no particular order. If you page through results, pass `sort` so the order stays the same from page to page.
+
+List responses look like this (`links` and `meta` are shortened here):
 
 ```json
 {
@@ -138,7 +140,7 @@ All IDs are UUIDs. The API follows the same permissions as the web app: you can 
 
 **List** `GET /portfolio`
 
-Returns portfolios you own or that are shared with you, each including its owner, transactions, and holdings.
+Returns portfolios you own or that are shared with you, each including its owner, transactions, and holdings (with each holding's performance).
 
 - Sort: `title`, `wishlist`, `created_at`, `updated_at`
 - Filter: `title`, `wishlist`, `holdings.symbol` (portfolios holding any of the given symbols)
@@ -158,6 +160,8 @@ curl "https://investbra.in/api/portfolio?filter[wishlist]=0&sort=title" \
 | `notes` | string | No | |
 | `wishlist` | boolean | No | Defaults to `false` |
 
+Returns `201 Created` with the new portfolio. You become its owner.
+
 ```bash
 curl -X POST https://investbra.in/api/portfolio \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
@@ -174,13 +178,14 @@ curl -X POST https://investbra.in/api/portfolio \
   "wishlist": false,
   "owner": { "id": "...", "name": "Jane Doe", "email": "jane@example.com", "...": "..." },
   "transactions": [],
-  "holdings": [],
   "created_at": "2026-11-01T14:03:11.000000Z",
   "updated_at": "2026-11-01T14:03:11.000000Z"
 }
 ```
 
 **Get** `GET /portfolio/{id}`
+
+Returns the portfolio with its owner and transactions. Unlike the list, single-portfolio responses (including those from create and update) don't include `holdings`. Use `GET /holding?filter[portfolio_id]=<id>` for those, or the portfolio list for holdings with performance.
 
 **Update** `PUT /portfolio/{id}` - send only the fields you want to change (`title`, `notes`, `wishlist`).
 
@@ -209,14 +214,20 @@ curl "https://investbra.in/api/transaction?filter[portfolio_id]=9d6c1f3e-...&fil
 | --- | --- | --- | --- |
 | `portfolio_id` | UUID | Yes | You need full access to this portfolio. |
 | `symbol` | string | Yes | Must be recognized by Investbrain's market data provider. |
-| `transaction_type` | string | Yes | `BUY` or `SELL` |
+| `transaction_type` | string | Yes | `BUY` or `SELL`, in upper case |
 | `date` | string | Yes | `YYYY-MM-DD`, not in the future |
 | `quantity` | number | Yes | Greater than 0. For sells, can't exceed the shares owned on that date. |
-| `currency` | string | Yes | Currency of the price, for example `USD`. Converted to the security's trading currency if different. |
+| `currency` | string | Yes | Currency of the price. Converted to the security's trading currency if different. One of `AUD`, `BRL`, `CAD`, `CHF`, `CNY`, `CZK`, `DKK`, `EUR`, `GBP`, `HKD`, `INR`, `JPY`, `KRW`, `NOK`, `NZD`, `SEK`, `SGD`, `USD`, or `ZAR`. Minor-unit codes such as `GBX` aren't accepted here; send the price in `GBP` instead. |
 | `cost_basis` | number | For `BUY` | Price paid per share |
 | `sale_price` | number | For `SELL` | Price received per share |
 
-For sells, the cost basis is calculated for you from the average cost of earlier buys. Any `cost_basis` you send with a sell is ignored.
+Returns `201 Created` with the new transaction.
+
+A few things to know:
+
+- **Always send `cost_basis` with a buy and `sale_price` with a sell.** Validation doesn't check for them yet. A buy without `cost_basis` fails with a `500` server error instead of a `422`, and a sell without `sale_price` is saved without one, which makes its realized gain wrong.
+- **For sells, the cost basis is calculated for you** from the average cost of earlier buys. Any `cost_basis` you send with a sell is ignored.
+- **`split` and `reinvested_dividend` are read-only.** Investbrain sets them on the transactions it creates for splits and dividend reinvestment, and ignores them in requests.
 
 ```bash
 curl -X POST https://investbra.in/api/transaction \
@@ -274,7 +285,11 @@ Holdings are created from transactions, so there is no endpoint to create or del
 
 The list includes fully sold positions (quantity `0`). Sort or check `quantity` if you only want open positions.
 
+In list results, `total_market_value`, `market_gain_dollars`, and `market_gain_percent` are currently always `null`. To get them, fetch the holding on its own (below), or use the portfolio list (`GET /portfolio`), which includes each portfolio's holdings with their performance.
+
 **Get** `GET /holding/{portfolio_id}/{symbol}`
+
+Use the symbol in upper case (`VOO`, not `voo`). Returns `404` if the portfolio has no holding for that symbol, and `403` if you don't have access to the portfolio.
 
 ```bash
 curl https://investbra.in/api/holding/9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f/VOO \
@@ -313,7 +328,9 @@ curl https://investbra.in/api/holding/9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f/VOO \
 
 **Get** `GET /market-data/{symbol}`
 
-Returns the latest market data for any symbol Investbrain's market data provider recognizes, whether or not you hold it. Returns `404` if the symbol can't be found.
+Returns the latest market data for any symbol Investbrain's market data provider recognizes, whether or not you hold it. Use the symbol in upper case. Returns `404` if the symbol can't be found.
+
+If Investbrain's stored price for the symbol is older than its refresh interval (30 minutes by default), this request fetches a fresh quote from the market data provider first, so it can take a moment. The response doesn't include the symbol's currency; the holding and transaction endpoints return it as `currency`.
 
 ```json
 {
@@ -340,6 +357,7 @@ Fields the provider doesn't supply are `null`.
 
 | Status | Meaning |
 | --- | --- |
+| `200 OK`, `201 Created`, `204 No Content` | Success. `201` is returned when a portfolio or transaction is created, and `204` after a delete. |
 | `401 Unauthorized` | Missing, invalid, expired, or revoked token. |
 | `403 Forbidden` | You don't have access to that portfolio, or you only have read-only access and tried to change something. |
 | `404 Not Found` | The record doesn't exist, or the symbol isn't recognized. |
@@ -360,4 +378,4 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-A machine-readable OpenAPI 3 description of the API is kept in the repository at [`openapi.json`](../openapi.json). Import it into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. The spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host.
+A machine-readable OpenAPI 3 description of the API is kept in the repository at [`openapi.json`](../openapi.json). Import it into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. The spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host. If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).
