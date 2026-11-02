@@ -50,6 +50,8 @@ class BackupExport extends Model
             if ($export->path) {
                 Storage::disk()->delete($export->path);
             }
+
+            Storage::disk()->deleteDirectory($export->performanceDirectory());
         });
     }
 
@@ -72,6 +74,29 @@ class BackupExport extends Model
             ->where('created_at', '>=', now()->subHours(static::RETENTION_HOURS))
             ->latest()
             ->first();
+    }
+
+    /**
+     * Where each portfolio's calculated performance figures are kept while the export is built.
+     */
+    public function performanceDirectory(): string
+    {
+        return 'exports/'.$this->user_id.'/'.$this->id.'-performance';
+    }
+
+    public function performancePath(string $portfolioId): string
+    {
+        return $this->performanceDirectory().'/'.$portfolioId.'.json';
+    }
+
+    public function markAsFailed(): void
+    {
+        $this->update([
+            'status' => 'failed',
+            'completed_at' => now(),
+        ]);
+
+        Storage::disk()->deleteDirectory($this->performanceDirectory());
     }
 
     public function filename(): string
