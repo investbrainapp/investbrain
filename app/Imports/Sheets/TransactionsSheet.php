@@ -10,10 +10,12 @@ use App\Models\Currency;
 use App\Models\CurrencyRate;
 use App\Models\Holding;
 use App\Models\Transaction;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -142,10 +144,14 @@ class TransactionsSheet implements SkipsEmptyRows, ToCollection, WithEvents, Wit
             'transaction_id' => ['sometimes', 'nullable', 'uuid'],
             'symbol' => ['required', 'string', 'max:25', 'regex:/^[A-Za-z0-9.\-^=:\/_]+$/'],
             'portfolio_id' => ['required', 'uuid'],
-            'quantity' => ['required', 'min:0', 'numeric'],
             'transaction_type' => ['required', 'in:BUY,SELL'],
             'date' => ['required', 'date'],
-            'quantity' => ['required', 'min:0', 'numeric'],
+            // reverse splits are recorded as split transactions with a negative quantity
+            'quantity' => Rule::forEach(fn ($value, $attribute, $data, $row) => [
+                'required',
+                'numeric',
+                ...(boolval(Arr::get($row, 'split')) ? [] : ['min:0']),
+            ]),
             'currency' => ['required', 'string'],
             'split' => ['sometimes', 'nullable', 'boolean'],
             'reinvested_dividend' => ['sometimes', 'nullable', 'boolean'],

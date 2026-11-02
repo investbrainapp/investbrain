@@ -29,7 +29,7 @@ Schedule::command(CaptureDailyChange::class)->dailyAt(config('investbrain.daily_
 Schedule::command(RefreshDividendData::class)->daily()->days([1, 3, 5]);
 
 /**
- * Refreshes split data for your holdings (and adjusts existing transactions for new splits)
+ * Refreshes split data for your holdings (and creates new transactions for new splits)
  */
 Schedule::command(RefreshSplitData::class)->weekly();
 

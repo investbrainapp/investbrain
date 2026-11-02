@@ -189,6 +189,22 @@ class ImportExportTest extends TestCase
         $this->assertFalse($validator->fails());
     }
 
+    #[TestWith([-200, true, false])]
+    #[TestWith([-200, false, true])]
+    #[TestWith([5, false, false])]
+    public function test_import_only_allows_negative_quantity_for_split_transactions(float $quantity, bool $split, bool $shouldFail): void
+    {
+        $sheet = $this->makeTransactionsSheet(User::factory()->create());
+
+        // rows are validated as a list, the same way Laravel Excel does
+        $validator = Validator::make(
+            [['quantity' => $quantity, 'split' => $split]],
+            ['*.quantity' => $sheet->rules()['quantity']]
+        );
+
+        $this->assertEquals($shouldFail, $validator->fails());
+    }
+
     /**
      * @return array{0: User, 1: Portfolio, 2: Transaction}
      */
