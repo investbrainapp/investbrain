@@ -3,6 +3,7 @@
 use App\Exports\BackupExport;
 use App\Models\BackupImport as BackupImportModel;
 use App\Traits\Toast;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
@@ -21,7 +22,17 @@ new class extends Component
 
     public ?BackupImportModel $backupImport = null;
 
-    public int $percent = 10;
+    public function mount(): void
+    {
+        // pick back up an import that is still running (e.g. after navigating away)
+        $this->backupImport = BackupImportModel::where('user_id', auth()->id())
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->where('created_at', '>=', now()->subHour())
+            ->latest()
+            ->first();
+
+        $this->importStatusDialog = ! is_null($this->backupImport);
+    }
 
     // methods
     public function import()
@@ -35,44 +46,41 @@ new class extends Component
             return;
         }
 
+        $this->importStatusDialog = true;
+
         $this->backupImport = BackupImportModel::create([
             'user_id' => auth()->user()->id,
             'path' => $this->file->getPathname(),
         ]);
 
-        $this->importStatusDialog = true;
-
+        $this->checkImportStatus();
     }
 
     public function checkImportStatus()
     {
-        if (Str::contains($this->backupImport?->message, 'portfolios')) {
-
-            $this->percent = (1 / 2) * 100;
-        }
-
-        if (Str::contains($this->backupImport?->message, 'transactions')) {
-
-            $this->percent = (3 / 4) * 100;
-        }
-
-        if (Str::contains($this->backupImport?->message, 'daily changes')) {
-
-            $this->percent = (7 / 8) * 100;
-        }
+        $this->backupImport?->refresh();
 
         if ($this->backupImport?->status == 'failed') {
 
-            unset($this->file);
-            $this->percent = 100;
+            $this->reset('file');
         }
 
         if ($this->backupImport?->status == 'success') {
 
             $this->importStatusDialog = false;
+            $message = $this->backupImport->message;
             $this->backupImport = null;
 
-            $this->success(__('Successfully imported!'), redirectTo: route('dashboard'));
+            $this->success($message, redirectTo: route('dashboard'));
+        }
+    }
+
+    public function closeImportStatus()
+    {
+        $this->importStatusDialog = false;
+
+        if ($this->backupImport?->isFinished()) {
+            $this->backupImport = null;
         }
     }
 
@@ -80,6 +88,7 @@ new class extends Component
     {
         return Excel::download(new BackupExport(empty: true), now()->format('Y_m_d').'_investbrain_template.xlsx');
     }
+
 }; ?>
 
 <x-forms.form-section submit="import">
@@ -88,46 +97,86 @@ new class extends Component
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Upload or recover your Investbrain portfolio and holdings.') }} 
-        <span class="text-xs text-secondary"><a href="#" title="{{ __('Click to download import template.') }}" @click="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></span>
+        {{ __('Upload or recover your Investbrain portfolio and holdings.') }}
+        <span class="text-xs text-secondary"><a href="#" title="{{ __('Click to download import template.') }}" @click.prevent="$wire.downloadTemplate()"> {{ __('Download import template.') }}</a></span>
     </x-slot>
 
     <x-slot:form>
-        
+
         <div class="col-span-6 sm:col-span-4">
-            <x-ui.file wire:model="file" label="{{ __('Select a file') }}" hint="" accept=".xlsx" required />
+            <x-ui.file wire:model="file" label="{{ __('Select a file') }}" hint="{{ __('An .xlsx file in the import template format (an Investbrain export works too).') }}" accept=".xlsx" required />
         </div>
 
-        <x-ui.dialog-modal wire:model.live="importStatusDialog" persistent>
-            <x-slot name="title">
 
-                @if($backupImport?->status)
-                <div 
-                    class="{{ $backupImport?->status == 'failed' ? 'text-error' : '' }}"
-                >
-                    {{ $backupImport?->message }}
-                </div>
+        <x-ui.dialog-modal wire:model.live="importStatusDialog" box-class="max-w-3xl" persistent>
+            <x-slot name="title">
+                @if($backupImport?->status == 'failed')
+                    <div class="text-error">{{ $backupImport->message }}</div>
+                @else
+                    {{ __('Importing your file') }}
                 @endif
             </x-slot>
+
             <x-slot name="content">
-                @if($backupImport?->status != 'failed')
-                <x-ui.progress 
-                    :indeterminate="$backupImport?->status == 'pending'"
-                    class="progress-primary h-3"
-                    value="{{ $percent }}"
-                    max="100"
-                />
+                @if($backupImport?->status == 'failed')
+
+                    <p class="mb-3">{{ __('Fix these problems in your spreadsheet and upload it again.') }}</p>
+
+                    <div class="overflow-auto max-h-96 border border-base-300 rounded-md">
+                        <table class="table table-sm table-pin-rows">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Sheet') }}</th>
+                                    <th>{{ __('Row') }}</th>
+                                    <th>{{ __('Column') }}</th>
+                                    <th>{{ __('Problem') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($backupImport->errors ?? [] as $error)
+                                <tr wire:key="import-error-{{ $loop->index }}">
+                                    <td class="whitespace-nowrap align-top">{{ $error['sheet'] ?? '' }}</td>
+                                    <td class="align-top">{{ $error['row'] ?? '' }}</td>
+                                    <td class="whitespace-nowrap align-top">{{ $error['column'] ?? '' }}</td>
+                                    <td class="align-top">
+                                        {{ $error['message'] }}
+                                        @if(filled($error['value'] ?? null))
+                                            <span class="block text-xs text-secondary-content font-mono">{{ __('Value: :value', ['value' => $error['value']]) }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if($backupImport->error_count > count($backupImport->errors ?? []))
+                        <p class="mt-2 text-xs text-secondary-content">
+                            {{ __('Showing the first :shown of :total problems.', ['shown' => count($backupImport->errors ?? []), 'total' => $backupImport->error_count]) }}
+                        </p>
+                    @endif
+
+                @else
+
+                    <div class="mb-2">{{ $backupImport?->message }}</div>
+
+                    <x-ui.progress
+                        :indeterminate="in_array($backupImport?->status, [null, 'pending'])"
+                        class="progress-primary h-3"
+                        value="{{ $backupImport?->progress ?? 0 }}"
+                        max="100"
+                    />
                 @endif
             </x-slot>
-            
+
             <x-slot name="footer">
                 @if($backupImport?->status == 'failed')
 
-                    <x-ui.button wire:click="$toggle('importStatusDialog')"> {{ __('Try again') }} </x-ui.button>
+                    <x-ui.button wire:click="closeImportStatus"> {{ __('Try again') }} </x-ui.button>
                 @else
-                    <div wire:poll="checkImportStatus" class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
+                    <div @if($backupImport && ! $backupImport->isFinished()) wire:poll.2s="checkImportStatus" @endif class="text-gray-400 text-sm">{{ __('Your import will continue in the background') }}</div>
                     <x-ui.flex-spacer />
-                    <x-ui.button wire:click="$toggle('importStatusDialog')"> {{ __('Dismiss') }} </x-ui.button>
+                    <x-ui.button wire:click="closeImportStatus"> {{ __('Dismiss') }} </x-ui.button>
                 @endif
             </x-slot>
         </x-ui.dialog-modal>
@@ -139,11 +188,9 @@ new class extends Component
         <x-forms.action-message class="me-3" on="saved">
             {{ __('Saved.') }}
         </x-forms.action-message>
-  
+
         <x-ui.button type="submit" wire:loading.attr="disabled" spinner="import">
             {{ __('Import') }}
         </x-ui.button>
     </x-slot>
 </x-forms.form-section>
-
-

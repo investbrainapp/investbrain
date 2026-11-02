@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Exports\Sheets;
 
 use App\Models\Transaction;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
+class TransactionsSheet implements FromQuery, WithHeadings, WithMapping, WithTitle
 {
     public function __construct(
         public bool $empty = false
@@ -35,32 +36,39 @@ class TransactionsSheet implements FromCollection, WithHeadings, WithTitle
         ];
     }
 
-    public function collection(): Collection
+    /**
+     * Uses a sub-select for the currency (rather than joining market data) so transactions
+     * without market data are still included in the backup.
+     */
+    public function query(): Builder
     {
-        if ($this->empty) {
-            return collect();
-        }
-
         return Transaction::myTransactions()
-            ->withMarketData()
-            ->get()
-            ->map(function ($transaction) {
-                return [
-                    'id' => $transaction->id,
-                    'symbol' => $transaction->symbol,
-                    'portfolio_id' => $transaction->portfolio_id,
-                    'transaction_type' => $transaction->transaction_type,
-                    'quantity' => $transaction->quantity,
-                    'cost_basis' => $transaction->cost_basis,
-                    'sale_price' => $transaction->sale_price,
-                    'currency' => $transaction->market_data_currency,
-                    'split' => $transaction->split,
-                    'reinvested_dividend' => $transaction->reinvested_dividend,
-                    'date' => date_format($transaction->date, 'Y-m-d'),
-                    'created_at' => $transaction->created_at,
-                    'updated_at' => $transaction->updated_at,
-                ];
-            });
+            ->when($this->empty, fn ($query) => $query->whereRaw('1 = 0'))
+            ->withAggregate('market_data', 'currency')
+            ->orderBy('date')
+            ->orderBy('id');
+    }
+
+    /**
+     * @param  Transaction  $transaction
+     */
+    public function map($transaction): array
+    {
+        return [
+            $transaction->id,
+            $transaction->symbol,
+            $transaction->portfolio_id,
+            $transaction->transaction_type,
+            $transaction->quantity,
+            $transaction->cost_basis,
+            $transaction->sale_price,
+            $transaction->market_data_currency,
+            $transaction->split,
+            $transaction->reinvested_dividend,
+            date_format($transaction->date, 'Y-m-d'),
+            $transaction->created_at,
+            $transaction->updated_at,
+        ];
     }
 
     public function title(): string

@@ -4,61 +4,94 @@ declare(strict_types=1);
 
 namespace App\Imports\Sheets;
 
+use App\Imports\ReadsSheetRows;
 use App\Models\BackupImport;
 use App\Models\Portfolio;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\SkipsUnknownSheets;
+use Maatwebsite\Excel\Concerns\ToArray;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Events\BeforeSheet;
 
-class PortfoliosSheet implements SkipsEmptyRows, ToCollection, WithEvents, WithHeadingRow, WithValidation
+class PortfoliosSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, WithCalculatedFormulas, WithHeadingRow, WithValidation
 {
-    public function __construct(
-        public BackupImport $backupImport
-    ) {}
+    use ReadsSheetRows;
 
-    public function registerEvents(): array
+    public function title(): string
+    {
+        return 'Portfolios';
+    }
+
+    /**
+     * @return array<string, array{label: string, required: bool}>
+     */
+    public static function columns(): array
     {
         return [
-            BeforeSheet::class => function (BeforeSheet $event) {
-                DB::commit();
-                $this->backupImport->update([
-                    'message' => __('Importing portfolios...'),
-                ]);
-                DB::beginTransaction();
-            },
+            'portfolio_id' => [
+                'label' => 'Portfolio ID',
+                'required' => false,
+            ],
+            'title' => [
+                'label' => 'Title',
+                'required' => true,
+            ],
+            'notes' => [
+                'label' => 'Notes',
+                'required' => false,
+            ],
+            'wishlist' => [
+                'label' => 'Wishlist',
+                'required' => false,
+            ],
         ];
     }
 
-    public function collection(Collection $portfolios): void
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>
+     */
+    public function normalize(array $row): array
     {
-        foreach ($portfolios as $index => $portfolio) {
+        return [
+            'portfolio_id' => $this->string($row['portfolio_id'] ?? null),
+            'title' => $this->string($row['title'] ?? null),
+            'notes' => $this->string($row['notes'] ?? null),
+            'wishlist' => $this->boolean($row['wishlist'] ?? null),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     */
+    public function rowRules(array $row): array
+    {
+        return [
+            'portfolio_id' => ['nullable', 'uuid'],
+            'title' => ['required', 'string', 'max:255'],
+            'wishlist' => ['boolean'],
+            'notes' => ['nullable', 'string'],
+        ];
+    }
+
+    public function persist(BackupImport $backupImport): void
+    {
+        foreach ($this->rows as $portfolio) {
 
             Portfolio::unguard(); // ensures we can set an owner for the portfolio
 
-            $portfolio = Portfolio::fullAccess($this->backupImport->user_id)->updateOrCreate([
+            Portfolio::fullAccess($backupImport->user_id)->updateOrCreate([
                 'id' => $portfolio['portfolio_id'],
             ], [
-                'id' => $portfolio['portfolio_id'] ?? null,
+                'id' => $portfolio['portfolio_id'],
                 'title' => $portfolio['title'],
-                'wishlist' => $portfolio['wishlist'] ?? false,
+                'wishlist' => $portfolio['wishlist'],
                 'notes' => $portfolio['notes'],
-                'owner_id' => $this->backupImport->user_id,
+                'owner_id' => $backupImport->user_id,
             ]);
         }
-    }
 
-    public function rules(): array
-    {
-        return [
-            'portfolio_id' => ['sometimes', 'nullable', 'uuid'],
-            'title' => ['required', 'string'],
-            'wishlist' => ['sometimes', 'nullable', 'boolean'],
-            'notes' => ['sometimes', 'nullable', 'string'],
-        ];
+        Portfolio::reguard();
     }
 }
