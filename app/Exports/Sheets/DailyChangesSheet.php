@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Exports\Sheets;
 
 use App\Models\DailyChange;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
+class DailyChangesSheet implements FromQuery, WithHeadings, WithMapping, WithTitle
 {
     public function __construct(
         public bool $empty = false
@@ -29,26 +30,33 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
         ];
     }
 
-    public function collection(): Collection
+    /**
+     * Read in chunks, which needs a stable order (several portfolios share each date).
+     */
+    public function query(): Builder
     {
-        if ($this->empty) {
-            return collect();
-        }
-
         return DailyChange::myDailyChanges()
+            ->when($this->empty, fn ($query) => $query->whereRaw('1 = 0'))
             ->withDailyPerformance()
-            ->get()
-            ->map(function ($daily_change) {
-                return [
-                    'date' => date_format($daily_change->date, 'Y-m-d'),
-                    'portfolio_id' => $daily_change->portfolio_id,
-                    'total_market_value' => $daily_change->total_market_value,
-                    'total_cost_basis' => $daily_change->total_cost_basis,
-                    'realized_gains' => $daily_change->realized_gain_dollars,
-                    'total_dividends_earned' => $daily_change->total_dividends_earned,
-                    'annotation' => $daily_change->annotation,
-                ];
-            });
+            ->addSelect('daily_change.annotation')
+            ->groupBy('daily_change.annotation')
+            ->orderBy('daily_change.portfolio_id');
+    }
+
+    /**
+     * @param  DailyChange  $daily_change
+     */
+    public function map($daily_change): array
+    {
+        return [
+            date_format($daily_change->date, 'Y-m-d'),
+            $daily_change->portfolio_id,
+            $daily_change->total_market_value,
+            $daily_change->total_cost_basis,
+            $daily_change->realized_gain_dollars,
+            $daily_change->total_dividends_earned,
+            $daily_change->annotation,
+        ];
     }
 
     public function title(): string

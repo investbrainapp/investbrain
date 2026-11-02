@@ -9,6 +9,7 @@ use App\Exports\Sheets\TransactionsSheet as TransactionsExportSheet;
 use App\Imports\Sheets\TransactionsSheet;
 use App\Interfaces\MarketData\MarketDataInterface;
 use App\Models\BackupImport as BackupImportModel;
+use App\Models\DailyChange;
 use App\Models\Holding;
 use App\Models\MarketData;
 use App\Models\Portfolio;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -79,6 +81,32 @@ class ImportExportTest extends TestCase
         $exported = (new TransactionsExportSheet)->query()->pluck('id');
 
         $this->assertSame([$transaction->id], $exported->all());
+    }
+
+    public function test_export_includes_every_daily_change_and_its_annotation_when_read_in_chunks(): void
+    {
+        config(['excel.exports.chunk_size' => 4]);
+        $user = User::factory()->create();
+        $portfolios = [$this->portfolioOwnedBy($user), $this->portfolioOwnedBy($user)];
+        $expected = [];
+
+        foreach ($portfolios as $portfolio) {
+            foreach (['2024-01-01', '2024-01-02', '2024-01-03'] as $date) {
+                DailyChange::forceCreate(['portfolio_id' => $portfolio->id, 'date' => $date, 'total_market_value' => 100, 'annotation' => 'Note '.$date]);
+                $expected[] = $date.'|'.$portfolio->id.'|Note '.$date;
+            }
+        }
+
+        $this->actingAs($user);
+        $path = tempnam(sys_get_temp_dir(), 'export').'.xlsx';
+        file_put_contents($path, Excel::raw(new BackupExport, \Maatwebsite\Excel\Excel::XLSX));
+
+        $rows = IOFactory::load($path)->getSheetByName('Daily Changes')->toArray();
+        unlink($path);
+
+        $exported = collect(array_slice($rows, 1))->map(fn ($row) => $row[0].'|'.$row[1].'|'.$row[6])->sort()->values()->all();
+        sort($expected);
+        $this->assertSame($expected, $exported);
     }
 
     public function test_import_job_completes(): void
