@@ -71,7 +71,7 @@ new class extends Component
             </a>
 
             <x-ui.button class="btn-ghost" wire:click="export" spinner="export">
-                {{ __('Create new export') }}
+                {{ __('Generate new export') }}
             </x-ui.button>
         </div>
 
@@ -86,7 +86,7 @@ new class extends Component
         @endif
 
         <x-ui.button wire:click="export" spinner="export">
-            {{ $backupExport?->status == 'failed' ? __('Try again') : __('Create Export') }}
+            {{ $backupExport?->status == 'failed' ? __('Try again') : __('Generate Export') }}
         </x-ui.button>
 
     @endif
