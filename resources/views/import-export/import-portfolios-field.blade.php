@@ -116,7 +116,7 @@ new class extends Component
     <x-slot:form>
 
         <div class="col-span-6 sm:col-span-4">
-            <x-ui.file wire:model="file" label="{{ __('Select a file') }}" hint="{{ __('An .xlsx file in the import template format (an Investbrain export works too).') }}" accept=".xlsx" required />
+            <x-ui.file wire:model="file" label="{{ __('Select a file') }}" accept=".xlsx" required />
         </div>
 
 

@@ -132,7 +132,7 @@ class TransactionsSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, 
             'symbol.regex' => __('This field may only contain letters, numbers and . - ^ = : / _ (no spaces).'),
             'transaction_type.in' => __('This field must be BUY or SELL.'),
             'currency.in' => __('This field must be a supported currency code, e.g. USD.'),
-            'date.date' => __('This field is not a date Investbrain understands. Try the YYYY-MM-DD format.'),
+            'date.date' => __('This field is not a valid date. Try the YYYY-MM-DD format.'),
         ];
     }
 

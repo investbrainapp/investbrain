@@ -215,7 +215,7 @@ class ImportExportTest extends TestCase
         ]);
 
         $this->assertSame('failed', $import->status);
-        $this->assertStringStartsWith('We could not find any data in your file.', $import->errors[0]['message']);
+        $this->assertSame('No data found. Check the sheet names and headings.', $import->errors[0]['message']);
     }
 
     public function test_currency_defaults_to_the_currency_the_symbol_trades_in(): void
@@ -251,7 +251,7 @@ class ImportExportTest extends TestCase
         ]);
 
         $this->assertSame([
-            ['sheet' => 'Transactions', 'row' => 2, 'column' => 'Symbol', 'value' => 'RDSB', 'message' => 'We could not find RDSB with your market data provider. Check that it is spelled the way your provider lists it.'],
+            ['sheet' => 'Transactions', 'row' => 2, 'column' => 'Symbol', 'value' => 'RDSB', 'message' => 'Could not find symbol.'],
         ], $import->errors);
         $this->assertDatabaseCount('holdings', 0);
     }

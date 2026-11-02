@@ -132,7 +132,7 @@ class BackupImport implements Import, SkipsUnknownSheets, WithMultipleSheets
         if (collect($this->sheets())->every(fn ($sheet) => empty($sheet->rows))) {
 
             throw new ImportValidationException([
-                $this->portfoliosSheet->error(null, null, __('We could not find any data in your file. Make sure the sheets are named Portfolios and Transactions and that the first row of each holds the column headings.')),
+                $this->portfoliosSheet->error(null, null, __('No data found. Check the sheet names and headings.')),
             ]);
         }
 
@@ -322,7 +322,7 @@ class BackupImport implements Import, SkipsUnknownSheets, WithMultipleSheets
         foreach ($rows as $rowNumber => $row) {
 
             if (! $marketData->has($row['symbol'])) {
-                $this->addError($this->transactionsSheet->error($rowNumber, 'symbol', __('We could not find :symbol with your market data provider. Check that it is spelled the way your provider lists it.', ['symbol' => $row['symbol']]), $row['symbol']));
+                $this->addError($this->transactionsSheet->error($rowNumber, 'symbol', __('Could not find symbol.'), $row['symbol']));
 
                 continue;
             }
