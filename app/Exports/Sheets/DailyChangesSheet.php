@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Exports\Sheets;
 
 use App\Models\DailyChange;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
+class DailyChangesSheet implements FromQuery, WithHeadings, WithMapping, WithTitle
 {
     public function __construct(
         public bool $empty = false
@@ -22,38 +23,34 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
             'Date',
             'Portfolio ID',
             'Total Market Value',
-            'Total Cost Basis',
-            'Realized Gains',
-            'Total Dividends Earned',
             'Annotation',
         ];
     }
 
     /**
-     * Read in a single query rather than in chunks: the performance columns are aggregated
-     * over all of a portfolio's history, so every chunk would recalculate the whole result.
+     * Only the stored columns: performance figures are recalculated from transactions when a
+     * backup is imported, and calculating them for every day made large exports very slow.
      */
-    public function collection(): Collection
+    public function query(): Builder
     {
-        if ($this->empty) {
-            return collect();
-        }
-
         return DailyChange::myDailyChanges()
-            ->withDailyPerformance()
-            ->addSelect('daily_change.annotation')
-            ->groupBy('daily_change.annotation')
-            ->orderBy('daily_change.portfolio_id')
-            ->get()
-            ->map(fn ($daily_change) => [
-                date_format($daily_change->date, 'Y-m-d'),
-                $daily_change->portfolio_id,
-                $daily_change->total_market_value,
-                $daily_change->total_cost_basis,
-                $daily_change->realized_gain_dollars,
-                $daily_change->total_dividends_earned,
-                $daily_change->annotation,
-            ]);
+            ->when($this->empty, fn ($query) => $query->whereRaw('1 = 0'))
+            ->select(['daily_change.date', 'daily_change.portfolio_id', 'daily_change.total_market_value', 'daily_change.annotation'])
+            ->orderBy('daily_change.date')
+            ->orderBy('daily_change.portfolio_id');
+    }
+
+    /**
+     * @param  DailyChange  $daily_change
+     */
+    public function map($daily_change): array
+    {
+        return [
+            date_format($daily_change->date, 'Y-m-d'),
+            $daily_change->portfolio_id,
+            $daily_change->total_market_value,
+            $daily_change->annotation,
+        ];
     }
 
     public function title(): string

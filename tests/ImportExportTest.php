@@ -88,6 +88,8 @@ class ImportExportTest extends TestCase
 
     public function test_export_includes_every_daily_change_with_its_annotation(): void
     {
+        // small chunks, so several portfolios on the same date span a chunk boundary
+        config(['excel.exports.chunk_size' => 4]);
         $user = User::factory()->create();
         $portfolios = [$this->portfolioOwnedBy($user), $this->portfolioOwnedBy($user)];
         $expected = [];
@@ -106,7 +108,7 @@ class ImportExportTest extends TestCase
         $rows = IOFactory::load($path)->getSheetByName('Daily Changes')->toArray();
         unlink($path);
 
-        $exported = collect(array_slice($rows, 1))->map(fn ($row) => $row[0].'|'.$row[1].'|'.$row[6])->sort()->values()->all();
+        $exported = collect(array_slice($rows, 1))->map(fn ($row) => $row[0].'|'.$row[1].'|'.$row[3])->sort()->values()->all();
         sort($expected);
         $this->assertSame($expected, $exported);
     }
@@ -161,6 +163,18 @@ class ImportExportTest extends TestCase
             ->test('export-portfolios-button')
             ->assertSee('Something went wrong while preparing your export.')
             ->assertSee('Try again');
+    }
+
+    public function test_export_is_not_started_again_while_one_is_being_prepared(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $running = BackupExportModel::create(['user_id' => $user->id]);
+
+        Livewire::actingAs($user)->test('export-portfolios-button')->call('export');
+
+        $this->assertSame($running->id, BackupExportModel::sole()->id);
+        Queue::assertNothingPushed();
     }
 
     public function test_finished_export_can_only_be_downloaded_by_its_owner(): void

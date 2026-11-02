@@ -22,6 +22,15 @@ new class extends Component
     // methods
     public function export(): void
     {
+        // e.g. a second tab or a double click while an export is being prepared
+        $latestExport = BackupExportModel::latestFor(auth()->id());
+
+        if ($latestExport && ! $latestExport->isFinished()) {
+            $this->backupExport = $latestExport;
+
+            return;
+        }
+
         if (! RateLimiter::attempt('export:'.auth()->user()->id, $perMinute = 3, fn () => null)) {
 
             $this->error(__('Hang on! You\'re doing that too much.'));
