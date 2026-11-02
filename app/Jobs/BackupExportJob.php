@@ -85,6 +85,11 @@ class BackupExportJob implements ShouldQueue
      */
     public function failed(?Throwable $exception): void
     {
+        // a duplicate run of a job that already finished shouldn't undo it
+        if ($this->backupExport->fresh()?->status == 'success') {
+            return;
+        }
+
         $this->backupExport->update([
             'status' => 'failed',
             'completed_at' => now(),
