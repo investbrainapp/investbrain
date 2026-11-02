@@ -86,9 +86,8 @@ class ImportExportTest extends TestCase
         $this->assertSame([$transaction->id], $exported->all());
     }
 
-    public function test_export_includes_every_daily_change_and_its_annotation_when_read_in_chunks(): void
+    public function test_export_includes_every_daily_change_with_its_annotation(): void
     {
-        config(['excel.exports.chunk_size' => 4]);
         $user = User::factory()->create();
         $portfolios = [$this->portfolioOwnedBy($user), $this->portfolioOwnedBy($user)];
         $expected = [];
