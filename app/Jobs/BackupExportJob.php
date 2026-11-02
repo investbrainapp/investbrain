@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Exports\BackupExport;
 use App\Models\BackupExport as BackupExportModel;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Bus;
 use Throwable;
 
 /**
- * Builds the backup workbook in the background so large accounts don't run into the web
- * request's time and memory limits.
+ * Starts building a backup in the background (away from the web request's time and memory
+ * limits): first each portfolio's performance figures, then the workbook itself.
  */
 class BackupExportJob implements ShouldQueue
 {
@@ -30,7 +28,7 @@ class BackupExportJob implements ShouldQueue
      *
      * @var int
      */
-    public $timeout = 900;
+    public $timeout = 60;
 
     /**
      * Indicate if the job should be marked as failed on timeout.
@@ -60,24 +58,22 @@ class BackupExportJob implements ShouldQueue
     {
         $this->backupExport->update(['status' => 'in_progress']);
 
-        // the export sheets are scoped to the authenticated user
-        Auth::setUser($this->backupExport->user);
+        $portfolioIds = $this->backupExport->user->portfolios()->pluck('portfolios.id');
 
-        try {
-            $path = 'exports/'.$this->backupExport->user_id.'/'.$this->backupExport->id.'.xlsx';
+        if ($portfolioIds->isEmpty()) {
 
-            // stored on the configured default filesystem disk
-            Excel::store(new BackupExport, $path);
+            AssembleBackupExportJob::dispatch($this->backupExport);
 
-            $this->backupExport->update([
-                'status' => 'success',
-                'path' => $path,
-                'completed_at' => now(),
-            ]);
-        } finally {
-            // queue workers are long lived, so don't leak the user into the next job
-            Auth::forgetUser();
+            return;
         }
+
+        // the performance figures are slow to calculate, so each portfolio gets its own job
+        // and the workbook is built once they have all finished
+        Bus::chain([
+            Bus::batch($portfolioIds->map(fn ($portfolioId) => new CalculateDailyPerformanceJob($this->backupExport, $portfolioId))->all())
+                ->name('Backup export '.$this->backupExport->id),
+            new AssembleBackupExportJob($this->backupExport),
+        ])->dispatch();
     }
 
     /**
@@ -85,9 +81,6 @@ class BackupExportJob implements ShouldQueue
      */
     public function failed(?Throwable $exception): void
     {
-        $this->backupExport->update([
-            'status' => 'failed',
-            'completed_at' => now(),
-        ]);
+        $this->backupExport->markAsFailed();
     }
 }
