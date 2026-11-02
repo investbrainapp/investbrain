@@ -23,6 +23,8 @@
         @endif
         <x-ui.toast />
 
+        @livewire('import-progress-tab')
+
         @filamentScripts
         @livewireScripts
     </body>

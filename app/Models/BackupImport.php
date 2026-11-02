@@ -69,6 +69,25 @@ class BackupImport extends Model
     }
 
     /**
+     * The user's latest import if it still needs their attention: it is still running, or it
+     * failed and they have not dismissed the problems yet.
+     */
+    public static function awaitingUser(int|string $userId): ?self
+    {
+        $latestImport = static::where('user_id', $userId)
+            ->where('created_at', '>=', now()->subHour())
+            ->latest()
+            ->first();
+
+        $isUnseenFailure = $latestImport?->status == 'failed'
+            && session('dismissed_import_id') != $latestImport->id;
+
+        return $latestImport && (! $latestImport->isFinished() || $isUnseenFailure)
+            ? $latestImport
+            : null;
+    }
+
+    /**
      * Record progress so the polling UI can show what the import is doing.
      */
     public function reportProgress(string $message, int $progress): void

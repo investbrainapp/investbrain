@@ -24,19 +24,10 @@ new class extends Component
 
     public function mount(): void
     {
-        $latestImport = BackupImportModel::where('user_id', auth()->id())
-            ->where('created_at', '>=', now()->subHour())
-            ->latest()
-            ->first();
-
         // pick back up an import that is still running, or that failed while the user was away
-        $isUnseenFailure = $latestImport?->status == 'failed'
-            && session('dismissed_import_id') != $latestImport->id;
+        $this->backupImport = BackupImportModel::awaitingUser(auth()->id());
 
-        if ($latestImport && (! $latestImport->isFinished() || $isUnseenFailure)) {
-            $this->backupImport = $latestImport;
-            $this->importStatusDialog = true;
-        }
+        $this->importStatusDialog = ! is_null($this->backupImport);
     }
 
     // methods
@@ -81,6 +72,11 @@ new class extends Component
 
             $this->success($message, redirectTo: route('dashboard'));
         }
+    }
+
+    public function showImportStatus(): void
+    {
+        $this->importStatusDialog = true;
     }
 
     public function closeImportStatus()
@@ -192,6 +188,15 @@ new class extends Component
                 @endif
             </x-slot>
         </x-ui.dialog-modal>
+
+        @if($backupImport && ! $backupImport->isFinished() && ! $importStatusDialog)
+            <x-ui.progress-tab
+                wire:click="showImportStatus"
+                :message="$backupImport->message"
+                :progress="$backupImport->status == 'pending' ? null : $backupImport->progress"
+                aria-label="{{ __('Show import progress') }}"
+            />
+        @endif
 
     </x-slot:form>
 

@@ -497,6 +497,71 @@ class ImportExportTest extends TestCase
         return [$owner, $portfolio, $transaction];
     }
 
+    public function test_dismissing_a_running_import_collapses_it_into_a_progress_tab(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        BackupImportModel::create(['user_id' => $user->id, 'path' => 'import.xlsx'])
+            ->reportProgress('Checking your file for problems...', 20);
+
+        Livewire::actingAs($user)
+            ->test('import-portfolios-field')
+            ->assertDontSee('Show import progress')
+            ->call('closeImportStatus')
+            ->assertSet('importStatusDialog', false)
+            ->assertSee('Show import progress')
+            ->assertSee('Checking your file for problems...')
+            ->call('showImportStatus')
+            ->assertSet('importStatusDialog', true)
+            ->assertDontSee('Show import progress');
+    }
+
+    public function test_running_import_is_shown_as_a_progress_tab_on_other_pages_only(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        BackupImportModel::create(['user_id' => $user->id, 'path' => 'import.xlsx']);
+
+        $this->actingAs($user)->get(route('dashboard'))->assertSee('Show import progress');
+        $this->actingAs($user)->get(route('import-export'))->assertDontSee('Show import progress');
+    }
+
+    public function test_progress_tab_announces_a_finished_import_and_disappears(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $backupImport = BackupImportModel::create(['user_id' => $user->id, 'path' => 'import.xlsx']);
+
+        $component = Livewire::actingAs($user)
+            ->test('import-progress-tab')
+            ->assertSee('Import starting...');
+
+        $backupImport->update(['status' => 'success', 'message' => 'Import complete! Portfolios: 1, transactions: 2.']);
+
+        $component->call('checkImportStatus')
+            ->assertSet('backupImport', null)
+            ->assertDontSee('Show import progress');
+    }
+
+    public function test_progress_tab_links_to_problems_until_they_are_dismissed(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $backupImport = BackupImportModel::create(['user_id' => $user->id, 'path' => 'import.xlsx']);
+        $this->markImportFailed($backupImport);
+
+        Livewire::actingAs($user)
+            ->test('import-progress-tab')
+            ->assertSee('View problems')
+            ->assertSee(route('import-export'));
+
+        session()->put('dismissed_import_id', $backupImport->id);
+
+        Livewire::actingAs($user)
+            ->test('import-progress-tab')
+            ->assertDontSee('View problems');
+    }
+
     private function markImportFailed(BackupImportModel $backupImport): void
     {
         $backupImport->update([
