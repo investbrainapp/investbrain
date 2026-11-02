@@ -8,6 +8,8 @@ use App\Exports\BackupExport;
 use App\Exports\Sheets\TransactionsSheet as TransactionsExportSheet;
 use App\Imports\Sheets\TransactionsSheet;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Jobs\BackupExportJob;
+use App\Models\BackupExport as BackupExportModel;
 use App\Models\BackupImport as BackupImportModel;
 use App\Models\DailyChange;
 use App\Models\Holding;
@@ -23,6 +25,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -107,6 +110,106 @@ class ImportExportTest extends TestCase
         $exported = collect(array_slice($rows, 1))->map(fn ($row) => $row[0].'|'.$row[1].'|'.$row[6])->sort()->values()->all();
         sort($expected);
         $this->assertSame($expected, $exported);
+    }
+
+    public function test_export_button_builds_the_backup_in_the_background(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test('export-portfolios-button')
+            ->call('export')
+            ->assertSee('Preparing your export.');
+
+        $backupExport = BackupExportModel::sole();
+        $this->assertSame('pending', $backupExport->status);
+        Queue::assertPushed(BackupExportJob::class, fn (BackupExportJob $job) => $job->backupExport->is($backupExport));
+    }
+
+    public function test_export_job_stores_the_backup_and_marks_it_ready(): void
+    {
+        Storage::fake(BackupExportModel::DISK);
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        Transaction::factory()->buy()->lastYear()->symbol('AAPL')->create();
+        Auth::logout();
+        $backupExport = BackupExportModel::create(['user_id' => $user->id]);
+
+        (new BackupExportJob($backupExport))->handle();
+
+        $backupExport->refresh();
+        $this->assertSame('success', $backupExport->status);
+        Storage::disk(BackupExportModel::DISK)->assertExists($backupExport->path);
+        $workbook = IOFactory::load(Storage::disk(BackupExportModel::DISK)->path($backupExport->path));
+        $this->assertCount(2, $workbook->getSheetByName('Transactions')->toArray());
+        $this->assertNull(Auth::user());
+
+        Livewire::actingAs($user)
+            ->test('export-portfolios-button')
+            ->assertSee(route('import-export.download', $backupExport));
+    }
+
+    public function test_failed_export_offers_to_try_again(): void
+    {
+        $user = User::factory()->create();
+        $backupExport = BackupExportModel::create(['user_id' => $user->id]);
+
+        (new BackupExportJob($backupExport))->failed(new \Exception('Out of memory'));
+
+        $this->assertSame('failed', $backupExport->refresh()->status);
+        Livewire::actingAs($user)
+            ->test('export-portfolios-button')
+            ->assertSee('Something went wrong while preparing your export.')
+            ->assertSee('Try again');
+    }
+
+    public function test_finished_export_can_only_be_downloaded_by_its_owner(): void
+    {
+        Storage::fake(BackupExportModel::DISK);
+        $owner = User::factory()->create();
+        $backupExport = BackupExportModel::create(['user_id' => $owner->id]);
+        Storage::disk(BackupExportModel::DISK)->put('exports/backup.xlsx', 'contents');
+
+        $this->actingAs($owner)->get(route('import-export.download', $backupExport))->assertNotFound();
+
+        $backupExport->update(['status' => 'success', 'path' => 'exports/backup.xlsx', 'completed_at' => now()]);
+
+        $this->actingAs($owner)->get(route('import-export.download', $backupExport))->assertDownload($backupExport->filename());
+        $this->actingAs(User::factory()->create())->get(route('import-export.download', $backupExport))->assertNotFound();
+    }
+
+    public function test_new_export_replaces_the_previous_one(): void
+    {
+        Queue::fake();
+        Storage::fake(BackupExportModel::DISK);
+        $user = User::factory()->create();
+        $previous = BackupExportModel::create(['user_id' => $user->id]);
+        $previous->update(['status' => 'success', 'path' => 'exports/previous.xlsx', 'completed_at' => now()]);
+        Storage::disk(BackupExportModel::DISK)->put('exports/previous.xlsx', 'contents');
+
+        Livewire::actingAs($user)->test('export-portfolios-button')->call('export');
+
+        $this->assertModelMissing($previous);
+        Storage::disk(BackupExportModel::DISK)->assertMissing('exports/previous.xlsx');
+    }
+
+    public function test_expired_exports_and_their_files_are_pruned(): void
+    {
+        Storage::fake(BackupExportModel::DISK);
+        $user = User::factory()->create();
+        $this->travel(-(BackupExportModel::RETENTION_HOURS + 1))->hours();
+        $expired = BackupExportModel::create(['user_id' => $user->id]);
+        $this->travelBack();
+        $expired->update(['status' => 'success', 'path' => 'exports/expired.xlsx']);
+        Storage::disk(BackupExportModel::DISK)->put('exports/expired.xlsx', 'contents');
+        $current = BackupExportModel::create(['user_id' => $user->id]);
+
+        $this->artisan('model:prune', ['--model' => BackupExportModel::class]);
+
+        $this->assertModelMissing($expired);
+        $this->assertModelExists($current);
+        Storage::disk(BackupExportModel::DISK)->assertMissing('exports/expired.xlsx');
     }
 
     public function test_import_job_completes(): void

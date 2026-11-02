@@ -154,6 +154,8 @@ The whole file is checked before anything is saved, including that each symbol i
 
 Exporting your portfolios and transactions is a convenient way to back-up your Investbrain data. It is also a convenient way to maintain portability of *your* data.
 
+Exports are built in the background by the queue worker, so large accounts don't time out. Once the file is ready, a download button appears on the Import / Export page. Each export can be downloaded for 24 hours, and starting a new export replaces the previous one.
+
 ## Configuration
 
 There are several optional configurations available when installing using the recommended [Docker method](#self-hosting). These options are configurable using an environment file. Configurations can be added to your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file or to the `environment` property in the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file. 
