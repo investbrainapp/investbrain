@@ -146,6 +146,10 @@ Investbrain includes a convenient feature which allows you to maintain the porta
 
 Imports are "upserted" to the database. If the record does not already exist in the database, the record will be created. However, when a portfolio or transaction exists (i.e. the record's ID matches an existing record), the record will be updated. This way, you can simultaneously create new records, but also bulk update records.
 
+Start from the import template (or an export) available on the Import / Export page. At a minimum, a Transactions sheet needs the `Symbol`, `Portfolio ID`, `Transaction Type`, `Quantity` and `Date` columns. The [import guide](import-guide.md) describes every column.
+
+The whole file is checked before anything is saved, including that each symbol is known to your market data provider and that no sale exceeds the shares held at the time. If there are problems, nothing is imported and you'll see every affected sheet, row and column so you can fix them in one pass.
+
 ### Export
 
 Exporting your portfolios and transactions is a convenient way to back-up your Investbrain data. It is also a convenient way to maintain portability of *your* data.
