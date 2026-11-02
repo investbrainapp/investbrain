@@ -124,6 +124,28 @@ class AuthenticationTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_mcp_server_and_oauth_routes_are_unavailable_when_disabled(): void
+    {
+        $_ENV['MCP_SERVER_ENABLED'] = $_SERVER['MCP_SERVER_ENABLED'] = 'false';
+
+        try {
+            $this->refreshApplication();
+        } finally {
+            unset($_ENV['MCP_SERVER_ENABLED'], $_SERVER['MCP_SERVER_ENABLED']);
+        }
+
+        $this->postJson(self::MCP_PATH, $this->initializePayload(), $this->mcpHeaders())
+            ->assertNotFound();
+
+        $this->getJson('/.well-known/oauth-protected-resource'.self::MCP_PATH)
+            ->assertNotFound();
+
+        $this->postJson('/oauth/register', [
+            'client_name' => 'Test MCP Client',
+            'redirect_uris' => [self::REDIRECT_URI],
+        ])->assertNotFound();
+    }
+
     public function test_publishes_oauth_discovery_metadata(): void
     {
         $this->getJson('/.well-known/oauth-protected-resource'.self::MCP_PATH)

@@ -14,7 +14,7 @@ use Throwable;
 class RecordUserActivity
 {
     /**
-     * Decides whether an event should be ignored, e.g. while a session is being impersonated.
+     * Decides whether an event should be ignored
      */
     protected static ?Closure $ignoreUsing = null;
 

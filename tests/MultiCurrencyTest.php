@@ -20,6 +20,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Investbrain\Frankfurter\Frankfurter;
+use Investbrain\Frankfurter\FrankfurterClient;
 use Mockery;
 
 class MultiCurrencyTest extends TestCase
@@ -38,7 +39,7 @@ class MultiCurrencyTest extends TestCase
 
     public function test_perists_rates_that_after_historic_lookup()
     {
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
+        $mockClient = Mockery::mock(FrankfurterClient::class);
 
         Frankfurter::shouldReceive('setSymbols')
             ->andReturn($mockClient);
@@ -174,7 +175,7 @@ class MultiCurrencyTest extends TestCase
     public function test_can_get_historic_exchange_rates()
     {
 
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
+        $mockClient = Mockery::mock(FrankfurterClient::class);
 
         Frankfurter::shouldReceive('setSymbols')
             ->andReturn($mockClient);
@@ -320,7 +321,7 @@ class MultiCurrencyTest extends TestCase
 
     public function test_can_handle_aliases_for_historic_rates()
     {
-        $mockClient = Mockery::mock(\Investbrain\Frankfurter\FrankfurterClient::class);
+        $mockClient = Mockery::mock(FrankfurterClient::class);
 
         Frankfurter::shouldReceive('setSymbols')
             ->andReturn($mockClient);
@@ -569,33 +570,14 @@ class MultiCurrencyTest extends TestCase
         $this->assertEqualsWithDelta($metrics->get('realized_gain_dollars'), $dailyChange->last()->realized_gain_dollars, 0.01);
         $this->assertEqualsWithDelta($metrics->get('total_market_value') - $metrics->get('total_cost_basis'), $dailyChange->last()->total_market_gain, 0.01);
 
-        // add currency rates
-        $rates = collect([[
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => $fiveWeeksAgo,
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => $fiveDaysAgo,
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => $monthAgo,
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => now()->subDay()->toDateString(),
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => now()->toDateString(),
-        ], [
-            'currency' => 'GBP',
-            'rate' => .88,
-            'date' => now()->addDay()->toDateString(),
-        ]]);
-        $rates->each(fn ($rate) => CurrencyRate::create($rate));
+        // add a rate for every calendar day, as the daily currency refresh does in production
+        foreach (CarbonPeriod::create($fiveWeeksAgo, now()->addDay()) as $date) {
+            CurrencyRate::create([
+                'currency' => 'GBP',
+                'rate' => .88,
+                'date' => $date->toDateString(),
+            ]);
+        }
 
         // switch user display currency
         $user->options = array_merge($user->options ?? [], [
