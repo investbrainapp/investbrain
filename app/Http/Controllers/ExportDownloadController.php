@@ -19,10 +19,10 @@ class ExportDownloadController extends Controller
         abort_unless($backupExport->user_id == $request->user()->id, 404);
 
         abort_unless(
-            $backupExport->status == 'success' && Storage::disk(BackupExport::DISK)->exists($backupExport->path),
+            $backupExport->status == 'success' && Storage::disk()->exists($backupExport->path),
             404
         );
 
-        return Storage::disk(BackupExport::DISK)->download($backupExport->path, $backupExport->filename());
+        return Storage::disk()->download($backupExport->path, $backupExport->filename());
     }
 }

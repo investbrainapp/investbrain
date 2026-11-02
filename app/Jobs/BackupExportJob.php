@@ -66,7 +66,8 @@ class BackupExportJob implements ShouldQueue
         try {
             $path = 'exports/'.$this->backupExport->user_id.'/'.$this->backupExport->id.'.xlsx';
 
-            Excel::store(new BackupExport, $path, BackupExportModel::DISK);
+            // stored on the configured default filesystem disk
+            Excel::store(new BackupExport, $path);
 
             $this->backupExport->update([
                 'status' => 'success',

@@ -15,8 +15,6 @@ class BackupExport extends Model
     use HasUuids;
     use Prunable;
 
-    public const DISK = 'local';
-
     /**
      * Number of hours a finished export can be downloaded for.
      */
@@ -50,7 +48,7 @@ class BackupExport extends Model
         static::deleting(function ($export) {
 
             if ($export->path) {
-                Storage::disk(static::DISK)->delete($export->path);
+                Storage::disk()->delete($export->path);
             }
         });
     }
