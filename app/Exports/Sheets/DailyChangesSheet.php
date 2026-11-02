@@ -29,6 +29,10 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
         ];
     }
 
+    /**
+     * Read in a single query rather than in chunks: the performance columns are aggregated
+     * over all of a portfolio's history, so every chunk would recalculate the whole result.
+     */
     public function collection(): Collection
     {
         if ($this->empty) {
@@ -37,18 +41,19 @@ class DailyChangesSheet implements FromCollection, WithHeadings, WithTitle
 
         return DailyChange::myDailyChanges()
             ->withDailyPerformance()
+            ->addSelect('daily_change.annotation')
+            ->groupBy('daily_change.annotation')
+            ->orderBy('daily_change.portfolio_id')
             ->get()
-            ->map(function ($daily_change) {
-                return [
-                    'date' => date_format($daily_change->date, 'Y-m-d'),
-                    'portfolio_id' => $daily_change->portfolio_id,
-                    'total_market_value' => $daily_change->total_market_value,
-                    'total_cost_basis' => $daily_change->total_cost_basis,
-                    'realized_gains' => $daily_change->realized_gain_dollars,
-                    'total_dividends_earned' => $daily_change->total_dividends_earned,
-                    'annotation' => $daily_change->annotation,
-                ];
-            });
+            ->map(fn ($daily_change) => [
+                date_format($daily_change->date, 'Y-m-d'),
+                $daily_change->portfolio_id,
+                $daily_change->total_market_value,
+                $daily_change->total_cost_basis,
+                $daily_change->realized_gain_dollars,
+                $daily_change->total_dividends_earned,
+                $daily_change->annotation,
+            ]);
     }
 
     public function title(): string
