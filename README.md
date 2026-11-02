@@ -224,12 +224,13 @@ If you need more details on what the command does, you can take a look at the op
 | ------------- | ------------- |
 | refresh:market-data | Refreshes market data with your configured market data provider. |
 | refresh:dividend-data | Refreshes dividend data with your configured market data provider. Will also re-calculate your total dividends earned for each holding. |
-| refresh:split-data | Refreshes splits data with your configured market data provider. Will also create new transactions to account for any splits. |
+| refresh:split-data | Refreshes splits data with your configured market data provider. Will also adjust the quantity and prices of existing transactions to account for any new splits (including reverse splits). |
 | refresh:currency-data | Grabs the latest daily currency exchange rate data and persists to the database. |
 | capture:daily-change | Captures a snapshot of each portfolio's daily performance. |
 | sync:daily-change | Syncs daily snapshots of your portfolio's daily performance. Useful to fill in gaps in your portfolio charts. (Note: this is an extremely resource intensive query.) |
 | sync:holdings | Syncs performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
 | fix:cost-basis-for-sales | Utility to automatically re-calculates cost basis for sale transactions. |
+| fix:split-transactions | Utility to convert split transactions created by older versions of Investbrain into split adjusted transactions. Also adjusts historical dividends for splits. Safe to run more than once. |
 
 ## Troubleshooting
 

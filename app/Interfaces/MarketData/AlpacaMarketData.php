@@ -112,12 +112,15 @@ class AlpacaMarketData implements MarketDataInterface
             'symbols' => $symbol,
             'limit' => 1000,
             'sort' => 'asc',
-            'types' => 'forward_split',
+            'types' => 'forward_split,reverse_split',
             'start' => $startDate->format('Y-m-d'),
             'end' => $endDate->format('Y-m-d'),
         ])->get('v1/corporate-actions');
 
-        $splits = $response->json('corporate_actions.forward_splits');
+        $splits = [
+            ...$response->json('corporate_actions.forward_splits') ?? [],
+            ...$response->json('corporate_actions.reverse_splits') ?? [],
+        ];
 
         return collect($splits)
             ->map(function ($split) use ($symbol) {
