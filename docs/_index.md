@@ -22,11 +22,6 @@ Both run the same open-source app so, generally speaking, these docs apply to bo
 - [Getting Started](getting-started.md) - the dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
 - [Account settings](account-settings.md) - profile, locale and display currency, password, two-factor authentication, social logins, authorized apps, and deleting your account
 - [Import and export](import-export.md) - backing up your data, moving between Investbrain Cloud and a self-hosted instance, and bulk-loading transactions from a spreadsheet
-
-## Advanced
-
-- [REST API](rest-api.md) - creating an API token and calling the Investbrain API
-- [API reference](https://investbra.in/docs/api) - every endpoint, with request and response details and code samples (on Investbrain Cloud)
 - [MCP server](mcp.md) - connecting AI assistants such as Claude, ChatGPT, Cursor, or VS Code to your Investbrain account
 
 ## Running your own instance
@@ -38,6 +33,10 @@ Both run the same open-source app so, generally speaking, these docs apply to bo
 
 - [Contributing](contributing.md) - how the project is built, setting up a development environment, coding conventions, and making pull requests
 - [Developing market data providers](market-data-providers.md) - writing, testing, and contributing a new market data provider
+
+## API Reference
+
+- [REST API](api.md) - creating an API token and calling the Investbrain API
 
 ## Issues and Security
 
