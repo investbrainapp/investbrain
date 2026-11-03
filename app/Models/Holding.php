@@ -280,13 +280,13 @@ class Holding extends Model
                                     FROM transactions as buy
                                     LEFT JOIN currency_rates as cr2
                                         ON cr2.date = buy.date
-                                        AND cr2.currency = '{$currency}'
+                                        AND cr2.currency = ?
                                     WHERE buy.symbol = transactions.symbol
                                         AND buy.portfolio_id = transactions.portfolio_id
                                         AND buy.transaction_type = 'BUY'
                                         AND buy.date <= transactions.date
                                 ) END)
-                                AS rate")
+                                AS rate", [$currency])
                     ->groupBy([
                         'transactions.id',
                         'transactions.symbol',

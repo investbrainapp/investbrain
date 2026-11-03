@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Blade;
 
 trait Toast
 {
-    public function toast(
+    protected function toast(
         string $type,
         string $title,
         ?string $description = null,
@@ -23,7 +23,7 @@ trait Toast
             'title' => $title,
             'description' => $description,
             'position' => $position,
-            'icon' => Blade::render("<x-ui.icon class='w-7 h-7' name='".$icon."' />"),
+            'icon' => Blade::render('<x-ui.icon class="w-7 h-7" :name="$icon" />', ['icon' => $icon]),
             'css' => $css,
             'timeout' => $timeout,
         ];
@@ -35,7 +35,7 @@ trait Toast
         }
     }
 
-    public function success(
+    protected function success(
         string $title,
         ?string $description = null,
         ?string $position = null,
@@ -47,7 +47,7 @@ trait Toast
         return $this->toast('success', $title, $description, $position, $icon, $css, $timeout, $redirectTo);
     }
 
-    public function warning(
+    protected function warning(
         string $title,
         ?string $description = null,
         ?string $position = null,
@@ -59,7 +59,7 @@ trait Toast
         return $this->toast('warning', $title, $description, $position, $icon, $css, $timeout, $redirectTo);
     }
 
-    public function error(
+    protected function error(
         string $title,
         ?string $description = null,
         ?string $position = null,
@@ -71,7 +71,7 @@ trait Toast
         return $this->toast('error', $title, $description, $position, $icon, $css, $timeout, $redirectTo);
     }
 
-    public function info(
+    protected function info(
         string $title,
         ?string $description = null,
         ?string $position = null,

@@ -334,6 +334,39 @@ class ImportExportTest extends TestCase
         $this->assertEquals(true, $holding->reinvest_dividends);
     }
 
+    public function test_supported_display_currency_is_set_on_import(): void
+    {
+        $user = User::factory()->create();
+
+        $import = $this->importWorkbook($user, [
+            'Config' => [
+                ['Key', 'Value'],
+                ['display_currency', 'GBP'],
+            ],
+        ]);
+
+        $this->assertNotSame('failed', $import->status);
+        $this->assertSame('GBP', $user->refresh()->getCurrency());
+    }
+
+    public function test_unsupported_display_currency_is_rejected_on_import(): void
+    {
+        $user = User::factory()->create();
+
+        $import = $this->importWorkbook($user, [
+            'Config' => [
+                ['Key', 'Value'],
+                ['display_currency', "US'D"],
+            ],
+        ]);
+
+        $this->assertSame('failed', $import->status);
+        $this->assertSame([
+            ['sheet' => 'Config', 'row' => 2, 'column' => 'Value', 'value' => "US'D", 'message' => 'This field must be a supported currency code, e.g. USD.'],
+        ], $import->errors);
+        $this->assertSame('USD', $user->refresh()->getCurrency());
+    }
+
     public function test_invalid_rows_are_all_reported_and_nothing_is_imported(): void
     {
         Notification::fake();
@@ -365,6 +398,25 @@ class ImportExportTest extends TestCase
         $this->assertDatabaseCount('transactions', 0);
 
         Notification::assertSentTo($user, ImportFailedNotification::class, fn ($notification) => $notification->errorCount === 2);
+    }
+
+    public function test_sheet_with_headings_but_no_rows_is_imported(): void
+    {
+        $user = User::factory()->create();
+        $portfolioId = Str::uuid()->toString();
+
+        $import = $this->importWorkbook($user, [
+            'Portfolios' => [
+                ['Portfolio ID', 'Title'],
+                [$portfolioId, 'Brokerage'],
+            ],
+            'Daily Changes' => [
+                ['Date', 'Portfolio ID', 'Annotation'],
+            ],
+        ]);
+
+        $this->assertNotSame('failed', $import->status);
+        $this->assertDatabaseHas('portfolios', ['id' => $portfolioId, 'title' => 'Brokerage']);
     }
 
     public function test_missing_required_column_is_reported_once(): void
