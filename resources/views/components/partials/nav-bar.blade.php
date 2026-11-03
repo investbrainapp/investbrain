@@ -65,7 +65,7 @@ new class extends Component
                 title="{{ __('Documentation') }}"
                 icon="o-book-open"
                 class="btn-circle btn-ghost btn-sm"
-                link="https://github.com/investbrainapp/investbrain"
+                link="https://investbra.in/docs"
                 external
             >
             </x-ui.button>
