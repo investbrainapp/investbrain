@@ -165,7 +165,7 @@ Most assistants ask for confirmation before using tools that change data. Read w
 | `update-holding` | Write | Change holding options | `portfolio_id`, `symbol`, `reinvest_dividends` |
 | `show-market-data` | Read | Price, market cap, dividend yield, and other data for a symbol | `symbol` |
 
-List tools return 15 items per page by default, up to 100. Responses use the same fields as the [REST API](api.md#openapi-specification).
+List tools return 15 items per page by default, up to 100. Responses use the same fields as the [REST API](rest-api.md#openapi-specification).
 
 ## Revoking access
 

@@ -256,7 +256,7 @@ You have read-only access to that portfolio, or no access at all. Changes requir
 
 ### 422 "The filter field may only contain..." or "The sort field may only contain..."
 
-You used a filter or sort column that isn't supported for that endpoint. The error message lists the allowed values. See [Pagination, sorting, filtering, and search](api.md#pagination-sorting-filtering-and-search).
+You used a filter or sort column that isn't supported for that endpoint. The error message lists the allowed values. See [Pagination, sorting, filtering, and search](rest-api.md#pagination-sorting-filtering-and-search).
 
 ## MCP clients can't connect
 

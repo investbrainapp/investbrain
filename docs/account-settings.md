@@ -10,7 +10,7 @@ Open the user menu at the bottom of the left sidebar to reach your account setti
 
 - **Manage Profile** - profile information, locale and display currency, password, two-factor authentication, and account deletion
 - **Connections** - social logins and authorized apps
-- **API Tokens** - personal access tokens for the [REST API](api.md)
+- **API Tokens** - personal access tokens for the [REST API](rest-api.md)
 - **Import / Export Data** - see [Import and export](import-export.md)
 
 ## Profile information

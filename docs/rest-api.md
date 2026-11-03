@@ -151,7 +151,7 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-A machine-readable OpenAPI specification of the API is kept in this repository at [`docs/openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/docs/openapi.json). It describes API v2 (Investbrain 1.4.0 and later). On Investbrain Cloud, you can also browse it as an [API reference](https://investbra.in/docs/api-reference), with a page for each endpoint and code samples in several languages.
+A machine-readable OpenAPI specification of the API is kept in this repository at [`docs/openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/docs/openapi.json). It describes API v2 (Investbrain 1.4.0 and later). On Investbrain Cloud, you can also browse it as an [API reference](https://investbra.in/docs/api), with a page for each endpoint and code samples in several languages.
 
 You can import into Postman, Insomnia, or Bruno to browse endpoints and try requests. 
 
