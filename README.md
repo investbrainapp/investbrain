@@ -14,286 +14,36 @@ Investbrain is a smart open-source investment tracker that helps you manage, tra
 
 <p align="center"><a href="https://investbra.in" target="_blank"><img src="https://raw.githubusercontent.com/investbrainapp/investbrain/main/screenshot.png" width="100%" alt="Investbrain Screenshot"></a></p>
 
+## Getting started
+
+There are two ways to use Investbrain:
+
+- **Investbrain Cloud** - sign up at [investbra.in](https://investbra.in/register). There's nothing to install.
+- **Self-hosted** - run it on your own server, NAS, or computer with Docker:
+
+  ```bash
+  curl -O https://raw.githubusercontent.com/investbrainapp/investbrain/main/docker-compose.yml
+  docker compose up -d
+  ```
+
+  Then open `http://localhost:8000/register`. Read the [self-hosting guide](docs/self-hosting.md) for configuration, HTTPS, updates, and backups before exposing it to the internet.
+
 ## Documentation
 
-Full documentation lives in the [docs](docs/README.md) folder, including the [user guide](docs/user-guide.md), [account settings](docs/account-settings.md), [import / export](docs/import-export.md), the [REST API](docs/api.md), the [MCP server](docs/mcp.md), [self-hosting](docs/self-hosting.md), [troubleshooting](docs/troubleshooting.md), [contributing](docs/contributing.md), and [developing market data providers](docs/market-data-providers.md).
-
-## Table of contents
-- [Documentation](#documentation)
-- [Under the hood](#under-the-hood)
-- [Install (self hosting)](#self-hosting)
-- [Chat with your holdings](#chat-with-your-holdings)
-- [Connect AI assistants (MCP)](#connect-ai-assistants-mcp)
-- [Market data providers](#market-data-providers)
-- [Import / Export](#import--export)
-- [Configuration](#configuration)
-- [Updating](#updating)
-- [Command line utilities](#command-line-utilities)
-- [Troubleshooting](#troubleshooting)
-- [Testing](#testing)
-
-## Under the hood
-
-Investbrain is a Laravel PHP web application that has an extensible market data provider interface. Out of the box, we feature many market data providers. But intrepid developers can [create their own providers](#custom-providers)! We also offer integrations with locally-hosted LLMs for our ["chat with your holdings"](#chat-with-your-holdings) capability and ships with a built-in [MCP server](#connect-ai-assistants-mcp). Finally, of course we have robust support for i18n, a11y, and dark mode. 
-
-## Self hosting
-
-For ease of installation, we _highly recommend_ installing Investbrain using the provided [Docker Compose](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file, which uses the official Investbrain Docker image and includes all the necessary dependencies to seamlessly build everything you need to get started quickly! 
-
-Before getting started, you should already have [Docker Engine](https://docs.docker.com/engine/install/) installed on your machine. 
-
-Ready? Let's get started! 
-
-**1. Download copy of Docker Compose file**
-
-Grab a copy of the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) using `wget`, `curl` or similar:
-
-```bash
-curl -O https://raw.githubusercontent.com/investbrainapp/investbrain/main/docker-compose.yml
-```
-
-**2. Set your environment**
-
-Adjust the `environment` properties in the compose file to your preferences. 
-
-**3. Run `docker compose up`**
-
-It might take a few minutes to pull the Docker images. But assuming everything worked as expected, you should now be able to access Investbrain in the browser by visiting:
-
-```bash
-http://localhost:8000/register
-```
-
-Congrats! You've just installed Investbrain!
-
-## Chat with your holdings
-
-Investbrain offers an AI powered chat assistant that is grounded on *your* investments. This enables you to use AI as a thought partner when making investment decisions. 
-
-Most of the major labs are currently supported (OpenAI, Anthropic, Gemini, xAI, etc). You'll need to obtain API keys from your selected provider and configure that in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file using the appropriate keys. 
-
-Investbrain is also compatible with Ollama (and other OpenAI compatible APIs). If you are self-hosting your own large language models ("LLMs") that exposes an OpenAI compatible API (e.g. [Ollama](https://ollama.com/blog/openai-compatibility)), you'll need to configure your local endpoint in your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file.
-
-See available options [below](#configuration).
-
-Always keep in mind the limitations of LLMs. When in doubt, consult a licensed investment advisor. 
-
-## Connect AI assistants (MCP)
-
-Investbrain includes a built-in MCP server. This lets MCP-compatible AI assistants (Claude, ChatGPT, Cursor, etc.) read and manage your portfolios on your behalf.
-
-Add your Investbrain MCP endpoint as a remote MCP server in your assistant:
-
-```
-https://your-investbrain-host/mcp
-```
-
-Authentication uses OAuth. Your assistant will discover and register itself automatically.
-
-> Note: Set `APP_URL` to the public URL your assistant can reach (HTTPS for most hosted assistants). The default of `http://localhost:8000` only works for local assistants.
-
-The MCP server is enabled by default. To turn it off, set `MCP_SERVER_ENABLED=false` (see [Configuration](#configuration)).
-
-## Market data providers
-
-Investbrain includes an extensible market data provider interface that allows you to retrieve stock market data from multiple providers, such as [Yahoo Finance](https://finance.yahoo.com/), [Twelve Data](https://twelvedata.com), [Finnhub](https://finnhub.io/pricing-stock-api-market-data), [Alpaca](https://alpaca.markets/), and [Alpha Vantage](https://www.alphavantage.co/support/). The interface includes a built-in fallback mechanism to ensure reliable data access, even if a provider fails.
-
-### Market Data Configuration
-
-You can specify the market data provider you want to use in your environment variables:
-
-```bash
-MARKET_DATA_PROVIDER=yahoo
-```
-
-You can also use Investbrain's built-in fallback mechanism to ensure reliable data access. If any provider fails, Investbrain will automatically attempt to retrieve data from the next available provider, continuing through your configured providers until one returns successfully.
-
-Your selected providers should be listed in your environment variables. Each should be separated by a comma:
-
-```bash
-MARKET_DATA_PROVIDER=yahoo,alphavantage
-```
-
-In the above example, Yahoo Finance will be attempted first. If Yahoo Finance fails to retrieve market data, the application will automatically try Alpha Vantage.
-
-### Monitoring providers
-
-Health data for market data providers is automatically captured to support troubleshooting. Captured data includes: call volume, success rate, how often a fallback was used, and average response time for the last 24 hours, 7 days or 30 days, along with the most recent failures and their error messages. By default, the first user created will have access to this screen.
-
-### Custom providers
-
-If you wish to create your own market data provider, you can create your own implementation of the [MarketDataInterface](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/MarketDataInterface.php). You can refer to any existing market data implementation as an example.
-
-Once you've created your market data implementation, be sure add your custom provider to the Investbrain configuration file, under the interfaces section:
-
-```php
-
-'interfaces' => [
-    //                       *  *  *
-    'custom_provider' => \App\Services\CustomProviderMarketData::class,
-    //                       *  *  *
-],
-```
-
-And add your custom provider to your .env file:
-
-```bash
-MARKET_DATA_PROVIDER=yahoo,alphavantage,custom_provider
-```
-
-Feel free to submit a PR with any custom providers you create.
-
-## Import / Export
-
-Investbrain includes a convenient feature which allows you to maintain the portability of your portfolios and transaction data. 
-
-### Import
-
-Imports are "upserted" to the database. If the record does not already exist in the database, the record will be created. However, when a portfolio or transaction exists (i.e. the record's ID matches an existing record), the record will be updated. This way, you can simultaneously create new records, but also bulk update records.
-
-Start from the import template (or an export) available on the Import / Export page. At a minimum, a Transactions sheet needs the `Symbol`, `Portfolio ID`, `Transaction Type`, `Quantity` and `Date` columns. The [import guide](docs/import-export.md) describes every column.
-
-The whole file is checked before anything is saved, including that each symbol is known to your market data provider and that no sale exceeds the shares held at the time. If there are problems, nothing is imported and you'll see every affected sheet, row and column so you can fix them in one pass.
-
-### Export
-
-Exporting your portfolios and transactions is a convenient way to back-up your Investbrain data. It is also a convenient way to maintain portability of *your* data.
-
-Exports are built in the background by the queue worker, so large accounts don't time out. Once the file is ready, a download button appears on the Import / Export page. Each export can be downloaded for 24 hours, and starting a new export replaces the previous one.
-
-## Configuration
-
-There are several optional configurations available when installing using the recommended [Docker method](#self-hosting). These options are configurable using an environment file. Configurations can be added to your [.env](https://github.com/investbrainapp/investbrain/blob/main/.env.example) file or to the `environment` property in the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file. 
-
-| Option      | Description      | Default      |
-| ------------- | ------------- | ------------- |
-| APP_URL | The URL where your Investbrain installation will be accessible | http://localhost |
-| APP_PORT | The HTTP port exposed by the NGINX container | 8000 |
-| APP_KEY | Encryption key for various security-related functions | Set automatically during install |
-| MARKET_DATA_PROVIDER | The market data provider to use (either `yahoo`, `twelvedata`, `alphavantage`, `alpaca`, or `finnhub`) | yahoo |
-| ALPHAVANTAGE_API_KEY | If using the Alpha Vantage provider | `null` |
-| FINNHUB_API_KEY | If using the Finnhub provider | `null` |
-| ALPACA_API_KEY | If using the Alpaca provider | `null` |
-| ALPACA_API_SECRET | If using the Alpaca provider | `null` |
-| TWELVEDATA_API_SECRET | If using the Twelve Data provider | `null` |
-| MARKET_DATA_REFRESH | Cadence to refresh market data in minutes | 30 |
-| APP_TIMEZONE | Timezone for the application, including daily change captures | UTC |
-| AI_CHAT_ENABLED | Whether to enable AI chat features | `false` |
-| MCP_SERVER_ENABLED | Whether to enable the built-in MCP server | `true` |
-| CHAT_PROVIDER | Which chat provider to use (one of `openai`, `anthropic`, `gemini`, `azure`, `groq`, `xai`, `deepseek`, `mistral`, `ollama`) | `openai` |
-| CHAT_MODEL | The selected LLM used for AI chat | defaults to current smartest model from lab |
-| ANTHROPIC_API_KEY | If using Anthropic for chat | `null` |
-| OPENAI_API_KEY | If using OpenAI for chat | `null` |
-| OLLAMA_BASE_URL | If using Ollama for chat | `http://localhost:11434` |
-| OLLAMA_API_KEY | May be required if using Ollama for chat | `null` |
-| DAILY_CHANGE_TIME | The time of day to capture daily change | 23:00 |
-| REGISTRATION_ENABLED | Whether to enable registration of new users | `true` |
-
-
-> Note: These options affect the [docker-compose.yml](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file and are cached during run-time. If change any environment configurations, you'll have to restart the container before your changes take effect.
-
-## Updating
-
-To update Investbrain using the recommended [Docker installation](#self-hosting) method, you just need to stop the running containers:
-
-```bash
-docker compose stop
-```
-
-Then pull the latest Docker image:
-
-```bash
-docker image pull investbrainapp/investbrain:latest
-```
-
-Finally bring the containers back up!
-
-```bash
-docker compose up
-```
-
-Easy as that!
-
-## Command line utilities
-
-Investbrain comes bundled with several helpful command line utilities to make managing your portfolios and holdings more efficient. Keep in mind these commands are extremely powerful and can make irreversable changes to your holdings.  Just to be safe, we recommend backing up your portfolios before using these commands.
-
-To run these commands, you can use `docker exec` like this:
-
-```bash
-docker exec -it investbrain-app php artisan <replace with command you want to run>
-```
-
-If you need more details on what the command does, you can take a look at the options available using the `help` option:
-
-```bash
-<command you want to run> --help
-```
-
-
-| Command      | Description      |
-| ------------- | ------------- |
-| refresh:market-data | Refreshes market data with your configured market data provider. |
-| refresh:dividend-data | Refreshes dividend data with your configured market data provider. Will also re-calculate your total dividends earned for each holding. |
-| refresh:split-data | Refreshes splits data with your configured market data provider. Will also create new transactions to account for any splits. |
-| refresh:currency-data | Grabs the latest daily currency exchange rate data and persists to the database. |
-| capture:daily-change | Captures a snapshot of each portfolio's daily performance. |
-| sync:daily-change | Syncs daily snapshots of your portfolio's daily performance. Useful to fill in gaps in your portfolio charts. (Note: this is an extremely resource intensive query.) |
-| sync:holdings | Syncs performance of holdings with related transactions (i.e. dividends, realized gains, etc). |
-| fix:cost-basis-for-sales | Utility to automatically re-calculates cost basis for sale transactions. |
-
-## Troubleshooting
-
-If you are facing issues with Investbrain, it can be handy to monitor the application's logs:
-
-```bash
-docker exec -it investbrain-app cat storage/logs/laravel.log
-```
-or you can live monitor logs using `tail`:
-
-```bash
-docker exec -it investbrain-app tail -f storage/logs/laravel.log
-```
-
-### Common issues
-
-<details>
-
-**<summary>Application styling is broken and images are too big</summary>**
-
-If you're serving Investbrain from a DNS name (e.g. example.com), it's likely that you haven't updated the `ASSET_URL` environment yet. The URL provided there will be used to generate absolute URLs for images, JS, and CSS assets on the front end of the application.
-
-</details>
-
-<details>
-
-**<summary>Market data not refreshing on fresh install</summary>**
-
-If you're unable to refresh market data out of the box (i.e. your market data provider is set to Yahoo), there is a chance Yahoo is being blocked by a firewall or adblocker.  Pihole is known to block `fc.yahoo.com` which is the domain used to query Yahoo. 
-
-Once you whitelist `fc.yahoo.com` in pihole, your market data should begin populating!
-
-</details>
-
-## Testing
-
-Investbrain has a robus PHPUnit test suite that creates an in-memory SQLite database and runs any queued jobs synchronously using Laravel's array driver. You can run the entire Investbrain test suite from within the Docker container by running:
-
-```bash
-docker exec -it investbrain-app php artisan test
-```
+Everything else is in the [docs](docs/README.md):
+
+- [Getting started](docs/getting-started.md) - portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
+- [Account settings](docs/account-settings.md) - locale and display currency, two-factor authentication, social logins, and authorized apps
+- [Import and export](docs/import-export.md) - backups, moving between instances, and bulk-loading transactions from a spreadsheet
+- [REST API](docs/api.md) - API tokens and endpoints
+- [MCP server](docs/mcp.md) - connecting AI assistants such as Claude, ChatGPT, Cursor, or VS Code
+- [Self-hosting](docs/self-hosting.md) - installation, configuration options, market data providers, AI chat, updating, and command line utilities
+- [Troubleshooting](docs/troubleshooting.md) - fixes for common problems
+- [Contributing](docs/contributing.md) and [developing market data providers](docs/market-data-providers.md) - development setup, running tests, and making pull requests
 
 ## Contributing
 
-We appreciate any contributions to Investbrain! Please open a pull request on our [Github repository](https://github.com/investbrainapp/investbrain). Here are some ideas for first time contributors:
-
-- Improve our documentation
-- Create new market data providers
-- Enhance the user interface
-- Additional translations
-- Fix bugs
-
-When you submit a contribution, don't forget to include passing tests with your PR! See the [contributing guide](docs/contributing.md) for how to set up a development environment and what we look for in a pull request, and [developing market data providers](docs/market-data-providers.md) if you're adding a provider.
+We appreciate any contributions to Investbrain, from documentation and translations to bug fixes and new market data providers. The [contributing guide](docs/contributing.md) explains how to set up a development environment and what we look for in a pull request.
 
 ## Code of Conduct
 

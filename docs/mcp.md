@@ -23,7 +23,7 @@ Everything happens on your behalf, with your permissions. An assistant can:
 - Turn dividend reinvestment on or off for a holding
 - Look up current market data for any symbol
 
-It can only see portfolios you have access to, and it can only change portfolios where you have [full access](user-guide.md#access-levels). Shared portfolios where you're read-only stay read-only.
+It can only see portfolios you have access to, and it can only change portfolios where you have [full access](getting-started.md#access-levels). Shared portfolios where you're read-only stay read-only.
 
 ## Before you start
 

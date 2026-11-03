@@ -119,7 +119,7 @@ The `links` keep your other query parameters, so you can follow `next` until it'
 
 ## Permissions
 
-The API follows the same permissions as the web app: you can read any portfolio you have access to, but creating, changing, or deleting anything requires [full access](user-guide.md#access-levels) to the portfolio.
+The API follows the same permissions as the web app: you can read any portfolio you have access to, but creating, changing, or deleting anything requires [full access](getting-started.md#access-levels) to the portfolio.
 
 ## Errors
 

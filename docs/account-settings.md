@@ -22,7 +22,7 @@ The **Locale Options** section on **Manage Profile** controls how Investbrain lo
 
 ![The Locale Options section with Locale and Display Currency](images/account-settings-locale-currency.png)
 
-Changing your display currency doesn't change any stored data. It only changes how totals are presented to you, so you can switch back and forth freely. Individual holdings in the holdings table keep showing their own trading currency. See [Multiple currencies](user-guide.md#multiple-currencies) for more.
+Changing your display currency doesn't change any stored data. It only changes how totals are presented to you, so you can switch back and forth freely. Individual holdings in the holdings table keep showing their own trading currency. See [Multiple currencies](getting-started.md#multiple-currencies) for more.
 
 Your display currency is also the default currency when you create a new transaction from the Transactions page or a portfolio page.
 

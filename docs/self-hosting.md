@@ -59,7 +59,7 @@ Visit `http://localhost:8000/register` (or your `APP_URL` followed by `/register
 
 **5. Optional: turn off registration**
 
-If you're the only user, or you'd rather invite people by [sharing a portfolio](user-guide.md#sharing-portfolios), set `REGISTRATION_ENABLED: false` and [apply the change](#applying-configuration-changes). Shared users can still set a password through their invitation link.
+If you're the only user, or you'd rather invite people by [sharing a portfolio](getting-started.md#sharing-portfolios), set `REGISTRATION_ENABLED: false` and [apply the change](#applying-configuration-changes). Shared users can still set a password through their invitation link.
 
 ## What's in the compose file
 
@@ -320,7 +320,7 @@ If you do want a different base currency, set `BASE_CURRENCY` **before** adding 
 
 ## AI chat
 
-To turn on the [AI chat](user-guide.md#ai-chat) assistant:
+To turn on the [AI chat](getting-started.md#ai-chat) assistant:
 
 ```yaml
       AI_CHAT_ENABLED: true
