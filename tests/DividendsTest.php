@@ -58,6 +58,38 @@ class DividendsTest extends TestCase
         $this->assertEqualsWithDelta(4.95, $dividendsReinvested * $market_data->market_value, 0.01);
     }
 
+    public function test_reinvested_dividends_only_count_shares_of_the_same_symbol(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('GOOG')->create();
+
+        Holding::query()->portfolio($portfolio->id)->symbol('ACME')->update(['reinvest_dividends' => true]);
+
+        Dividend::refreshDividendData('ACME');
+
+        $transactions = Transaction::where(['reinvested_dividend' => true])->symbol('ACME')->portfolio($portfolio->id)->get();
+
+        $this->assertEqualsWithDelta(4.95, $transactions->sum('quantity') * MarketData::symbol('ACME')->first()->market_value, 0.01);
+    }
+
+    public function test_dividends_are_only_reinvested_once(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        Holding::query()->portfolio($portfolio->id)->symbol('ACME')->update(['reinvest_dividends' => true]);
+
+        Dividend::refreshDividendData('ACME');
+        Dividend::refreshDividendData('ACME');
+
+        $this->assertCount(3, Transaction::where(['reinvested_dividend' => true])->symbol('ACME')->portfolio($portfolio->id)->get());
+    }
+
     public function test_cannot_insert_duplicate_dividends(): void
     {
         // first insert

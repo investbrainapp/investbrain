@@ -453,7 +453,10 @@ class Holding extends Model
             $date = now();
         }
 
-        $transactions = $this->transactions->where('date', '<=', $date);
+        // the transactions relation covers the whole portfolio, not just this symbol
+        $transactions = $this->transactions
+            ->where('symbol', $this->symbol)
+            ->where('date', '<=', $date);
 
         $purchases = $transactions->where('transaction_type', 'BUY')->sum('quantity');
 
