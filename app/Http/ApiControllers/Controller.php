@@ -15,6 +15,11 @@ abstract class Controller
     public const MAX_ITEMS_PER_PAGE = 100;
 
     /**
+     * Requests each user can make across the whole API per minute.
+     */
+    public const REQUESTS_PER_MINUTE = 60;
+
+    /**
      * Validate the shared pagination parameters and return the requested page size.
      */
     protected function itemsPerPage(Request $request): int
