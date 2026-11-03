@@ -10,15 +10,6 @@ Investbrain includes a built-in [Model Context Protocol](https://modelcontextpro
 
 Once connected, an assistant such as Claude, ChatGPT, Cursor, or VS Code can look up your portfolios, record transactions, and check market data for you, in plain conversation.
 
-- [What an assistant can do](#what-an-assistant-can-do)
-- [Before you start](#before-you-start)
-- [Connecting an assistant](#connecting-an-assistant)
-- [Authorizing access](#authorizing-access)
-- [Example prompts](#example-prompts)
-- [Available tools](#available-tools)
-- [Revoking access](#revoking-access)
-- [Troubleshooting](#troubleshooting)
-
 ## What an assistant can do
 
 Everything happens on your behalf, with your permissions. An assistant can:

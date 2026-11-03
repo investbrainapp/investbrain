@@ -10,21 +10,6 @@ The only supported way to self-host Investbrain is with the official Docker imag
 
 If you'd rather not run a server, [Investbrain Cloud](https://investbra.in) runs the same app with nothing to install or manage. 
 
-- [Installation](#installation)
-- [What's in the compose file](#whats-in-the-compose-file)
-- [What happens on startup](#what-happens-on-startup)
-- [Configuration](#configuration)
-- [Running behind a reverse proxy (HTTPS)](#running-behind-a-reverse-proxy-https)
-- [MCP and OAuth requirements](#mcp-and-oauth-requirements)
-- [Market data providers](#market-data-providers)
-- [Monitoring market data providers](#monitoring-market-data-providers)
-- [Currency](#currency)
-- [AI chat](#ai-chat)
-- [Social login](#social-login)
-- [Email](#email)
-- [Updating](#updating)
-- [Command line utilities](#command-line-utilities)
-
 ## Installation
 
 **1. Download the compose file**

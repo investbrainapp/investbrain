@@ -8,20 +8,6 @@ order: 10
 
 This guide covers the basics of Investbrain.
 
-- [Key concepts](#key-concepts)
-- [The dashboard](#the-dashboard)
-- [Portfolios](#portfolios)
-- [Sharing portfolios](#sharing-portfolios)
-- [Transactions](#transactions)
-- [Holdings](#holdings)
-- [Dividends](#dividends)
-- [Stock splits](#stock-splits)
-- [Multiple currencies](#multiple-currencies)
-- [Performance charts](#performance-charts)
-- [Search](#search)
-- [AI chat](#ai-chat)
-- [Appearance and language](#appearance-and-language)
-
 ## Key concepts
 
 Investbrain is built around four key things:

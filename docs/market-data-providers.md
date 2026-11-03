@@ -10,13 +10,6 @@ Investbrain gets prices, fundamentals, dividends, splits, and price history thro
 
 If you only want to choose or configure a provider, see [Market data providers](self-hosting.md#market-data-providers) instead. For setting up a development environment and opening pull requests in general, see [Contributing](contributing.md).
 
-- [How providers work](#how-providers-work)
-- [The interface](#the-interface)
-- [Return types](#return-types)
-- [Rules every provider must follow](#rules-every-provider-must-follow)
-- [Trying it in the app](#trying-it-in-the-app)
-- [Contributing your provider](#contributing-your-provider)
-
 ## How providers work
 
 Application code never calls a provider class directly. It asks the container for `App\Interfaces\MarketData\MarketDataInterface`, which [`AppServiceProvider`](https://github.com/investbrainapp/investbrain/blob/main/app/Providers/AppServiceProvider.php) binds to [`FallbackInterface`](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/FallbackInterface.php).

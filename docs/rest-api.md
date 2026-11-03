@@ -8,12 +8,6 @@ order: 20
 
 Investbrain has a JSON REST API for reading and managing your portfolios, transactions, and holdings, and for looking up market data. Use it to build scripts, sync data from a brokerage, feed a spreadsheet, or integrate with other tools.
 
-- [Creating an API token](#creating-an-api-token)
-- [Making requests](#making-requests)
-- [Pagination, sorting, filtering, and search](#pagination-sorting-filtering-and-search)
-- [Errors](#errors)
-- [OpenAPI specification](#openapi-specification)
-
 ## Creating an API token
 
 The API authenticates with personal access tokens.
