@@ -7,7 +7,7 @@ updated_at: "2026-11-02"
 ---
 # REST API
 
-Investbrain has a JSON REST API for reading and managing your portfolios, transactions, and holdings, and for looking up market data. Use it to build scripts, sync data from a brokerage, feed a spreadsheet, or integrate with other tools.
+Investbrain has a [JSON REST API](/docs/api) for reading and managing your portfolios, transactions, and holdings, and for looking up market data. Use it to build scripts, sync data from a brokerage, feed a spreadsheet, or integrate with other tools.
 
 ## Creating an API token
 
@@ -146,7 +146,7 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-A machine-readable OpenAPI specification of the API is kept in this repository at [`docs/openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/docs/openapi.json). It describes API v2 (Investbrain 1.4.0 and later). On Investbrain Cloud, you can also browse it as an [API reference](https://investbra.in/docs/api), with a page for each endpoint and code samples in several languages.
+A machine-readable OpenAPI specification of the API is kept in this repository at [`docs/openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/docs/openapi.json). It describes Investbrain API v2 (Investbrain 1.4.0 and later). You can also browse it as an [API reference](https://investbra.in/docs/api), with a page for each endpoint and code samples in several languages.
 
 You can import into Postman, Insomnia, or Bruno to browse endpoints and try requests. 
 
