@@ -250,7 +250,7 @@ Wrap every user-facing string in `__()`, for example `{{ __('Create Portfolio') 
 
 **Market data providers.** See [Developing market data providers](market-data-providers.md).
 
-**Documentation.** User-facing changes should update the relevant page in `docs/` and, where it applies, the root `README.md`. Screenshot conventions are in [`docs/images/README.md`](images/README.md).
+**Documentation.** User-facing changes should update the relevant page in `docs/` and, where it applies, the root `README.md`. Screenshots go in the [`docs/images/`](images/) folder.
 
 ## Using AI coding assistants
 

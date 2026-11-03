@@ -13,7 +13,7 @@ Open **Import / Export Data** from the user menu to get started. On Investbrain 
 
 ## Exporting your data
 
-1. Click **Generate Export**. While its generating, tou can leave the page and check back later.
+1. Click **Generate Export**. While it's generating, you can leave the page and check back later.
 2. When it's ready, click **Download Export**. 
 
 You'll get a portable Excel file like `2026_11_01_investbrain_backup.xlsx` containing 4 sheets:
