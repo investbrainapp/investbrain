@@ -60,14 +60,9 @@ new class extends Component
             return;
         }
 
-        // prevent spam
+        // prevent spam (the attempt is counted in generateCompletion, where the model is called)
         if ($this->isRateLimited()) {
-            array_push($this->messages, [
-                'role' => 'assistant',
-                'content' => __('Hang on! You\'re doing that too much.'),
-                'created_at' => now(),
-            ]);
-            $this->js('scrollChatWindow(250)');
+            $this->addRateLimitedMessage();
 
             return;
         }
@@ -97,6 +92,14 @@ new class extends Component
 
     public function generateCompletion(): void
     {
+        // counted here rather than in startCompletion, since the client can call this directly
+        if (! $this->attempt()) {
+            $this->addRateLimitedMessage();
+            $this->resetPrompt();
+
+            return;
+        }
+
         $userPrompt = end($this->messages)['content'] ?? '';
 
         try {
@@ -128,6 +131,11 @@ new class extends Component
     #[Async]
     public function generateSuggestedPrompts(): void
     {
+        if (! $this->attempt('suggestions')) {
+            $this->suggested_prompts = [];
+
+            return;
+        }
 
         try {
             $response = ChatWithSuggestedPromptsAgent::make(messages: array_slice($this->messages, -3))->prompt('');
@@ -146,17 +154,32 @@ new class extends Component
         $this->streaming = false;
     }
 
-    public function isRateLimited(): bool
+    protected function isRateLimited(): bool
     {
-        $rateLimitKey = auth()->id().'/'.$this->chatable->id;
+        return RateLimiter::tooManyAttempts($this->rateLimitKey(), 20);
+    }
 
-        if (RateLimiter::tooManyAttempts($rateLimitKey, 20)) {
-            return true;
-        }
+    /**
+     * Count a model call against the rate limit; false when the limit is already used up.
+     */
+    protected function attempt(string $action = 'completion'): bool
+    {
+        return RateLimiter::attempt($this->rateLimitKey($action), 20, fn () => true, 60);
+    }
 
-        RateLimiter::hit($rateLimitKey, 60);
+    protected function rateLimitKey(string $action = 'completion'): string
+    {
+        return auth()->id().'/'.$this->chatable->id.($action === 'completion' ? '' : '/'.$action);
+    }
 
-        return false;
+    protected function addRateLimitedMessage(): void
+    {
+        array_push($this->messages, [
+            'role' => 'assistant',
+            'content' => __('Hang on! You\'re doing that too much.'),
+            'created_at' => now(),
+        ]);
+        $this->js('scrollChatWindow(250)');
     }
 
     private function makeAgent(): Agent
