@@ -3,7 +3,7 @@
   "info": {
     "version": "2.0.0",
     "title": "Investbrain API v2",
-    "description": "Version 2 of the Investbrain API, used by Investbrain 1.4.0 and later. For Investbrain versions before 1.4.0, see the v1 specification at docs/openapi-v1.json.\n\nInvestbrain is a smart open-source investment tracker that consolidates and monitors market performance across your different brokerages.",
+    "description": "Investbrain is a smart open-source investment tracker that consolidates and monitors market performance across your different brokerages.",
     "termsOfService": "https://investbra.in/terms",
     "contact": {
       "url": "https://github.com/investbrainapp/investbrain",
