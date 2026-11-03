@@ -2,7 +2,7 @@
 title: "Contributing"
 description: "How the project is built, setting up a development environment, coding conventions, and making pull requests."
 group: "Contributing"
-order: 8
+order: 9
 ---
 # Contributing
 
@@ -79,7 +79,7 @@ Investbrain is a [Laravel](https://laravel.com) application.
 | `tests/` | All tests, in a flat folder under the `Tests` namespace, plus `tests/Api` and `tests/Mcp` |
 | `docker/` | The Dockerfile, entrypoint script, Nginx, and Supervisor configuration for the official image |
 | `docs/` | This documentation |
-| `openapi.json` | The REST API specification |
+| `docs/openapi.json` | The REST API specification |
 
 ## Setting up a development environment
 
@@ -250,7 +250,7 @@ Wrap every user-facing string in `__()`, for example `{{ __('Create Portfolio') 
 
 **Database.** Create migrations with `php artisan make:migration`. They must run on both PostgreSQL (production) and SQLite (tests). New models need a factory, and a seeder where it's useful.
 
-**REST API.** Routes are in `routes/api.php`, controllers in `app/Http/ApiControllers/`, and the JSON shapes in `app/Http/Resources/`. If you add or change an endpoint, field, filter, or sort, update [`openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/openapi.json) and [`docs/api.md`](api.md), and add tests in `tests/Api/`. `tests/Api/OpenApiSpecTest.php` fails if `openapi.json` is missing a route, or if its documented sorts and filters don't match what an endpoint actually allows.
+**REST API.** Routes are in `routes/api.php`, controllers in `app/Http/ApiControllers/`, and the JSON shapes in `app/Http/Resources/`. If you add or change an endpoint, field, filter, or sort, update [`docs/openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/docs/openapi.json) and [`docs/api.md`](api.md), and add tests in `tests/Api/`. `tests/Api/OpenApiSpecTest.php` fails if `docs/openapi.json` is missing a route, or if its documented sorts and filters don't match what an endpoint actually allows.
 
 **MCP server.** Tools are in `app/Mcp/Tools/` and are registered in `app/Mcp/Servers/InvestbrainServer.php`. Tools should call the shared actions and return the same resources as the API. Add tests in `tests/Mcp/` and update the tool table in [`docs/mcp.md`](mcp.md).
 

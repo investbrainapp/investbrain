@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * Keeps openapi.json in step with the API routes, sorts, and filters it documents.
+ * Keeps docs/openapi.json in step with the API routes, sorts, and filters it documents.
  */
 class OpenApiSpecTest extends ApiTestCase
 {
@@ -128,7 +128,7 @@ class OpenApiSpecTest extends ApiTestCase
      */
     private function spec(): array
     {
-        return json_decode((string) file_get_contents(base_path('openapi.json')), true, flags: JSON_THROW_ON_ERROR);
+        return json_decode((string) file_get_contents(base_path('docs/openapi.json')), true, flags: JSON_THROW_ON_ERROR);
     }
 
     /**

@@ -2,7 +2,7 @@
 title: "Self-Hosting"
 description: "Install with the supported Docker Compose file, then configure, update, and maintain your instance."
 group: "Running your own instance"
-order: 6
+order: 7
 ---
 # Self-Hosting
 

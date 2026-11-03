@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use cebe\openapi\Reader;
 use Laradocs\Http\Middleware\EnsureDocsEnabled;
 use Laradocs\Http\Middleware\SetDocsLocale;
 use Laradocs\Http\Middleware\SetDocsVersion;
@@ -909,12 +910,14 @@ return [
     */
 
     'openapi' => [
-        'enabled' => (bool) env('LARADOCS_OPENAPI', false),
+        // renders docs/openapi.json whenever the devizzent/cebe-php-openapi parser is installed
+        'enabled' => (bool) env('LARADOCS_OPENAPI', class_exists(Reader::class)),
         'files' => ['openapi.yaml', 'openapi.yml', 'openapi.json'],
-        'base_slug' => 'api',
-        'title' => 'Overview',
-        'group' => 'API Reference',
-        'order' => 100,
+        // docs/api.md already serves /docs/api
+        'base_slug' => 'api-reference',
+        'title' => 'API Reference',
+        'group' => 'Advanced',
+        'order' => 5,
         'render_markdown_descriptions' => true,
 
         'generator' => [

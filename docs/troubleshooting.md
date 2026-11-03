@@ -2,7 +2,7 @@
 title: "Troubleshooting"
 description: "Fixes for the most common problems on self-hosted instances."
 group: "Running your own instance"
-order: 7
+order: 8
 ---
 # Troubleshooting
 
