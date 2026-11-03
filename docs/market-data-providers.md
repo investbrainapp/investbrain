@@ -2,7 +2,7 @@
 title: "Developing Market Data Providers"
 description: "Write, test, and contribute a new market data provider."
 group: "Contributing"
-order: 10
+order: 41
 ---
 # Developing Market Data Providers
 

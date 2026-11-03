@@ -917,7 +917,7 @@ return [
         'base_slug' => 'api-reference',
         'title' => 'API Reference',
         'group' => 'Advanced',
-        'order' => 5,
+        'order' => 21,
         'render_markdown_descriptions' => true,
 
         'generator' => [

@@ -2,7 +2,7 @@
 title: "Contributing"
 description: "How the project is built, setting up a development environment, coding conventions, and making pull requests."
 group: "Contributing"
-order: 9
+order: 40
 ---
 # Contributing
 

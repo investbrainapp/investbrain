@@ -2,7 +2,7 @@
 title: "MCP Server"
 description: "Connect AI assistants such as Claude, ChatGPT, Cursor, or VS Code to your Investbrain account."
 group: "Advanced"
-order: 6
+order: 22
 ---
 # MCP Server
 
