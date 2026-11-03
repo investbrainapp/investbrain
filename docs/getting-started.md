@@ -1,6 +1,6 @@
-# User Guide
+# Getting Started
 
-This guide covers the core of Investbrain: portfolios, transactions, and holdings, plus the features built on top of them. It applies to both [Investbrain Cloud](https://investbra.in) and self-hosted instances; the few differences are called out where they come up.
+This guide covers the basics of Investbrain.
 
 - [Key concepts](#key-concepts)
 - [Creating an account and signing in](#creating-an-account-and-signing-in)
@@ -19,33 +19,18 @@ This guide covers the core of Investbrain: portfolios, transactions, and holding
 
 ## Key concepts
 
-Investbrain is built around four things:
+Investbrain is built around four key things:
 
 | Concept | What it is |
 | --- | --- |
-| **Portfolio** | A container for investments, usually one per brokerage account (for example "Fidelity IRA" or "Joint Brokerage"). |
-| **Transaction** | A single buy or sell of a security on a given date. Transactions are the source of truth for everything else. |
-| **Holding** | A position in one security within one portfolio. Holdings are created and updated automatically from your transactions. You never create a holding by hand. |
+| **Portfolio** | A container for investments, usually one per brokerage account (for example "Fidelity IRA" or "Robinhood Brokerage"). |
+| **Transaction** | A single buy or sell of a security on a given date. Transactions are the source of truth used to build your holdings and performance data. |
+| **Holding** | A position in one security within one portfolio. Holdings are generated and managed automatically based on your transactions. |
 | **Market data** | Prices, fundamentals, dividends, and splits for each security, updated automatically from a market data provider. Investbrain Cloud handles this for you. If you self-host, you [choose the provider](self-hosting.md#market-data-providers). |
-
-## Creating an account and signing in
-
-Create an account with your name, email, and a password:
-
-- **Investbrain Cloud** - sign up at [investbra.in/register](https://investbra.in/register). You'll be asked to agree to the Terms of Service and Privacy Policy, and to verify your email address. Until your email is verified, the Import / Export, Connections, and API Tokens pages aren't available. If the verification email doesn't arrive, request a new one from the verification page or from **Manage Profile**.
-- **Self-hosted** - open `/register` on your instance. The first account you create is the only one that can see [Provider Health](self-hosting.md#monitoring-market-data-providers). If you've [turned off registration](self-hosting.md#installation), you can still add people by [sharing a portfolio](#sharing-portfolios) with them: they get an invitation email with a link to set their password.
-
-When social logins are available, the login page shows a **Login with ...** button for each provider (GitHub, Google, Facebook, or LinkedIn). On a self-hosted instance they appear once you've [set them up](self-hosting.md#social-login). See [Social logins](account-settings.md#social-logins) for how linking works.
-
-Other sign-in features:
-
-- **Forgot password** - request a reset link from the login page. On a self-hosted instance, you need to [set up email](self-hosting.md#email) for the link to be delivered.
-- **Two-factor authentication** - if you have turned it on, you'll be asked for a code from your authenticator app (or a recovery code) after entering your password. See [Two-factor authentication](account-settings.md#two-factor-authentication).
-- Login attempts are limited to five per minute for each email and IP address.
 
 ## The dashboard
 
-The dashboard is the first thing you see after signing in. It rolls up every portfolio you have access to, **except wishlists**.
+The dashboard is the first thing you see after logging in. It rolls up every portfolio you have access to, **except [wishlists](#wishlists)**.
 
 - **Performance chart** - your combined market gain over time. You can switch to market value or cost basis and pick a time range (1 month, 3 months, year to date, 1 year, 3 years, all time).
 - **Summary cards** - market gain/loss, total cost basis, total market value, realized gain/loss, and dividends earned. These are shown in your [display currency](account-settings.md#locale-and-display-currency).
@@ -55,8 +40,7 @@ The dashboard is the first thing you see after signing in. It rolls up every por
 
 A brand new account shows two shortcuts: **Import / Export Data** and **Create your first portfolio!**
 
-<!-- SCREENSHOT: Dashboard with a few portfolios: performance chart, the five summary cards, My portfolios, Recent activity, and Top performers. -->
-<!-- ![The Investbrain dashboard](images/user-guide-dashboard.png) -->
+![The Investbrain dashboard](images/user-guide-dashboard.png) 
 
 ## Portfolios
 
@@ -68,11 +52,11 @@ Click **Create Portfolio** in the sidebar (or the button on an empty dashboard) 
 | --- | --- |
 | Title | Required, at least 5 characters. |
 | Notes | Optional free-form text, for example the account number or brokerage. |
-| Wishlist | Optional. See [Wishlists](#wishlists). |
+| Wishlist | Optional. See [wishlists](#wishlists). |
 
-You become the **owner** of every portfolio you create.
+You are the **owner** of portfolios you create.
 
-### The portfolio page
+### Viewing a portfolio
 
 Each portfolio has its own page with:
 
@@ -82,8 +66,7 @@ Each portfolio has its own page with:
 - **Top performers** within the portfolio
 - An **AI chat** window, when [AI chat](#ai-chat) is available
 
-<!-- SCREENSHOT: A portfolio page showing the toolbar (title, pencil icon, Create Transaction), chart, summary cards, Holdings table, and Recent activity. -->
-<!-- ![A portfolio page with its chart, summary cards, and holdings table](images/user-guide-portfolio-page.png) -->
+![A portfolio page with its chart, summary cards, and holdings table](images/user-guide-portfolio-page.png) 
 
 ### Editing or deleting a portfolio
 
@@ -91,18 +74,18 @@ Click the pencil icon next to the portfolio title to open **Manage Portfolio**. 
 
 Deleting a portfolio permanently deletes all of its transactions, holdings, and history. There is no undo, so consider [exporting a backup](import-export.md#exporting-your-data) first.
 
-You need full access to a portfolio to edit or delete it. If you only have read-only access you'll see an eye icon instead of the pencil.
+Only users with _full access_ to a portfolio to edit or delete it. If you have read-only access you'll see an eye icon instead of the pencil.
 
 ### Wishlists
 
-Turn on **Wishlist** to treat a portfolio as a watchlist of ideas rather than real money. A wishlist works like any other portfolio (you can add transactions to it to model hypothetical positions), but:
+Toggle **wishlist** to treat a portfolio as a watchlist of ideas rather than real money. A wishlist works like any other portfolio (you can add transactions to it to model hypothetical positions), but:
 
 - Its holdings are left out of the dashboard totals and the dashboard performance chart
-- It is labeled with a **Wishlist** badge in the sidebar, on the dashboard, and on the portfolio page
+- It is labeled with a **wishlist** badge in the sidebar, on the dashboard, and on the portfolio page
 
 ## Sharing portfolios
 
-You can share a portfolio with anyone by email, which is handy for a spouse, a financial advisor, or an accountant.
+You can share a portfolio with anyone by email, which is handy for a spouse, friends, a financial advisor, or an accountant.
 
 1. Open the portfolio and click the pencil icon to open **Manage Portfolio**.
 2. Under **People with access**, click **Add People**.
@@ -110,18 +93,17 @@ You can share a portfolio with anyone by email, which is handy for a spouse, a f
 4. Optionally turn on **Grant full access**.
 5. Click **Share**.
 
-<!-- SCREENSHOT: Manage Portfolio drawer with People with access (owner plus one read-only and one full-access user) and the Share Portfolio dialog open. -->
-<!-- ![The Share Portfolio dialog and the People with access list](images/user-guide-portfolio-sharing.png) -->
+![The Share Portfolio dialog and the People with access list](images/user-guide-portfolio-sharing.png)
 
-The person receives an email invitation. If they don't have an Investbrain account yet, one is created for them and the invitation link lets them set a password. On a self-hosted instance, invitations only arrive once you've [set up email](self-hosting.md#email).
+The people you share a portfolio with will receive an email invitation. If they don't have an Investbrain account yet, one is created for them and the invitation link lets them set a password. On a self-hosted instance, invitations only arrive once you've [set up email](self-hosting.md#email).
 
 ### Access levels
 
-| Level | Can view the portfolio | Can add, edit, and delete transactions | Can edit portfolio details, manage sharing, and delete the portfolio |
+| Level | View the portfolio | Add, edit, and delete transactions | Edit portfolio details, manage sharing, and delete the portfolio |
 | --- | --- | --- | --- |
-| Owner | Yes | Yes | Yes |
-| Full access | Yes | Yes | Yes |
-| Read only | Yes | No | No |
+| Owner | ✅ | ✅ | ✅ |
+| Full access | ✅ | ✅ | ✅ |
+| Read only | ✅ | ❌ | ❌ |
 
 From **People with access** you can switch someone between **Read only** and **Full access** at any time, or click the **x** next to their name to remove them. Removed users lose access immediately. The owner can't be removed.
 
@@ -137,8 +119,8 @@ Every holding, gain, and chart in Investbrain is calculated from your transactio
 
 You can create a transaction from:
 
-- A portfolio page (**Create Transaction**)
-- A holding page (**Create transaction**, with the symbol filled in for you)
+- The portfolio page (**Create Transaction**)
+- The holding page (**Create transaction**, with the symbol filled in for you)
 - The **Transactions** page in the sidebar (you'll also pick which portfolio it belongs to)
 
 | Field | Notes |
@@ -152,23 +134,22 @@ You can create a transaction from:
 | Sale Price | Sells only. The price received **per share**. |
 | Currency | The currency you paid or received, picked from the drop-down next to the price. Defaults to your display currency (or, on a holding page, the security's trading currency). See [Multiple currencies](#multiple-currencies). |
 
-<!-- SCREENSHOT: Create Transaction dialog for a Buy, with symbol, date, quantity, cost basis filled in and the currency drop-down visible. -->
-<!-- ![The Create Transaction form](images/user-guide-transaction-create.png) -->
+![The Create Transaction form](images/user-guide-transaction-create.png)
 
-When you save a buy or sell, Investbrain:
+When you save a buy or sell transaction, Investbrain:
 
 - Creates the holding if this is the first transaction for that symbol in the portfolio
-- Recalculates the holding's quantity, average cost basis, realized gains, and dividends earned
+- Re-calculates the holding's quantity, average cost basis, realized gains, and dividends earned
 - Updates the portfolio's daily history so the performance chart reflects the change
 
 ### Rules for sells
 
-- You can't sell more shares than you owned **as of the sale date**. Buys on the same day as the sale count toward what you owned.
+- You can't sell more shares than you owned **as of the sale date**. 
 - You don't enter a cost basis for a sale. Investbrain uses the average cost basis of all your buys of that symbol in that portfolio up to the sale date, and uses it to calculate the realized gain.
 
-### Editing, moving, and deleting transactions
+### Editing and deleting transactions
 
-To edit a transaction, open its holding page and click the transaction in **Recent activity**. (Clicking a transaction on the dashboard or a portfolio page takes you to the holding page first.) You can change any field, including the portfolio, which moves the transaction to another portfolio. Moving requires full access to both portfolios. Use **Delete Transaction** to remove it.
+To edit a transaction, open its holding page and click the transaction in **Recent activity**. (Clicking a transaction on the dashboard or a portfolio page takes you to the holding page first.) Use **Delete Transaction** to remove it.
 
 After an edit or delete, the affected holding (or holdings, if you changed the symbol) is recalculated automatically.
 
@@ -180,8 +161,7 @@ After an edit or delete, the affected holding (or holdings, if you changed the s
 - Filter by transaction type (buy or sell) and by portfolio
 - Click a row to jump to that holding
 
-<!-- SCREENSHOT: Transactions page with the filter panel open and at least one SPLIT or REINVEST badge visible in the Type column. -->
-<!-- ![The Transactions page with filters](images/user-guide-transactions-page.png) -->
+![The Transactions page with filters](images/user-guide-transactions-page.png) 
 
 The **Type** column shows **BUY** and **SELL**, plus two special labels for transactions Investbrain created for you:
 
@@ -190,7 +170,7 @@ The **Type** column shows **BUY** and **SELL**, plus two special labels for tran
 
 ## Holdings
 
-A holding is your position in one symbol within one portfolio. You don't create holdings yourself; they appear when you record the first transaction for a symbol.
+A holding is your position in one symbol within one portfolio. You don't create or update holdings yourself; they'll appear or re-calculate when you record a transaction for a symbol.
 
 ### The holdings table
 
@@ -210,8 +190,7 @@ Values in this table are shown in each security's own trading currency.
 
 By default the table only shows **open positions** (quantity above zero). Turn off the **Open positions** filter to include holdings you've completely sold. You can also build custom filters on the symbol, name, or market value, and sort by any column. Click a row to open the holding.
 
-<!-- SCREENSHOT: Holdings table with several rows, showing gain/loss badges and the Open positions filter. -->
-<!-- ![The holdings table on a portfolio page](images/user-guide-holdings-table.png) -->
+![The holdings table on a portfolio page](images/user-guide-holdings-table.png)
 
 ### The holding page
 
@@ -224,8 +203,7 @@ Each holding has a page with:
 - **Splits** - stock splits since you started holding it
 - **AI chat**, when [AI chat](#ai-chat) is available
 
-<!-- SCREENSHOT: A holding page for a dividend-paying stock so the Market data, Fundamentals, Recent activity, Dividends, and Splits cards all have content. -->
-<!-- ![A holding page with market data, fundamentals, activity, dividends, and splits](images/user-guide-holding-page.png) -->
+![A holding page with market data, fundamentals, activity, dividends, and splits](images/user-guide-holding-page.png) 
 
 ### Holding options
 
@@ -233,7 +211,7 @@ Click the pencil icon next to the holding name to open **Holding Options**. The 
 
 ## Dividends
 
-Investbrain downloads dividend history for every symbol you hold and works out how much you earned from how many shares you owned on each dividend date. Dividend data is refreshed automatically three times a week (Monday, Wednesday, and Friday). Dividends earned show up on the holding page, in the holdings table, and in the dividends total on the portfolio page and dashboard.
+Investbrain captures dividend history for every symbol you hold and calculates how much you've earned based on how many shares you owned on each dividend date. Dividend data is refreshed automatically three times a week (Monday, Wednesday, and Friday).
 
 ### Reinvesting dividends
 
@@ -253,7 +231,7 @@ Investbrain tracks prices in the currency each security trades in, and converts 
 - **Transaction currency** - when you record a transaction you can enter the price in any supported currency. If it differs from the trading currency, Investbrain converts it using the exchange rate on the transaction date.
 - **Display currency** - dashboard and portfolio totals and performance charts are converted into your personal display currency. Change it under [Locale and display currency](account-settings.md#locale-and-display-currency).
 
-Exchange rates are refreshed daily. Some exchanges quote prices in minor units; Investbrain understands GBX (British pence), ZAC (South African cents), and RMB (an alias of CNY) and adjusts them automatically.
+Exchange rates are refreshed daily. Some exchanges quote prices in minor units; Investbrain has aliases built-in for GBX (British pence), ZAC (South African cents), and RMB (a.k.a. Chinese Yuan) and adjusts them automatically.
 
 ## Performance charts
 
@@ -262,14 +240,13 @@ The dashboard and every portfolio page include a performance chart built from a 
 - Choose the time range from the drop-down: 1 month, 3 months, year to date, 1 year, 3 years, or all time.
 - The chart shows **Market Gain** by default. Click **Market Value** or **Cost Basis** in the legend to show those lines too.
 - Snapshots are captured once every weekday. On a self-hosted instance the time is set by `DAILY_CHANGE_TIME` (11 PM by default, see [Configuration](self-hosting.md#options)).
-- When you add or change a transaction dated in the past, the portfolio's history is rebuilt from the market data provider so the chart stays accurate.
+- When you add or change a transaction dated in the past, the portfolio's history is re-built from the market data provider.
 
 ## Search
 
 Press `/` anywhere in the app, or click the search box in the top bar, to search your portfolios by title and your open holdings by symbol or company name. Use the arrow keys to move through results and Enter to open one.
 
-<!-- SCREENSHOT: Search dialog open with a query that returns both a portfolio and a holding. -->
-<!-- ![The search dialog showing portfolio and holding results](images/user-guide-search.png) -->
+![The search dialog showing portfolio and holding results](images/user-guide-search.png) 
 
 ## AI chat
 
@@ -281,13 +258,10 @@ When AI chat is available, every portfolio and holding page shows an **AI Chat**
 
 Suggested prompts are shown to get you started. Your conversation for each portfolio or holding is saved for you, and other people with access to the same portfolio can't see it.
 
-<!-- SCREENSHOT: AI chat window on a portfolio page with the suggested prompts and one short question and answer. -->
-<!-- ![The AI chat window on a portfolio page](images/user-guide-ai-chat.png) -->
-
-AI-generated advice can be wrong. Treat it as a thought partner, not a recommendation, and consult a licensed investment advisor before making decisions.
+![The AI chat window on a portfolio page](images/user-guide-ai-chat.png) 
 
 ## Appearance and language
 
 - **Light and dark mode** - use the theme toggle in the top bar.
 - **Sidebar** - collapse or expand it with the menu button in the top bar.
-- **Language and number formatting** - set your locale in [account settings](account-settings.md#locale-and-display-currency). Investbrain is available in English, French, and Spanish.
+- **Language and number formatting** - set your locale in [account settings](account-settings.md#locale-and-display-currency). Investbrain is currently available in English, French, and Spanish.

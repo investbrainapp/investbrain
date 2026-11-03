@@ -15,7 +15,7 @@ Both run the same open-source app so, generally speaking, these docs apply to bo
 
 ## Using Investbrain
 
-- [User guide](user-guide.md) - the dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
+- [Getting Started](getting-started.md) - the dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
 - [Account settings](account-settings.md) - profile, locale and display currency, password, two-factor authentication, social logins, authorized apps, and deleting your account
 - [Import and export](import-export.md) - backing up your data, moving between Investbrain Cloud and a self-hosted instance, and bulk-loading transactions from a spreadsheet
 
@@ -25,8 +25,6 @@ Both run the same open-source app so, generally speaking, these docs apply to bo
 - [MCP server](mcp.md) - connecting AI assistants such as Claude, ChatGPT, Cursor, or VS Code to your Investbrain account
 
 ## Running your own instance
-
-These pages are for self-hosting. You don't need them if you use Investbrain Cloud.
 
 - [Self-hosting](self-hosting.md) - installing with the supported Docker Compose file, configuration, reverse proxies, updates, backups, and command line utilities
 - [Troubleshooting](troubleshooting.md) - fixes for the most common problems (mostly for self-hosted instances)

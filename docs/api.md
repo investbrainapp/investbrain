@@ -2,36 +2,12 @@
 
 Investbrain has a JSON REST API for reading and managing your portfolios, transactions, and holdings, and for looking up market data. Use it to build scripts, sync data from a brokerage, feed a spreadsheet, or integrate with other tools.
 
-- [API versions](#api-versions)
 - [Creating an API token](#creating-an-api-token)
 - [Making requests](#making-requests)
 - [Pagination, sorting, filtering, and search](#pagination-sorting-filtering-and-search)
 - [Endpoints](#endpoints)
 - [Errors](#errors)
 - [OpenAPI specification](#openapi-specification)
-
-## API versions
-
-This page documents **API v2**. API v1 is kept for reference. These version numbers refer to the API specification, not to Investbrain itself.
-
-| API version | Specification version | Used by | Specification |
-| --- | --- | --- | --- |
-| **v1** | 1.0.1 | Investbrain versions before 1.4.0 | [`docs/openapi-v1.json`](openapi-v1.json) (archived) |
-| **v2** | 2.0.0 | Investbrain 1.4.0 and later | [`openapi.json`](../openapi.json) |
-
-If you self-host, your Investbrain version is printed at the top of the `app` container's log when it starts (`docker compose logs app`).
-
-The two versions have the same endpoints, request bodies, and response formats, and use the same API tokens. Only the query parameters for sorting, filtering, and paging through the list endpoints (`GET /portfolio`, `GET /transaction`, and `GET /holding`) changed:
-
-| | v1 | v2 |
-| --- | --- | --- |
-| Sorting | `sortBy=date&sortDesc=true` | `sort=-date` (several columns allowed, such as `sort=-date,symbol`) |
-| Filtering | `filter[column]=value` on any column | `filter[column]=value` on [documented columns](#endpoints) only; separate values with commas to match any of them |
-| Unsupported sort or filter | Not checked | Rejected with `422` |
-| Page size | `itemsPerPage`, default 10 | `itemsPerPage`, default 15, maximum 100 |
-| Search | `search` | `search`, a case-insensitive partial match on documented columns |
-
-**Updating a v1 script for v2:** replace `sortBy` and `sortDesc` with `sort`, and check that each `filter[...]` column is in the list for its endpoint. A v2 instance ignores `sortBy` and `sortDesc` instead of rejecting them, so results come back unsorted rather than failing. If your script relies on the page size, set `itemsPerPage` explicitly.
 
 ## Creating an API token
 
@@ -42,8 +18,7 @@ The API authenticates with personal access tokens.
 3. Click **Create**.
 4. Copy the token from the dialog. **It's only shown once.** If you lose it, delete it and create a new one.
 
-<!-- SCREENSHOT: API Tokens page with the new-token dialog open. Use a token you revoke right after, or blur most of it. -->
-<!-- ![The API Token dialog shown after creating a token](images/api-token-created.png) -->
+![The API Token dialog shown after creating a token](images/api-token-created.png) 
 
 The token acts as you: it can see and change everything your account can, across every portfolio you have access to. Keep it secret and don't commit it to source control.
 
@@ -77,11 +52,15 @@ Send request bodies as JSON with `Content-Type: application/json`.
 
 **Example: check that your token works**
 
+_Request:_
+
 ```bash
 curl https://investbra.in/api/me \
   -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
   -H "Accept: application/json"
 ```
+
+_Response:_
 
 ```json
 {
@@ -138,244 +117,9 @@ List responses look like this (`links` and `meta` are shortened here):
 
 The `links` keep your other query parameters, so you can follow `next` until it's `null` to read every page.
 
-## Endpoints
+## Permissions
 
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/me` | Your user profile and preferences |
-| `GET` | `/portfolio` | List portfolios |
-| `POST` | `/portfolio` | Create a portfolio |
-| `GET` | `/portfolio/{id}` | Get a portfolio |
-| `PUT` | `/portfolio/{id}` | Update a portfolio |
-| `DELETE` | `/portfolio/{id}` | Delete a portfolio |
-| `GET` | `/transaction` | List transactions |
-| `POST` | `/transaction` | Create a transaction |
-| `GET` | `/transaction/{id}` | Get a transaction |
-| `PUT` | `/transaction/{id}` | Update a transaction |
-| `DELETE` | `/transaction/{id}` | Delete a transaction |
-| `GET` | `/holding` | List holdings |
-| `GET` | `/holding/{portfolio_id}/{symbol}` | Get a holding |
-| `PUT` | `/holding/{portfolio_id}/{symbol}` | Update a holding's options |
-| `GET` | `/market-data/{symbol}` | Get current market data for a symbol |
-
-All IDs are UUIDs. The API follows the same permissions as the web app: you can read any portfolio you have access to, but creating, changing, or deleting anything requires [full access](user-guide.md#access-levels) to the portfolio.
-
-### Portfolios
-
-**List** `GET /portfolio`
-
-Returns portfolios you own or that are shared with you, each including its owner, transactions, and holdings (with each holding's performance).
-
-- Sort: `title`, `wishlist`, `created_at`, `updated_at`
-- Filter: `title`, `wishlist`, `holdings.symbol` (portfolios holding any of the given symbols)
-- Search: title and notes
-
-```bash
-curl "https://investbra.in/api/portfolio?filter[wishlist]=0&sort=title" \
-  -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
-  -H "Accept: application/json"
-```
-
-**Create** `POST /portfolio`
-
-| Field | Type | Required | Notes |
-| --- | --- | --- | --- |
-| `title` | string | Yes | 5 to 255 characters |
-| `notes` | string | No | |
-| `wishlist` | boolean | No | Defaults to `false` |
-
-Returns `201 Created` with the new portfolio. You become its owner.
-
-```bash
-curl -X POST https://investbra.in/api/portfolio \
-  -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Fidelity Roth IRA", "notes": "Account ending 1234"}'
-```
-
-```json
-{
-  "id": "9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f",
-  "title": "Fidelity Roth IRA",
-  "notes": "Account ending 1234",
-  "wishlist": false,
-  "owner": { "id": "...", "name": "Jane Doe", "email": "jane@example.com", "...": "..." },
-  "transactions": [],
-  "created_at": "2026-11-01T14:03:11.000000Z",
-  "updated_at": "2026-11-01T14:03:11.000000Z"
-}
-```
-
-**Get** `GET /portfolio/{id}`
-
-Returns the portfolio with its owner and transactions. Unlike the list, single-portfolio responses (including those from create and update) don't include `holdings`. Use `GET /holding?filter[portfolio_id]=<id>` for those, or the portfolio list for holdings with performance.
-
-**Update** `PUT /portfolio/{id}` - send only the fields you want to change (`title`, `notes`, `wishlist`).
-
-**Delete** `DELETE /portfolio/{id}` - returns `204 No Content`. This permanently deletes the portfolio with all of its transactions and holdings.
-
-### Transactions
-
-**List** `GET /transaction`
-
-Returns transactions across all portfolios you have access to.
-
-- Sort: `symbol`, `transaction_type`, `quantity`, `cost_basis`, `sale_price`, `date`, `created_at`, `updated_at`
-- Filter: `symbol`, `portfolio_id`, `transaction_type`, `split`, `reinvested_dividend`
-- Search: symbol
-
-```bash
-# All AAPL sells in one portfolio, newest first
-curl "https://investbra.in/api/transaction?filter[portfolio_id]=9d6c1f3e-...&filter[symbol]=AAPL&filter[transaction_type]=SELL&sort=-date" \
-  -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
-  -H "Accept: application/json"
-```
-
-**Create** `POST /transaction`
-
-| Field | Type | Required | Notes |
-| --- | --- | --- | --- |
-| `portfolio_id` | UUID | Yes | You need full access to this portfolio. |
-| `symbol` | string | Yes | Must be recognized by Investbrain's market data provider. |
-| `transaction_type` | string | Yes | `BUY` or `SELL`, in upper case |
-| `date` | string | Yes | `YYYY-MM-DD`, not in the future |
-| `quantity` | number | Yes | Greater than 0. For sells, can't exceed the shares owned on that date. |
-| `currency` | string | Yes | Currency of the price. Converted to the security's trading currency if different. One of `AUD`, `BRL`, `CAD`, `CHF`, `CNY`, `CZK`, `DKK`, `EUR`, `GBP`, `HKD`, `INR`, `JPY`, `KRW`, `NOK`, `NZD`, `SEK`, `SGD`, `USD`, or `ZAR`. Minor-unit codes such as `GBX` aren't accepted here; send the price in `GBP` instead. |
-| `cost_basis` | number | For `BUY` | Price paid per share |
-| `sale_price` | number | For `SELL` | Price received per share |
-
-Returns `201 Created` with the new transaction.
-
-A few things to know:
-
-- **Always send `cost_basis` with a buy and `sale_price` with a sell.** Validation doesn't check for them yet. A buy without `cost_basis` fails with a `500` server error instead of a `422`, and a sell without `sale_price` is saved without one, which makes its realized gain wrong.
-- **For sells, the cost basis is calculated for you** from the average cost of earlier buys. Any `cost_basis` you send with a sell is ignored.
-- **`split` and `reinvested_dividend` are read-only.** Investbrain sets them on the transactions it creates for splits and dividend reinvestment, and ignores them in requests.
-
-```bash
-curl -X POST https://investbra.in/api/transaction \
-  -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "portfolio_id": "9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f",
-    "symbol": "VOO",
-    "transaction_type": "BUY",
-    "date": "2026-10-15",
-    "quantity": 10,
-    "currency": "USD",
-    "cost_basis": 512.34
-  }'
-```
-
-```json
-{
-  "id": "4b0f7c1a-...",
-  "symbol": "VOO",
-  "portfolio_id": "9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f",
-  "transaction_type": "BUY",
-  "quantity": 10,
-  "currency": "USD",
-  "cost_basis": 512.34,
-  "sale_price": null,
-  "split": false,
-  "reinvested_dividend": false,
-  "date": "2026-10-15",
-  "created_at": "2026-11-01T14:10:02.000000Z",
-  "updated_at": "2026-11-01T14:10:02.000000Z"
-}
-```
-
-The `currency` returned is always the security's trading currency, and `cost_basis` and `sale_price` are in that currency.
-
-**Get** `GET /transaction/{id}`
-
-**Update** `PUT /transaction/{id}` - send only the fields you want to change. The same validation rules apply. Moving a transaction to another portfolio (changing `portfolio_id`) requires full access to both.
-
-**Delete** `DELETE /transaction/{id}` - returns `204 No Content`.
-
-Creating, updating, or deleting a transaction recalculates the affected holding automatically.
-
-### Holdings
-
-Holdings are created from transactions, so there is no endpoint to create or delete them.
-
-**List** `GET /holding`
-
-- Sort: `symbol`, `quantity`, `average_cost_basis`, `total_cost_basis`, `realized_gain_dollars`, `dividends_earned`, `created_at`, `updated_at`
-- Filter: `symbol`, `portfolio_id`, `reinvest_dividends`
-- Search: symbol
-
-The list includes fully sold positions (quantity `0`). Sort or check `quantity` if you only want open positions.
-
-In list results, `total_market_value`, `market_gain_dollars`, and `market_gain_percent` are currently always `null`. To get them, fetch the holding on its own (below), or use the portfolio list (`GET /portfolio`), which includes each portfolio's holdings with their performance.
-
-**Get** `GET /holding/{portfolio_id}/{symbol}`
-
-Use the symbol in upper case (`VOO`, not `voo`). Returns `404` if the portfolio has no holding for that symbol, and `403` if you don't have access to the portfolio.
-
-```bash
-curl https://investbra.in/api/holding/9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f/VOO \
-  -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
-  -H "Accept: application/json"
-```
-
-```json
-{
-  "id": "e2a1...",
-  "portfolio_id": "9d6c1f3e-5b1a-4c0e-8f5e-2a7b9c3d4e5f",
-  "symbol": "VOO",
-  "quantity": 10,
-  "currency": "USD",
-  "reinvest_dividends": false,
-  "average_cost_basis": 512.34,
-  "total_cost_basis": 5123.4,
-  "realized_gain_dollars": 0,
-  "dividends_earned": 0,
-  "splits_synced_at": "2026-11-01T14:10:02.000000Z",
-  "total_market_value": 5250.1,
-  "market_gain_dollars": 126.7,
-  "market_gain_percent": 2.47,
-  "created_at": "2026-11-01T14:10:02.000000Z",
-  "updated_at": "2026-11-01T14:10:02.000000Z"
-}
-```
-
-**Update** `PUT /holding/{portfolio_id}/{symbol}`
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| `reinvest_dividends` | boolean | Turn [dividend reinvestment](user-guide.md#reinvesting-dividends) on or off |
-
-### Market data
-
-**Get** `GET /market-data/{symbol}`
-
-Returns the latest market data for any symbol Investbrain's market data provider recognizes, whether or not you hold it. Use the symbol in upper case. Returns `404` if the symbol can't be found.
-
-If Investbrain's stored price for the symbol is older than its refresh interval (30 minutes by default), this request fetches a fresh quote from the market data provider first, so it can take a moment. The response doesn't include the symbol's currency; the holding and transaction endpoints return it as `currency`.
-
-```json
-{
-  "symbol": "AAPL",
-  "name": "Apple Inc.",
-  "market_value": 231.45,
-  "fifty_two_week_low": 164.08,
-  "fifty_two_week_high": 260.1,
-  "last_dividend_date": "2026-08-11T00:00:00.000000Z",
-  "last_dividend_amount": 0.26,
-  "dividend_yield": 0.45,
-  "market_cap": 3480000000000,
-  "trailing_pe": 35.2,
-  "forward_pe": 30.1,
-  "book_value": 4.43,
-  "created_at": "2025-01-04T18:22:10.000000Z",
-  "updated_at": "2026-11-01T14:00:03.000000Z"
-}
-```
-
-Fields the provider doesn't supply are `null`.
+The API follows the same permissions as the web app: you can read any portfolio you have access to, but creating, changing, or deleting anything requires [full access](user-guide.md#access-levels) to the portfolio.
 
 ## Errors
 
@@ -402,4 +146,8 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-Machine-readable OpenAPI 3 descriptions of both API versions are kept in the repository: [`openapi.json`](../openapi.json) for API v2 (Investbrain 1.4.0 and later), and [`docs/openapi-v1.json`](openapi-v1.json) for API v1 (Investbrain versions before 1.4.0). See [API versions](#api-versions). Import either one into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. Each spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host. If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).
+Machine-readable OpenAPI specifications of the API is kept in this repository: [`openapi.json`](../openapi.json) for API v2 (Investbrain 1.4.0 and later). 
+
+You can import into Postman, Insomnia, or Bruno to browse endpoints and try requests. 
+
+If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).

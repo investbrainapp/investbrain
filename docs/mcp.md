@@ -1,6 +1,8 @@
 # MCP Server
 
-Investbrain includes a built-in [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server. MCP is an open standard that lets AI assistants use outside tools. Once connected, an assistant such as Claude, ChatGPT, Cursor, or VS Code can look up your portfolios, record transactions, and check market data for you, in plain conversation.
+Investbrain includes a built-in [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server. 
+
+Once connected, an assistant such as Claude, ChatGPT, Cursor, or VS Code can look up your portfolios, record transactions, and check market data for you, in plain conversation.
 
 - [What an assistant can do](#what-an-assistant-can-do)
 - [Before you start](#before-you-start)
@@ -43,7 +45,7 @@ The MCP server is on by default on self-hosted instances. If you've set `MCP_SER
 
 ## Connecting an assistant
 
-The examples below use the Investbrain Cloud endpoint, `https://investbra.in/mcp`. If you self-host, use your own endpoint instead. Menus change between versions, so check your assistant's documentation if a step doesn't match exactly. In every case you only need the endpoint URL: there's no API key to paste, because sign-in happens through OAuth in your browser.
+The examples below use the Investbrain Cloud endpoint, `https://investbra.in/mcp`. If you self-host, use your own endpoint instead. Menus change between versions, so check your assistant's documentation if a step doesn't match exactly. 
 
 ### Claude (web, desktop, and mobile)
 
@@ -51,8 +53,6 @@ The examples below use the Investbrain Cloud endpoint, `https://investbra.in/mcp
 2. Choose **Add custom connector**.
 3. Give it a name, such as "Investbrain", and paste your MCP endpoint URL.
 4. Click **Add**, then **Connect**. Claude opens Investbrain in your browser so you can [authorize access](#authorizing-access).
-
-On Team and Enterprise plans, an organization owner may need to add the connector first.
 
 ### Claude Code
 
@@ -119,8 +119,7 @@ When you connect, your assistant sends you to Investbrain in the browser:
 2. Investbrain shows a consent screen: **Authorize _client name_**, with the email of the account being shared and a list of what the app will be able to do (**View and manage your portfolios, transactions, and holdings**).
 3. Click **Authorize** to grant access, or **Cancel** to refuse.
 
-<!-- SCREENSHOT: The Authorize consent screen for an MCP client such as Claude, showing the client name, account email, and permission list. -->
-<!-- ![The Investbrain authorization screen for an MCP client](images/mcp-consent-screen.png) -->
+![The Investbrain authorization screen for an MCP client](images/mcp-consent-screen.png)
 
 You're then sent back to your assistant, which can start using the tools.
 
@@ -161,26 +160,13 @@ Most assistants ask for confirmation before using tools that change data. Read w
 | `update-holding` | Write | Change holding options | `portfolio_id`, `symbol`, `reinvest_dividends` |
 | `show-market-data` | Read | Price, market cap, dividend yield, and other data for a symbol | `symbol` |
 
-List tools return 15 items per page by default, up to 100. Responses use the same fields as the [REST API](api.md#endpoints), and the tools enforce the same validation and permission rules as the web app. For example, a sell can't exceed the shares you owned on that date, and dates can't be in the future.
-
-Tools are annotated as read-only, idempotent, or destructive so assistants can decide when to ask you for confirmation.
+List tools return 15 items per page by default, up to 100. Responses use the same fields as the [REST API](api.md#endpoints).
 
 ## Revoking access
 
 Go to **Connections** in the Investbrain user menu. Every assistant you've authorized is listed under **Authorized Apps** with what it can do and when you authorized it. Click **Revoke** to cut off access immediately. The assistant will need to go through authorization again to reconnect.
 
-<!-- SCREENSHOT: Reuses the Authorized Apps screenshot from account-settings.md. No separate capture needed. -->
-<!-- ![The Authorized Apps section listing a connected AI assistant](images/account-settings-authorized-apps.png) -->
-
-## How authentication works
-
-This section covers the technical details, in case you're debugging a client or building your own.
-
-- The MCP endpoint is protected by OAuth 2.1 (Laravel Passport). Requests need a bearer access token that carries the `mcp:use` scope.
-- Clients discover the authorization server automatically through standard metadata at `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. An unauthenticated request to `/mcp` returns `401` with a `WWW-Authenticate` header pointing at the resource metadata.
-- Clients register themselves using dynamic client registration at `/oauth/register`, then use the authorization code flow with PKCE (`S256`).
-- Personal access tokens from the **API Tokens** page don't carry the `mcp:use` scope, so they're rejected by the MCP endpoint with `403 Forbidden`. Use OAuth for MCP and API tokens for the REST API.
-- On a self-hosted instance, signing keys for OAuth tokens are generated automatically on first start of the Docker container and stored in the `storage` volume.
+![The Authorized Apps section listing a connected AI assistant](images/account-settings-authorized-apps.png) 
 
 ## Troubleshooting
 

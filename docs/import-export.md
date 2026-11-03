@@ -9,59 +9,43 @@ Investbrain can export everything in your account to a single Excel workbook and
 
 Open **Import / Export Data** from the user menu to get started. On Investbrain Cloud, you need to verify your email address before this page is available.
 
-<!-- SCREENSHOT: The Import / Export page showing the Import section (with the Download import template link) and the Export section. -->
-<!-- ![The Import / Export page](images/import-export-page.png) -->
+![The Import / Export page](images/import-export-page.png) 
 
 ## Exporting your data
 
-1. Click **Generate Export**. Investbrain builds the workbook in the background, so large accounts don't time out. You can leave the page while it's being prepared and come back later.
-2. When it's ready, click **Download Export**. Hover over the button to see when the export was created.
+1. Click **Generate Export**. While its generating, tou can leave the page and check back later.
+2. When it's ready, click **Download Export**. 
 
-You'll get a file named like `2026_11_01_investbrain_backup.xlsx` containing:
+You'll get a portable Excel file like `2026_11_01_investbrain_backup.xlsx` containing 4 sheets:
 
-- Every portfolio you have access to, including portfolios shared with you
-- Every transaction in those portfolios
-- Each portfolio's daily history: market value, cost basis, realized gains, dividends earned, and any annotations
-- Your profile settings: name, locale, display currency, and which holdings have dividend reinvestment turned on
-
-Things to know:
-
-- **An export can be downloaded for 24 hours.** After that it's deleted, and you can generate a new one.
-- **Only your latest export is kept.** Clicking **Generate new export** replaces the previous file.
-- **The download link only works for your account.** Other people, including those you share portfolios with, can't use it.
-- **One export at a time.** While an export is being prepared, you can't start another one. You can start up to three exports per minute.
-- If something goes wrong, the page says so and shows a **Try again** button.
-
-On a self-hosted instance, exports are built by the queue workers inside the `app` container and stored in the `storage` volume until they expire.
+- **Portfolios:** Every portfolio you have access to, including portfolios shared with you
+- **Transactions:** Every transaction in those portfolios
+- **Daily Change:** Each portfolio's daily history: market value, cost basis, realized gains, dividends earned, and any annotations
+- **Configs:** name, locale, display currency, and which holdings have dividend reinvestment turned on
 
 ## Importing into Investbrain
 
 Investbrain imports `.xlsx` workbooks of up to 2 MB. The easiest starting point is the import template: click **Download import template** on the Import / Export page to get an empty workbook with the right sheets and headings. An Investbrain export uses the same format, so you can also add rows to an existing export and import it again.
 
-<!-- SCREENSHOT: The downloaded template open in Excel or LibreOffice with the Transactions sheet selected and the Portfolios, Transactions, Daily Changes, and Config tabs visible. -->
-<!-- ![The import template opened in a spreadsheet app, showing its four sheets](images/import-export-template-workbook.png) -->
+![The import template opened in a spreadsheet app, showing its four sheets](images/import-export-template-workbook.png)
 
 ### Running an import
 
 1. Click **Select a file** and choose your workbook.
 2. Click **Import**.
 
-A progress dialog shows each step as the import reads your file, checks it for problems, looks up any symbols Investbrain doesn't know yet, and saves your data. The import runs in the background, so you can click **Dismiss** and keep using Investbrain. While it runs, a progress tab follows you to other pages, and it tells you when the import has finished. You'll also get an email when it succeeds or fails. On a self-hosted instance, that email is only sent once you've [set up email](self-hosting.md#email).
+The import runs in the background, so you can click **Dismiss** and keep using Investbrain. You'll also get an email notification once it completes. On a self-hosted instance, that email is only sent once you've [set up email](self-hosting.md#email).
 
-<!-- SCREENSHOT: Import progress dialog part-way through, for example while importing transactions. -->
-<!-- ![The import progress dialog](images/import-export-progress.png) -->
+![The import progress dialog](images/import-export-progress.png)
 
 After the import finishes, Investbrain refreshes dividends for the imported holdings, recalculates them, and rebuilds each portfolio's daily history in the background. On a large import this can take several minutes, so charts and totals may fill in gradually.
 
-You can start up to three imports per minute.
-
 ### How imports work
 
-- **Only fill in the sheets you need.** Every sheet is optional, and a sheet you don't need can be left empty or removed. Most people only need the Transactions sheet. The Portfolios sheet is useful when you want the import to create or update portfolios. The Daily Changes and Config sheets are only needed to restore a backup.
-- **Keep the sheet names and the heading row as they are.** Columns are matched by their heading, so their order doesn't matter and extra columns are ignored. A sheet that's missing a required column is reported once, rather than on every row.
-- **Rows are created or updated.** A row with a blank ID is created as a new record. A row whose ID matches an existing record updates that record. Importing never deletes anything, so rows you remove from the spreadsheet stay in Investbrain.
-- **The whole file is checked before anything is saved.** If anything is wrong, nothing is imported. The import page lists every problem with its sheet, row, column, and the value that caused it, so you can fix them all and upload the file again. The page shows up to 100 problems, and the failure email lists the first 10. Because nothing was saved, it's safe to import the same file again once it's fixed.
-- **Problems stay on the page until you dismiss them.** If an import fails while you're on another page, the progress tab links to the list of problems.
+- **Only fill in the sheets you need.** Every sheet is optional, and a sheet you don't need can be left empty or removed. Most people only need the Transactions sheet. 
+- **Keep the sheet names and the heading row as they are.** Columns are matched by their heading, so their order doesn't matter and extra columns are ignored. 
+- **Rows are created or updated.** A row with a blank ID is created as a new record. A row whose ID matches an existing record updates that record. 
+- **The whole file is checked before anything is saved.** If anything is wrong, nothing is imported. The import page lists every problem with its sheet, row, column, and the value that caused it, so you can fix them all and upload the file again. 
 
 ## Portfolios sheet
 
@@ -97,11 +81,9 @@ The Portfolio ID column must contain a portfolio's ID (a UUID such as `9d6c1f3e-
 - **For an existing portfolio**, open it in Investbrain and copy the ID from the address bar (`/portfolio/<id>`), or take it from an export.
 - **For a new portfolio**, generate a UUID yourself (for example with `uuidgen` or an online UUID generator). Put it in the Portfolio ID column on the Portfolios sheet, and use the same value on the Transactions sheet.
 
-IDs are matched without regard to case. You can only import into portfolios that you own or that have been shared with you with full access. The same goes for updating an existing transaction: you need full access to the portfolio it currently belongs to.
-
 ### Currencies
 
-Leave the Currency column blank and Investbrain uses the currency each symbol trades in, which is the safest choice. If you fill it in, use that same trading currency, such as `USD` for `AAPL` or `GBX` (pence) for most London-listed shares. Unlike the transaction form in the app, imports don't convert a price from another currency into the trading currency, so a price entered in a different currency shows up with the wrong value.
+If you leave the currency column blank, Investbrain uses the currency each symbol trades in. If you fill it in, use that same trading currency. Unlike the transaction form in the app, imports don't convert a price from another currency into the trading currency. So, a price entered in a different currency shows up with the wrong value.
 
 ### Reinvested dividends
 
@@ -125,7 +107,7 @@ If you leave Cost Basis blank on a `SELL` row, Investbrain uses the average cost
 
 ### Symbols
 
-Every symbol must be known to your market data provider. Symbols Investbrain hasn't seen before are looked up during the check, and any it can't find are reported as problems. Symbols can contain letters, numbers, and `. - ^ = : / _`, with no spaces, up to 25 characters.
+Every symbol must be known to your market data provider. Symbols Investbrain hasn't seen before are validated, and any symbols it can't find are reported.
 
 ## Daily Changes sheet
 
@@ -139,7 +121,7 @@ This sheet stores your portfolios' daily history and is only needed to restore a
 
 ## Config sheet
 
-This sheet stores your account settings and is only needed to restore a backup.
+This sheet stores your account settings and is only needed to restore a backup. You generally shouldn't touch this sheet.
 
 | Column | Required | Description |
 | --- | --- | --- |

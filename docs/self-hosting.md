@@ -1,12 +1,11 @@
 # Self-Hosting
 
-The supported way to run Investbrain is with the official Docker image and the [`docker-compose.yml`](../docker-compose.yml) file in this repository. It bundles everything you need: the web app, a background queue, a task scheduler, PostgreSQL, and Redis.
+The only supported way to self-host Investbrain is with the official Docker image and the [`docker-compose.yml`](../docker-compose.yml) file in this repository. It bundles everything you need: the web app, a background queue, a task scheduler, PostgreSQL, and Redis.
 
-If you'd rather not run a server, [Investbrain Cloud](https://investbra.in) runs the same app with nothing to install. You can start on one and move to the other later by [exporting and importing your data](import-export.md).
+If you'd rather not run a server, [Investbrain Cloud](https://investbra.in) runs the same app with nothing to install or manage. 
 
-- [Requirements](#requirements)
-- [What's in the compose file](#whats-in-the-compose-file)
 - [Installation](#installation)
+- [What's in the compose file](#whats-in-the-compose-file)
 - [What happens on startup](#what-happens-on-startup)
 - [Configuration](#configuration)
 - [Running behind a reverse proxy (HTTPS)](#running-behind-a-reverse-proxy-https)
@@ -22,11 +21,47 @@ If you'd rather not run a server, [Investbrain Cloud](https://investbra.in) runs
 - [Backing up and restoring](#backing-up-and-restoring)
 - [Command line utilities](#command-line-utilities)
 
-## Requirements
+## Installation
 
-- A Linux, macOS, or Windows machine (or a NAS or VPS) with [Docker Engine](https://docs.docker.com/engine/install/) and the Docker Compose plugin (`docker compose`)
-- Outbound internet access, so Investbrain can reach your market data provider and the exchange rate service
-- Ports `8000` (web) available on the host. The default compose file also publishes PostgreSQL on `5432` (see [Hardening](#hardening))
+**1. Download the compose file**
+
+```bash
+mkdir investbrain && cd investbrain
+curl -O https://raw.githubusercontent.com/investbrainapp/investbrain/main/docker-compose.yml
+```
+
+**2. Review the settings**
+
+Open `docker-compose.yml` and adjust the `environment` section of the `app` service. At a minimum:
+
+- Set `APP_URL` to the address you'll use to reach Investbrain, for example `http://192.168.1.50:8000` or `https://investbrain.home`.
+- Change `DB_PASSWORD` from the default. If you change any of `DB_DATABASE`, `DB_USERNAME`, or `DB_PASSWORD`, make the same change to `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` in the `pgsql` service (they must match, and they only take effect the first time the database volume is created).
+
+See [Configuration](#configuration) for everything else you can set.
+
+**3. Start Investbrain**
+
+```bash
+docker compose up -d
+```
+
+The first start pulls the images and runs database migrations, which can take a few minutes. Follow along with:
+
+```bash
+docker compose logs -f app
+```
+
+When you see Supervisor start, Investbrain is ready!
+
+**4. Create your account**
+
+Visit `http://localhost:8000/register` (or your `APP_URL` followed by `/register`) and create an account.
+
+**Register your own account first.** The first account registered is the only one that can see the [Provider Health](#monitoring-market-data-providers) page.
+
+**5. Optional: turn off registration**
+
+If you're the only user, or you'd rather invite people by [sharing a portfolio](user-guide.md#sharing-portfolios), set `REGISTRATION_ENABLED: false` and [apply the change](#applying-configuration-changes). Shared users can still set a password through their invitation link.
 
 ## What's in the compose file
 
@@ -44,53 +79,9 @@ Three named volumes keep your data across restarts and upgrades:
 | `investbrain-pgsql` | `/var/lib/postgresql/data` in `pgsql` | All portfolio, transaction, and user data |
 | `investbrain-redis` | `/data` in `redis` | Cache and queued jobs |
 
-The `investbrain-storage` volume holds your encryption key and OAuth keys. Back it up along with the database (see [Backing up and restoring](#backing-up-and-restoring)).
-
-## Installation
-
-**1. Download the compose file**
-
-```bash
-mkdir investbrain && cd investbrain
-curl -O https://raw.githubusercontent.com/investbrainapp/investbrain/main/docker-compose.yml
-```
-
-**2. Review the settings**
-
-Open `docker-compose.yml` and adjust the `environment` section of the `app` service. At a minimum:
-
-- Set `APP_URL` to the address you'll use to reach Investbrain, for example `http://192.168.1.50:8000` or `https://investbrain.example.com`.
-- Change `DB_PASSWORD` from the default. If you change any of `DB_DATABASE`, `DB_USERNAME`, or `DB_PASSWORD`, make the same change to `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` in the `pgsql` service (they must match, and they only take effect the first time the database volume is created).
-
-See [Configuration](#configuration) for everything else you can set.
-
-**3. Start Investbrain**
-
-```bash
-docker compose up -d
-```
-
-The first start pulls the images and runs database migrations, which can take a few minutes. Follow along with:
-
-```bash
-docker compose logs -f app
-```
-
-When you see Supervisor start, Investbrain is ready.
-
-**4. Create your account**
-
-Visit `http://localhost:8000/register` (or your `APP_URL` followed by `/register`) and create an account.
-
-**Register your own account first.** The first account registered is the only one that can see the [Provider Health](#monitoring-market-data-providers) page.
-
-**5. Optional: turn off registration**
-
-If you're the only user, or you'd rather invite people by [sharing a portfolio](user-guide.md#sharing-portfolios), set `REGISTRATION_ENABLED: false` and [apply the change](#applying-configuration-changes). Shared users can still set a password through their invitation link.
-
 ## What happens on startup
 
-Every time the `app` container starts, its entrypoint script:
+Every time the `app` container starts, the entrypoint script:
 
 1. Creates any missing folders under `storage` and fixes their permissions.
 2. Checks for an `APP_KEY`. If none is set in the environment and `storage/app/.key` doesn't exist, it generates one, saves it to `storage/app/.key`, and prints it in the log inside a box of asterisks.
@@ -105,7 +96,7 @@ The image also has a health check that requests `/up` every 30 seconds. `docker 
 
 ### Where to put settings
 
-You can configure Investbrain in one of two ways. **Pick one; don't mix them.**
+You can configure Investbrain in one of two ways. **Pick one, don't mix them!**
 
 - **The `environment` block** in `docker-compose.yml` (recommended). Everything lives in one file.
 - **An env file.** Create a `.env` file next to `docker-compose.yml` (use [`.env.example`](../.env.example) as a starting point), remove the `environment` block from the `app` service, and add `env_file: .env` in its place.
@@ -197,9 +188,6 @@ These are already set correctly in the compose file. Only change them if you kno
 | `DB_HOST`, `DB_PORT` | `investbrain-pgsql`, `5432` |
 | `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | `investbrain` |
 | `REDIS_HOST` | `investbrain-redis` |
-| `SESSION_DRIVER`, `QUEUE_CONNECTION`, `CACHE_STORE` | `redis` |
-
-Keep `CACHE_STORE` set to `redis`. Investbrain uses tagged caching, which the `file` and `database` cache stores don't support.
 
 ### Changing the port
 
@@ -221,7 +209,7 @@ By default `storage` lives in a named Docker volume. To keep it in a folder on t
       - /path/to/storage:/var/app/storage
 ```
 
-The container fixes the folder's permissions on startup.
+The container will attempt to correct the folder's permissions on startup.
 
 ### Hardening
 
@@ -244,43 +232,9 @@ Your proxy must:
 Then set in Investbrain:
 
 ```yaml
-      APP_URL: "https://investbrain.example.com"
-      ASSET_URL: "https://investbrain.example.com"
+      APP_URL: "https://investbrain.home"
+      ASSET_URL: "https://investbrain.home"
 ```
-
-**Caddy example**
-
-```
-investbrain.example.com {
-    reverse_proxy localhost:8000
-}
-```
-
-Caddy obtains a certificate automatically and sends the `Host` and `X-Forwarded-Proto` headers by default.
-
-**Nginx example**
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name investbrain.example.com;
-
-    ssl_certificate     /etc/ssl/certs/investbrain.pem;
-    ssl_certificate_key /etc/ssl/private/investbrain.key;
-
-    client_max_body_size 10m;
-
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
-If the proxy runs as another container, you can attach it to the `investbrain-network` network and proxy to `http://investbrain-app:80` instead of publishing port 8000 on the host.
 
 ## MCP and OAuth requirements
 
@@ -293,7 +247,7 @@ The [MCP server](mcp.md) uses OAuth so AI assistants can connect without a paste
 You can check the metadata from any machine:
 
 ```bash
-curl https://investbrain.example.com/.well-known/oauth-authorization-server
+curl https://investbrain.home/.well-known/oauth-authorization-server
 ```
 
 Every URL in the response should start with your public HTTPS address.
@@ -306,13 +260,7 @@ The MCP server is on by default. If you don't want AI assistants to be able to c
       MCP_SERVER_ENABLED: false
 ```
 
-Then [apply the change](#applying-configuration-changes). With the MCP server off:
-
-- `/mcp` returns `404 Not Found`, so assistants can't connect or use any tools.
-- The MCP discovery endpoints (`/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`) and client registration (`/oauth/register`) are turned off too, so new assistants can't register themselves.
-- The [REST API](api.md) and API tokens keep working.
-
-Assistants that were authorized before you turned it off still appear under **Connections > Authorized Apps**. They can't reach your data while the server is off, but they can reconnect without signing in again if you turn it back on, as long as their access hasn't expired. Revoke them there if you want them to sign in again.
+Then [apply the change](#applying-configuration-changes). 
 
 ## Market data providers
 
