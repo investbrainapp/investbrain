@@ -8,7 +8,9 @@ updated_at: "2026-11-02"
 
 ## Two ways to use Investbrain
 
-Use Investbrain Cloud by signing up at [investbra.in/register](https://investbra.in/register); hosting, updates, market data, and email are handled for you. Or self-host the app on your own server, NAS, or computer using the [supported compose file](self-hosting.md), and manage your own hosting while choosing your market data providers, AI chat provider, social logins, and other [options](self-hosting.md#options). Both run the same open-source app, so these docs generally apply to both unless otherwise noted. You can switch between self-hosted and cloud at any time by [exporting your data](import-export.md).
+Self-host Investbrain on your own server using the [supported compose file](self-hosting.md) and manage your own install, choose your market data providers, AI chat provider, social logins, and other [options](self-hosting.md#options).  Or use Investbrain Cloud by signing up at [investbra.in/register](https://investbra.in/register) and everything is handled for you.
+
+Both self-hosted and cloud run the same open-source app. You can switch between self-hosted and cloud at any time by [exporting your data](import-export.md).
 
 ## Using Investbrain
 
