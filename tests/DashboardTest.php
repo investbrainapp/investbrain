@@ -14,6 +14,15 @@ class DashboardTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_dashboard_loads_for_a_user_with_an_unsupported_stored_locale(): void
+    {
+        $this->actingAs(User::factory()->create([
+            'options' => ['display_currency' => 'USD', 'locale' => 'en/US'],
+        ]));
+
+        $this->get(route('dashboard'))->assertOk();
+    }
+
     public function test_user_has_portfolios(): void
     {
         $this->actingAs($user = User::factory()->create());

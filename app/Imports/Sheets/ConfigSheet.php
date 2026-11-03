@@ -6,17 +6,13 @@ namespace App\Imports\Sheets;
 
 use App\Imports\ImportSheet;
 use App\Models\BackupImport;
-use App\Models\Currency;
 use App\Models\Holding;
+use App\Models\Portfolio;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 
 class ConfigSheet extends ImportSheet
 {
-    /**
-     * @var list<string>|null
-     */
-    protected ?array $currencies = null;
-
     public function title(): string
     {
         return 'Config';
@@ -60,10 +56,12 @@ class ConfigSheet extends ImportSheet
     {
         return [
             'key' => ['required', 'string'],
+            // the same rules the localization form applies
             'value' => [
                 'required',
                 'string',
-                Rule::when(($row['key'] ?? null) === 'display_currency', [Rule::in($this->currencies())]),
+                Rule::when(($row['key'] ?? null) === 'display_currency', ['exists:currencies,currency']),
+                Rule::when(($row['key'] ?? null) === 'locale', [Rule::in(Arr::pluck(config('app.available_locales'), 'locale'))]),
             ],
         ];
     }
@@ -71,7 +69,8 @@ class ConfigSheet extends ImportSheet
     public function messages(): array
     {
         return [
-            'value.in' => __('This field must be a supported currency code, e.g. USD.'),
+            'value.exists' => __('This field must be a supported currency code, e.g. USD.'),
+            'value.in' => __('This field must be a supported locale, e.g. en_US.'),
         ];
     }
 
@@ -100,7 +99,8 @@ class ConfigSheet extends ImportSheet
                 case 'reinvested_dividends':
                     if (json_validate($config['value'])) {
                         foreach (json_decode($config['value'], true) as $reinvest) {
-                            Holding::myHoldings($user->id)
+                            // only portfolios the user can change, not ones shared with them read-only
+                            Holding::whereIn('portfolio_id', Portfolio::fullAccess($user->id)->select('id'))
                                 ->where('portfolio_id', $reinvest['portfolio_id'] ?? null)
                                 ->where('symbol', $reinvest['symbol'] ?? null)
                                 ->update([
@@ -114,13 +114,5 @@ class ConfigSheet extends ImportSheet
                     break;
             }
         }
-    }
-
-    /**
-     * @return list<string>
-     */
-    protected function currencies(): array
-    {
-        return $this->currencies ??= Currency::list()->pluck('currency')->all();
     }
 }

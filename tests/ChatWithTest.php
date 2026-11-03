@@ -165,6 +165,62 @@ class ChatWithTest extends TestCase
         ChatWithPortfolioAgent::assertNeverPrompted();
     }
 
+    public function test_calling_generate_completion_directly_is_rate_limited(): void
+    {
+        ChatWithPortfolioAgent::fake(['Test response']);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
+
+        $this->actingAs($user = User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        for ($i = 0; $i < 20; $i++) {
+            RateLimiter::hit($user->id.'/'.$portfolio->id, 60);
+        }
+
+        $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('messages', [['role' => 'user', 'content' => 'Am I rate limited?', 'created_at' => now()]])
+            ->call('generateCompletion')
+            ->assertSet('streaming', false);
+
+        $lastMessage = collect($component->get('messages'))->last()['content'];
+        $this->assertStringContainsString("Hang on! You're doing that too much.", $lastMessage);
+        ChatWithPortfolioAgent::assertNeverPrompted();
+    }
+
+    public function test_calling_generate_suggested_prompts_directly_is_rate_limited(): void
+    {
+        ChatWithPortfolioAgent::fake(['Test response']);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
+
+        $this->actingAs($user = User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        for ($i = 0; $i < 20; $i++) {
+            RateLimiter::hit($user->id.'/'.$portfolio->id.'/suggestions', 60);
+        }
+
+        Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->call('generateSuggestedPrompts')
+            ->assertSet('suggested_prompts', []);
+
+        ChatWithSuggestedPromptsAgent::assertNeverPrompted();
+    }
+
+    public function test_failed_suggested_prompts_show_an_error_instead_of_breaking_the_chat(): void
+    {
+        ChatWithPortfolioAgent::fake(['Test response']);
+        ChatWithSuggestedPromptsAgent::fake(fn () => throw new \RuntimeException('Provider unavailable'));
+
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->call('generateSuggestedPrompts')
+            ->assertSet('suggested_prompts', []);
+
+        $this->assertStringContainsString('Provider unavailable', json_encode($component->effects['xjs'] ?? []));
+    }
+
     public function test_suggested_prompt_is_used_as_prompt(): void
     {
         ChatWithPortfolioAgent::fake(['Here is the best holding!']);

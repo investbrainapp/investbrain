@@ -380,6 +380,7 @@
     "This field may only contain letters, numbers and . - ^ = : / _ (no spaces).": "Ce champ ne peut contenir que des lettres, des chiffres et . - ^ = : / _ (sans espaces).",
     "This field must be BUY or SELL.": "Ce champ doit être BUY ou SELL.",
     "This field must be a supported currency code, e.g. USD.": "Ce champ doit être un code de devise pris en charge, par ex. USD.",
+    "This field must be a supported locale, e.g. en_US.": "Ce champ doit être une langue prise en charge, par ex. en_US.",
     "This field is not a valid date. Try the YYYY-MM-DD format.": "Ce champ n'est pas une date valide. Essayez le format AAAA-MM-JJ.",
     "Importing your file": "Importation de votre fichier",
     "Show import progress": "Afficher la progression de l'importation",
