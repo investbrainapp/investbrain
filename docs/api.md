@@ -1,7 +1,6 @@
 ---
 title: "REST API"
 description: "Create an API token and call the Investbrain API."
-group: "Advanced"
 order: 20
 updated_at: "2026-11-02"
 ---
@@ -146,8 +145,6 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-A machine-readable OpenAPI specification of the API is kept in this repository at [`docs/openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/docs/openapi.json). It describes Investbrain API v2 (Investbrain 1.4.0 and later). You can also browse it as an [API reference](https://investbra.in/docs/api), with a page for each endpoint and code samples in several languages.
-
-You can import into Postman, Insomnia, or Bruno to browse endpoints and try requests. 
+A machine-readable OpenAPI specification of the API is kept in this repository at [`docs/openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/docs/openapi.json). You can import into Postman, Insomnia, or Bruno to browse endpoints and try requests. 
 
 If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).
