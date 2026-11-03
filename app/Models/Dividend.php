@@ -105,6 +105,16 @@ class Dividend extends Model
 
             $market_data = MarketData::getMarketData($symbol);
 
+            // the provider can return dividends we already stored, which must not be reinvested again
+            $stored_dates = self::where('symbol', $symbol)
+                ->whereDate('date', '>=', Carbon::parse($dividend_data->min('date')))
+                ->pluck('date')
+                ->map(fn ($date) => $date->toDateString());
+
+            $new_dividends = $dividend_data->reject(
+                fn ($dividend) => $stored_dates->contains(Carbon::parse(Arr::get($dividend, 'date'))->toDateString())
+            );
+
             $dividend_data
                 ->chunk(10)
                 ->each(function ($chunk) use ($market_data) {
@@ -129,7 +139,7 @@ class Dividend extends Model
             self::syncHoldings($symbol);
 
             // re-invest dividends
-            self::reinvestDividends($dividend_data, $market_data);
+            self::reinvestDividends($new_dividends, $market_data);
 
             // sync last dividend amount to market data table
             $market_data->last_dividend_amount = $dividend_data->sortByDesc('date')->first()['dividend_amount'];
