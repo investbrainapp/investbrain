@@ -29,6 +29,21 @@ class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (User $user) {
+
+            // owned portfolios go with their owner (the database cascades to their transactions,
+            // holdings and daily changes); portfolios shared with the user stay with their owner
+            $user->portfolios()->wherePivot('owner', true)->get()->each->delete();
+
+            // through the model so the export files are removed too
+            BackupExport::where('user_id', $user->id)->get()->each->delete();
+        });
+    }
+
     protected $fillable = [
         'name',
         'email',

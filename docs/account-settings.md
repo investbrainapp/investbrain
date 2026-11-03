@@ -69,6 +69,8 @@ Click **Revoke** to cut off an app's access immediately. The app will need to as
 
 ## Deleting your account
 
-At the bottom of **Manage Profile**, click **Delete Account** and enter your password to confirm. Your account, profile photo, API tokens, connected social accounts, and AI chat history are permanently deleted, your access to every portfolio is removed, and you're signed out.
+At the bottom of **Manage Profile**, click **Delete Account** and enter your password to confirm. Your account, profile photo, API tokens, connected social accounts, AI chat history, and backup exports are permanently deleted, and you're signed out.
+
+Portfolios you own are deleted too, with their transactions, holdings, and history, even if you've shared them: the people you shared them with lose access. Portfolios other people shared with you aren't affected; you're just removed from them.
 
 This can't be undone. [Export your data](import-export.md#exporting-your-data) first if you might want it later.
