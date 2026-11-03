@@ -28,6 +28,21 @@ class HoldingsTest extends TestCase
         $this->assertEquals(500, $holding->get('total_cost_basis'));
     }
 
+    public function test_display_currency_is_bound_as_a_value_in_portfolio_metrics(): void
+    {
+        $this->actingAs(User::factory()->create([
+            'options' => ['display_currency' => "US'D"],
+        ]));
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy()->lastYear()->costBasis(200)->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $metrics = Holding::query()->getPortfolioMetrics();
+
+        $this->assertEquals(200, $metrics->get('total_cost_basis'));
+    }
+
     public function test_calculates_cost_basis_after_multiple_sales(): void
     {
         $this->actingAs($user = User::factory()->create());
