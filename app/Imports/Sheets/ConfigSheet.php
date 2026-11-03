@@ -7,6 +7,7 @@ namespace App\Imports\Sheets;
 use App\Imports\ImportSheet;
 use App\Models\BackupImport;
 use App\Models\Holding;
+use App\Models\Portfolio;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 
@@ -98,7 +99,8 @@ class ConfigSheet extends ImportSheet
                 case 'reinvested_dividends':
                     if (json_validate($config['value'])) {
                         foreach (json_decode($config['value'], true) as $reinvest) {
-                            Holding::myHoldings($user->id)
+                            // only portfolios the user can change, not ones shared with them read-only
+                            Holding::whereIn('portfolio_id', Portfolio::fullAccess($user->id)->select('id'))
                                 ->where('portfolio_id', $reinvest['portfolio_id'] ?? null)
                                 ->where('symbol', $reinvest['symbol'] ?? null)
                                 ->update([

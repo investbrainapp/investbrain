@@ -629,6 +629,36 @@ class ImportExportTest extends TestCase
         $this->assertSame(0, Transaction::where('symbol', 'MSFT')->count());
     }
 
+    public function test_read_only_member_cannot_turn_on_dividend_reinvestment_via_import(): void
+    {
+        [$owner, $sharedPortfolio] = $this->createSharedPortfolioWithTransaction(fullAccess: false);
+        $member = $sharedPortfolio->users()->where('owner', false)->first();
+
+        $this->importWorkbook($member, [
+            'Config' => [
+                ['Key', 'Value'],
+                ['reinvested_dividends', json_encode([['portfolio_id' => $sharedPortfolio->id, 'symbol' => 'AAPL']])],
+            ],
+        ]);
+
+        $this->assertFalse((bool) Holding::where(['portfolio_id' => $sharedPortfolio->id, 'symbol' => 'AAPL'])->first()->reinvest_dividends);
+    }
+
+    public function test_full_access_member_can_turn_on_dividend_reinvestment_via_import(): void
+    {
+        [$owner, $sharedPortfolio] = $this->createSharedPortfolioWithTransaction(fullAccess: true);
+        $member = $sharedPortfolio->users()->where('owner', false)->first();
+
+        $this->importWorkbook($member, [
+            'Config' => [
+                ['Key', 'Value'],
+                ['reinvested_dividends', json_encode([['portfolio_id' => $sharedPortfolio->id, 'symbol' => 'AAPL']])],
+            ],
+        ]);
+
+        $this->assertTrue((bool) Holding::where(['portfolio_id' => $sharedPortfolio->id, 'symbol' => 'AAPL'])->first()->reinvest_dividends);
+    }
+
     public function test_read_only_member_cannot_hijack_transaction_via_import(): void
     {
         [$owner, $victimPortfolio, $victimTransaction] = $this->createSharedPortfolioWithTransaction(fullAccess: false);
