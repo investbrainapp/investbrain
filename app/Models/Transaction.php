@@ -158,12 +158,12 @@ class Transaction extends Model
     public function syncToHolding(): void
     {
 
-        // if symbol name changed, sync previous symbol too
-        if (Arr::has($this->changes, 'symbol')) {
+        // if the symbol or portfolio changed, sync the holding the transaction moved out of too
+        if (Arr::hasAny($this->changes, ['symbol', 'portfolio_id'])) {
 
             $temp = new Transaction;
             $temp->symbol = $this->original['symbol'];
-            $temp->portfolio_id = $this->portfolio_id;
+            $temp->portfolio_id = $this->original['portfolio_id'];
 
             $temp->syncToHolding();
         }

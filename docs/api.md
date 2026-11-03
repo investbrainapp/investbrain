@@ -2,7 +2,7 @@
 title: "REST API"
 description: "Create an API token and call the Investbrain API."
 order: 20
-updated_at: "2026-11-02"
+updated_at: "2026-11-03"
 ---
 # REST API
 
@@ -129,6 +129,7 @@ The API follows the same permissions as the web app: you can read any portfolio 
 | `403 Forbidden` | You don't have access to that portfolio, or you only have read-only access and tried to change something. |
 | `404 Not Found` | The record doesn't exist, or the symbol isn't recognized. |
 | `422 Unprocessable Content` | Validation failed. See the `errors` object for details. |
+| `429 Too Many Requests` | You've hit a [rate limit](#rate-limits). Wait the number of seconds in the `Retry-After` header, then try again. |
 
 Validation errors look like this:
 
@@ -142,6 +143,10 @@ Validation errors look like this:
 ```
 
 If you get an HTML login page instead of a JSON error, add the `Accept: application/json` header.
+
+## Rate limits
+
+Each user can make 60 requests per minute across the whole API; all endpoints share that budget. Over the limit, the API returns `429 Too Many Requests` with a `Retry-After` header saying how many seconds to wait. Every response includes `X-RateLimit-Limit` and `X-RateLimit-Remaining` headers so you can slow down before you hit it.
 
 ## OpenAPI specification
 

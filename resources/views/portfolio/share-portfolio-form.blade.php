@@ -82,18 +82,21 @@ new class extends Component
     {
         $this->authorize('fullAccess', $this->portfolio);
 
-        abort_if($this->portfolio->owner_id === $userId, 403);
+        $member = $this->portfolio->users()->find($userId);
+
+        // look the member up rather than comparing ids as strings, which another spelling of the owner's id gets past
+        abort_unless($member && ! $member->pivot->owner, 403);
 
         if (! $confirmed) {
-            $this->deletingAccessFor = $userId;
+            $this->deletingAccessFor = $member->id;
             $this->confirmingAccessDeletion = true;
 
             return;
         }
 
-        unset($this->permissions[$userId]);
+        unset($this->permissions[$member->id]);
 
-        $this->portfolio->unShare($userId);
+        $this->portfolio->unShare($member->id);
 
         $this->portfolio->refresh();
 

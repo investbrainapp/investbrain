@@ -88,6 +88,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -135,6 +138,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -179,6 +185,9 @@
           "404": {
             "$ref": "#/components/responses/NotFoundError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -222,6 +231,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -244,6 +256,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
           },
           "500": {
             "$ref": "#/components/responses/ServerError"
@@ -306,6 +321,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -362,6 +380,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -406,6 +427,9 @@
           "404": {
             "$ref": "#/components/responses/NotFoundError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -449,6 +473,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -471,6 +498,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
           },
           "500": {
             "$ref": "#/components/responses/ServerError"
@@ -534,6 +564,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -588,6 +621,9 @@
           "404": {
             "$ref": "#/components/responses/NotFoundError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -631,6 +667,9 @@
           "422": {
             "$ref": "#/components/responses/ValidationError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -673,6 +712,9 @@
           "404": {
             "$ref": "#/components/responses/NotFoundError"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
           "500": {
             "$ref": "#/components/responses/ServerError"
           }
@@ -698,6 +740,9 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
           },
           "500": {
             "$ref": "#/components/responses/ServerError"
@@ -1143,6 +1188,17 @@
       },
       "ServerError": {
         "description": "Server error"
+      },
+      "TooManyRequestsError": {
+        "description": "Rate limit exceeded. Retry after the number of seconds in the Retry-After header.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        }
       },
       "ValidationError": {
         "description": "The query parameters or request body failed validation",
