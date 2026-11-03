@@ -21,8 +21,10 @@ You don't have to write code to help. Some good places to start:
 - **Report bugs** with clear steps to reproduce them
 - **Improve the documentation** in this `docs` folder
 - **Add translations** or fix existing ones in `lang/`
+
+If you want to write code, you can:
 - **Add a market data provider** (see [Developing market data providers](market-data-providers.md))
-- **Improve the interface**, accessibility, or mobile layout
+- **Improve the UI**, accessibility, or mobile layout
 - **Fix bugs** from the [issue tracker](https://github.com/investbrainapp/investbrain/issues)
 
 ## Before you start
@@ -87,7 +89,7 @@ These steps run the app directly on your machine with PHP, and use Docker only f
 - **[Docker](https://docs.docker.com/engine/install/)**, for PostgreSQL and Redis (or install them locally if you prefer)
 - **Git**
 
-On macOS, [Laravel Herd](https://herd.laravel.com) installs PHP, Composer, and Node for you (choose PHP 8.4 in its settings). On Linux, install PHP and the extensions from your distribution's packages.
+On macOS, [Herd](https://herd.laravel.com) or [Yerd](https://yerd.app/) installs PHP, Composer, and Node for you (choose PHP 8.4 in its settings). On Linux, install PHP and the extensions from your distribution's packages.
 
 ### 1. Fork and clone
 
@@ -125,8 +127,6 @@ REDIS_HOST=127.0.0.1
 MAIL_MAILER=log
 ```
 
-For working offline, or to avoid hitting a real data provider, set `MARKET_DATA_PROVIDER=fake`. The fake provider returns the same made-up quote, dividends, and splits for every symbol.
-
 ### 4. Start PostgreSQL and Redis
 
 The repository's compose file already defines PostgreSQL with its port published, so you can start just that service:
@@ -160,21 +160,6 @@ Optionally, seed a test user (`test@example.com` with the password `password`) a
 php artisan db:seed
 php artisan db:seed --class=MarketDataSeeder
 ```
-
-### 6. Run it
-
-You need a few processes running at once. Open a terminal for each:
-
-```bash
-php artisan serve          # the app, at http://localhost:8000
-npm run dev                # Vite, rebuilds CSS and JS as you edit
-php artisan queue:work     # background jobs: imports, emails, history rebuilds
-php artisan schedule:work  # optional: scheduled market data refreshes and snapshots
-```
-
-If you don't want to run a queue worker, set `QUEUE_CONNECTION=sync` in `.env` and jobs run immediately during the request. That's simpler, but slow operations like imports will block the page.
-
-Visit `http://localhost:8000/register` to create an account, or sign in with the seeded test user.
 
 ### Keeping your fork up to date
 
@@ -271,14 +256,7 @@ Wrap every user-facing string in `__()`, for example `{{ __('Create Portfolio') 
 
 ## Using AI coding assistants
 
-The repository includes guidance for AI coding assistants, and it's also a handy summary of the project's rules for people:
-
-- `AGENTS.md` - the main project guidelines
-- `.ai/rules/` - project rules; `.ai/rules/index.md` maps file paths to the rules that apply to them
-- `.ai/skills/` - detailed guides for specific areas such as Livewire, Volt, Passport, MCP, and testing
-- `.mcp.json` - configures [Laravel Boost](https://github.com/laravel/boost), a development MCP server (`php artisan boost:mcp`) that gives assistants access to your local app's routes, configuration, database schema, and version-specific documentation
-
-You're welcome to use AI tools. You're still responsible for the code: read and understand everything you submit, make sure it follows the conventions above, and run the tests yourself.
+You're welcome to use AI tools. You're still responsible for the code. Read and understand everything you submit, make sure it follows the conventions above, and run the tests yourself.
 
 ## Making a pull request
 
@@ -330,19 +308,3 @@ Mark the pull request as a draft if you'd like early feedback before it's finish
 
 A maintainer will review your pull request and may ask for changes. Push follow-up commits to the same branch; there's no need to open a new pull request. Please be patient; this is a community project maintained in people's spare time.
 
-## Reporting bugs and security issues
-
-**Bugs.** Open an [issue](https://github.com/investbrainapp/investbrain/issues) with:
-
-- What you did, what you expected, and what happened instead
-- Steps to reproduce, ideally with a minimal example
-- Your Investbrain version (shown at the top of the container's startup log) and how you run it
-- Relevant log lines from `storage/logs/laravel.log`, with any secrets removed
-
-**Security vulnerabilities.** Don't open a public issue. Report them privately through [GitHub security advisories](https://github.com/investbrainapp/investbrain/security/advisories/new) and keep the details confidential until they're fixed. See [`SECURITY.md`](../SECURITY.md).
-
-**Code of conduct.** Be kind and polite when you interact with the Investbrain community.
-
-## License
-
-Investbrain is licensed under [CC BY-NC 4.0](../LICENSE.md). Contributions you submit are made under the same license.

@@ -16,9 +16,7 @@ If you'd rather not run a server, [Investbrain Cloud](https://investbra.in) runs
 - [AI chat](#ai-chat)
 - [Social login](#social-login)
 - [Email](#email)
-- [Scheduled tasks](#scheduled-tasks)
 - [Updating](#updating)
-- [Backing up and restoring](#backing-up-and-restoring)
 - [Command line utilities](#command-line-utilities)
 
 ## Installation
@@ -301,12 +299,11 @@ Open **Provider Health** from the user menu. For the last 24 hours, 7 days, or 3
 - A breakdown per provider and method, with the last failure
 - The most recent failures with the symbol and error message
 
-<!-- SCREENSHOT: Provider Health page with some traffic: summary cards, calls-over-time chart, and the Providers table. -->
-<!-- ![The Provider Health page](images/self-hosting-provider-health.png) -->
-
 Use it to spot a provider that's failing or rate limiting you. Old failure records are cleaned up automatically.
 
-Provider Health is only shown to the first account registered on your instance. To give another account access, set its `admin` flag in the database:
+Provider Health is only shown to the first account registered on your instance. 
+
+To give another account access to provider health, set the user's `admin` flag in the database:
 
 ```bash
 docker exec -it investbrain-pgsql psql -U investbrain -d investbrain \
@@ -315,11 +312,11 @@ docker exec -it investbrain-pgsql psql -U investbrain -d investbrain \
 
 ## Currency
 
-Investbrain converts between currencies using daily exchange rates from the [Frankfurter](https://frankfurter.dev/) service, refreshed once a day.
+Investbrain converts between currencies using daily exchange rates from the [Frankfurter](https://frankfurter.dev/) service, refreshed once per day.
 
 Values are stored in each security's trading currency and also converted into a single **base currency** (`BASE_CURRENCY`, default `USD`). Each user then picks their own [display currency](account-settings.md#locale-and-display-currency), so you don't need to change the base currency for users who prefer euros, pounds, or anything else.
 
-If you do want a different base currency, set `BASE_CURRENCY` **before** adding any data. Changing it later leaves previously stored values converted with the old base currency.
+If you do want a different base currency, set `BASE_CURRENCY` **before** adding any data. Changing it later leaves previously stored values converted with the old base currency. You generally shouldn't adjust this.
 
 ## AI chat
 
@@ -404,22 +401,6 @@ To send real email, configure an SMTP server:
 
 Emails are sent by the background queue workers, which run inside the `app` container automatically.
 
-## Scheduled tasks
-
-The scheduler runs inside the `app` container. You don't need to set up cron.
-
-| Task | When | What it does |
-| --- | --- | --- |
-| Refresh market data | Every minute on weekdays | Refreshes prices for symbols with open positions that are older than `MARKET_DATA_REFRESH` minutes |
-| Capture daily change | Weekdays at `DAILY_CHANGE_TIME` | Saves a snapshot of each portfolio's value for the performance charts |
-| Refresh dividend data | Daily on Monday, Wednesday, and Friday | Downloads new dividends, updates dividends earned, and creates reinvestment transactions |
-| Refresh split data | Weekly | Downloads new splits and creates split transactions |
-| Refresh currency data | Daily | Downloads the latest exchange rates |
-| Sync holdings | Yearly | Reconciles every holding with its transactions and dividends |
-| Prune old records | Daily | Deletes old provider failure records |
-
-Times are in `APP_TIMEZONE`.
-
 ## Updating
 
 ```bash
@@ -429,44 +410,13 @@ docker compose up -d
 
 This downloads the latest images and recreates the containers. Database migrations run automatically on startup. Your data is kept in the volumes.
 
-It's a good idea to [back up](#backing-up-and-restoring) before updating. The running version is printed at the top of the `app` container's log on startup.
+It's a good idea to back up before updating. The running version is printed at the top of the `app` container's log on startup.
 
 Don't change the major version of the `postgres` image (for example from `15` to `16`) on an existing database volume. PostgreSQL can't read data files from a different major version. To upgrade PostgreSQL, dump the database, start a fresh volume with the new version, and restore.
 
-## Backing up and restoring
-
-There are two complementary ways to back up.
-
-**In-app export (per user)**
-
-Each user can download a full backup of their own data from [Import / Export](import-export.md). This is portable between instances and versions but doesn't include passwords, 2FA settings, API tokens, or other users.
-
-**Full instance backup**
-
-Back up both the database and the storage volume.
-
-```bash
-# Database
-docker exec investbrain-pgsql pg_dump -U investbrain -d investbrain -Fc > investbrain-$(date +%F).dump
-
-# Storage volume (contains APP_KEY and OAuth keys)
-docker run --rm -v investbrain_investbrain-storage:/data -v "$PWD":/backup alpine \
-  tar czf /backup/investbrain-storage-$(date +%F).tar.gz -C /data .
-```
-
-Docker prefixes volume names with the compose project name (the folder name by default), so the storage volume might be called `investbrain_investbrain-storage`. Run `docker volume ls` to check.
-
-To restore the database into a running instance:
-
-```bash
-docker exec -i investbrain-pgsql pg_restore -U investbrain -d investbrain --clean --if-exists < investbrain-2026-11-01.dump
-```
-
-Restore the storage archive the same way in reverse, before starting the `app` container. If you restore the database without the original `APP_KEY`, encrypted values such as 2FA secrets can't be read, so keep the two backups together.
-
 ## Command line utilities
 
-Investbrain includes command line utilities for maintenance. They can make large, irreversible changes, so back up first. Run them inside the `app` container:
+Investbrain includes several command line utilities for maintenance. They can make large, irreversible changes, so back up first. Run them inside the `app` container:
 
 ```bash
 docker exec -it investbrain-app php artisan <command>

@@ -27,7 +27,7 @@ Both run the same open-source app so, generally speaking, these docs apply to bo
 ## Running your own instance
 
 - [Self-hosting](self-hosting.md) - installing with the supported Docker Compose file, configuration, reverse proxies, updates, backups, and command line utilities
-- [Troubleshooting](troubleshooting.md) - fixes for the most common problems (mostly for self-hosted instances)
+- [Troubleshooting](troubleshooting.md) - fixes for the most common problems on self-hosted instances
 
 ## Contributing
 
