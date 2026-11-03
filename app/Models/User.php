@@ -115,7 +115,11 @@ class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
     {
         $available_locales = Arr::pluck(config('app.available_locales'), 'locale');
 
-        return Arr::get($this->options, 'locale') ?? request()->getPreferredLanguage($available_locales) ?? config('app.locale');
+        // ignore a stored locale that isn't available, so a bad value can't break every page
+        $locale = Arr::get($this->options, 'locale');
+
+        return (in_array($locale, $available_locales, true) ? $locale : null)
+            ?? request()->getPreferredLanguage($available_locales) ?? config('app.locale');
     }
 
     public function setOption(mixed $key, ?string $value = null): self

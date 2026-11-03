@@ -367,6 +367,38 @@ class ImportExportTest extends TestCase
         $this->assertSame('USD', $user->refresh()->getCurrency());
     }
 
+    public function test_supported_locale_is_set_on_import(): void
+    {
+        $user = User::factory()->create();
+
+        $this->importWorkbook($user, [
+            'Config' => [
+                ['Key', 'Value'],
+                ['locale', 'en_CA'],
+            ],
+        ]);
+
+        $this->assertSame('en_CA', $user->refresh()->getLocale());
+    }
+
+    public function test_unsupported_locale_is_rejected_on_import(): void
+    {
+        $user = User::factory()->create();
+
+        $import = $this->importWorkbook($user, [
+            'Config' => [
+                ['Key', 'Value'],
+                ['locale', 'en/US'],
+            ],
+        ]);
+
+        $this->assertSame('failed', $import->status);
+        $this->assertSame([
+            ['sheet' => 'Config', 'row' => 2, 'column' => 'Value', 'value' => 'en/US', 'message' => 'This field must be a supported locale, e.g. en_US.'],
+        ], $import->errors);
+        $this->assertSame('en', $user->refresh()->options['locale']);
+    }
+
     public function test_invalid_rows_are_all_reported_and_nothing_is_imported(): void
     {
         Notification::fake();

@@ -380,6 +380,7 @@
     "This field may only contain letters, numbers and . - ^ = : / _ (no spaces).": "Este campo solo puede contener letras, números y . - ^ = : / _ (sin espacios).",
     "This field must be BUY or SELL.": "Este campo debe ser BUY o SELL.",
     "This field must be a supported currency code, e.g. USD.": "Este campo debe ser un código de moneda compatible, p. ej. USD.",
+    "This field must be a supported locale, e.g. en_US.": "Este campo debe ser una configuración regional compatible, p. ej. en_US.",
     "This field is not a valid date. Try the YYYY-MM-DD format.": "Este campo no es una fecha válida. Prueba el formato AAAA-MM-DD.",
     "Importing your file": "Importando tu archivo",
     "Show import progress": "Mostrar el progreso de la importación",
