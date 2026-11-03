@@ -19,7 +19,7 @@ Both run the same open-source app so, generally speaking, these docs apply to bo
 
 ## Using Investbrain
 
-- [Getting Started](getting-started.md) - the dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
+- [Getting started](getting-started.md) - the dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
 - [Account settings](account-settings.md) - profile, locale and display currency, password, two-factor authentication, social logins, authorized apps, and deleting your account
 - [Import and export](import-export.md) - backing up your data, moving between Investbrain Cloud and a self-hosted instance, and bulk-loading transactions from a spreadsheet
 - [MCP server](mcp.md) - connecting AI assistants such as Claude, ChatGPT, Cursor, or VS Code to your Investbrain account
