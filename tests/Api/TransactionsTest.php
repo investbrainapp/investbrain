@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Api;
 
+use App\Models\MarketData;
 use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
@@ -81,6 +82,21 @@ class TransactionsTest extends ApiTestCase
             ->assertJsonCount(2, 'data')
             ->assertJsonPath('data.0.symbol', 'AAPL')
             ->assertJsonPath('data.1.symbol', 'AAPL');
+    }
+
+    public function test_can_filter_transactions_by_the_symbols_trading_currency()
+    {
+        $this->actingAs($this->user);
+        Transaction::factory()->buy()->symbol('AAPL')->portfolio($this->portfolio->id)->create();
+        Transaction::factory()->buy()->symbol('BARC.L')->portfolio($this->portfolio->id)->create();
+        MarketData::where('symbol', 'BARC.L')->update(['currency' => 'GBP']);
+
+        $response = $this->getJson(route('api.transaction.index', ['filter' => ['currency' => 'GBP']]));
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.symbol', 'BARC.L')
+            ->assertJsonPath('data.0.currency', 'GBP');
     }
 
     public function test_filter_with_comma_separated_values_matches_any_value()

@@ -27,7 +27,7 @@ class TransactionController extends ApiController
                 AllowedFilter::exact('symbol'),
                 AllowedFilter::exact('portfolio_id'),
                 AllowedFilter::exact('transaction_type'),
-                AllowedFilter::exact('currency'),
+                AllowedFilter::exact('currency', 'market_data.currency'),
                 AllowedFilter::exact('split'),
                 AllowedFilter::exact('reinvested_dividend'),
             )

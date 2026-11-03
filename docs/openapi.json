@@ -1305,6 +1305,11 @@
                 "SELL"
               ]
             },
+            "currency": {
+              "type": "string",
+              "example": "USD",
+              "description": "Currency the transaction is recorded in"
+            },
             "split": {
               "type": "boolean"
             },
