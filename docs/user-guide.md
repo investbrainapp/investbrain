@@ -19,15 +19,16 @@ This guide covers the core of Investbrain: portfolios, transactions, and holding
 
 ## Key concepts
 
-Investbrain is built around three things:
+Investbrain is built around four things:
 
 | Concept | What it is |
 | --- | --- |
 | **Portfolio** | A container for investments, usually one per brokerage account (for example "Fidelity IRA" or "Joint Brokerage"). |
 | **Transaction** | A single buy or sell of a security on a given date. Transactions are the source of truth for everything else. |
 | **Holding** | A position in one security within one portfolio. Holdings are created and updated automatically from your transactions. You never create a holding by hand. |
+| **Market data** | Information about a security itself, rather than your position in it: its name, current price, trading currency, 52-week range, fundamentals such as market cap and P/E, and its dividend and split history. It's looked up by symbol, kept up to date automatically, and used to value your holdings, calculate dividends earned, and record splits. |
 
-Market data (prices, 52-week ranges, fundamentals), dividends, and splits are pulled from a market data provider and applied to your holdings automatically. Investbrain Cloud takes care of this for you. On a self-hosted instance, you [choose the provider](self-hosting.md#market-data-providers).
+Market data comes from a market data provider. Investbrain Cloud takes care of this for you. On a self-hosted instance, you [choose the provider](self-hosting.md#market-data-providers).
 
 ## Creating an account and signing in
 
