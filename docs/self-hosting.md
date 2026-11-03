@@ -310,6 +310,8 @@ Values are stored in each security's trading currency and also converted into a 
 
 If you do want a different base currency, set `BASE_CURRENCY` **before** adding any data. Changing it later leaves previously stored values converted with the old base currency. You generally shouldn't adjust this.
 
+To add a currency that is not in the seeded list (for example PLN), see [Custom currencies](custom-currencies.md).
+
 ## AI chat
 
 To turn on the [AI chat](getting-started.md#ai-chat) assistant:

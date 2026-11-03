@@ -23,6 +23,7 @@ Both self-hosted and cloud run the same open-source app. You can switch between 
 
 - [Self-hosting](self-hosting.md) - installing with the supported Docker Compose file, configuration, reverse proxies, updates, backups, and command line utilities
 - [Troubleshooting](troubleshooting.md) - fixes for the most common problems on self-hosted instances
+- [Custom currencies](custom-currencies.md) - adding extra Frankfurter-supported currencies that are not in the seeded list
 
 ## Contributing
 
