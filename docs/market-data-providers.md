@@ -8,8 +8,6 @@ If you only want to choose or configure a provider, see [Market data providers](
 - [The interface](#the-interface)
 - [Return types](#return-types)
 - [Rules every provider must follow](#rules-every-provider-must-follow)
-- [Building a provider step by step](#building-a-provider-step-by-step)
-- [Testing your provider](#testing-your-provider)
 - [Trying it in the app](#trying-it-in-the-app)
 - [Contributing your provider](#contributing-your-provider)
 
