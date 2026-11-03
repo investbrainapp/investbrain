@@ -3,6 +3,7 @@ title: "Getting Started"
 description: "The dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat."
 group: "Using Investbrain"
 order: 10
+updated_at: "2026-11-02"
 ---
 # Getting Started
 

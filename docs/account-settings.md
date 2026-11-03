@@ -3,6 +3,7 @@ title: "Account Settings"
 description: "Profile, locale and display currency, password, two-factor authentication, social logins, authorized apps, and deleting your account."
 group: "Using Investbrain"
 order: 11
+updated_at: "2026-11-03"
 ---
 # Account Settings
 

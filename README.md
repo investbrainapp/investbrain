@@ -30,7 +30,7 @@ There are two ways to use Investbrain:
 
 ## Documentation
 
-Everything else is in the [docs](docs/README.md):
+Everything else is in the [docs](docs/_index.md):
 
 - [Getting started](docs/getting-started.md) - portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
 - [Account settings](docs/account-settings.md) - locale and display currency, two-factor authentication, social logins, and authorized apps

@@ -3,6 +3,7 @@ title: "Troubleshooting"
 description: "Fixes for the most common problems on self-hosted instances."
 group: "Running your own instance"
 order: 31
+updated_at: "2026-11-03"
 ---
 # Troubleshooting
 

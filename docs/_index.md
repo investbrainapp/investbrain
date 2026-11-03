@@ -2,6 +2,7 @@
 title: "Investbrain"
 description: "Investbrain is a smart open-source investment tracker that helps you manage, track, and make informed decisions about your investments."
 order: 0
+updated_at: "2026-11-02"
 ---
 # Investbrain
 

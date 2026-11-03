@@ -3,6 +3,7 @@ title: "Import and Export"
 description: "Back up your data, move between Investbrain Cloud and a self-hosted instance, and bulk-load transactions from a spreadsheet."
 group: "Using Investbrain"
 order: 12
+updated_at: "2026-11-03"
 ---
 # Import and Export
 

@@ -3,6 +3,7 @@ title: "Contributing"
 description: "How the project is built, setting up a development environment, coding conventions, and making pull requests."
 group: "Contributing"
 order: 40
+updated_at: "2026-11-03"
 ---
 # Contributing
 

@@ -3,6 +3,7 @@ title: "REST API"
 description: "Create an API token and call the Investbrain API."
 group: "Advanced"
 order: 20
+updated_at: "2026-11-02"
 ---
 # REST API
 
