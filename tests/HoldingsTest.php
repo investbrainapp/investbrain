@@ -43,6 +43,35 @@ class HoldingsTest extends TestCase
         $this->assertEquals(200, $metrics->get('total_cost_basis'));
     }
 
+    public function test_moving_a_transaction_to_another_portfolio_resyncs_the_holding_it_left(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $from = Portfolio::factory()->create();
+        $to = Portfolio::factory()->create();
+        Transaction::factory()->buy()->lastYear()->costBasis(100)->portfolio($from->id)->symbol('AAPL')->create();
+        $moving = Transaction::factory()->buy()->lastMonth()->costBasis(200)->portfolio($from->id)->symbol('AAPL')->create();
+
+        $moving->update(['portfolio_id' => $to->id]);
+
+        $this->assertEquals(1, Holding::query()->portfolio($from->id)->symbol('AAPL')->first()->quantity);
+        $this->assertEquals(1, Holding::query()->portfolio($to->id)->symbol('AAPL')->first()->quantity);
+    }
+
+    public function test_moving_a_portfolios_only_transaction_for_a_symbol_removes_the_holding_it_left(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $from = Portfolio::factory()->create();
+        $to = Portfolio::factory()->create();
+        $moving = Transaction::factory()->buy()->lastYear()->portfolio($from->id)->symbol('AAPL')->create();
+
+        $moving->update(['portfolio_id' => $to->id, 'symbol' => 'MSFT']);
+
+        $this->assertNull(Holding::query()->portfolio($from->id)->symbol('AAPL')->first());
+        $this->assertNotNull(Holding::query()->portfolio($to->id)->symbol('MSFT')->first());
+    }
+
     public function test_calculates_cost_basis_after_multiple_sales(): void
     {
         $this->actingAs($user = User::factory()->create());
