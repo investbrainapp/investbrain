@@ -6,14 +6,19 @@ namespace App\Imports;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Concerns\OnEachRow;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Row;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use Throwable;
 
 /**
- * Collects a worksheet's rows (keyed by their spreadsheet row number) so the whole
- * workbook can be validated before anything is written to the database.
+ * One worksheet of an Investbrain workbook. Collects its rows (keyed by their spreadsheet row
+ * number) so the whole workbook can be validated before anything is written to the database.
  */
-trait ReadsSheetRows
+abstract class ImportSheet implements OnEachRow, SkipsEmptyRows, WithCalculatedFormulas, WithHeadingRow
 {
     /**
      * @var array<int, array<string, mixed>>
@@ -27,46 +32,40 @@ trait ReadsSheetRows
      */
     public array $headings = [];
 
+    abstract public function title(): string;
+
     /**
-     * The package hands each row (with its spreadsheet row number) to this hook as it reads
-     * the sheet, which makes it the one place rows can be collected with their row number.
+     * @return array<string, array{label: string, required: bool}>
+     */
+    abstract public static function columns(): array;
+
+    /**
+     * Tidy up a row's raw cell values before they are validated.
      *
      * @param  array<string, mixed>  $row
      * @return array<string, mixed>
      */
-    public function prepareForValidation(array $row, int $rowNumber): array
+    abstract public function normalize(array $row): array;
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>
+     */
+    abstract public function rowRules(array $row): array;
+
+    /**
+     * Collect each row as the package reads the sheet.
+     */
+    public function onRow(Row $row): void
     {
+        // the same arguments the package read the row with, so this is a cache hit
+        $cells = $row->toArray(calculateFormulas: true, formatData: false);
+
         if (empty($this->headings)) {
-            $this->headings = array_map('strval', array_keys($row));
+            $this->headings = array_map('strval', array_keys($cells));
         }
 
-        $this->rows[$rowNumber] = $this->normalize($row);
-
-        return $row;
-    }
-
-    /**
-     * Rows were already collected in prepareForValidation().
-     *
-     * @param  array<int, array<string, mixed>>  $array
-     */
-    public function array(array $array): void
-    {
-        //
-    }
-
-    /**
-     * Rows are validated together with the rest of the workbook in validationErrors() rather
-     * than by the package (which stops at the first sheet with a problem).
-     */
-    public function rules(): array
-    {
-        return [];
-    }
-
-    public function onUnknownSheet(string|int $sheetName): void
-    {
-        // every sheet is optional
+        $this->rows[$row->getIndex()] = $this->normalize($cells);
     }
 
     /**

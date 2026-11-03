@@ -4,19 +4,11 @@ declare(strict_types=1);
 
 namespace App\Imports\Sheets;
 
-use App\Imports\ReadsSheetRows;
+use App\Imports\ImportSheet;
 use App\Models\DailyChange;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\SkipsUnknownSheets;
-use Maatwebsite\Excel\Concerns\ToArray;
-use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
 
-class DailyChangesSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, WithCalculatedFormulas, WithHeadingRow, WithValidation
+class DailyChangesSheet extends ImportSheet
 {
-    use ReadsSheetRows;
-
     public function title(): string
     {
         return 'Daily Changes';
