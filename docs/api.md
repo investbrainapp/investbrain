@@ -12,14 +12,14 @@ Investbrain has a JSON REST API for reading and managing your portfolios, transa
 
 ## API versions
 
-This page documents **version 2** of the API. Version 1 is kept for reference.
+This page documents **API v2**. API v1 is kept for reference. These version numbers refer to the API specification, not to Investbrain itself.
 
-| Version | Used by | Specification |
-| --- | --- | --- |
-| **v2** | Investbrain releases after v1.3.2 | [`openapi.json`](../openapi.json) |
-| **v1** | Investbrain v1.3.2 and earlier | [`docs/openapi-v1.json`](openapi-v1.json) (archived) |
+| API version | Specification version | Used by | Specification |
+| --- | --- | --- | --- |
+| **v1** | 1.0.1 | Investbrain versions before 1.4.0 | [`docs/openapi-v1.json`](openapi-v1.json) (archived) |
+| **v2** | 2.0.0 | Investbrain 1.4.0 and later | [`openapi.json`](../openapi.json) |
 
-If you self-host, the version is printed at the top of the `app` container's log when it starts (`docker compose logs app`).
+If you self-host, your Investbrain version is printed at the top of the `app` container's log when it starts (`docker compose logs app`).
 
 The two versions have the same endpoints, request bodies, and response formats, and use the same API tokens. Only the query parameters for sorting, filtering, and paging through the list endpoints (`GET /portfolio`, `GET /transaction`, and `GET /holding`) changed:
 
@@ -402,4 +402,4 @@ If you get an HTML login page instead of a JSON error, add the `Accept: applicat
 
 ## OpenAPI specification
 
-A machine-readable OpenAPI 3 description of the API is kept in the repository at [`openapi.json`](../openapi.json). The archived v1 specification is at [`docs/openapi-v1.json`](openapi-v1.json) (see [API versions](#api-versions)). Import it into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. The spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host. If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).
+Machine-readable OpenAPI 3 descriptions of both API versions are kept in the repository: [`openapi.json`](../openapi.json) for API v2 (Investbrain 1.4.0 and later), and [`docs/openapi-v1.json`](openapi-v1.json) for API v1 (Investbrain versions before 1.4.0). See [API versions](#api-versions). Import either one into Postman, Insomnia, Bruno, or the [Swagger Editor](https://editor.swagger.io/) to browse endpoints and try requests. Each spec defines two servers: Investbrain Cloud (`https://investbra.in/api`) and a self-hosted server where you fill in your own host. If the spec and this page ever disagree, please [open an issue](https://github.com/investbrainapp/investbrain/issues).

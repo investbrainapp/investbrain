@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "version": "1.0.1",
-    "title": "Investbrain API",
-    "description": "Archived specification for version 1 of the Investbrain API, used by Investbrain v1.3.2 and earlier. Newer versions use API v2, documented in openapi.json in the repository root. Endpoints and response formats are the same in both versions; v2 changed the query parameters for sorting, filtering, and pagination on list endpoints.\n\nInvestbrain is a smart open-source investment tracker that consolidates and monitors market performance across your different brokerages.",
+    "title": "Investbrain API v1",
+    "description": "Archived specification for version 1 of the Investbrain API, used by Investbrain versions before 1.4.0. Investbrain 1.4.0 and later use API v2, documented in openapi.json in the repository root. Endpoints and response formats are the same in both versions; v2 changed the query parameters for sorting, filtering, and pagination on list endpoints.\n\nInvestbrain is a smart open-source investment tracker that consolidates and monitors market performance across your different brokerages.",
     "termsOfService": "https://investbra.in/terms",
     "contact": {
       "url": "https://github.com/investbrainapp/investbrain",
