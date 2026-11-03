@@ -7,7 +7,6 @@ namespace App\Jobs;
 use App\Imports\BackupImport as BackupImportExcel;
 use App\Imports\ImportValidationException;
 use App\Models\BackupImport;
-use App\Models\User;
 use App\Notifications\ImportFailedNotification;
 use App\Notifications\ImportSucceededNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,16 +42,12 @@ class BackupImportJob implements ShouldQueue
      */
     public $failOnTimeout = true;
 
-    public User $user;
-
     /**
      * Create a new job instance.
      */
     public function __construct(
         public BackupImport $backupImport
-    ) {
-        $this->user = User::find($this->backupImport->user_id);
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -72,7 +67,7 @@ class BackupImportJob implements ShouldQueue
 
             $this->markAsFailed($e->getMessage(), $e->errors);
 
-            $this->user->notify(new ImportFailedNotification($e->getMessage(), array_slice($e->errors, 0, 10), count($e->errors)));
+            $this->backupImport->user->notify(new ImportFailedNotification($e->getMessage(), array_slice($e->errors, 0, 10), count($e->errors)));
 
             return;
         }
@@ -84,7 +79,7 @@ class BackupImportJob implements ShouldQueue
             'completed_at' => now(),
         ]);
 
-        $this->user->notify(new ImportSucceededNotification);
+        $this->backupImport->user->notify(new ImportSucceededNotification);
     }
 
     /**
@@ -100,7 +95,7 @@ class BackupImportJob implements ShouldQueue
             'message' => substr((string) $e?->getMessage(), 0, 500),
         ]]);
 
-        $this->user->notify(new ImportFailedNotification((string) $e?->getMessage()));
+        $this->backupImport->user->notify(new ImportFailedNotification((string) $e?->getMessage()));
     }
 
     /**

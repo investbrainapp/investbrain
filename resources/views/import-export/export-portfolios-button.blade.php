@@ -1,8 +1,10 @@
 <?php
 
-use App\Jobs\BackupExportJob;
+use App\Jobs\AssembleBackupExportJob;
+use App\Jobs\CalculateDailyPerformanceJob;
 use App\Models\BackupExport as BackupExportModel;
 use App\Traits\Toast;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Volt\Component;
 
@@ -43,7 +45,18 @@ new class extends Component
 
         $this->backupExport = BackupExportModel::create(['user_id' => auth()->id()]);
 
-        BackupExportJob::dispatch($this->backupExport);
+        // the performance figures are slow to calculate, so each portfolio gets its own job
+        // and the workbook is built once they have all finished
+        $performanceJobs = auth()->user()->portfolios()->pluck('portfolios.id')
+            ->map(fn ($portfolioId) => new CalculateDailyPerformanceJob($this->backupExport, $portfolioId));
+
+        $jobs = [new AssembleBackupExportJob($this->backupExport)];
+
+        if ($performanceJobs->isNotEmpty()) {
+            array_unshift($jobs, Bus::batch($performanceJobs->all())->name('Backup export '.$this->backupExport->id));
+        }
+
+        Bus::chain($jobs)->dispatch();
 
         $this->backupExport->refresh();
     }

@@ -62,7 +62,7 @@ class AssembleBackupExportJob implements ShouldQueue
         Auth::setUser($this->backupExport->user);
 
         try {
-            $path = 'exports/'.$this->backupExport->user_id.'/'.$this->backupExport->id.'.xlsx';
+            $path = $this->backupExport->workbookPath();
 
             // stored on the configured default filesystem disk
             Excel::store(new BackupExport(backupExport: $this->backupExport), $path);

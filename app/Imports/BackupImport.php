@@ -449,7 +449,7 @@ class BackupImport implements Import, SkipsUnknownSheets, WithMultipleSheets
         $this->invalidRows[$error['sheet']][$error['row'] ?? 0] = true;
     }
 
-    protected function isInvalid(object $sheet, int $rowNumber): bool
+    protected function isInvalid(ImportSheet $sheet, int $rowNumber): bool
     {
         return isset($this->invalidRows[$sheet->title()][$rowNumber])
             || isset($this->invalidRows[$sheet->title()][0]);
@@ -458,7 +458,7 @@ class BackupImport implements Import, SkipsUnknownSheets, WithMultipleSheets
     /**
      * @return Collection<int, array<string, mixed>>
      */
-    protected function validRows(object $sheet): Collection
+    protected function validRows(ImportSheet $sheet): Collection
     {
         return collect($sheet->rows)->reject(fn ($row, $rowNumber) => $this->isInvalid($sheet, $rowNumber));
     }

@@ -5,23 +5,15 @@ declare(strict_types=1);
 namespace App\Imports\Sheets;
 
 use App\Actions\EnsureCostBasisAddedToSale;
-use App\Imports\ReadsSheetRows;
+use App\Imports\ImportSheet;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
 use App\Models\Transaction;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\SkipsUnknownSheets;
-use Maatwebsite\Excel\Concerns\ToArray;
-use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
 
-class TransactionsSheet implements SkipsEmptyRows, SkipsUnknownSheets, ToArray, WithCalculatedFormulas, WithHeadingRow, WithValidation
+class TransactionsSheet extends ImportSheet
 {
-    use ReadsSheetRows;
-
     /**
      * @var list<string>|null
      */
