@@ -24,7 +24,7 @@ class BackupExport extends Model
 
     protected $fillable = [
         'user_id',
-        'status', // pending, in_progress, success, failed
+        'status', // pending, success, failed
         'path', // where the finished workbook is stored
         'completed_at',
     ];
@@ -87,6 +87,14 @@ class BackupExport extends Model
     public function performancePath(string $portfolioId): string
     {
         return $this->performanceDirectory().'/'.$portfolioId.'.json';
+    }
+
+    /**
+     * Where the finished workbook is stored.
+     */
+    public function workbookPath(): string
+    {
+        return 'exports/'.$this->user_id.'/'.$this->id.'.xlsx';
     }
 
     public function markAsFailed(): void

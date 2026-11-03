@@ -9,7 +9,6 @@ use App\Exports\Sheets\TransactionsSheet as TransactionsExportSheet;
 use App\Imports\Sheets\TransactionsSheet;
 use App\Interfaces\MarketData\MarketDataInterface;
 use App\Jobs\AssembleBackupExportJob;
-use App\Jobs\BackupExportJob;
 use App\Jobs\CalculateDailyPerformanceJob;
 use App\Models\BackupExport as BackupExportModel;
 use App\Models\BackupImport as BackupImportModel;
@@ -119,7 +118,7 @@ class ImportExportTest extends TestCase
 
     public function test_export_button_builds_the_backup_in_the_background(): void
     {
-        Queue::fake();
+        Bus::fake();
         $user = User::factory()->create();
 
         Livewire::actingAs($user)
@@ -129,28 +128,28 @@ class ImportExportTest extends TestCase
 
         $backupExport = BackupExportModel::sole();
         $this->assertSame('pending', $backupExport->status);
-        Queue::assertPushed(BackupExportJob::class, fn (BackupExportJob $job) => $job->backupExport->is($backupExport));
+        // without portfolios there are no performance figures to calculate first
+        Bus::assertChained([AssembleBackupExportJob::class]);
     }
 
-    public function test_export_kicks_off_one_performance_job_per_portfolio_then_assembles_the_workbook(): void
+    public function test_export_calculates_each_portfolio_before_assembling_the_workbook(): void
     {
         Bus::fake();
         $user = User::factory()->create();
         $this->portfolioOwnedBy($user);
         $this->portfolioOwnedBy($user);
-        $backupExport = BackupExportModel::create(['user_id' => $user->id]);
 
-        (new BackupExportJob($backupExport))->handle();
+        Livewire::actingAs($user)->test('export-portfolios-button')->call('export');
 
-        $this->assertSame('in_progress', $backupExport->refresh()->status);
+        $backupExport = BackupExportModel::sole();
         Bus::assertChained([
             Bus::chainedBatch(fn (PendingBatch $batch) => $batch->jobs->count() === 2
-                && $batch->jobs->every(fn ($job) => $job instanceof CalculateDailyPerformanceJob)),
+                && $batch->jobs->every(fn ($job) => $job instanceof CalculateDailyPerformanceJob && $job->backupExport->is($backupExport))),
             AssembleBackupExportJob::class,
         ]);
     }
 
-    public function test_export_job_stores_the_backup_with_performance_figures_and_marks_it_ready(): void
+    public function test_export_stores_the_backup_with_performance_figures_and_marks_it_ready(): void
     {
         Storage::fake();
         $user = User::factory()->create();
@@ -158,14 +157,13 @@ class ImportExportTest extends TestCase
         $transaction = Transaction::factory()->buy()->lastYear()->symbol('AAPL')->create();
         DailyChange::forceCreate(['portfolio_id' => $transaction->portfolio_id, 'date' => now()->subWeek()->toDateString(), 'total_market_value' => 100]);
         $expected = DailyChange::myDailyChanges()->withDailyPerformance()->sole();
-        Auth::logout();
-        $backupExport = BackupExportModel::create(['user_id' => $user->id]);
 
         // the queue runs synchronously in tests, so this runs the whole batch and chain
-        (new BackupExportJob($backupExport))->handle();
+        $component = Livewire::actingAs($user)->test('export-portfolios-button')->call('export');
 
-        $backupExport->refresh();
+        $backupExport = BackupExportModel::sole();
         $this->assertSame('success', $backupExport->status);
+        $this->assertSame($backupExport->workbookPath(), $backupExport->path);
         Storage::disk()->assertExists($backupExport->path);
         Storage::disk()->assertMissing($backupExport->performanceDirectory());
         $workbook = IOFactory::load(Storage::disk()->path($backupExport->path));
@@ -173,11 +171,8 @@ class ImportExportTest extends TestCase
         $dailyChange = $workbook->getSheetByName('Daily Changes')->toArray()[1];
         $this->assertEqualsWithDelta($expected->total_cost_basis, $dailyChange[3], 0.01);
         $this->assertEqualsWithDelta($expected->realized_gain_dollars, $dailyChange[4], 0.01);
-        $this->assertNull(Auth::user());
 
-        Livewire::actingAs($user)
-            ->test('export-portfolios-button')
-            ->assertSee(route('import-export.download', $backupExport));
+        $component->assertSee(route('import-export.download', $backupExport));
     }
 
     public function test_failed_performance_job_fails_the_export_and_removes_its_figures(): void
@@ -198,7 +193,7 @@ class ImportExportTest extends TestCase
         $user = User::factory()->create();
         $backupExport = BackupExportModel::create(['user_id' => $user->id]);
 
-        (new BackupExportJob($backupExport))->failed(new \Exception('Out of memory'));
+        (new AssembleBackupExportJob($backupExport))->failed(new \Exception('Out of memory'));
 
         $this->assertSame('failed', $backupExport->refresh()->status);
         Livewire::actingAs($user)
