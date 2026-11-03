@@ -8,14 +8,7 @@ updated_at: "2026-11-02"
 
 ## Two ways to use Investbrain
 
-| | Investbrain Cloud | Self-hosted |
-| --- | --- | --- |
-| **Where** | [investbra.in](https://investbra.in) | Your own server, NAS, or computer |
-| **Setup** | Sign up at [investbra.in/register](https://investbra.in/register). Nothing to install. | Run the official Docker image with the [supported compose file](self-hosting.md) |
-| **Hosting, updates, market data, and email** | Handled for you | Managed by you |
-| **Configuration** | Managed by Investbrain | You choose the market data providers, AI chat provider, social logins, and every other [option](self-hosting.md#options) |
-
-Both run the same open-source app so, generally speaking, these docs apply to both unless otherwise noted. You can switch between self-hosted and cloud at any time by [exporting your data](import-export.md#exporting-your-data) from one and importing it into the other.
+Use Investbrain Cloud by signing up at [investbra.in/register](https://investbra.in/register); hosting, updates, market data, and email are handled for you. Or self-host the app on your own server, NAS, or computer using the [supported compose file](self-hosting.md), and manage your own hosting while choosing your market data providers, AI chat provider, social logins, and other [options](self-hosting.md#options). Both run the same open-source app, so these docs generally apply to both unless otherwise noted. You can switch between self-hosted and cloud at any time by [exporting your data](import-export.md).
 
 ## Using Investbrain
 
@@ -40,4 +33,4 @@ Both run the same open-source app so, generally speaking, these docs apply to bo
 
 ## Issues and Security
 
-If something isn't covered here, search the [GitHub issues](https://github.com/investbrainapp/investbrain/issues) or open a new one. Security issues should be reported privately through [GitHub security advisories](https://github.com/investbrainapp/investbrain/security/advisories/new).
+If something isn't covered here, search the [GitHub issues](https://github.com/investbrainapp/investbrain/issues) or open a new one. Security issues should be reported privately through [GitHub security advisories](https://github.com/investbrainapp/investbrain/security/advisories).
