@@ -206,6 +206,21 @@ class ChatWithTest extends TestCase
         ChatWithSuggestedPromptsAgent::assertNeverPrompted();
     }
 
+    public function test_failed_suggested_prompts_show_an_error_instead_of_breaking_the_chat(): void
+    {
+        ChatWithPortfolioAgent::fake(['Test response']);
+        ChatWithSuggestedPromptsAgent::fake(fn () => throw new \RuntimeException('Provider unavailable'));
+
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->call('generateSuggestedPrompts')
+            ->assertSet('suggested_prompts', []);
+
+        $this->assertStringContainsString('Provider unavailable', json_encode($component->effects['xjs'] ?? []));
+    }
+
     public function test_suggested_prompt_is_used_as_prompt(): void
     {
         ChatWithPortfolioAgent::fake(['Here is the best holding!']);

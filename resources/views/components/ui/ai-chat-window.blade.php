@@ -6,6 +6,7 @@ use App\Ai\Agents\ChatWithSuggestedPromptsAgent;
 use App\Models\ChatWithConversation;
 use App\Models\Holding;
 use App\Models\Portfolio;
+use App\Traits\Toast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Ai\Contracts\Agent;
@@ -15,6 +16,8 @@ use Livewire\Volt\Component;
 
 new class extends Component
 {
+    use Toast;
+
     // props
     public Model $chatable;
 
