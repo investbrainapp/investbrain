@@ -367,6 +367,25 @@ class ImportExportTest extends TestCase
         Notification::assertSentTo($user, ImportFailedNotification::class, fn ($notification) => $notification->errorCount === 2);
     }
 
+    public function test_sheet_with_headings_but_no_rows_is_imported(): void
+    {
+        $user = User::factory()->create();
+        $portfolioId = Str::uuid()->toString();
+
+        $import = $this->importWorkbook($user, [
+            'Portfolios' => [
+                ['Portfolio ID', 'Title'],
+                [$portfolioId, 'Brokerage'],
+            ],
+            'Daily Changes' => [
+                ['Date', 'Portfolio ID', 'Annotation'],
+            ],
+        ]);
+
+        $this->assertNotSame('failed', $import->status);
+        $this->assertDatabaseHas('portfolios', ['id' => $portfolioId, 'title' => 'Brokerage']);
+    }
+
     public function test_missing_required_column_is_reported_once(): void
     {
         $user = User::factory()->create();

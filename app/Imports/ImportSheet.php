@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Row;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use Throwable;
@@ -18,7 +19,7 @@ use Throwable;
  * One worksheet of an Investbrain workbook. Collects its rows (keyed by their spreadsheet row
  * number) so the whole workbook can be validated before anything is written to the database.
  */
-abstract class ImportSheet implements OnEachRow, SkipsEmptyRows, WithCalculatedFormulas, WithHeadingRow
+abstract class ImportSheet implements OnEachRow, SkipsEmptyRows, WithCalculatedFormulas, WithHeadingRow, WithStartRow
 {
     /**
      * @var array<int, array<string, mixed>>
@@ -54,6 +55,15 @@ abstract class ImportSheet implements OnEachRow, SkipsEmptyRows, WithCalculatedF
     abstract public function rowRules(array $row): array;
 
     /**
+     * Read from the heading row rather than the row after it. Laravel Excel's OnEachRow loop
+     * throws when it starts past the last row, which is every sheet with headings but no rows.
+     */
+    public function startRow(): int
+    {
+        return 1;
+    }
+
+    /**
      * Collect each row as the package reads the sheet.
      */
     public function onRow(Row $row): void
@@ -61,8 +71,10 @@ abstract class ImportSheet implements OnEachRow, SkipsEmptyRows, WithCalculatedF
         // the same arguments the package read the row with, so this is a cache hit
         $cells = $row->toArray(calculateFormulas: true, formatData: false);
 
-        if (empty($this->headings)) {
+        if ($row->getIndex() === $this->startRow()) {
             $this->headings = array_map('strval', array_keys($cells));
+
+            return;
         }
 
         $this->rows[$row->getIndex()] = $this->normalize($cells);
