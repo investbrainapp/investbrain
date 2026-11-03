@@ -11,8 +11,6 @@ Thanks for helping improve Investbrain! This guide covers how the project is put
 - [Working on specific areas](#working-on-specific-areas)
 - [Using AI coding assistants](#using-ai-coding-assistants)
 - [Making a pull request](#making-a-pull-request)
-- [Reporting bugs and security issues](#reporting-bugs-and-security-issues)
-- [License](#license)
 
 ## Ways to contribute
 

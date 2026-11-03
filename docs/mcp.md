@@ -11,7 +11,6 @@ Once connected, an assistant such as Claude, ChatGPT, Cursor, or VS Code can loo
 - [Example prompts](#example-prompts)
 - [Available tools](#available-tools)
 - [Revoking access](#revoking-access)
-- [How authentication works](#how-authentication-works)
 - [Troubleshooting](#troubleshooting)
 
 ## What an assistant can do

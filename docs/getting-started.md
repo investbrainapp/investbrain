@@ -3,7 +3,6 @@
 This guide covers the basics of Investbrain.
 
 - [Key concepts](#key-concepts)
-- [Creating an account and signing in](#creating-an-account-and-signing-in)
 - [The dashboard](#the-dashboard)
 - [Portfolios](#portfolios)
 - [Sharing portfolios](#sharing-portfolios)

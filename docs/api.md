@@ -5,7 +5,6 @@ Investbrain has a JSON REST API for reading and managing your portfolios, transa
 - [Creating an API token](#creating-an-api-token)
 - [Making requests](#making-requests)
 - [Pagination, sorting, filtering, and search](#pagination-sorting-filtering-and-search)
-- [Endpoints](#endpoints)
 - [Errors](#errors)
 - [OpenAPI specification](#openapi-specification)
 
