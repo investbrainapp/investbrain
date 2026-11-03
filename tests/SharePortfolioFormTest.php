@@ -174,6 +174,18 @@ class SharePortfolioFormTest extends TestCase
         $this->assertNotNull($portfolio->users()->find($owner->id));
     }
 
+    public function test_full_access_member_cannot_remove_the_owner_with_a_differently_spelled_id(): void
+    {
+        [$owner, $portfolio, $member] = $this->createPortfolioWithFullAccessMember();
+
+        Livewire::actingAs($member)
+            ->test('share-portfolio-form', ['portfolio' => $portfolio])
+            ->call('deleteUser', strtoupper($owner->id), true)
+            ->assertForbidden();
+
+        $this->assertNotNull($portfolio->users()->find($owner->id));
+    }
+
     public function test_sharing_requires_a_valid_email(): void
     {
         $this->actingAs(User::factory()->create());
