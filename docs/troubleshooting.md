@@ -30,6 +30,24 @@ The `app` container should show `healthy` after a minute or so.
 
 ## Installation and startup
 
+### "400 Bad Request" or "Oops! An Error Occurred"
+
+Investbrain only answers to the address in `APP_URL` (and its subdomains). Opening it at any other address shows "Oops! An Error Occurred. The server returned a 400 Bad Request". This most often happens because:
+
+- `APP_URL` is still the default `http://localhost:8000`, and you're opening Investbrain from another device at an address like `http://192.168.1.50:8000`.
+- You moved Investbrain to a new domain and didn't update `APP_URL`.
+- You reach Investbrain by more than one address, such as an IP address and a hostname. Only the one in `APP_URL` works.
+
+To fix it:
+
+1. Set `APP_URL` to the address you type into the browser, for example `http://192.168.1.50:8000` or `https://investbrain.home`. Set `ASSET_URL` to the same value if you set it separately.
+2. [Apply the change](self-hosting.md#applying-configuration-changes) with `docker compose up -d`.
+3. If you use a reverse proxy, make sure it forwards the original `Host` header (see [Running behind a reverse proxy](self-hosting.md#running-behind-a-reverse-proxy-https)). If the proxy sends its own name for the upstream, such as `investbrain-app`, every page returns this error.
+
+The container can still show `healthy` while you see this error, because its health check calls `http://localhost` from inside the container. Investbrain always accepts `localhost`.
+
+This check exists so that password reset links can't be pointed at someone else's server.
+
 ### "Database is not ready after one minute. Exiting..."
 
 The `app` container waits up to a minute for PostgreSQL, then gives up. Check the database log with `docker compose logs pgsql`.
@@ -96,7 +114,6 @@ Investbrain decides between `http://` and `https://` from the `X-Forwarded-Proto
 - If links are `http://` behind an HTTPS proxy, add `X-Forwarded-Proto: https` to your proxy configuration (see [Running behind a reverse proxy](self-hosting.md#running-behind-a-reverse-proxy-https)).
 - If links are `https://` but you serve plain HTTP, make sure nothing in front of Investbrain sets `X-Forwarded-Proto`. Any value of that header, even `http`, makes Investbrain treat the request as secure.
 
-Links in emails (password resets and invitations) are built from `APP_URL`, so check that too.
 
 ### Registering is disabled and I can't create the first account
 

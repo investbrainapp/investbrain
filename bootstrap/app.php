@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->appendToGroup('web', LocalizationMiddleware::class);
+
+        // only answer to the APP_URL host (and its subdomains), so links built from the request,
+        // like password reset emails, can't point at a host a client made up. localhost stays trusted
+        // for the Docker health check, which calls http://localhost/up from inside the container.
+        $middleware->trustHosts(at: ['^localhost$']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // report disallowed API filters and sorts as validation errors, matching other query parameters
