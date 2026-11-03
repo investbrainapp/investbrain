@@ -26,7 +26,7 @@ There are two ways to use Investbrain:
   docker compose up -d
   ```
 
-  Then open `http://localhost:8000/register`. Read the [self-hosting guide](docs/self-hosting.md) for configuration, HTTPS, updates, and backups before exposing it to the internet.
+  Then open `http://localhost:8000/register`. Read the full [self-hosting guide](docs/self-hosting.md) for more.
 
 ## Documentation
 
@@ -43,16 +43,8 @@ Everything else is in the [docs](docs/README.md):
 
 ## Contributing
 
-We appreciate any contributions to Investbrain, from documentation and translations to bug fixes and new market data providers. The [contributing guide](docs/contributing.md) explains how to set up a development environment and what we look for in a pull request.
+We appreciate all contributions to Investbrain. The [contributing guide](docs/contributing.md) explains how to set up a development environment and what we look for in a pull request.
 
 ## Code of Conduct
 
 We ask that you be kind and polite when interacting with the Investbrain community. 
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Investbrain, please submit your report via [Github](https://github.com/investbrainapp/investbrain/security/advisories/new). All security vulnerabilities will be promptly addressed. We ask that you keep any suspected vulnerabilities private and confidential until they have been appropriately addressed.
-
-## License
-
-Investbrain is open-sourced software licensed under the [CC-BY-NC 4.0](https://github.com/investbrainapp/investbrain?tab=License-1-ov-file).
