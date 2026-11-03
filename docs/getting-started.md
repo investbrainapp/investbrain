@@ -1,3 +1,9 @@
+---
+title: "Getting Started"
+description: "The dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat."
+group: "Using Investbrain"
+order: 1
+---
 # Getting Started
 
 This guide covers the basics of Investbrain.

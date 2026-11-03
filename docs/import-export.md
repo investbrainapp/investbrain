@@ -1,3 +1,9 @@
+---
+title: "Import and Export"
+description: "Back up your data, move between Investbrain Cloud and a self-hosted instance, and bulk-load transactions from a spreadsheet."
+group: "Using Investbrain"
+order: 3
+---
 # Import and Export
 
 Investbrain can export everything in your account to a single Excel workbook and import that workbook back. Use it to:

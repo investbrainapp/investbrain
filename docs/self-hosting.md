@@ -1,6 +1,12 @@
+---
+title: "Self-Hosting"
+description: "Install with the supported Docker Compose file, then configure, update, and maintain your instance."
+group: "Running your own instance"
+order: 6
+---
 # Self-Hosting
 
-The only supported way to self-host Investbrain is with the official Docker image and the [`docker-compose.yml`](../docker-compose.yml) file in this repository. It bundles everything you need: the web app, a background queue, a task scheduler, PostgreSQL, and Redis.
+The only supported way to self-host Investbrain is with the official Docker image and the [`docker-compose.yml`](https://github.com/investbrainapp/investbrain/blob/main/docker-compose.yml) file in this repository. It bundles everything you need: the web app, a background queue, a task scheduler, PostgreSQL, and Redis.
 
 If you'd rather not run a server, [Investbrain Cloud](https://investbra.in) runs the same app with nothing to install or manage. 
 
@@ -97,7 +103,7 @@ The image also has a health check that requests `/up` every 30 seconds. `docker 
 You can configure Investbrain in one of two ways. **Pick one, don't mix them!**
 
 - **The `environment` block** in `docker-compose.yml` (recommended). Everything lives in one file.
-- **An env file.** Create a `.env` file next to `docker-compose.yml` (use [`.env.example`](../.env.example) as a starting point), remove the `environment` block from the `app` service, and add `env_file: .env` in its place.
+- **An env file.** Create a `.env` file next to `docker-compose.yml` (use [`.env.example`](https://github.com/investbrainapp/investbrain/blob/main/.env.example) as a starting point), remove the `environment` block from the `app` service, and add `env_file: .env` in its place.
 
 ### Applying configuration changes
 

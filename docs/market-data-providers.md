@@ -1,3 +1,9 @@
+---
+title: "Developing Market Data Providers"
+description: "Write, test, and contribute a new market data provider."
+group: "Contributing"
+order: 9
+---
 # Developing Market Data Providers
 
 Investbrain gets prices, fundamentals, dividends, splits, and price history through a small, pluggable interface. Adding support for a new data source means writing one PHP class. This guide explains how the provider system works, what your class has to return, and how to test it and contribute it back.
@@ -13,8 +19,8 @@ If you only want to choose or configure a provider, see [Market data providers](
 
 ## How providers work
 
-Application code never calls a provider class directly. It asks the container for `App\Interfaces\MarketData\MarketDataInterface`, which [`AppServiceProvider`](../app/Providers/AppServiceProvider.php) binds to [`FallbackInterface`](../app/Interfaces/MarketData/FallbackInterface.php).
-- `FallbackInterface` reads the comma-separated `MARKET_DATA_PROVIDER` setting, looks up each name in the `interfaces` map in [`config/investbrain.php`](../config/investbrain.php), and calls the same method on each provider in order until one returns without throwing.
+Application code never calls a provider class directly. It asks the container for `App\Interfaces\MarketData\MarketDataInterface`, which [`AppServiceProvider`](https://github.com/investbrainapp/investbrain/blob/main/app/Providers/AppServiceProvider.php) binds to [`FallbackInterface`](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/FallbackInterface.php).
+- `FallbackInterface` reads the comma-separated `MARKET_DATA_PROVIDER` setting, looks up each name in the `interfaces` map in [`config/investbrain.php`](https://github.com/investbrainapp/investbrain/blob/main/config/investbrain.php), and calls the same method on each provider in order until one returns without throwing.
 
 ```
 app code  ──>  MarketDataInterface  ──>  FallbackInterface  ──>  yahoo ──> finnhub ──> ...
@@ -33,7 +39,7 @@ Here's where the app calls each method:
 
 ## The interface
 
-Your class implements [`MarketDataInterface`](../app/Interfaces/MarketData/MarketDataInterface.php):
+Your class implements [`MarketDataInterface`](https://github.com/investbrainapp/investbrain/blob/main/app/Interfaces/MarketData/MarketDataInterface.php):
 
 ```php
 interface MarketDataInterface
@@ -56,7 +62,7 @@ The start and end dates the app passes are Carbon instances, so you can call `to
 
 ## Return types
 
-Results are returned as small typed collections in [`app/Interfaces/MarketData/Types`](../app/Interfaces/MarketData/Types). You build them by passing an array to the constructor. Each key maps to a setter (`market_value` calls `setMarketValue()`), and the setters validate and normalize the values. Passing a value of the wrong type throws an `InvalidArgumentException`, and `null` values are skipped.
+Results are returned as small typed collections in [`app/Interfaces/MarketData/Types`](https://github.com/investbrainapp/investbrain/tree/main/app/Interfaces/MarketData/Types). You build them by passing an array to the constructor. Each key maps to a setter (`market_value` calls `setMarketValue()`), and the setters validate and normalize the values. Passing a value of the wrong type throws an `InvalidArgumentException`, and `null` values are skipped.
 
 ### `Quote`
 

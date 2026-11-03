@@ -1,3 +1,9 @@
+---
+title: "Contributing"
+description: "How the project is built, setting up a development environment, coding conventions, and making pull requests."
+group: "Contributing"
+order: 8
+---
 # Contributing
 
 Thanks for helping improve Investbrain! This guide covers how the project is put together, how to set up a development environment, the conventions the codebase follows, and how to get a pull request merged.
@@ -180,7 +186,7 @@ Then change `image:` in `docker-compose.yml` to `investbrain:dev` (don't commit 
 
 ## Running the tests
 
-Tests use an in-memory SQLite database, the `array` cache, a synchronous queue, and the `fake` market data provider (see [`phpunit.xml`](../phpunit.xml)). They don't need PostgreSQL, Redis, or a network connection.
+Tests use an in-memory SQLite database, the `array` cache, a synchronous queue, and the `fake` market data provider (see [`phpunit.xml`](https://github.com/investbrainapp/investbrain/blob/main/phpunit.xml)). They don't need PostgreSQL, Redis, or a network connection.
 
 ```bash
 # The whole suite
@@ -244,13 +250,13 @@ Wrap every user-facing string in `__()`, for example `{{ __('Create Portfolio') 
 
 **Database.** Create migrations with `php artisan make:migration`. They must run on both PostgreSQL (production) and SQLite (tests). New models need a factory, and a seeder where it's useful.
 
-**REST API.** Routes are in `routes/api.php`, controllers in `app/Http/ApiControllers/`, and the JSON shapes in `app/Http/Resources/`. If you add or change an endpoint, field, filter, or sort, update [`openapi.json`](../openapi.json) and [`docs/api.md`](api.md), and add tests in `tests/Api/`. `tests/Api/OpenApiSpecTest.php` fails if `openapi.json` is missing a route, or if its documented sorts and filters don't match what an endpoint actually allows.
+**REST API.** Routes are in `routes/api.php`, controllers in `app/Http/ApiControllers/`, and the JSON shapes in `app/Http/Resources/`. If you add or change an endpoint, field, filter, or sort, update [`openapi.json`](https://github.com/investbrainapp/investbrain/blob/main/openapi.json) and [`docs/api.md`](api.md), and add tests in `tests/Api/`. `tests/Api/OpenApiSpecTest.php` fails if `openapi.json` is missing a route, or if its documented sorts and filters don't match what an endpoint actually allows.
 
 **MCP server.** Tools are in `app/Mcp/Tools/` and are registered in `app/Mcp/Servers/InvestbrainServer.php`. Tools should call the shared actions and return the same resources as the API. Add tests in `tests/Mcp/` and update the tool table in [`docs/mcp.md`](mcp.md).
 
 **Market data providers.** See [Developing market data providers](market-data-providers.md).
 
-**Documentation.** User-facing changes should update the relevant page in `docs/` and, where it applies, the root `README.md`. Screenshots go in the [`docs/images/`](images/) folder.
+**Documentation.** User-facing changes should update the relevant page in `docs/` and, where it applies, the root `README.md`. Screenshots go in the [`docs/images/`](https://github.com/investbrainapp/investbrain/tree/main/docs/images) folder.
 
 ## Using AI coding assistants
 

@@ -1,3 +1,9 @@
+---
+title: "Account Settings"
+description: "Profile, locale and display currency, password, two-factor authentication, social logins, authorized apps, and deleting your account."
+group: "Using Investbrain"
+order: 2
+---
 # Account Settings
 
 Open the user menu at the bottom of the left sidebar to reach your account settings:

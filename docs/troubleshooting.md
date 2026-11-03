@@ -1,3 +1,9 @@
+---
+title: "Troubleshooting"
+description: "Fixes for the most common problems on self-hosted instances."
+group: "Running your own instance"
+order: 7
+---
 # Troubleshooting
 
 On a self-hosted instance, start with the logs. Most problems leave a clear message in one of them.

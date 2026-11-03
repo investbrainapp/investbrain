@@ -1,3 +1,8 @@
+---
+title: "Investbrain"
+description: "Documentation for Investbrain, the open-source investment tracker, on Investbrain Cloud and self-hosted instances."
+order: 0
+---
 # Investbrain
 
 Investbrain is a smart open-source investment tracker that helps you manage, track, and make informed decisions about your investments. 

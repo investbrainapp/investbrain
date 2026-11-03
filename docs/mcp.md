@@ -1,3 +1,9 @@
+---
+title: "MCP Server"
+description: "Connect AI assistants such as Claude, ChatGPT, Cursor, or VS Code to your Investbrain account."
+group: "Advanced"
+order: 5
+---
 # MCP Server
 
 Investbrain includes a built-in [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server. 
