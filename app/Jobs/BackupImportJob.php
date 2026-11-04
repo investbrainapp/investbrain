@@ -87,15 +87,16 @@ class BackupImportJob implements ShouldQueue
      */
     public function failed(?Throwable $e): void
     {
-        $this->markAsFailed(__('Something went wrong while importing your file. Nothing was imported.'), [[
-            'sheet' => null,
-            'row' => null,
-            'column' => null,
-            'value' => null,
-            'message' => substr((string) $e?->getMessage(), 0, 500),
-        ]]);
+        // the exception can carry database connection details and SQL, so it goes to the log, not the user
+        if ($e) {
+            report($e);
+        }
 
-        $this->backupImport->user->notify(new ImportFailedNotification((string) $e?->getMessage()));
+        $message = __('Something went wrong while importing your file. Nothing was imported.');
+
+        $this->markAsFailed($message, []);
+
+        $this->backupImport->user->notify(new ImportFailedNotification($message));
     }
 
     /**

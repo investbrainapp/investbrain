@@ -47,8 +47,7 @@ class ImportFailedNotification extends Notification implements ShouldQueue
 
         if (empty($this->errors)) {
 
-            return $mail->line('**Technical details:**')
-                ->line($this->errorMessage);
+            return $mail->line($this->errorMessage);
         }
 
         $mail->line('**'.$this->errorMessage.'**');

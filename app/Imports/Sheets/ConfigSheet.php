@@ -62,6 +62,8 @@ class ConfigSheet extends ImportSheet
                 'string',
                 Rule::when(($row['key'] ?? null) === 'display_currency', ['exists:currencies,currency']),
                 Rule::when(($row['key'] ?? null) === 'locale', [Rule::in(Arr::pluck(config('app.available_locales'), 'locale'))]),
+                // users.name holds 255 characters; a longer name would fail in the database instead
+                Rule::when(($row['key'] ?? null) === 'name', ['max:255']),
             ],
         ];
     }
