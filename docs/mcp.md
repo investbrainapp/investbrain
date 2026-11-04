@@ -98,7 +98,7 @@ Start the server from the file or the MCP servers list and follow the sign-in pr
 
 ### Other clients
 
-Any client that supports remote MCP servers over Streamable HTTP with OAuth should work. Point it at your `/mcp` endpoint. The client registers itself with Investbrain automatically.
+Any client that supports remote MCP servers over Streamable HTTP with OAuth should work. Point it at your `/mcp` endpoint. The client registers itself with Investbrain automatically. Registration is limited to 10 attempts a minute per IP address, so if a client reports a "Too Many Requests" error while connecting, wait a minute and try again.
 
 To test the server without an assistant, you can use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector):
 
