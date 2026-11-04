@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\VerifyConnectedAccountNotification;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\MessageBag;
@@ -166,8 +167,11 @@ class ConnectedAccountController extends Controller
         }
     }
 
-    public function verify(ConnectedAccount $connected_account)
+    public function verify(Request $request, ConnectedAccount $connected_account)
     {
+        // the link was issued to one user; refuse it if the account now belongs to another
+        abort_unless($connected_account->user_id === $request->query('user'), 403);
+
         if (! $connected_account->verified_at) {
 
             // mark request as verified
