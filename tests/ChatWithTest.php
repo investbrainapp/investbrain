@@ -252,4 +252,66 @@ class ChatWithTest extends TestCase
         Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
             ->set('agent_conversation_id', $othersConversation->id);
     }
+
+    public function test_markdown_in_answers_still_renders(): void
+    {
+        ChatWithPortfolioAgent::fake(["Your **top holding** is AAPL.\n\n- first\n- second\n\n[Read more](https://example.com)"]);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
+
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('prompt', 'What is my top holding?')
+            ->call('startCompletion')
+            ->call('generateCompletion')
+            ->assertSeeHtml('<strong>top holding</strong>')
+            ->assertSeeHtml('<li>first</li>')
+            ->assertSeeHtml('<a href="https://example.com">Read more</a>');
+    }
+
+    public function test_html_in_answers_is_shown_as_text(): void
+    {
+        ChatWithPortfolioAgent::fake(['Hello <b data-test="raw">raw html</b> and [a link](javascript:void(0))']);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
+
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('prompt', 'Say hello')
+            ->call('startCompletion')
+            ->call('generateCompletion')
+            ->assertDontSeeHtml('<b data-test="raw">')
+            ->assertSeeHtml('&lt;b data-test="raw"&gt;raw html&lt;/b&gt;')
+            ->assertDontSeeHtml('href="javascript:');
+    }
+
+    public function test_streamed_answer_html_is_escaped(): void
+    {
+        ChatWithPortfolioAgent::fake(['Hello <b data-test="raw">raw html</b>']);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
+
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('prompt', 'Say hello')
+            ->call('startCompletion');
+
+        // Livewire writes each streamed chunk to the output as JSON and flushes it, so collect it from the buffer
+        $output = '';
+        ob_start(function (string $buffer) use (&$output) {
+            $output .= $buffer;
+
+            return '';
+        });
+        $component->call('generateCompletion');
+        ob_end_clean();
+
+        preg_match_all('/\{"stream":true.*?"endStream":true\}/', $output, $chunks);
+        $streamed = collect($chunks[0])->map(fn ($chunk) => json_decode($chunk, true)['body']['content'])->implode('');
+
+        $this->assertSame(e('Hello <b data-test="raw">raw html</b>'), $streamed);
+    }
 }

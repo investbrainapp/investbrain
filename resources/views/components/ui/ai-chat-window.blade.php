@@ -125,7 +125,8 @@ new class extends Component
 
         foreach ($stream as $event) {
             if ($event instanceof TextDelta) {
-                $this->stream(to: 'answer', content: $event->delta, replace: false);
+                // wire:stream inserts chunks as HTML, so escape them; the saved answer is rendered as escaped markdown below
+                $this->stream(to: 'answer', content: e($event->delta), replace: false);
                 $this->answer .= $event->delta;
             }
             $this->js('scrollChatWindow()');
@@ -311,7 +312,7 @@ new class extends Component
                             <x-ui.icon name="o-sparkles" class="h-auto p-1 w-10" />
                         </span>
                         <div class="leading-relaxed" >
-                            <span class="block font-bold" title="{{ $message['created_at'] }}">AI </span> {!! Str::markdown($message['content']) !!}
+                            <span class="block font-bold" title="{{ $message['created_at'] }}">AI </span> {!! Str::markdown($message['content'], ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}
                         </div>
                         
                     @endif
