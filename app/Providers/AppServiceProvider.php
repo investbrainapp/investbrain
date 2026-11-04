@@ -13,6 +13,7 @@ use Filament\Support\Facades\FilamentColor;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Mail\Markdown;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -49,6 +50,10 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         JsonResource::withoutWrapping();
+
+        // escape [ ] \ < > in values put into mail Markdown, so text a user wrote (a portfolio title, a name)
+        // can't become a link or image in an email sent from this instance
+        Markdown::withSecuredEncoding();
 
         Gate::define('admin', fn (User $user): bool => (bool) $user->admin);
 
