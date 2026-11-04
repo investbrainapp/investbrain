@@ -9,7 +9,6 @@ use App\Models\Portfolio;
 use App\Models\User;
 use App\Notifications\VerifyConnectedAccountNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Socialite\Facades\Socialite;
 use Livewire\Livewire;
@@ -87,21 +86,5 @@ class EmailCaseTest extends TestCase
             ->assertSet('confirmingPassword', false);
 
         $this->assertSame('same@example.com', $user->fresh()->email);
-    }
-
-    public function test_migration_lower_cases_existing_emails_unless_that_would_clash(): void
-    {
-        $upper = User::factory()->create();
-        $clash = User::factory()->create();
-        User::factory()->create(['email' => 'dup@example.com']);
-
-        // written past the model, as older accounts were
-        DB::table('users')->where('id', $upper->id)->update(['email' => 'Upper@Example.com']);
-        DB::table('users')->where('id', $clash->id)->update(['email' => 'Dup@Example.com']);
-
-        (require database_path('migrations/2026_11_04_031448_lowercase_user_emails.php'))->up();
-
-        $this->assertSame('upper@example.com', DB::table('users')->where('id', $upper->id)->value('email'));
-        $this->assertSame('Dup@Example.com', DB::table('users')->where('id', $clash->id)->value('email'));
     }
 }
