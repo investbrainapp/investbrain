@@ -28,7 +28,7 @@ class ApiTokenPermissionsTest extends TestCase
         $token = $user->createToken('Test Token')->getToken();
 
         Livewire::test('api-token-manager')
-            ->set(['apiTokenIdBeingDeleted' => $token->id])
+            ->call('confirmApiTokenDeletion', $token->id)
             ->call('deleteApiToken');
 
         $this->assertTrue($token->fresh()->revoked);
@@ -107,7 +107,7 @@ class ApiTokenPermissionsTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         Livewire::test('api-token-manager')
-            ->set(['apiTokenIdBeingDeleted' => $otherToken->id])
+            ->call('confirmApiTokenDeletion', $otherToken->id)
             ->call('deleteApiToken')
             ->assertStatus(404);
 

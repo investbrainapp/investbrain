@@ -4,6 +4,7 @@ use App\Traits\Toast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Volt\Component;
+use Livewire\Attributes\Locked;
 
 new class extends Component
 {
@@ -30,6 +31,7 @@ new class extends Component
      *
      * @var string|null
      */
+    #[Locked]
     public $plainTextToken;
 
     /**
@@ -44,6 +46,7 @@ new class extends Component
      *
      * @var string|null
      */
+    #[Locked]
     public $apiTokenIdBeingDeleted;
 
     /**

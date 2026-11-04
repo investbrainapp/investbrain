@@ -20,6 +20,7 @@ use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Number;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class HoldingsTable extends Component implements HasActions, HasSchemas, HasTable
@@ -28,6 +29,7 @@ class HoldingsTable extends Component implements HasActions, HasSchemas, HasTabl
     use InteractsWithSchemas;
     use InteractsWithTable;
 
+    #[Locked]
     public $portfolio;
 
     public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver

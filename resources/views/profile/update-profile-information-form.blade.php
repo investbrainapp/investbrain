@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Locked;
 
 new class extends Component
 {
@@ -30,6 +31,7 @@ new class extends Component
      *
      * @var bool
      */
+    #[Locked]
     public $verificationLinkSent = false;
 
     /**

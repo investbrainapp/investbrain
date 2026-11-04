@@ -5,6 +5,7 @@ use App\Traits\Toast;
 use App\Traits\WithTrimStrings;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
+use Livewire\Attributes\Locked;
 
 new class extends Component
 {
@@ -24,6 +25,7 @@ new class extends Component
 
     public bool $confirmingAccessDeletion = false;
 
+    #[Locked]
     public ?string $deletingAccessFor = null;
 
     // methods
