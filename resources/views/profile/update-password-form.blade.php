@@ -28,11 +28,10 @@ new class extends Component
 
         $updater->update(Auth::user(), $this->state);
 
-        if (request()->hasSession()) {
-            request()->session()->put([
-                'password_hash_'.Auth::getDefaultDriver() => Auth::user()->getAuthPassword(),
-            ]);
-        }
+        // keep this session signed in: AuthenticateSession signs out sessions whose stored hash no longer matches
+        session()->put([
+            'password_hash_'.Auth::getDefaultDriver() => Auth::guard()->hashPasswordForCookie(Auth::user()->getAuthPassword()),
+        ]);
 
         $this->state = [
             'current_password' => '',
