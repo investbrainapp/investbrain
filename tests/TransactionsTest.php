@@ -155,6 +155,24 @@ class TransactionsTest extends TestCase
             ->assertSeeHtml('$wire.goToHolding('.Js::from($transaction->only(['portfolio_id', 'symbol']))->toHtml().')');
     }
 
+    public function test_transaction_form_rejects_dates_before_1970(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        Livewire::test('manage-transaction-form', ['portfolio' => $portfolio])
+            ->set('symbol', 'AAPL')
+            ->set('transaction_type', 'BUY')
+            ->set('date', '1969-12-31')
+            ->set('quantity', 1)
+            ->set('cost_basis', 100)
+            ->set('currency', 'USD')
+            ->call('save')
+            ->assertHasErrors(['date' => 'after_or_equal']);
+
+        $this->assertDatabaseCount('transactions', 0);
+    }
+
     public function test_transactions_list_cannot_open_a_transaction_from_another_portfolio(): void
     {
         [$member, $ownPortfolio, $readOnlyTransaction] = $this->createReadOnlyMemberWithOwnPortfolio();

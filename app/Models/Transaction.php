@@ -25,6 +25,12 @@ class Transaction extends Model
     use HasMarketData;
     use HasUuids;
 
+    /**
+     * The earliest date a transaction can have. Daily performance, price history and currency rates
+     * are all built day by day from a portfolio's first transaction, so an ancient date would make them enormous.
+     */
+    public const EARLIEST_DATE = '1970-01-01';
+
     protected $fillable = [
         'symbol',
         'date',

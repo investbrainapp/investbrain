@@ -115,7 +115,7 @@ class TransactionsSheet extends ImportSheet
             'reinvested_dividend' => ['boolean'],
             'cost_basis' => ['nullable', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0'],
-            'date' => ['required', 'date', 'before_or_equal:today'],
+            'date' => ['required', 'date', 'after_or_equal:'.Transaction::EARLIEST_DATE, 'before_or_equal:today'],
         ];
     }
 

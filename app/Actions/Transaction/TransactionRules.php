@@ -24,7 +24,7 @@ class TransactionRules
             'portfolio_id' => ['required', 'exists:portfolios,id'],
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => ['required', 'string', 'in:BUY,SELL'],
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->toDateString()],
+            'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:'.Transaction::EARLIEST_DATE, 'before_or_equal:'.now()->toDateString()],
             'quantity' => [
                 'required',
                 'numeric',

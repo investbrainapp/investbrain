@@ -48,7 +48,7 @@ new class extends Component
             'symbol' => ['required', 'string', new SymbolValidationRule],
             'transaction_type' => 'required|string|in:BUY,SELL',
             'portfolio_id' => 'required|exists:portfolios,id',
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:'.now()->toDateString()],
+            'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:'.Transaction::EARLIEST_DATE, 'before_or_equal:'.now()->toDateString()],
             'quantity' => [
                 'required',
                 'numeric',
@@ -159,7 +159,7 @@ new class extends Component
             ['id' => 'SELL', 'name' => 'Sell']
         ]" wire:model.live="transaction_type" />
         
-        <x-ui.datetime label="{{ __('Transaction Date') }}" wire:model="date" required />
+        <x-ui.datetime label="{{ __('Transaction Date') }}" wire:model="date" min="{{ \App\Models\Transaction::EARLIEST_DATE }}" required />
         
         <x-ui.input label="{{ __('Quantity') }}" type="number" step="any" wire:model="quantity" required />
         

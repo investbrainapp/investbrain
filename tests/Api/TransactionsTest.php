@@ -225,6 +225,32 @@ class TransactionsTest extends ApiTestCase
             ]);
     }
 
+    public function test_transactions_cannot_be_dated_before_1970()
+    {
+        Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+            '--force' => true,
+        ]);
+
+        $data = [
+            'symbol' => 'AAPL',
+            'portfolio_id' => $this->portfolio->id,
+            'transaction_type' => 'BUY',
+            'quantity' => 10,
+            'currency' => 'USD',
+            'cost_basis' => 150,
+        ];
+
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), [...$data, 'date' => '1969-12-31'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('date');
+
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), [...$data, 'date' => '1970-01-01'])
+            ->assertCreated();
+    }
+
     public function test_cannot_create_transaction_without_required_fields()
     {
         $this->actingAs($this->user)
