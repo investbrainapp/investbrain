@@ -93,6 +93,8 @@ class ConnectedAccountTest extends TestCase
         $user = User::where('email', 'john@example.com')->first();
         $this->assertNotNull($user);
         $this->assertEquals('John Doe', $user->name);
+        // the provider has verified the address, so the new account starts verified
+        $this->assertNotNull($user->email_verified_at);
 
         $connectedAccount = ConnectedAccount::first();
         $this->assertNotNull($connectedAccount);

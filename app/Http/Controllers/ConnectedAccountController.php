@@ -77,11 +77,13 @@ class ConnectedAccountController extends Controller
         // new user, let's create one
         if (! $user = User::where('email', Str::lower(trim((string) $providerUser->email)))->first()) {
 
-            $user = User::create([
+            $user = User::make([
                 'name' => $providerUser->name,
                 'email' => $providerUser->email,
-                'email_verified_at' => now(),
             ]);
+
+            // email_verified_at isn't mass assignable, so User::create() used to drop it silently
+            $user->forceFill(['email_verified_at' => now()])->save();
 
             $connected_account->user_id = $user->id;
             $connected_account->verified_at = now();
