@@ -39,6 +39,8 @@ Your display currency is also the default currency when you create a new transac
 
 Under **Update Password**, enter your current password and the new password twice.
 
+Changing your password signs you out everywhere else, including devices where you chose "Remember me". Resetting it from the login page does the same. The device you changed it on stays signed in.
+
 If you signed up with a social login, your account doesn't have a password yet. Use **Forgot your password?** on the login page to set one by email.
 
 ## Two-factor authentication

@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // like password reset emails, can't point at a host a client made up. localhost stays trusted
         // for the Docker health check, which calls http://localhost/up from inside the container.
         $middleware->trustHosts(at: ['^localhost$']);
+
+        // sign out other sessions and remember-me cookies once the password changes or is reset
+        $middleware->authenticateSessions();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // report disallowed API filters and sorts as validation errors, matching other query parameters

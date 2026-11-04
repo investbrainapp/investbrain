@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Laravel\Fortify\Contracts\ResetsUserPasswords;
 use Laravel\Fortify\Features;
 
 class PasswordResetTest extends TestCase
@@ -91,5 +92,20 @@ class PasswordResetTest extends TestCase
 
             return true;
         });
+    }
+
+    public function test_resetting_the_password_signs_out_existing_sessions(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+        $this->get(route('dashboard'))->assertOk();
+
+        // someone completes a password reset for this account
+        app(ResetsUserPasswords::class)->reset($user, [
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+
+        $this->get(route('dashboard'))->assertRedirect(route('login'));
+        $this->assertGuest();
     }
 }
