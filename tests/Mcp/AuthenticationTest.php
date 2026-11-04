@@ -175,6 +175,20 @@ class AuthenticationTest extends TestCase
         $this->assertDatabaseHas('oauth_clients', ['name' => 'Test MCP Client']);
     }
 
+    public function test_client_registration_is_rate_limited(): void
+    {
+        for ($i = 0; $i < 10; $i++) {
+            $this->registerClient();
+        }
+
+        $this->postJson('/oauth/register', [
+            'client_name' => 'One Too Many',
+            'redirect_uris' => [self::REDIRECT_URI],
+        ])->assertTooManyRequests();
+
+        $this->assertDatabaseMissing('oauth_clients', ['name' => 'One Too Many']);
+    }
+
     public function test_client_registration_requires_redirect_uris(): void
     {
         $this->postJson('/oauth/register', ['client_name' => 'No Redirects'])
