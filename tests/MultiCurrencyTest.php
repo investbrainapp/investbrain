@@ -94,6 +94,31 @@ class MultiCurrencyTest extends TestCase
         $this->assertEquals(1098, $count);
     }
 
+    public function test_rate_requests_are_limited_to_the_dates_frankfurter_has(): void
+    {
+        Frankfurter::expects('setSymbols')->andReturnSelf();
+        Frankfurter::expects('timeSeries')
+            ->withArgs(fn ($start, $end) => $start->toDateString() === '1999-01-04' && $end->toDateString() === now()->toDateString())
+            ->andReturn(['rates' => []]);
+
+        CurrencyRate::timeSeriesRates('ZZZ', '1000-01-01', now()->addYears(5));
+    }
+
+    public function test_base_currency_rates_are_limited_to_the_dates_frankfurter_has(): void
+    {
+        $rates = CurrencyRate::timeSeriesRates(config('investbrain.base_currency'), '1000-01-01', now()->addYears(5));
+
+        $this->assertSame('1999-01-04', array_key_first($rates));
+        $this->assertSame(now()->toDateString(), array_key_last($rates));
+    }
+
+    public function test_no_rates_are_requested_for_a_range_entirely_in_the_future(): void
+    {
+        Frankfurter::shouldReceive('timeSeries')->never();
+
+        $this->assertSame([], CurrencyRate::timeSeriesRates('ZZZ', now()->addDays(2), now()->addDays(5)));
+    }
+
     public function test_can_convert_currency_to_base()
     {
         CurrencyRate::create(['currency' => 'INR', 'date' => now(), 'rate' => 85]);
@@ -225,8 +250,9 @@ class MultiCurrencyTest extends TestCase
         Frankfurter::expects('timeSeries')
             ->andReturn(['rates' => $results]);
 
+        // every day from the start date is returned, including the first
         $result = CurrencyRate::timeSeriesRates('ZZZ', $start, $end);
-        $this->assertEquals(count($period) - 1, count($result));
+        $this->assertEquals(count($period), count($result));
 
         $result = CurrencyRate::all();
         $this->assertEquals(count($period), count($result));
