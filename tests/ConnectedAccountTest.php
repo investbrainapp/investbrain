@@ -171,6 +171,42 @@ class ConnectedAccountTest extends TestCase
         $response->assertSessionHas('toast');
     }
 
+    public function test_verify_link_cannot_log_in_as_a_user_the_account_was_repointed_to()
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $attacker = User::factory()->create(['email' => 'x@example.com']);
+        $victim = User::factory()->create(['email' => 'v@example.com']);
+        $providerUser = fn (string $email) => (object) [
+            'id' => '999',
+            'name' => 'Provider User',
+            'email' => $email,
+            'token' => 'token',
+            'tokenSecret' => null,
+            'refreshToken' => null,
+            'expiresIn' => null,
+        ];
+
+        Socialite::shouldReceive('driver')
+            ->with('github')
+            ->andReturnSelf()
+            ->shouldReceive('user')
+            ->andReturn($providerUser('x@example.com'), $providerUser('v@example.com'));
+
+        // the provider reports the attacker's email, so the link is mailed to the attacker
+        $this->get(route('oauth.callback', ['provider' => 'github']));
+        $connectedAccount = ConnectedAccount::firstOrFail();
+        $attackersLink = (new VerifyConnectedAccountNotification($connectedAccount->id))->toMail($attacker)->actionUrl;
+
+        // then it reports the victim's email, which points the same pending account at the victim
+        $this->get(route('oauth.callback', ['provider' => 'github']));
+        $this->assertSame($victim->id, $connectedAccount->fresh()->user_id);
+
+        $this->get($attackersLink)->assertForbidden();
+
+        $this->assertGuest();
+        $this->assertNull($connectedAccount->fresh()->verified_at);
+    }
+
     public function test_verify_connected_account_requires_a_signed_link()
     {
         $user = User::factory()->create();

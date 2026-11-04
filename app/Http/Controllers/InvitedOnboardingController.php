@@ -27,6 +27,7 @@ class InvitedOnboardingController extends Controller
             return view('auth.invited-onboarding', [
                 'portfolio' => $portfolio,
                 'user' => $user,
+                'expiresAt' => (int) $request->query('expires'),
             ]);
         }
 

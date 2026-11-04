@@ -39,7 +39,11 @@ class VerifyConnectedAccountNotification extends Notification implements ShouldQ
         $connected_account = ConnectedAccount::find($this->connected_account_id);
         $provider = config("services.$connected_account->provider.name");
 
-        $url = url()->signedRoute('oauth.verify_connected_account', ['connected_account' => $this->connected_account_id], now()->addDays($days = 7));
+        // signed for this user too, so the link stops working if the account is later pointed at someone else
+        $url = url()->signedRoute('oauth.verify_connected_account', [
+            'connected_account' => $this->connected_account_id,
+            'user' => $notifiable->getKey(),
+        ], now()->addDays($days = 7));
 
         return (new MailMessage)
             ->greeting('Welcome back!')
