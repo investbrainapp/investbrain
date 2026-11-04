@@ -75,7 +75,8 @@ new class extends Component
             @click="
                 if ($wire.shouldGoToHolding) {
 
-                    $wire.goToHolding(JSON.parse('{{ json_encode($transaction->only(['portfolio_id', 'symbol'])) }}'))
+                    {{-- Js::from is what @js outputs; Blade doesn't run directives inside a component's attributes --}}
+                    $wire.goToHolding({{ \Illuminate\Support\Js::from($transaction->only(['portfolio_id', 'symbol'])) }})
                     
                     return;
                 }

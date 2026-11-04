@@ -13,6 +13,7 @@ use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Js;
 use Livewire\Livewire;
 
 class TransactionsTest extends TestCase
@@ -128,6 +129,17 @@ class TransactionsTest extends TestCase
         });
 
         $this->assertTrue($failed, 'Not permitted to sell more than owned.');
+    }
+
+    public function test_transactions_list_passes_the_holding_to_javascript_safely(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        // a quote in the symbol used to end the JavaScript string in the click handler
+        $transaction = Transaction::factory()->buy()->portfolio($portfolio->id)->symbol("AB'C")->create();
+
+        Livewire::test('transactions-list', ['portfolio' => $portfolio, 'transactions' => $portfolio->transactions()->get()])
+            ->assertSeeHtml('$wire.goToHolding('.Js::from($transaction->only(['portfolio_id', 'symbol']))->toHtml().')');
     }
 
     public function test_transactions_list_cannot_open_a_transaction_from_another_portfolio(): void
