@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Streaming\Events\TextDelta;
 use Livewire\Attributes\Async;
+use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -21,16 +22,21 @@ new class extends Component
     // props
     public Model $chatable;
 
+    #[Locked]
     public array $suggested_prompts = [];
 
+    #[Locked]
     public array $messages = [];
 
     public ?string $prompt = null;
 
+    #[Locked]
     public ?string $answer = null;
 
+    #[Locked]
     public bool $streaming = false;
 
+    #[Locked]
     public ?string $agent_conversation_id = null;
 
     // methods

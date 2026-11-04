@@ -7,7 +7,9 @@ namespace Tests;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class TwoFactorAuthenticationSettingsTest extends TestCase
 {
@@ -72,5 +74,20 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
         $component->call('disableTwoFactorAuthentication');
 
         $this->assertNull($user->fresh()->two_factor_secret);
+    }
+
+    #[TestWith(['showingQrCode'])]
+    #[TestWith(['showingRecoveryCodes'])]
+    public function test_secret_and_recovery_codes_cannot_be_shown_by_setting_the_flag_from_the_browser(string $flag): void
+    {
+        $this->actingAs(User::factory()->create([
+            'two_factor_secret' => encrypt('secret'),
+            'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
+            'two_factor_confirmed_at' => now(),
+        ]));
+
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+
+        Livewire::test('two-factor-authentication-form')->set($flag, true);
     }
 }

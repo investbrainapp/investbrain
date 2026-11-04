@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Volt\Volt;
 
 class ChatWithTest extends TestCase
@@ -115,7 +116,8 @@ class ChatWithTest extends TestCase
         $portfolio = Portfolio::factory()->create();
 
         Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
-            ->set('messages', [['role' => 'user', 'content' => 'How is my portfolio doing?', 'created_at' => now()]])
+            ->set('prompt', 'How is my portfolio doing?')
+            ->call('startCompletion')
             ->call('generateCompletion')
             ->assertSet('streaming', false);
 
@@ -178,7 +180,6 @@ class ChatWithTest extends TestCase
         }
 
         $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
-            ->set('messages', [['role' => 'user', 'content' => 'Am I rate limited?', 'created_at' => now()]])
             ->call('generateCompletion')
             ->assertSet('streaming', false);
 
@@ -233,5 +234,22 @@ class ChatWithTest extends TestCase
             ->call('startCompletion', 'Which holding is most successful in this portfolio?')
             ->assertSet('streaming', true)
             ->assertSee('Which holding is most successful in this portfolio?');
+    }
+
+    public function test_conversation_cannot_be_switched_to_another_users_from_the_browser(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        $othersConversation = ChatWithConversation::create([
+            'chatable_type' => Portfolio::class,
+            'chatable_id' => $portfolio->id,
+            'user_id' => User::factory()->create()->id,
+            'title' => 'Chat with investments',
+        ]);
+
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+
+        Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('agent_conversation_id', $othersConversation->id);
     }
 }
