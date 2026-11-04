@@ -3,6 +3,7 @@
 use App\Models\Portfolio;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 
@@ -12,6 +13,12 @@ new class extends Component
     public Portfolio $portfolio;
 
     public User $user;
+
+    /**
+     * When the signed invite link expires, as a Unix timestamp.
+     */
+    #[Locked]
+    public int $expiresAt;
 
     #[Rule('required|string')]
     public string $name;
@@ -30,6 +37,9 @@ new class extends Component
 
     public function updateUserInformation()
     {
+        // the controller checks the signed link once, but a saved copy of this form can be submitted later,
+        // so check again that the invite is still open: unexpired, and no password set yet
+        abort_if(now()->timestamp > $this->expiresAt || ! is_null($this->user->password), 403);
 
         $this->validate();
 

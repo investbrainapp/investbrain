@@ -12,6 +12,7 @@
         @livewire('invited-onboarding-form', [
             'portfolio' => $portfolio,
             'user' => $user,
+            'expiresAt' => $expiresAt,
         ])
 
     </x-ui.authentication-card>
