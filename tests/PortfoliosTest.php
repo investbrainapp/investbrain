@@ -23,6 +23,18 @@ class PortfoliosTest extends TestCase
         $this->assertEquals($user->id, $portfolio->owner_id);
     }
 
+    public function test_owner_reflects_ownership_set_after_the_users_were_loaded(): void
+    {
+        $this->actingAs($owner = User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        $portfolio->load('users');
+
+        $newOwner = User::factory()->create();
+        $portfolio->users()->sync([$newOwner->id => ['owner' => true]]);
+
+        $this->assertSame($newOwner->id, $portfolio->owner->id);
+    }
+
     public function test_owner_can_be_forced_on_create(): void
     {
         $this->actingAs($user = User::factory()->create());

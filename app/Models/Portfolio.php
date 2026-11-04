@@ -113,10 +113,9 @@ class Portfolio extends Model
 
     public function getOwnerAttribute()
     {
-        if (! $this->relationLoaded('user')) {
-
-            $this->load('users');
-        }
+        // always reload: the owner is attached right after the portfolio is saved, so an already
+        // loaded users relation can be missing it
+        $this->load('users');
 
         return $this->users->where('pivot.owner', true)->first();
     }
