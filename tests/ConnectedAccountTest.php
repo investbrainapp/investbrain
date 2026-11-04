@@ -9,9 +9,12 @@ use App\Models\ConnectedAccount;
 use App\Models\User;
 use App\Notifications\VerifyConnectedAccountNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\View\ViewException;
 use Laravel\Socialite\Facades\Socialite;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class ConnectedAccountTest extends TestCase
 {
@@ -331,5 +334,29 @@ class ConnectedAccountTest extends TestCase
             ->andReturnSelf()
             ->shouldReceive('user')
             ->andReturn($providerUser);
+    }
+
+    #[TestWith(['o-check-circle', true])]
+    #[TestWith(["o-check-circle' data-injected='yes", false])]
+    public function test_redirect_toast_treats_the_icon_as_a_name_not_markup(string $icon, bool $rendersIcon): void
+    {
+        $controller = new class extends ConnectedAccountController
+        {
+            public function toastRedirect(string $icon): RedirectResponse
+            {
+                return $this->redirectWithToast('/dashboard', 'Connected', icon: $icon);
+            }
+        };
+
+        try {
+            $html = json_decode($controller->toastRedirect($icon)->getSession()->get('toast'), true)['toast']['icon'];
+        } catch (ViewException $e) {
+            // an unknown icon name is an error, not extra markup
+            $this->assertStringContainsString('not found', $e->getMessage());
+            $html = '';
+        }
+
+        $this->assertSame($rendersIcon, str_contains($html, '<svg'));
+        $this->assertStringNotContainsString('data-injected', $html);
     }
 }

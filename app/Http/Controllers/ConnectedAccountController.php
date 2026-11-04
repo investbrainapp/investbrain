@@ -155,7 +155,8 @@ class ConnectedAccountController extends Controller
                 'title' => $title,
                 'description' => null,
                 'css' => $css,
-                'icon' => Blade::render("<x-ui.icon class='w-7 h-7' name='$icon' />"),
+                // the icon is passed as view data rather than spliced into the template, as the Toast trait does
+                'icon' => Blade::render('<x-ui.icon class="w-7 h-7" :name="$icon" />', ['icon' => $icon]),
                 'position' => 'toast-top toast-end',
                 'timeout' => '5000',
             ],
