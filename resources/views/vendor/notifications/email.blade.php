@@ -37,7 +37,10 @@
 
 {{-- Salutation --}}
 @if (! empty($salutation))
-{!! nl2br($salutation) !!}
+{{-- each line is echoed with {{ }} so it is HTML-escaped and Markdown links are neutralised --}}
+@foreach (explode("\n", $salutation) as $salutationLine)
+{{ $salutationLine }}@if (! $loop->last)<br>@endif
+@endforeach
 @else
 @lang('Regards,')<br>
 {{ config('app.name') }}

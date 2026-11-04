@@ -49,7 +49,7 @@ class InvitedOnboardingNotification extends Notification implements ShouldQueue
             ->line("Once you're in, you'll be able to see all the holdings, dividends, market performance and more for {$this->portfolio->title}!")
             ->action('Get Started', $url)
             ->line('If you have any questions, you can reply to this email.')
-            ->salutation("See you there,\n".e($this->sender->name));
+            ->salutation("See you there,\n".$this->sender->name);
     }
 
     /**

@@ -50,7 +50,7 @@ class VerifyConnectedAccountNotification extends Notification implements ShouldQ
             ->subject("Connect your $provider account with Investbrain")
             ->line("You recently attempted to log into an existing Investbrain account using $provider. To safeguard your Investbrain account, please confirm this was you by pressing the 'Connect $provider' button below:")
             ->action("Connect $provider", $url)
-            ->line('If you do not recognize this activity, we recommend [changing your password]('.route('profile.show').") as soon as possible. Otherwise, you can disregard this message. This link will expire in {$days} days.");
+            ->line("If you do not recognize this activity, we recommend changing your password from your profile settings as soon as possible. Otherwise, you can disregard this message. This link will expire in {$days} days.");
     }
 
     /**

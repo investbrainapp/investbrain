@@ -212,4 +212,20 @@ class SharePortfolioFormTest extends TestCase
 
         return [$owner, $portfolio, $member];
     }
+
+    public function test_invitations_are_rate_limited(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        $component = Livewire::test('share-portfolio-form', ['portfolio' => $portfolio]);
+        for ($i = 1; $i <= 10; $i++) {
+            $component->set('emailAddress', "friend{$i}@example.net")->call('addUser');
+        }
+
+        $component->set('emailAddress', 'one-too-many@example.net')->call('addUser');
+
+        $this->assertDatabaseMissing('users', ['email' => 'one-too-many@example.net']);
+        $this->assertCount(11, $portfolio->fresh()->users);
+    }
 }

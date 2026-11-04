@@ -3,6 +3,7 @@
 use App\Models\Portfolio;
 use App\Traits\Toast;
 use App\Traits\WithTrimStrings;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Livewire\Attributes\Locked;
@@ -114,6 +115,13 @@ new class extends Component
         $this->authorize('fullAccess', $this->portfolio);
 
         $this->validate();
+
+        // each share emails the address, so limit how many invitations one user can send
+        if (! RateLimiter::attempt('share:'.auth()->id(), 10, fn () => null)) {
+            $this->error(__('Hang on! You\'re doing that too much.'));
+
+            return;
+        }
 
         $this->portfolio->share($this->emailAddress, $this->fullAccess);
 
