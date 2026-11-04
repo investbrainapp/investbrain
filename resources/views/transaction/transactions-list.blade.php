@@ -5,6 +5,7 @@ use App\Models\Transaction;
 use App\Traits\Toast;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
+use Livewire\Attributes\Locked;
 
 new class extends Component 
 {
@@ -17,14 +18,19 @@ new class extends Component
 
     public ?Transaction $editingTransaction;
 
+    #[Locked]
     public bool $shouldGoToHolding = true;
 
+    #[Locked]
     public bool $showPortfolio = false;
 
+    #[Locked]
     public bool $paginate = true;
 
+    #[Locked]
     public int $perPage = 5;
 
+    #[Locked]
     public int $offset = 0;
 
     protected $listeners = [

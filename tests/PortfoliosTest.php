@@ -7,6 +7,8 @@ namespace Tests;
 use App\Models\Portfolio;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
+use Livewire\Livewire;
 
 class PortfoliosTest extends TestCase
 {
@@ -43,5 +45,16 @@ class PortfoliosTest extends TestCase
         $portfolio->save();
 
         $this->assertEquals($owner->id, $portfolio->owner_id);
+    }
+
+    public function test_performance_chart_time_periods_cannot_be_changed_from_the_browser(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+
+        Livewire::test('portfolio-performance-chart', ['portfolio' => $portfolio])
+            ->set('scopeOptions', [['id' => 'YTD', 'name' => 'Year to date', 'method' => 'subDays', 'args' => [1]]]);
     }
 }

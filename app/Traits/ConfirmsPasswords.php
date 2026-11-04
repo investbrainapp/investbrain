@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits;
 
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\ConfirmPassword;
+use Livewire\Attributes\Locked;
 
 trait ConfirmsPasswords
 {
@@ -21,6 +24,7 @@ trait ConfirmsPasswords
      *
      * @var string|null
      */
+    #[Locked]
     public $confirmableId = null;
 
     /**
@@ -33,7 +37,6 @@ trait ConfirmsPasswords
     /**
      * Start confirming the user's password.
      *
-     * @param  string  $confirmableId
      * @return void
      */
     public function startConfirmingPassword(string $confirmableId)

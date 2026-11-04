@@ -3,6 +3,7 @@
 use App\Models\DailyChange;
 use App\Models\Portfolio;
 use Livewire\Attributes\Lazy;
+use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
 new #[Lazy] class extends Component
@@ -10,10 +11,13 @@ new #[Lazy] class extends Component
     // props
     public ?Portfolio $portfolio = null;
 
+    #[Locked]
     public string $name = 'portfolio';
 
+    #[Locked]
     public string $scope = 'YTD';
 
+    #[Locked]
     public array $scopeOptions = [
         ['id' => '1M', 'name' => '1 month', 'method' => 'subMonths', 'args' => [1]],
         ['id' => '3M', 'name' => '3 months', 'method' => 'subMonths', 'args' => [3]],
@@ -24,6 +28,7 @@ new #[Lazy] class extends Component
     ];
 
     // data
+    #[Locked]
     public array $chartSeries;
 
     // methods

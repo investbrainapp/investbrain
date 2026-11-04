@@ -1,23 +1,25 @@
 <?php
 
+use App\Traits\ConfirmsPasswords;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
-use Livewire\Volt\Component;
 use Laravel\Fortify\Features;
-use App\Traits\ConfirmsPasswords;
+use Livewire\Attributes\Locked;
+use Livewire\Volt\Component;
 
 new class extends Component
 {
     use ConfirmsPasswords;
-    
+
     /**
      * Indicates if two factor authentication QR code is being displayed.
      *
      * @var bool
      */
+    #[Locked]
     public $showingQrCode = false;
 
     /**
@@ -25,6 +27,7 @@ new class extends Component
      *
      * @var bool
      */
+    #[Locked]
     public $showingConfirmation = false;
 
     /**
@@ -32,6 +35,7 @@ new class extends Component
      *
      * @var bool
      */
+    #[Locked]
     public $showingRecoveryCodes = false;
 
     /**

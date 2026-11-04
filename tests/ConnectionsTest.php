@@ -114,7 +114,7 @@ class ConnectionsTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         Livewire::test('connected-accounts-manager')
-            ->set('accountIdBeingDisconnected', $account->id)
+            ->call('confirmDisconnect', $account->id)
             ->call('disconnect')
             ->assertStatus(404);
 
@@ -220,7 +220,7 @@ class ConnectionsTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         Livewire::test('authorized-apps-manager')
-            ->set('clientIdBeingRevoked', $client->id)
+            ->call('confirmRevoke', $client->id)
             ->call('revoke')
             ->assertStatus(404);
 
