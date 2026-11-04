@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Traits\WithTrimStrings;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
@@ -22,6 +23,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
+        // emails are stored in lower case; normalise first so the unique check and change detection agree
+        if (is_string($input['email'] ?? null)) {
+            $input['email'] = Str::lower(trim($input['email']));
+        }
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],

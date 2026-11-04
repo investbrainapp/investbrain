@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class ConnectedAccountController extends Controller
@@ -74,7 +75,7 @@ class ConnectedAccountController extends Controller
         }
 
         // new user, let's create one
-        if (! $user = User::where('email', $providerUser->email)->first()) {
+        if (! $user = User::where('email', Str::lower(trim((string) $providerUser->email)))->first()) {
 
             $user = User::create([
                 'name' => $providerUser->name,

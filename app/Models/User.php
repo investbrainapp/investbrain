@@ -7,11 +7,13 @@ namespace App\Models;
 use App\Traits\HasConnectedAccounts;
 use App\Traits\HasProfilePhoto;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
@@ -74,6 +76,16 @@ class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
             'admin' => 'boolean',
             'options' => 'json',
         ];
+    }
+
+    /**
+     * Store emails in lower case, so a lookup matches however the address was typed (Postgres compares case-sensitively).
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => is_null($value) ? null : Str::lower(trim($value)),
+        );
     }
 
     public function portfolios()

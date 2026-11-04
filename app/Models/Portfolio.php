@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Interfaces\MarketData\MarketDataInterface;
-use App\Models\ChatWithConversation;
 use App\Notifications\InvitedOnboardingNotification;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -69,7 +69,7 @@ class Portfolio extends Model
         return $this->hasMany(DailyChange::class);
     }
 
-    public function chatWithConversation(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    public function chatWithConversation(): MorphOne
     {
         return $this->morphOne(ChatWithConversation::class, 'chatable')
             ->where('user_id', auth()->id());
@@ -258,6 +258,9 @@ class Portfolio extends Model
      */
     public function share(string $email, bool $fullAccess = false): void
     {
+        // emails are stored in lower case, so look the address up the same way
+        $email = Str::lower(trim($email));
+
         $user = User::firstOrCreate([
             'email' => $email,
         ], [
