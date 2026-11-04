@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class ConnectedAccountController extends Controller
@@ -74,13 +75,15 @@ class ConnectedAccountController extends Controller
         }
 
         // new user, let's create one
-        if (! $user = User::where('email', $providerUser->email)->first()) {
+        if (! $user = User::where('email', Str::lower(trim((string) $providerUser->email)))->first()) {
 
-            $user = User::create([
+            $user = User::make([
                 'name' => $providerUser->name,
                 'email' => $providerUser->email,
-                'email_verified_at' => now(),
             ]);
+
+            // email_verified_at isn't mass assignable, so User::create() used to drop it silently
+            $user->forceFill(['email_verified_at' => now()])->save();
 
             $connected_account->user_id = $user->id;
             $connected_account->verified_at = now();
@@ -152,7 +155,8 @@ class ConnectedAccountController extends Controller
                 'title' => $title,
                 'description' => null,
                 'css' => $css,
-                'icon' => Blade::render("<x-ui.icon class='w-7 h-7' name='$icon' />"),
+                // the icon is passed as view data rather than spliced into the template, as the Toast trait does
+                'icon' => Blade::render('<x-ui.icon class="w-7 h-7" :name="$icon" />', ['icon' => $icon]),
                 'position' => 'toast-top toast-end',
                 'timeout' => '5000',
             ],

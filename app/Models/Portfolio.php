@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Interfaces\MarketData\MarketDataInterface;
-use App\Models\ChatWithConversation;
 use App\Notifications\InvitedOnboardingNotification;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -69,15 +69,15 @@ class Portfolio extends Model
         return $this->hasMany(DailyChange::class);
     }
 
-    public function chatWithConversation(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    public function chatWithConversation(): MorphOne
     {
         return $this->morphOne(ChatWithConversation::class, 'chatable')
             ->where('user_id', auth()->id());
     }
 
-    public function scopeMyPortfolios()
+    public function scopeMyPortfolios($query)
     {
-        return $this->whereHas('users', function ($query) {
+        return $query->whereHas('users', function ($query) {
             $query->where('user_id', auth()->user()->id);
         });
     }
@@ -93,9 +93,9 @@ class Portfolio extends Model
         });
     }
 
-    public function scopeWithoutWishlists()
+    public function scopeWithoutWishlists($query)
     {
-        return $this->where(['wishlist' => false]);
+        return $query->where(['wishlist' => false]);
     }
 
     public function setOwnerIdAttribute($value)
@@ -113,10 +113,9 @@ class Portfolio extends Model
 
     public function getOwnerAttribute()
     {
-        if (! $this->relationLoaded('user')) {
-
-            $this->load('users');
-        }
+        // always reload: the owner is attached right after the portfolio is saved, so an already
+        // loaded users relation can be missing it
+        $this->load('users');
 
         return $this->users->where('pivot.owner', true)->first();
     }
@@ -258,6 +257,9 @@ class Portfolio extends Model
      */
     public function share(string $email, bool $fullAccess = false): void
     {
+        // emails are stored in lower case, so look the address up the same way
+        $email = Str::lower(trim($email));
+
         $user = User::firstOrCreate([
             'email' => $email,
         ], [

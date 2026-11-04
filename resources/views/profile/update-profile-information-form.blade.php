@@ -6,6 +6,7 @@ use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Locked;
+use Illuminate\Support\Str;
 
 new class extends Component
 {
@@ -85,7 +86,8 @@ new class extends Component
      */
     protected function emailIsChanging(): bool
     {
-        return ($this->state['email'] ?? null) !== Auth::user()->email;
+        // emails are stored in lower case, so a change of case alone isn't a new address
+        return Str::lower(trim((string) ($this->state['email'] ?? ''))) !== Auth::user()->email;
     }
 
     /**
