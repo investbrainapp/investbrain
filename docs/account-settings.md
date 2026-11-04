@@ -18,6 +18,8 @@ Open the user menu at the bottom of the left sidebar to reach your account setti
 
 Under **Manage Profile** you can change your name and email address and upload a profile photo. Click **Save** once you're done.
 
+Changing your email address asks for your password first, because password reset links are sent to that address. If you signed up with a social login and haven't set a password yet, use **Forgot your password?** on the login page to set one.
+
 ## Locale and display currency
 
 The **Locale Options** section on **Manage Profile** controls how Investbrain looks for you.

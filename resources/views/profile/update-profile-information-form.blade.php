@@ -1,5 +1,6 @@
 <?php
 
+use App\Traits\ConfirmsPasswords;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Livewire\Volt\Component;
@@ -7,6 +8,7 @@ use Livewire\WithFileUploads;
 
 new class extends Component
 {
+    use ConfirmsPasswords;
     use WithFileUploads;
 
     /**
@@ -53,6 +55,13 @@ new class extends Component
     {
         $this->resetErrorBag();
 
+        // password reset links go to this address, so changing it needs the password, like changing the password does
+        if ($this->emailIsChanging() && ! $this->passwordIsConfirmed()) {
+            $this->startConfirmingPassword(md5('updateProfileInformation'));
+
+            return null;
+        }
+
         $updater->update(
             Auth::user(),
             $this->photo
@@ -67,6 +76,14 @@ new class extends Component
         $this->dispatch('saved');
 
         $this->dispatch('refresh-navigation-menu');
+    }
+
+    /**
+     * Determine if the submitted email differs from the user's current one.
+     */
+    protected function emailIsChanging(): bool
+    {
+        return ($this->state['email'] ?? null) !== Auth::user()->email;
     }
 
     /**
@@ -104,6 +121,7 @@ new class extends Component
     }
 }; ?>
 
+<div>
 <x-forms.form-section submit="updateProfileInformation">
     <x-slot name="title">
         {{ __('Profile Information') }}
@@ -203,3 +221,7 @@ new class extends Component
         </x-ui.button>
     </x-slot>
 </x-forms.form-section>
+
+{{-- Saving a new email opens this dialog, and saves again once the password is confirmed. It sits outside the form so its buttons don't submit it. --}}
+<x-forms.confirms-password wire:then="updateProfileInformation" />
+</div>

@@ -28,6 +28,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
         ])->validateWithBag('updateProfileInformation');
 
+        // password reset links go to this address, so a new one needs a recent password confirmation;
+        // checked here as well as in the profile form because Fortify's own profile route also calls this
+        abort_if($input['email'] !== $user->email && ! $this->passwordWasRecentlyConfirmed(), 403);
+
         if (isset($input['photo'])) {
             $user->updateProfilePhoto($input['photo']);
         }
@@ -41,6 +45,14 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'email' => $input['email'],
             ])->save();
         }
+    }
+
+    /**
+     * Determine if the user confirmed their password within the password timeout, as ConfirmsPasswords does.
+     */
+    protected function passwordWasRecentlyConfirmed(): bool
+    {
+        return (time() - session('auth.password_confirmed_at', 0)) < config('auth.password_timeout', 900);
     }
 
     /**
