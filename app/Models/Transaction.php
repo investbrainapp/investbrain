@@ -143,9 +143,9 @@ class Transaction extends Model
         return $query->whereDate('date', '<=', $date);
     }
 
-    public function scopeMyTransactions(): Builder
+    public function scopeMyTransactions($query): Builder
     {
-        return $this->whereHas('portfolio', function ($query) {
+        return $query->whereHas('portfolio', function ($query) {
             $query->whereHas('users', function ($query) {
                 $query->where('id', auth()->id());
             });

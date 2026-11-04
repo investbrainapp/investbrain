@@ -75,9 +75,9 @@ class Portfolio extends Model
             ->where('user_id', auth()->id());
     }
 
-    public function scopeMyPortfolios()
+    public function scopeMyPortfolios($query)
     {
-        return $this->whereHas('users', function ($query) {
+        return $query->whereHas('users', function ($query) {
             $query->where('user_id', auth()->user()->id);
         });
     }
@@ -93,9 +93,9 @@ class Portfolio extends Model
         });
     }
 
-    public function scopeWithoutWishlists()
+    public function scopeWithoutWishlists($query)
     {
-        return $this->where(['wishlist' => false]);
+        return $query->where(['wishlist' => false]);
     }
 
     public function setOwnerIdAttribute($value)

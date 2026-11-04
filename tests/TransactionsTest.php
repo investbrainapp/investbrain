@@ -131,6 +131,19 @@ class TransactionsTest extends TestCase
         $this->assertTrue($failed, 'Not permitted to sell more than owned.');
     }
 
+    public function test_my_transactions_keeps_earlier_constraints_and_eager_loads(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->buy()->portfolio($portfolio->id)->symbol('MSFT')->create();
+
+        $query = Transaction::with('portfolio')->where('symbol', 'AAPL')->myTransactions();
+
+        $this->assertSame(['AAPL'], $query->pluck('symbol')->all());
+        $this->assertArrayHasKey('portfolio', $query->getEagerLoads());
+    }
+
     public function test_transactions_list_passes_the_holding_to_javascript_safely(): void
     {
         $this->actingAs($user = User::factory()->create());

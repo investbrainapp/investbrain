@@ -35,6 +35,24 @@ class PortfoliosTest extends TestCase
         $this->assertSame($newOwner->id, $portfolio->owner->id);
     }
 
+    public function test_my_portfolios_keeps_earlier_constraints(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Portfolio::factory()->create(['title' => 'Kept']);
+        Portfolio::factory()->create(['title' => 'Filtered out']);
+
+        $this->assertSame(['Kept'], Portfolio::where('title', 'Kept')->myPortfolios()->pluck('title')->all());
+    }
+
+    public function test_without_wishlists_keeps_earlier_constraints(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Portfolio::factory()->create(['title' => 'Kept', 'wishlist' => false]);
+        Portfolio::factory()->create(['title' => 'Filtered out', 'wishlist' => false]);
+
+        $this->assertSame(['Kept'], Portfolio::where('title', 'Kept')->withoutWishlists()->pluck('title')->all());
+    }
+
     public function test_owner_can_be_forced_on_create(): void
     {
         $this->actingAs($user = User::factory()->create());
