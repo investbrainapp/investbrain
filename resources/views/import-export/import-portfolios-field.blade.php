@@ -126,7 +126,11 @@ new class extends Component
             </x-slot>
 
             <x-slot name="content">
-                @if($backupImport?->status == 'failed')
+                @if($backupImport?->status == 'failed' && empty($backupImport->errors))
+
+                    {{-- nothing to list: the title says what went wrong and the footer offers to try again --}}
+
+                @elseif($backupImport?->status == 'failed')
 
                     <p class="mb-3">{{ __('Fix these problems in your spreadsheet and upload it again.') }}</p>
 

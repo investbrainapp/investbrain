@@ -9,6 +9,7 @@ use App\Exports\Sheets\TransactionsSheet as TransactionsExportSheet;
 use App\Imports\Sheets\TransactionsSheet;
 use App\Interfaces\MarketData\MarketDataInterface;
 use App\Jobs\AssembleBackupExportJob;
+use App\Jobs\BackupImportJob;
 use App\Jobs\CalculateDailyPerformanceJob;
 use App\Models\BackupExport as BackupExportModel;
 use App\Models\BackupImport as BackupImportModel;
@@ -26,6 +27,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -365,6 +367,22 @@ class ImportExportTest extends TestCase
             ['sheet' => 'Config', 'row' => 2, 'column' => 'Value', 'value' => "US'D", 'message' => 'This field must be a supported currency code, e.g. USD.'],
         ], $import->errors);
         $this->assertSame('USD', $user->refresh()->getCurrency());
+    }
+
+    public function test_too_long_name_is_rejected_on_import(): void
+    {
+        $user = User::factory()->create(['name' => 'Original Name']);
+
+        $import = $this->importWorkbook($user, [
+            'Config' => [
+                ['Key', 'Value'],
+                ['name', str_repeat('a', 256)],
+            ],
+        ]);
+
+        $this->assertSame('failed', $import->status);
+        $this->assertSame(['Config', 2, 'Value'], [$import->errors[0]['sheet'], $import->errors[0]['row'], $import->errors[0]['column']]);
+        $this->assertSame('Original Name', $user->refresh()->name);
     }
 
     public function test_supported_locale_is_set_on_import(): void
@@ -753,6 +771,38 @@ class ImportExportTest extends TestCase
         $import = BackupImportModel::sole();
         $this->assertSame('failed', $import->status);
         $this->assertSame('Something went wrong while importing your file. Nothing was imported.', $import->message);
+    }
+
+    public function test_unexpected_import_failure_does_not_show_the_error_details(): void
+    {
+        Exceptions::fake();
+        Notification::fake();
+        $user = User::factory()->create();
+        // created without its events, so the import job doesn't run on its own
+        $import = BackupImportModel::withoutEvents(fn () => BackupImportModel::create([
+            'user_id' => $user->id,
+            'path' => 'import.xlsx',
+            'status' => 'pending',
+            'message' => 'Import starting...',
+            'progress' => 0,
+        ]));
+        $exception = new \RuntimeException('SQLSTATE[22001] (Connection: pgsql, Host: db.internal, Port: 5432, Database: investbrain)');
+
+        (new BackupImportJob($import))->failed($exception);
+
+        Exceptions::assertReported(fn (\RuntimeException $e) => $e === $exception);
+        $import->refresh();
+        $this->assertSame('Something went wrong while importing your file. Nothing was imported.', $import->message);
+        $this->assertSame([], $import->errors);
+        Notification::assertSentTo($user, ImportFailedNotification::class, function (ImportFailedNotification $notification) use ($user) {
+            return ! str_contains((string) $notification->toMail($user)->render(), 'db.internal');
+        });
+
+        Livewire::actingAs($user)
+            ->test('import-portfolios-field')
+            ->assertSee('Something went wrong while importing your file. Nothing was imported.')
+            ->assertDontSee('Fix these problems in your spreadsheet')
+            ->assertDontSee('db.internal');
     }
 
     public function test_import_page_lists_problems_with_the_uploaded_file(): void
