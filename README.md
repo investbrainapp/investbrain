@@ -35,7 +35,7 @@ Everything else is in the [docs](docs/_index.md):
 - [Getting started](docs/getting-started.md) - portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat
 - [Account settings](docs/account-settings.md) - locale and display currency, two-factor authentication, social logins, and authorized apps
 - [Import and export](docs/import-export.md) - backups, moving between instances, and bulk-loading transactions from a spreadsheet
-- [REST API](docs/rest-api.md) - API tokens and endpoints
+- [REST API](docs/api.md) - API tokens and endpoints
 - [MCP server](docs/mcp.md) - connecting AI assistants such as Claude, ChatGPT, Cursor, or VS Code
 - [Self-hosting](docs/self-hosting.md) - installation, configuration options, market data providers, AI chat, updating, and command line utilities
 - [Troubleshooting](docs/troubleshooting.md) - fixes for common problems
