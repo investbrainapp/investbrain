@@ -27,3 +27,4 @@ yarn-error.log
 vapor.yml
 .vapor
 .claude
+composer.local.json
