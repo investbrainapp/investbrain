@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Support\Sql;
 use App\Traits\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -70,10 +69,10 @@ class DailyChange extends Model
         $portfolioIds = $query->clone()->select('daily_change.portfolio_id');
 
         $transactionChanges = DB::table('transactions')
-            ->leftJoin('currency_rates as cr', Sql::onCurrencyRate('transactions.date', $currency))
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('transactions.date', $currency))
             ->select('transactions.portfolio_id')
-            ->selectRaw(Sql::date('transactions.date').' AS date')
-            ->selectRaw('('.Sql::signedQuantity().') * transactions.cost_basis_base * COALESCE(cr.rate, 1) AS cost_basis')
+            ->selectRaw(Transaction::dateSql('transactions.date').' AS date')
+            ->selectRaw('('.Transaction::signedQuantitySql().') * transactions.cost_basis_base * COALESCE(cr.rate, 1) AS cost_basis')
             ->selectRaw("
                 CASE WHEN transactions.transaction_type = 'SELL'
                     THEN (transactions.sale_price_base - transactions.cost_basis_base) * transactions.quantity * COALESCE(cr.rate, 1)
@@ -84,16 +83,13 @@ class DailyChange extends Model
             ->whereIn('transactions.portfolio_id', $portfolioIds);
 
         $dividendChanges = DB::table('dividends')
-            ->join('transactions', function ($join) {
-                $join->on('transactions.symbol', '=', 'dividends.symbol')
-                    ->on(DB::raw(Sql::date('transactions.date')), '<=', DB::raw(Sql::date('dividends.date')));
-            })
-            ->leftJoin('currency_rates as cr', Sql::onCurrencyRate('dividends.date', $currency))
+            ->join('transactions', Dividend::joinTransactionsUpToDate())
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('dividends.date', $currency))
             ->select('transactions.portfolio_id')
-            ->selectRaw(Sql::date('dividends.date').' AS date')
+            ->selectRaw(Transaction::dateSql('dividends.date').' AS date')
             ->selectRaw('0 AS cost_basis')
             ->selectRaw('0 AS realized_gains')
-            ->selectRaw('('.Sql::signedQuantity().') * dividends.dividend_amount_base * COALESCE(cr.rate, 1) AS dividends_earned')
+            ->selectRaw('('.Transaction::signedQuantitySql().') * dividends.dividend_amount_base * COALESCE(cr.rate, 1) AS dividends_earned')
             ->whereIn('transactions.portfolio_id', $portfolioIds);
 
         // running totals for each day a portfolio changed, which hold until the next change (next_date)
@@ -116,7 +112,7 @@ class DailyChange extends Model
             ->selectRaw("{$marketValue} - COALESCE(running_totals.cost_basis, 0) AS total_market_gain")
             ->selectRaw('COALESCE(running_totals.realized_gains, 0) AS realized_gain_dollars')
             ->selectRaw('COALESCE(running_totals.dividends_earned, 0) AS total_dividends_earned')
-            ->leftJoin('currency_rates as cr', Sql::onCurrencyRate('daily_change.date', $currency))
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('daily_change.date', $currency))
             ->leftJoinSub($runningTotals, 'running_totals', function ($join) {
                 $join->on('running_totals.portfolio_id', '=', 'daily_change.portfolio_id')
                     ->on('running_totals.date', '<=', 'daily_change.date')

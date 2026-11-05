@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Support\Sql;
 use App\Traits\HasMarketData;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -179,7 +178,7 @@ class Holding extends Model
         $portfolioIds = $query->clone()->select('holdings.portfolio_id');
 
         $transactions = DB::table('transactions')
-            ->leftJoin('currency_rates as cr', Sql::onCurrencyRate('transactions.date', $currency))
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('transactions.date', $currency))
             ->select(['transactions.symbol', 'transactions.portfolio_id'])
             ->selectRaw("
                 SUM(CASE WHEN transactions.transaction_type = 'SELL'
@@ -196,13 +195,10 @@ class Holding extends Model
             ->groupBy(['transactions.symbol', 'transactions.portfolio_id']);
 
         $dividends = DB::table('dividends')
-            ->join('transactions', function ($join) {
-                $join->on('transactions.symbol', '=', 'dividends.symbol')
-                    ->on(DB::raw(Sql::date('transactions.date')), '<=', DB::raw(Sql::date('dividends.date')));
-            })
-            ->leftJoin('currency_rates as cr', Sql::onCurrencyRate('dividends.date', $currency))
+            ->join('transactions', Dividend::joinTransactionsUpToDate())
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('dividends.date', $currency))
             ->select(['dividends.symbol', 'transactions.portfolio_id'])
-            ->selectRaw('SUM(('.Sql::signedQuantity().') * dividends.dividend_amount_base * COALESCE(cr.rate, 1)) AS total_dividends_earned')
+            ->selectRaw('SUM(('.Transaction::signedQuantitySql().') * dividends.dividend_amount_base * COALESCE(cr.rate, 1)) AS total_dividends_earned')
             ->whereIn('transactions.portfolio_id', $portfolioIds)
             ->groupBy(['dividends.symbol', 'transactions.portfolio_id']);
 

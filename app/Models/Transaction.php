@@ -9,7 +9,6 @@ use App\Actions\CopyToBaseCurrency;
 use App\Actions\EnsureCostBasisAddedToSale;
 use App\Actions\EnsureDailyChangeIsSynced;
 use App\Casts\BaseCurrency;
-use App\Support\Sql;
 use App\Traits\HasMarketData;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -152,6 +151,27 @@ class Transaction extends Model
     }
 
     /**
+     * Quantity of a transaction as SQL, positive for a buy and negative for a sale. Summed over a
+     * holding's transactions it gives the shares owned.
+     */
+    public static function signedQuantitySql(): string
+    {
+        return "CASE transactions.transaction_type WHEN 'BUY' THEN transactions.quantity WHEN 'SELL' THEN -transactions.quantity ELSE 0 END";
+    }
+
+    /**
+     * The calendar date of a date column as SQL.
+     *
+     * SQLite has no date type, and the same table can hold 'Y-m-d' and 'Y-m-d H:i:s' text depending
+     * on whether the row was written by Eloquent or as a plain string, so comparing columns as text
+     * fails on the same day. PostgreSQL stores real dates, so the column is left bare to keep its index.
+     */
+    public static function dateSql(string $column): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite' ? "DATE({$column})" : $column;
+    }
+
+    /**
      * Adds the gain per share: the sale price for a sale, otherwise the current market value, less the cost basis
      */
     public function scopeWithGainDollars($query): Builder
@@ -169,7 +189,7 @@ class Transaction extends Model
      */
     public function scopeSharesOwned($query): float
     {
-        return (float) $query->sum(DB::raw(Sql::signedQuantity()));
+        return (float) $query->sum(DB::raw(self::signedQuantitySql()));
     }
 
     public function scopeMyTransactions($query): Builder

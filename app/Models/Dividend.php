@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Actions\CopyToBaseCurrency;
 use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
-use App\Support\Sql;
 use App\Traits\HasMarketData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -75,12 +74,22 @@ class Dividend extends Model
     }
 
     /**
+     * Join condition for the transactions made on or before each dividend's date, optionally of one portfolio
+     */
+    public static function joinTransactionsUpToDate(?string $portfolioId = null): \Closure
+    {
+        return fn (JoinClause $join) => $join->on('transactions.symbol', '=', 'dividends.symbol')
+            ->on(DB::raw(Transaction::dateSql('transactions.date')), '<=', DB::raw(Transaction::dateSql('dividends.date')))
+            ->when($portfolioId, fn (JoinClause $join) => $join->where('transactions.portfolio_id', '=', $portfolioId));
+    }
+
+    /**
      * Adds the shares each portfolio owned on the dividend date, and the amount it received.
      * Dividends paid while a portfolio owned no shares are left out.
      */
     public function scopeWithSharesOwned(Builder $query, ?string $portfolioId = null): Builder
     {
-        $sharesOwned = 'SUM('.Sql::signedQuantity().')';
+        $sharesOwned = 'SUM('.Transaction::signedQuantitySql().')';
 
         return $query
             ->select([
@@ -93,11 +102,7 @@ class Dividend extends Model
             ->selectRaw("{$sharesOwned} AS shares_owned")
             ->selectRaw("{$sharesOwned} * dividends.dividend_amount AS total_received")
             ->selectRaw("{$sharesOwned} * dividends.dividend_amount_base AS total_received_base")
-            ->join('transactions', function (JoinClause $join) use ($portfolioId) {
-                $join->on('transactions.symbol', '=', 'dividends.symbol')
-                    ->on(DB::raw(Sql::date('transactions.date')), '<=', DB::raw(Sql::date('dividends.date')))
-                    ->when($portfolioId, fn (JoinClause $join) => $join->where('transactions.portfolio_id', '=', $portfolioId));
-            })
+            ->join('transactions', self::joinTransactionsUpToDate($portfolioId))
             ->groupBy([
                 'transactions.portfolio_id',
                 'dividends.symbol',
