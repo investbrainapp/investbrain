@@ -41,39 +41,36 @@ class SyncDailyChangesJobTest extends TestCase
         $this->assertDatabaseCount('daily_change', 0);
     }
 
-    public function test_a_newer_sync_replaces_an_older_one(): void
+    public function test_only_one_sync_waits_per_portfolio(): void
     {
         Queue::fake();
 
-        SyncDailyChangesJob::dispatchFor($this->portfolio);
-        SyncDailyChangesJob::dispatchFor($this->portfolio);
+        SyncDailyChangesJob::dispatch($this->portfolio);
+        SyncDailyChangesJob::dispatch($this->portfolio);
+        SyncDailyChangesJob::dispatch(Portfolio::factory()->create());
 
-        [$older, $newer] = Queue::pushed(SyncDailyChangesJob::class)->all();
-
-        $older->handle();
-        $this->assertDatabaseCount('daily_change', 0);
-
-        $newer->handle();
-        $this->assertDatabaseHas('daily_change', ['portfolio_id' => $this->portfolio->id]);
+        // the second dispatch for the same portfolio is dropped; the waiting sync will see its data
+        Queue::assertPushed(SyncDailyChangesJob::class, 2);
+        Queue::assertPushed(SyncDailyChangesJob::class, fn (SyncDailyChangesJob $job) => $job->portfolio->is($this->portfolio));
     }
 
-    public function test_a_sync_replaced_while_running_stops_without_writing(): void
+    public function test_another_sync_can_wait_once_the_waiting_one_starts_running(): void
     {
-        $checks = 0;
+        // runs straight away on the sync queue, which starts processing it and frees its place
+        SyncDailyChangesJob::dispatch($this->portfolio);
+        $this->assertDatabaseHas('daily_change', ['portfolio_id' => $this->portfolio->id]);
 
-        // replaced after the first holding: the check before the second one says stop
-        $this->portfolio->syncDailyChanges(function () use (&$checks) {
-            return ++$checks > 1;
-        });
+        Queue::fake();
 
-        $this->assertSame(2, $checks);
-        $this->assertDatabaseCount('daily_change', 0);
+        SyncDailyChangesJob::dispatch($this->portfolio);
+
+        Queue::assertPushed(SyncDailyChangesJob::class, 1);
     }
 
     public function test_syncs_for_the_same_portfolio_run_one_at_a_time(): void
     {
-        $job = new SyncDailyChangesJob($this->portfolio, 'token');
-        $otherJob = new SyncDailyChangesJob(Portfolio::factory()->create(), 'token');
+        $job = new SyncDailyChangesJob($this->portfolio);
+        $otherJob = new SyncDailyChangesJob(Portfolio::factory()->create());
 
         $middleware = $job->middleware()[0];
 

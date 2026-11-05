@@ -19,8 +19,8 @@ class EnsureDailyChangeIsSynced
                     || $model->date->lessThan($model->portfolio->transactions()->where('id', '!=', $model->id)->max('date') ?? now())
                 )
             ) {
-                // queued, one at a time per portfolio, and a newer one replaces any still queued or running
-                SyncDailyChangesJob::dispatchFor($model->portfolio);
+                // queued, with at most one waiting and one running per portfolio
+                SyncDailyChangesJob::dispatch($model->portfolio);
             }
         }
 

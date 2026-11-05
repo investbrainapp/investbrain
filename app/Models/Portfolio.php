@@ -134,13 +134,9 @@ class Portfolio extends Model
 
     /**
      * Writes daily change history for a portfolio to the database
-     *
-     * @param  (callable(): bool)|null  $shouldStop  checked between holdings; when it returns true, the sync stops without writing anything
      */
-    public function syncDailyChanges(?callable $shouldStop = null): void
+    public function syncDailyChanges(): void
     {
-        $stopped = false;
-
         $holdings = $this->holdings()
             ->join('transactions', function ($join) {
                 $join->on('transactions.symbol', '=', 'holdings.symbol')
@@ -158,14 +154,7 @@ class Portfolio extends Model
             $currency_rates[$currency] = CurrencyRate::timeSeriesRates($currency, $holdings->min('first_transaction_date'), now());
         }
 
-        $holdings->each(function ($holding) use (&$total_performance, $currency_rates, $shouldStop, &$stopped) {
-
-            // each holding asks the market data provider for its price history, so stop before the next one if asked
-            if ($shouldStop && $shouldStop()) {
-                $stopped = true;
-
-                return false;
-            }
+        $holdings->each(function ($holding) use (&$total_performance, $currency_rates) {
 
             $period = CarbonPeriod::create(
                 $holding->first_transaction_date,
@@ -207,11 +196,6 @@ class Portfolio extends Model
                 }
             }
         });
-
-        // a partial history would replace the full one, so write nothing if stopped
-        if ($stopped || ($shouldStop && $shouldStop())) {
-            return;
-        }
 
         if (! empty($total_performance)) {
             DB::transaction(function () use ($total_performance) {
