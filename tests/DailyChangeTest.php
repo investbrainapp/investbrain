@@ -182,22 +182,14 @@ class DailyChangeTest extends TestCase
             ->whereDate('daily_change.date', '=', $dividends->first()->date->nextWeekday())
             ->first();
 
-        $owned = $dividends->first()->purchased - $dividends->first()->sold;
-
-        $this->assertEqualsWithDelta($dividends->first()->dividend_amount * $owned, $first_dividend_change->total_dividends_earned, 0.01);
+        $this->assertEqualsWithDelta($dividends->first()->total_received, $first_dividend_change->total_dividends_earned, 0.01);
 
         $last_dividend_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
             ->whereDate('daily_change.date', '=', $dividends->last()->date->nextWeekday())
             ->first();
 
-        $total_dividends = $dividends->reduce(function (?float $carry, $dividend) {
-            return $carry + ($dividend['dividend_amount'] * ($dividend['purchased'] - $dividend['sold']));
-        });
-
-        $owned = $dividends->last()->purchased - $dividends->last()->sold;
-
-        $this->assertEqualsWithDelta($total_dividends, $last_dividend_change->total_dividends_earned, 0.01);
+        $this->assertEqualsWithDelta($dividends->sum('total_received'), $last_dividend_change->total_dividends_earned, 0.01);
     }
 
     public function test_daily_changes_synced_into_past_for_older_transactions(): void

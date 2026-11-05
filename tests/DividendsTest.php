@@ -155,4 +155,29 @@ class DividendsTest extends TestCase
 
         $this->assertEquals(4.95, $holding->dividends_earned);
     }
+
+    public function test_holding_lists_dividends_paid_while_shares_were_owned(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy(10)->date(now()->subMonths(7)->toDateString())->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->sell(4)->date(now()->subMonths(4)->toDateString())->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        // shares owned in another portfolio don't count
+        Transaction::factory()->buy(5)->yearsAgo()->portfolio(Portfolio::factory()->create()->id)->symbol('ACME')->create();
+
+        Dividend::refreshDividendData('ACME');
+
+        $dividends = Holding::query()->portfolio($portfolio->id)->symbol('ACME')->first()->dividends;
+
+        // the dividend from 9 months ago was paid before the shares were bought
+        $this->assertCount(2, $dividends);
+
+        $this->assertEquals(6, $dividends[0]->shares_owned);
+        $this->assertEqualsWithDelta(6 * 2.11, $dividends[0]->total_received, 0.01);
+
+        $this->assertEquals(10, $dividends[1]->shares_owned);
+        $this->assertEqualsWithDelta(10 * 1.89, $dividends[1]->total_received, 0.01);
+    }
 }

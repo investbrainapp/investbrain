@@ -7,11 +7,14 @@ namespace App\Models;
 use App\Actions\CopyToBaseCurrency;
 use App\Casts\BaseCurrency;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Support\Sql;
 use App\Traits\HasMarketData;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +40,9 @@ class Dividend extends Model
         'last_dividend_update' => 'date',
         'dividend_amount' => 'float',
         'dividend_amount_base' => BaseCurrency::class,
+        'shares_owned' => 'float',
+        'total_received' => 'float',
+        'total_received_base' => 'float',
     ];
 
     protected static function boot()
@@ -66,6 +72,40 @@ class Dividend extends Model
     public function scopeSymbol($query, $symbol)
     {
         return $query->where('dividends.symbol', $symbol);
+    }
+
+    /**
+     * Adds the shares each portfolio owned on the dividend date, and the amount it received.
+     * Dividends paid while a portfolio owned no shares are left out.
+     */
+    public function scopeWithSharesOwned(Builder $query, ?string $portfolioId = null): Builder
+    {
+        $sharesOwned = 'SUM('.Sql::signedQuantity().')';
+
+        return $query
+            ->select([
+                'transactions.portfolio_id',
+                'dividends.symbol',
+                'dividends.date',
+                'dividends.dividend_amount',
+                'dividends.dividend_amount_base',
+            ])
+            ->selectRaw("{$sharesOwned} AS shares_owned")
+            ->selectRaw("{$sharesOwned} * dividends.dividend_amount AS total_received")
+            ->selectRaw("{$sharesOwned} * dividends.dividend_amount_base AS total_received_base")
+            ->join('transactions', function (JoinClause $join) use ($portfolioId) {
+                $join->on('transactions.symbol', '=', 'dividends.symbol')
+                    ->on(DB::raw(Sql::date('transactions.date')), '<=', DB::raw(Sql::date('dividends.date')))
+                    ->when($portfolioId, fn (JoinClause $join) => $join->where('transactions.portfolio_id', '=', $portfolioId));
+            })
+            ->groupBy([
+                'transactions.portfolio_id',
+                'dividends.symbol',
+                'dividends.date',
+                'dividends.dividend_amount',
+                'dividends.dividend_amount_base',
+            ])
+            ->havingRaw("{$sharesOwned} > 0");
     }
 
     /**
@@ -147,43 +187,22 @@ class Dividend extends Model
         }
     }
 
+    /**
+     * Updates the dividends earned by every holding of a symbol
+     */
     public static function syncHoldings(string $symbol): void
     {
-        // group by holdings
-        $subQuery = self::select([
-            'holdings.portfolio_id',
-            'dividends.date',
-            'dividends.symbol',
-            'dividends.dividend_amount',
-        ])->selectRaw("
-            (COALESCE(SUM(CASE WHEN transactions.transaction_type = 'BUY'
-                AND date(transactions.date) <= date(dividends.date)
-                THEN transactions.quantity ELSE 0 END), 0)
-            - COALESCE(SUM(CASE WHEN transactions.transaction_type = 'SELL'
-                AND date(transactions.date) <= date(dividends.date)
-                THEN transactions.quantity ELSE 0 END), 0))
-            * dividends.dividend_amount
-            AS total_received
-        ")->join('transactions', 'transactions.symbol', '=', 'dividends.symbol')
-            ->join('holdings', function ($join) {
-                $join->on('transactions.portfolio_id', '=', 'holdings.portfolio_id')
-                    ->on('holdings.symbol', '=', 'dividends.symbol');
-            })
-            ->where('dividends.symbol', $symbol)
-            ->groupBy('holdings.portfolio_id', 'dividends.date', 'dividends.symbol', 'dividends.dividend_amount', 'dividends.dividend_amount_base');
+        $received = self::symbol($symbol)
+            ->withSharesOwned()
+            ->get()
+            ->groupBy('portfolio_id')
+            ->map->sum('total_received');
 
-        $dividends = DB::table(DB::raw("({$subQuery->toSql()}) as sub"))
-            ->mergeBindings($subQuery->getQuery())
-            ->where('total_received', '>', 0)
-            ->get();
-
-        // iterate through holdings and update
         Holding::where(['symbol' => $symbol])
             ->get()
-            ->each(function ($holding) use ($dividends) {
+            ->each(function ($holding) use ($received) {
                 $holding->update([
-                    'dividends_earned' => $dividends->where('portfolio_id', $holding->portfolio_id)
-                        ->sum('total_received'),
+                    'dividends_earned' => $received->get($holding->portfolio_id, 0),
                 ]);
             });
     }

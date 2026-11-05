@@ -23,13 +23,9 @@ new class extends Component
     <x-ui.list-item :item="$dividend" no-separator no-hover>
         <x-slot:value>
         
-            @php
-                $owned = ($dividend->purchased - $dividend->sold);
-            @endphp 
-
             {{ Number::currency($dividend->dividend_amount, $holding->market_data->currency) }}
-            x {{ $owned }}
-            = {{ Number::currency($owned * $dividend->dividend_amount, $holding->market_data->currency) }}
+            x {{ $dividend->shares_owned }}
+            = {{ Number::currency($dividend->total_received, $holding->market_data->currency) }}
 
         </x-slot:value>
         <x-slot:sub-value>

@@ -10,6 +10,7 @@ use App\Models\BackupImport;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
 use App\Models\DailyChange;
+use App\Models\Dividend;
 use App\Models\Holding;
 use App\Models\Portfolio;
 use App\Models\Transaction;
@@ -670,5 +671,58 @@ class MultiCurrencyTest extends TestCase
         $this->assertContains('BP.L', $user->holdings->pluck('symbol'));
         $this->assertEquals(17, $user->holdings->sum('quantity'));
         $this->assertEqualsWithDelta(371.42, $user->holdings->sum('average_cost_basis'), 0.01);
+    }
+
+    public function test_portfolio_metrics_count_same_day_transactions_once(): void
+    {
+        $this->actingAs(User::factory()->create(['options' => ['display_currency' => 'EUR']]));
+
+        $portfolio = Portfolio::factory()->create();
+
+        $firstPurchase = now()->subMonths(2)->toDateString();
+        $secondPurchase = now()->subMonth()->toDateString();
+
+        CurrencyRate::create(['currency' => 'EUR', 'rate' => 0.9, 'date' => $firstPurchase]);
+        CurrencyRate::create(['currency' => 'EUR', 'rate' => 0.8, 'date' => $secondPurchase]);
+
+        Transaction::factory()->buy(10)->costBasis(100)->date($firstPurchase)->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->buy(10)->costBasis(120)->date($secondPurchase)->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        // sold the same day as the second purchase, at the average cost basis of 110
+        Transaction::factory()->sell(5)->salePrice(150)->date($secondPurchase)->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        $metrics = Holding::query()->portfolio($portfolio->id)->getPortfolioMetrics();
+
+        // (150 - 110) * 5 at the 0.8 rate on the day of the sale
+        $this->assertEqualsWithDelta(160, $metrics->get('realized_gain_dollars'), 0.01);
+
+        // purchases cost 10 * 100 * 0.9 + 10 * 120 * 0.8 = 1860 for 20 shares, of which 15 are still owned
+        $this->assertEqualsWithDelta(1395, $metrics->get('total_cost_basis'), 0.01);
+    }
+
+    public function test_portfolio_metrics_convert_dividends_at_the_rate_on_the_dividend_date(): void
+    {
+        $this->actingAs(User::factory()->create(['options' => ['display_currency' => 'EUR']]));
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(10)->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        $dividend = Dividend::create([
+            'symbol' => 'ACME',
+            'date' => now()->subMonth()->toDateString(),
+            'dividend_amount' => 2,
+        ]);
+
+        // stored the way rates from the currency provider are, as plain dates
+        CurrencyRate::insert([
+            'currency' => 'EUR',
+            'rate' => 0.5,
+            'date' => $dividend->date->toDateString(),
+        ]);
+
+        $metrics = Holding::query()->portfolio($portfolio->id)->getPortfolioMetrics();
+
+        $this->assertEqualsWithDelta(10 * 2 * 0.5, $metrics->get('total_dividends_earned'), 0.01);
     }
 }

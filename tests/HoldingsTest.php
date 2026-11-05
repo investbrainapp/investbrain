@@ -154,4 +154,47 @@ class HoldingsTest extends TestCase
 
         $this->assertFalse((bool) $holding->fresh()->reinvest_dividends);
     }
+
+    public function test_daily_performance_tracks_shares_owned_and_realized_gains(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(10)->costBasis(100)->date(now()->subDays(4)->toDateString())->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->sell(4)->salePrice(150)->date(now()->subDays(2)->toDateString())->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('AAPL')->first();
+
+        $performance = $holding->dailyPerformance(now()->subDays(5), now());
+
+        $this->assertCount(6, $performance);
+
+        $this->assertEquals(0, $performance[now()->subDays(5)->toDateString()]->owned);
+        $this->assertEquals(0, $performance[now()->subDays(5)->toDateString()]->cost_basis);
+
+        $this->assertEquals(10, $performance[now()->subDays(3)->toDateString()]->owned);
+        $this->assertEquals(1000, $performance[now()->subDays(3)->toDateString()]->cost_basis);
+        $this->assertEquals(0, $performance[now()->subDays(3)->toDateString()]->realized_gains);
+
+        $this->assertEquals(6, $performance[now()->toDateString()]->owned);
+        $this->assertEquals(200, $performance[now()->toDateString()]->realized_gains);
+    }
+
+    public function test_fix_cost_basis_command_recalculates_cost_basis_of_sales(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(1)->costBasis(100)->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->buy(1)->costBasis(300)->sixMonthsAgo()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $sale = Transaction::factory()->sell(1)->salePrice(400)->recent()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        Transaction::whereKey($sale->id)->toBase()->update(['cost_basis' => 0]);
+
+        $this->artisan('fix:cost-basis-for-sales', ['--portfolio' => $portfolio->id])->assertSuccessful();
+
+        $this->assertEquals(200, $sale->fresh()->cost_basis);
+    }
 }
