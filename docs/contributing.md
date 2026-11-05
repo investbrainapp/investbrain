@@ -201,12 +201,11 @@ Then create a `composer.local.json` file in the project root. Git ignores this f
             "url": "packages/*",
             "options": { "symlink": true }
         }
-    ],
-    "require": {
-        "investbrainapp/frankfurter-client": "@dev"
-    }
+    ]
 }
 ```
+
+The merge plugin puts these repositories ahead of the ones in `composer.json`, so Composer uses your local copy to meet the requirement `composer.json` already has (`dev-main`). You don't need to repeat the package in a `require` section.
 
 Then update the package so Composer symlinks your local copy into `vendor/`:
 
