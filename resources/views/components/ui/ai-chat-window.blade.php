@@ -111,25 +111,30 @@ new class extends Component
 
         $userPrompt = end($this->messages)['content'] ?? '';
 
+        // the stream is lazy, so the provider is called and the conversation is saved while it's iterated. Once the
+        // first chunk is streamed the headers are sent, and an exception escaping from here would leave Livewire
+        // with an empty response, so anything thrown is caught and shown in the chat instead
         try {
             $agent = $this->makeAgent()->continue($this->agent_conversation_id, auth()->user());
             $stream = $agent->stream($userPrompt);
-        } catch (Exception $e) {
+
+            $this->stream(to: 'answer', content: '', replace: true);
+
+            foreach ($stream as $event) {
+                if ($event instanceof TextDelta) {
+                    // wire:stream inserts chunks as HTML, so escape them; the saved answer is rendered as escaped markdown below
+                    $this->stream(to: 'answer', content: e($event->delta), replace: false);
+                    $this->answer .= $event->delta;
+                }
+                $this->js('scrollChatWindow()');
+            }
+        } catch (Throwable $e) {
+            report($e);
+
             array_push($this->messages, ['role' => 'assistant', 'content' => $e->getMessage(), 'created_at' => now()]);
             $this->resetPrompt();
 
             return;
-        }
-
-        $this->stream(to: 'answer', content: '', replace: true);
-
-        foreach ($stream as $event) {
-            if ($event instanceof TextDelta) {
-                // wire:stream inserts chunks as HTML, so escape them; the saved answer is rendered as escaped markdown below
-                $this->stream(to: 'answer', content: e($event->delta), replace: false);
-                $this->answer .= $event->delta;
-            }
-            $this->js('scrollChatWindow()');
         }
 
         array_push($this->messages, ['role' => 'assistant', 'content' => $this->answer, 'created_at' => now()]);
@@ -141,14 +146,15 @@ new class extends Component
     #[Async]
     public function generateSuggestedPrompts(): void
     {
-        if (! $this->attempt('suggestions')) {
+        if (empty($this->messages) || ! $this->attempt('suggestions')) {
             $this->suggested_prompts = [];
 
             return;
         }
 
         try {
-            $response = ChatWithSuggestedPromptsAgent::make(messages: array_slice($this->messages, -3))->prompt('');
+            $agent = ChatWithSuggestedPromptsAgent::make(messages: array_slice($this->messages, -3));
+            $response = $agent->prompt($agent->conversation());
 
             $this->suggested_prompts = $response->toArray()['suggested_prompts'] ?? [];
         } catch (Exception $e) {

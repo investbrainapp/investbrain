@@ -8,7 +8,6 @@ use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
-use Laravel\Ai\Contracts\Messages;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Promptable;
 use Stringable;
@@ -17,6 +16,9 @@ class ChatWithSuggestedPromptsAgent implements Agent, HasStructuredOutput, HasTo
 {
     use Promptable;
 
+    /**
+     * @param  array<int, array{role: string, content: string}>  $messages
+     */
     public function __construct(
         public array $messages
     ) {}
@@ -46,13 +48,16 @@ Generate between 1 and 5 (no more than 5) follow up questions a curious investor
     }
 
     /**
-     * Get the messages available to the agent.
+     * Get the recent messages as the text to prompt with.
      *
-     * @return Messages[]
+     * The agent isn't conversational, so the messages are sent as the prompt; an empty prompt is also
+     * rejected by providers like Anthropic.
      */
-    public function messages(): iterable
+    public function conversation(): string
     {
-        return $this->messages;
+        return collect($this->messages)
+            ->map(fn (array $message): string => ($message['role'] === 'user' ? 'Investor' : 'Advisor').': '.$message['content'])
+            ->implode("\n\n");
     }
 
     /**
