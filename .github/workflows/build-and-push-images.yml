@@ -3,62 +3,60 @@ name: Build and push Docker images
 on:
   push:
     tags:
-      - "v*"
+      - "v[0-9]+.[0-9]+.[0-9]+*"
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    # runs-on: self-hosted
+    # only release tags publish; a dispatch from a branch stops here
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    # waits for approval, and only v* tags may use it (see Settings > Environments)
+    environment: release
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GIT_HUB_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Extract version from tag
-        id: extract-version
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-      
-          TAGS="investbrainapp/investbrain:${VERSION},ghcr.io/investbrainapp/investbrain:${VERSION}"
-      
-          # Conditionally add 'latest' tags unless 'pre-release' is in the version
-          if [[ "${GITHUB_REF_NAME}" != *alpha* && "${GITHUB_REF_NAME}" != *beta* && "${GITHUB_REF_NAME}" != *rc* ]]; then
-            TAGS="$TAGS,investbrainapp/investbrain:latest,ghcr.io/investbrainapp/investbrain:latest"
-          fi
-      
-          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          images: |
+            investbrainapp/investbrain
+            ghcr.io/investbrainapp/investbrain
+          # the version without its v, plus latest for non-prerelease versions
+          tags: |
+            type=semver,pattern={{version}}
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           platforms: linux/amd64,linux/arm64
           file: ./docker/Dockerfile
           push: true
-          tags: ${{ steps.extract-version.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ github.ref_name }}
-
