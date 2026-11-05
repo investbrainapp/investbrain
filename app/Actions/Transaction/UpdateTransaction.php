@@ -21,16 +21,19 @@ class UpdateTransaction
      */
     public function handle(Transaction $transaction, array $data): Transaction
     {
-        $portfolio = isset($data['portfolio_id'])
-            ? Portfolio::find($data['portfolio_id'])
-            : $transaction->portfolio;
-
-        $validated = Validator::make($data, $this->rules->build($data, $portfolio, $transaction))->validate();
-
         Gate::authorize('fullAccess', $transaction->portfolio);
 
-        // moving a transaction also requires full access to the destination portfolio
-        Gate::authorize('fullAccess', $portfolio);
+        $portfolio = isset($data['portfolio_id'])
+            ? (is_string($data['portfolio_id']) ? Portfolio::find($data['portfolio_id']) : null)
+            : $transaction->portfolio;
+
+        // moving a transaction also requires full access to the destination portfolio, checked before
+        // validating for the same reason as in CreateTransaction; a missing one is left for validation to report
+        if ($portfolio) {
+            Gate::authorize('fullAccess', $portfolio);
+        }
+
+        $validated = Validator::make($data, $this->rules->build($data, $portfolio, $transaction))->validate();
 
         $transaction->update($validated);
 

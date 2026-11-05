@@ -225,6 +225,63 @@ class TransactionsTest extends ApiTestCase
             ]);
     }
 
+    #[TestWith([1])]
+    #[TestWith([100])]
+    public function test_selling_from_another_users_portfolio_is_forbidden_whatever_it_holds(int $quantity)
+    {
+        Artisan::call('db:seed', ['--class' => CurrencySeeder::class, '--force' => true]);
+        $this->actingAs($otherUser = User::factory()->create());
+        $othersPortfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy()->lastYear()->portfolio($othersPortfolio->id)->symbol('AAPL')->create(['quantity' => 5]);
+
+        // whether the sale would fit the other portfolio's holdings mustn't show in the response
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), [
+                'symbol' => 'AAPL',
+                'portfolio_id' => $othersPortfolio->id,
+                'transaction_type' => 'SELL',
+                'quantity' => $quantity,
+                'currency' => 'USD',
+                'date' => now()->toDateString(),
+                'sale_price' => 150,
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_moving_a_transaction_into_another_users_portfolio_is_forbidden_before_validation()
+    {
+        Artisan::call('db:seed', ['--class' => CurrencySeeder::class, '--force' => true]);
+        $this->actingAs($this->user);
+        $transaction = Transaction::factory()->sell()->lastMonth()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
+        $this->actingAs(User::factory()->create());
+        $othersPortfolio = Portfolio::factory()->create();
+
+        $this->actingAs($this->user)
+            ->putJson(route('api.transaction.update', ['transaction' => $transaction->id]), [
+                'portfolio_id' => $othersPortfolio->id,
+                'quantity' => 100,
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_selling_from_an_unknown_portfolio_is_a_validation_error()
+    {
+        Artisan::call('db:seed', ['--class' => CurrencySeeder::class, '--force' => true]);
+
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), [
+                'symbol' => 'AAPL',
+                'portfolio_id' => '00000000-0000-4000-8000-000000000000',
+                'transaction_type' => 'SELL',
+                'quantity' => 1,
+                'currency' => 'USD',
+                'date' => now()->toDateString(),
+                'sale_price' => 150,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('portfolio_id');
+    }
+
     public function test_cannot_create_transaction_without_required_fields()
     {
         $this->actingAs($this->user)
