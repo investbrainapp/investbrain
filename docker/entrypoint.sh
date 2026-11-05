@@ -53,7 +53,7 @@ fi
 
 # Ensure Passport signing keys exist / generate if required
 if [ -z "$PASSPORT_PRIVATE_KEY" ] && [ ! -s "storage/oauth-private.key" ]; then
-    php artisan passport:keys --no-interaction
+    echo $(php artisan passport:keys --no-interaction)
     chown www-data:www-data storage/oauth-*.key
 
     echo -e "\n > Generated Passport keys and saved in storage/ "
