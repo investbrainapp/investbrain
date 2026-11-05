@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Api;
 
+use App\Interfaces\MarketData\MarketDataInterface;
 use App\Models\MarketData;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class MarketDataTest extends ApiTestCase
 {
@@ -70,5 +72,18 @@ class MarketDataTest extends ApiTestCase
     public function test_cannot_access_market_data_when_unauthenticated(): void
     {
         $this->getJson(route('api.market-data.show', ['symbol' => 'AAPL']))->assertUnauthorized();
+    }
+
+    #[TestWith(['AA PL'])]
+    #[TestWith(["AA\nPL"])]
+    #[TestWith(['ABCDEFGHIJKLMNOPQRSTUVWXYZ'])]
+    public function test_malformed_symbols_are_rejected_without_asking_the_provider(string $symbol): void
+    {
+        $this->mock(MarketDataInterface::class)->shouldNotReceive('quote');
+
+        $this->actingAs($this->user)
+            ->getJson(route('api.market-data.show', ['symbol' => $symbol]))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('symbol');
     }
 }
