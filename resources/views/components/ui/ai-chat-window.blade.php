@@ -146,14 +146,15 @@ new class extends Component
     #[Async]
     public function generateSuggestedPrompts(): void
     {
-        if (! $this->attempt('suggestions')) {
+        if (empty($this->messages) || ! $this->attempt('suggestions')) {
             $this->suggested_prompts = [];
 
             return;
         }
 
         try {
-            $response = ChatWithSuggestedPromptsAgent::make(messages: array_slice($this->messages, -3))->prompt('');
+            $agent = ChatWithSuggestedPromptsAgent::make(messages: array_slice($this->messages, -3));
+            $response = $agent->prompt($agent->conversation());
 
             $this->suggested_prompts = $response->toArray()['suggested_prompts'] ?? [];
         } catch (Exception $e) {

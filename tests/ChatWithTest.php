@@ -235,6 +235,42 @@ class ChatWithTest extends TestCase
         }
 
         Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('prompt', 'How is my portfolio doing?')
+            ->call('startCompletion')
+            ->call('generateSuggestedPrompts')
+            ->assertSet('suggested_prompts', []);
+
+        ChatWithSuggestedPromptsAgent::assertNeverPrompted();
+    }
+
+    public function test_suggested_prompts_are_based_on_the_conversation(): void
+    {
+        ChatWithPortfolioAgent::fake(['The portfolio looks great!']);
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => [['text' => 'Any risks?', 'value' => 'What are the risks in my portfolio?']]]]);
+
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('prompt', 'How is my portfolio doing?')
+            ->call('startCompletion')
+            ->call('generateCompletion')
+            ->call('generateSuggestedPrompts')
+            ->assertSet('suggested_prompts', [['text' => 'Any risks?', 'value' => 'What are the risks in my portfolio?']]);
+
+        ChatWithSuggestedPromptsAgent::assertPrompted(
+            fn ($prompt) => $prompt->prompt === "Investor: How is my portfolio doing?\n\nAdvisor: The portfolio looks great!"
+        );
+    }
+
+    public function test_suggested_prompts_are_not_requested_for_an_empty_conversation(): void
+    {
+        ChatWithSuggestedPromptsAgent::fake([['suggested_prompts' => []]]);
+
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
             ->call('generateSuggestedPrompts')
             ->assertSet('suggested_prompts', []);
 
@@ -250,6 +286,8 @@ class ChatWithTest extends TestCase
         $portfolio = Portfolio::factory()->create();
 
         $component = Volt::test('ui.ai-chat-window', ['chatable' => $portfolio])
+            ->set('prompt', 'How is my portfolio doing?')
+            ->call('startCompletion')
             ->call('generateSuggestedPrompts')
             ->assertSet('suggested_prompts', []);
 
