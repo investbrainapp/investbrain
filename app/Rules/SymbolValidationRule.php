@@ -20,8 +20,6 @@ class SymbolValidationRule implements ValidationRule
      */
     public const MAX_LENGTH = 25;
 
-    public $symbol;
-
     /**
      * The format checks on their own, for places that look symbols up some other way, like the import.
      *
@@ -37,8 +35,6 @@ class SymbolValidationRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
-        $this->symbol = $value;
-
         // check the format first, so a malformed value never reaches the market data provider
         if (! is_string($value) || mb_strlen($value) > self::MAX_LENGTH) {
             $fail(__('validation.max.string', ['max' => self::MAX_LENGTH]));
@@ -53,14 +49,14 @@ class SymbolValidationRule implements ValidationRule
         }
 
         // Check if the symbol exists in the Market Data table first (avoid API call)
-        if (MarketData::find($this->symbol)) {
+        if (MarketData::find($value)) {
 
             return;
         }
 
         // Then check against market data provider
         if (! app(MarketDataInterface::class)->exists($value)) {
-            $fail('The symbol provided ('.$this->symbol.') is not valid');
+            $fail('The symbol provided ('.$value.') is not valid');
         }
     }
 }
