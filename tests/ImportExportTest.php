@@ -417,6 +417,26 @@ class ImportExportTest extends TestCase
         $this->assertSame('en', $user->refresh()->options['locale']);
     }
 
+    public function test_import_rejects_transactions_dated_before_1970(): void
+    {
+        $user = User::factory()->create();
+        $portfolio = $this->portfolioOwnedBy($user);
+
+        $import = $this->importWorkbook($user, [
+            'Transactions' => [
+                self::TRANSACTION_HEADINGS,
+                [null, 'AAPL', $portfolio->id, 'BUY', 1, 100, null, 'USD', null, null, '1969-12-31'],
+            ],
+        ]);
+
+        $this->assertSame('failed', $import->status);
+        $this->assertSame(
+            ['sheet' => 'Transactions', 'row' => 2, 'column' => 'Date', 'message' => 'This field must be a date after or equal to 1970-01-01.'],
+            collect($import->errors[0])->only(['sheet', 'row', 'column', 'message'])->all(),
+        );
+        $this->assertDatabaseCount('transactions', 0);
+    }
+
     public function test_invalid_rows_are_all_reported_and_nothing_is_imported(): void
     {
         Notification::fake();

@@ -3,7 +3,7 @@ title: "Import and Export"
 description: "Back up your data, move between Investbrain Cloud and a self-hosted instance, and bulk-load transactions from a spreadsheet."
 group: "Using Investbrain"
 order: 12
-updated_at: "2026-11-03"
+updated_at: "2026-11-04"
 ---
 # Import and Export
 
@@ -78,7 +78,7 @@ After the import finishes, Investbrain refreshes dividends for the imported hold
 | Currency | Optional | Currency of the prices, such as `USD`. Defaults to the currency the symbol trades in (see [Currencies](#currencies)). |
 | Split | Optional | `TRUE` if the row records shares added or removed by a stock split. Defaults to `FALSE`. |
 | Reinvested Dividend | Optional | `TRUE` if the row is a `BUY` paid for with a dividend. Defaults to `FALSE`. |
-| Date | Required | Trade date, such as `2024-03-15`. Excel date cells work too. Dates in the future aren't accepted. |
+| Date | Required | Trade date, such as `2024-03-15`. Excel date cells work too. Dates before 1970-01-01 or in the future aren't accepted. |
 | Created, Updated | Optional | Included in exports for reference. Ignored on import. |
 
 ### Referring to portfolios

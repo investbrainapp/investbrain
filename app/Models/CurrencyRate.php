@@ -14,6 +14,11 @@ use Investbrain\Frankfurter\Frankfurter;
 
 class CurrencyRate extends Model
 {
+    /**
+     * The first date Frankfurter (the European Central Bank's reference rates) has rates for.
+     */
+    public const FIRST_RATE_DATE = '1999-01-04';
+
     protected $hidden = [];
 
     protected $primaryKey = 'currency';
@@ -117,7 +122,14 @@ class CurrencyRate extends Model
             return [];
         }
 
-        $end = $end ?? now();
+        // Frankfurter has no rates before its first date or in the future, so don't build or request
+        // days outside that; callers treat a missing date as a rate of 1, which is what they'd get anyway
+        $start = Carbon::parse($start)->max(self::FIRST_RATE_DATE)->toDateString();
+        $end = Carbon::parse($end ?? now())->min(now())->toDateString();
+
+        if ($start > $end) {
+            return [];
+        }
 
         $period = CarbonPeriod::create($start, $end);
 
