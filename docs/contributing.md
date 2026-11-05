@@ -3,7 +3,7 @@ title: "Contributing"
 description: "How the project is built, setting up a development environment, coding conventions, and making pull requests."
 group: "Contributing"
 order: 40
-updated_at: "2026-11-03"
+updated_at: "2026-11-04"
 ---
 # Contributing
 
@@ -182,6 +182,39 @@ docker build -f docker/Dockerfile -t investbrain:dev .
 ```
 
 Then change `image:` in `docker-compose.yml` to `investbrain:dev` (don't commit that change) and run `docker compose up`.
+
+### Developing a package locally
+
+To work on a package Investbrain depends on, such as `investbrainapp/frankfurter-client`, alongside the app, clone it into the `packages/` folder (which Git ignores):
+
+```bash
+git clone https://github.com/investbrainapp/frankfurter-client.git packages/frankfurter-client
+```
+
+Then create a `composer.local.json` file in the project root. Git ignores this file too. The [Composer merge plugin](https://github.com/wikimedia/composer-merge-plugin) merges it into `composer.json` when Composer runs, so the main `composer.json` stays the same:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/*",
+            "options": { "symlink": true }
+        }
+    ],
+    "require": {
+        "investbrainapp/frankfurter-client": "@dev"
+    }
+}
+```
+
+Then update the package so Composer symlinks your local copy into `vendor/`:
+
+```bash
+composer update investbrainapp/frankfurter-client
+```
+
+Changes you make in `packages/frankfurter-client` now take effect straight away. When you're done, delete `composer.local.json` and run the same `composer update` command again to go back to the published version. Don't commit the `composer.lock` changes this makes.
 
 ## Running the tests
 
