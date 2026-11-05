@@ -27,6 +27,7 @@ use App\Models\User;
 use Database\Seeders\CurrencySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class InvestbrainServerTest extends TestCase
@@ -339,6 +340,22 @@ class InvestbrainServerTest extends TestCase
                 'reinvest_dividends' => true,
             ])
             ->assertHasErrors();
+    }
+
+    #[TestWith(['AAPL'])]
+    #[TestWith(['NOPE'])]
+    public function test_update_holding_treats_another_users_portfolio_as_not_found(string $symbol): void
+    {
+        $this->actingAs(User::factory()->create());
+        $transaction = Transaction::factory()->create(['symbol' => 'AAPL']);
+
+        InvestbrainServer::actingAs($this->user)
+            ->tool(UpdateHoldingTool::class, [
+                'portfolio_id' => $transaction->portfolio_id,
+                'symbol' => $symbol,
+                'reinvest_dividends' => true,
+            ])
+            ->assertHasErrors(['Portfolio not found.']);
     }
 
     public function test_can_get_market_data(): void

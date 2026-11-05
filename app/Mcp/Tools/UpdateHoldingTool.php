@@ -8,6 +8,7 @@ use App\Actions\Holding\UpdateHolding;
 use App\Http\Resources\HoldingResource;
 use App\Models\Portfolio;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\Support\Facades\Gate;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
@@ -29,7 +30,9 @@ class UpdateHoldingTool extends Tool
 
         $portfolio = Portfolio::find($identifiers['portfolio_id']);
 
-        if (! $portfolio) {
+        // a portfolio the user can't change looks the same as one that doesn't exist, so the
+        // reply can't reveal whether it exists or what it holds
+        if (! $portfolio || Gate::denies('fullAccess', $portfolio)) {
             return Response::error('Portfolio not found.');
         }
 
