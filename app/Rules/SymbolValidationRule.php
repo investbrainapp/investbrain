@@ -31,6 +31,21 @@ class SymbolValidationRule implements ValidationRule
     }
 
     /**
+     * The message for a symbol that fails the format, keyed for formatRules() on the given attribute.
+     *
+     * @return array<string, string>
+     */
+    public static function formatMessages(string $attribute): array
+    {
+        return [$attribute.'.regex' => self::formatMessage()];
+    }
+
+    private static function formatMessage(): string
+    {
+        return __('This field may only contain letters, numbers and . - ^ = : / _ (no spaces).');
+    }
+
+    /**
      * Validate the attribute.
      */
     public function validate(string $attribute, mixed $value, \Closure $fail): void
@@ -43,7 +58,7 @@ class SymbolValidationRule implements ValidationRule
         }
 
         if (! preg_match(self::PATTERN, $value)) {
-            $fail(__('This field may only contain letters, numbers and . - ^ = : / _ (no spaces).'));
+            $fail(self::formatMessage());
 
             return;
         }

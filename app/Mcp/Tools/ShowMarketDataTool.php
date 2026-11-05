@@ -6,6 +6,7 @@ namespace App\Mcp\Tools;
 
 use App\Http\Resources\MarketDataResource;
 use App\Models\MarketData;
+use App\Rules\SymbolValidationRule;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -22,8 +23,8 @@ class ShowMarketDataTool extends Tool
     public function handle(Request $request): Response
     {
         $validated = $request->validate([
-            'symbol' => ['required', 'string'],
-        ]);
+            'symbol' => ['required', 'string', ...SymbolValidationRule::formatRules()],
+        ], SymbolValidationRule::formatMessages('symbol'));
 
         try {
             $marketData = MarketData::getMarketData($validated['symbol']);

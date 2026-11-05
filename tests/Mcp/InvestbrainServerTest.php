@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Mcp;
 
+use App\Interfaces\MarketData\MarketDataInterface;
 use App\Mcp\Servers\InvestbrainServer;
 use App\Mcp\Tools\CreatePortfolioTool;
 use App\Mcp\Tools\CreateTransactionTool;
@@ -364,5 +365,16 @@ class InvestbrainServerTest extends TestCase
             ->tool(ShowMarketDataTool::class, ['symbol' => 'AAPL'])
             ->assertOk()
             ->assertSee('"symbol":"AAPL"');
+    }
+
+    #[TestWith(['AA PL'])]
+    #[TestWith(["AA\nPL"])]
+    public function test_market_data_rejects_malformed_symbols_without_asking_the_provider(string $symbol): void
+    {
+        $this->mock(MarketDataInterface::class)->shouldNotReceive('quote');
+
+        InvestbrainServer::actingAs($this->user)
+            ->tool(ShowMarketDataTool::class, ['symbol' => $symbol])
+            ->assertHasErrors(['This field may only contain letters, numbers and . - ^ = : / _ (no spaces).']);
     }
 }
