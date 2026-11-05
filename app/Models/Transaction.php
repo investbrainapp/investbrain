@@ -9,6 +9,7 @@ use App\Actions\CopyToBaseCurrency;
 use App\Actions\EnsureCostBasisAddedToSale;
 use App\Actions\EnsureDailyChangeIsSynced;
 use App\Casts\BaseCurrency;
+use App\Support\Sql;
 use App\Traits\HasMarketData;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Pipeline;
 
 class Transaction extends Model
@@ -147,6 +149,27 @@ class Transaction extends Model
     public function scopeBeforeDate($query, $date): Builder
     {
         return $query->whereDate('date', '<=', $date);
+    }
+
+    /**
+     * Adds the gain per share: the sale price for a sale, otherwise the current market value, less the cost basis
+     */
+    public function scopeWithGainDollars($query): Builder
+    {
+        return $query->selectRaw("
+            (CASE WHEN transactions.transaction_type = 'SELL'
+                THEN COALESCE(transactions.sale_price, 0)
+                ELSE COALESCE((SELECT market_data.market_value FROM market_data WHERE market_data.symbol = transactions.symbol), 0)
+            END) - COALESCE(transactions.cost_basis, 0) AS gain_dollars
+        ");
+    }
+
+    /**
+     * Shares owned across the transactions matching the query
+     */
+    public function scopeSharesOwned($query): float
+    {
+        return (float) $query->sum(DB::raw(Sql::signedQuantity()));
     }
 
     public function scopeMyTransactions($query): Builder

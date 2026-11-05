@@ -55,12 +55,7 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                     ->with(['portfolio', 'market_data'])
                     ->myTransactions()
                     ->addSelect(['transactions.*'])
-                    ->selectRaw('
-                        (CASE
-                            WHEN transaction_type = \'SELL\'
-                            THEN COALESCE(transactions.sale_price, 0)
-                            ELSE COALESCE((SELECT market_value FROM market_data WHERE market_data.symbol = transactions.symbol LIMIT 1), 0)
-                        END) - COALESCE(transactions.cost_basis, 0) AS gain_dollars')
+                    ->withGainDollars()
             )
             ->defaultSort('date', 'desc')
             ->extremePaginationLinks()
