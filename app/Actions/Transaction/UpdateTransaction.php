@@ -23,9 +23,9 @@ class UpdateTransaction
     {
         Gate::authorize('fullAccess', $transaction->portfolio);
 
-        abort_if(isset($data['portfolio_id']) && ! is_string($data['portfolio_id']), 422, __('validation.string'));
-
-        $portfolio = isset($data['portfolio_id']) ? Portfolio::find($data['portfolio_id']) : $transaction->portfolio;
+        $portfolio = isset($data['portfolio_id'])
+            ? (is_string($data['portfolio_id']) ? Portfolio::find($data['portfolio_id']) : null)
+            : $transaction->portfolio;
 
         // moving a transaction also requires full access to the destination portfolio, checked before
         // validating for the same reason as in CreateTransaction; a missing one is left for validation to report
