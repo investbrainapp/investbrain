@@ -250,4 +250,20 @@ class DailyChangeTest extends TestCase
     {
         return ($date->isWeekday() ? $date->copy() : $date->copy()->nextWeekday())->toDateString();
     }
+
+    public function test_cost_basis_includes_transactions_made_that_day(): void
+    {
+        $date = now()->subMonths(2)->nextWeekday()->toDateString();
+
+        $transaction = Transaction::factory()->buy(3)->costBasis(50)->date($date)->portfolio($this->portfolio->id)->symbol('ACME')->create();
+
+        $this->portfolio->syncDailyChanges();
+
+        $daily_change = DailyChange::withDailyPerformance()
+            ->portfolio($this->portfolio->id)
+            ->whereDate('daily_change.date', '=', $date)
+            ->first();
+
+        $this->assertEqualsWithDelta($transaction->quantity * $transaction->cost_basis, $daily_change->total_cost_basis, 0.01);
+    }
 }

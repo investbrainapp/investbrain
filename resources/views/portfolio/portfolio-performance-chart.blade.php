@@ -48,7 +48,7 @@ new #[Lazy] class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $dailyChangeQuery = DailyChange::withDailyPerformance();
+        $dailyChangeQuery = DailyChange::query();
 
         if (isset($this->portfolio)) {
 
@@ -65,6 +65,9 @@ new #[Lazy] class extends Component
 
             $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
+
+        // after the filters, so performance is only calculated for the portfolios shown
+        $dailyChangeQuery->withDailyPerformance();
 
         $dailyChange = cache()->remember(
             'graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
