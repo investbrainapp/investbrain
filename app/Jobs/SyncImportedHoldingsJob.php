@@ -62,7 +62,8 @@ class SyncImportedHoldingsJob implements ShouldQueue
 
         Portfolio::whereIn('id', $this->portfolioIds)->get()->each(function (Portfolio $portfolio) {
             try {
-                $portfolio->syncDailyChanges();
+                // through the same job as other syncs, so it runs one at a time per portfolio
+                SyncDailyChangesJob::dispatch($portfolio);
             } catch (Throwable $e) {
                 Log::warning('Could not sync daily changes for portfolio '.$portfolio->id.' after import: '.$e->getMessage());
             }
