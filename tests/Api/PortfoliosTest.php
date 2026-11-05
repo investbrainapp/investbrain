@@ -236,6 +236,16 @@ class PortfoliosTest extends ApiTestCase
             ->assertForbidden();
     }
 
+    public function test_updating_another_users_portfolio_is_forbidden_even_with_invalid_data()
+    {
+        $this->actingAs($this->user);
+        $portfolio = Portfolio::factory()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->putJson(route('api.portfolio.update', $portfolio), ['title' => str_repeat('a', 300)])
+            ->assertForbidden();
+    }
+
     public function test_can_delete_a_portfolio()
     {
         $this->actingAs($this->user);

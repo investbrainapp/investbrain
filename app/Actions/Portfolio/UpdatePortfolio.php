@@ -18,9 +18,10 @@ class UpdatePortfolio
      */
     public function handle(Portfolio $portfolio, array $data): Portfolio
     {
-        $validated = Validator::make($data, $this->rules())->validate();
-
+        // check access first, like the transaction and holding actions, so someone else's portfolio is always a 403
         Gate::authorize('fullAccess', $portfolio);
+
+        $validated = Validator::make($data, $this->rules())->validate();
 
         $portfolio->update($validated);
 
