@@ -3,7 +3,7 @@ title: "Contributing"
 description: "How the project is built, setting up a development environment, coding conventions, and making pull requests."
 group: "Contributing"
 order: 40
-updated_at: "2026-11-04"
+updated_at: "2026-11-05"
 ---
 # Contributing
 
@@ -314,15 +314,14 @@ git checkout -b fix/same-day-sell-validation
 
 ### 3. Check your work
 
-Before pushing, make sure:
+Before pushing, make sure of the following. The same checklist is at the end of the pull request template.
 
 - [ ] `php artisan test --compact` passes
 - [ ] `vendor/bin/pint --dirty` has been run
 - [ ] New or changed behaviour has tests
-- [ ] New strings are in `en.json`, `es.json`, and `fr.json`
+- [ ] New translation strings are in `lang/` (in `en.json`, `es.json`, and `fr.json`)
 - [ ] Docs, `README.md`, and `openapi.json` are updated if the change affects users or the API
-- [ ] You've tried the change in the browser, if it touches the interface
-- [ ] No new dependencies, unless they were agreed in an issue
+- [ ] You've tried the change in the browser, if it touches the UI
 
 ### 4. Write good commit messages
 
@@ -330,13 +329,14 @@ Use a short summary line in the imperative mood, such as "Count same-day purchas
 
 ### 5. Open the pull request
 
-Push your branch to your fork and open a pull request against `investbrainapp/investbrain:main`. In the description, include:
+Push your branch to your fork and open a pull request against `investbrainapp/investbrain:main`. The description starts from a template with a section for each of these:
 
-- **What** the change does and **why**
-- A link to the related issue (for example `Fixes #123`)
-- **How you tested it**, including confirmation that the test suite passes
-- **Screenshots or a short recording** for interface changes
-- Anything reviewers should look at closely, or any follow-up work you've left out
+- **What** the change does
+- **Why** it's needed, with a link to any related issues (for example `Fixes #123`)
+- **How** you solved it (the specific changes)
+- **Testing**: the new or changed tests and whether they fail without your change, or why you didn't add tests
+- **Screenshots** or a short recording, for interface changes
+- **Notes for reviewers**: anything to look at closely, trade-offs you made, or follow-up work you've left out
 
 Mark the pull request as a draft if you'd like early feedback before it's finished.
 
