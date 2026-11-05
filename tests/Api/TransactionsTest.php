@@ -283,6 +283,29 @@ class TransactionsTest extends ApiTestCase
             ->assertJsonValidationErrors('portfolio_id');
     }
 
+    public function test_a_portfolio_id_that_is_not_a_string_is_rejected()
+    {
+        Artisan::call('db:seed', ['--class' => CurrencySeeder::class, '--force' => true]);
+        $this->actingAs($this->user);
+        $transaction = Transaction::factory()->buy()->lastMonth()->portfolio($this->portfolio->id)->symbol('AAPL')->create();
+
+        $this->postJson(route('api.transaction.store'), [
+            'symbol' => 'AAPL',
+            'portfolio_id' => [$this->portfolio->id],
+            'transaction_type' => 'BUY',
+            'quantity' => 1,
+            'currency' => 'USD',
+            'date' => now()->toDateString(),
+            'cost_basis' => 150,
+        ])->assertUnprocessable();
+
+        $this->putJson(route('api.transaction.update', ['transaction' => $transaction->id]), [
+            'portfolio_id' => [$this->portfolio->id],
+        ])->assertUnprocessable();
+
+        $this->assertSame($this->portfolio->id, $transaction->fresh()->portfolio_id);
+    }
+
     #[TestWith(['AA PL'])]
     #[TestWith(["AB'C"])]
     #[TestWith(['ABCDEFGHIJKLMNOPQRSTUVWXYZ'])]
