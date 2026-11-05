@@ -60,7 +60,6 @@ class ConnectedAccountController extends Controller
             'secret' => $providerUser->tokenSecret,
             'refresh_token' => $providerUser->refreshToken,
             'expires_at' => $providerUser->expiresIn,
-            'verified_at' => false,
         ]);
 
         // already linked and verified, let's go login!

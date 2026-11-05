@@ -8,6 +8,7 @@ use App\Http\Controllers\ConnectedAccountController;
 use App\Models\ConnectedAccount;
 use App\Models\User;
 use App\Notifications\VerifyConnectedAccountNotification;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -144,6 +145,35 @@ class ConnectedAccountTest extends TestCase
 
         $response->assertRedirect(route('login'));
         $response->assertSessionHas('status', 'Account already exists. Check your email to connect your GitHub account.');
+    }
+
+    public function test_an_account_waiting_for_its_email_link_stays_unverified_even_if_verified_at_were_fillable(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        User::factory()->create(['email' => 'jane@example.com']);
+
+        Socialite::shouldReceive('driver')
+            ->with('github')
+            ->andReturnSelf()
+            ->shouldReceive('user')
+            ->andReturn((object) [
+                'id' => '54321',
+                'name' => 'Jane Doe',
+                'email' => 'jane@example.com',
+                'token' => 'token',
+                'tokenSecret' => null,
+                'refreshToken' => null,
+                'expiresIn' => null,
+            ]);
+
+        // the defaults given to firstOrNew mustn't mark the account verified once mass assignment allows it
+        Model::unguarded(function (): void {
+            $this->get(route('oauth.callback', ['provider' => 'github']))->assertRedirect(route('login'));
+            $this->get(route('oauth.callback', ['provider' => 'github']))->assertRedirect(route('login'));
+        });
+
+        $this->assertNull(ConnectedAccount::sole()->verified_at);
+        $this->assertGuest();
     }
 
     public function test_verify_connected_account()
