@@ -206,7 +206,6 @@ The container will attempt to correct the folder's permissions on startup.
 The default compose file is designed to get you running quickly. Before exposing Investbrain to the internet:
 
 - **Change the database password** (see step 2 of [Installation](#installation)).
-- **Stop publishing PostgreSQL to the host.** The `pgsql` service has `ports: - "5432:5432"`, which makes the database reachable from outside Docker. Investbrain connects over the internal Docker network and doesn't need it. Remove those two lines unless you need direct database access.
 - **Serve over HTTPS** through a reverse proxy (below).
 - **Turn off registration** if you don't want strangers creating accounts.
 

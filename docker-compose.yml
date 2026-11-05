@@ -44,8 +44,6 @@ services:
     image: postgres:15-alpine
     container_name: investbrain-pgsql
     restart: unless-stopped
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_DB: ${DB_DATABASE:-investbrain}
       POSTGRES_USER: ${DB_USERNAME:-investbrain}

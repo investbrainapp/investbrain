@@ -65,7 +65,7 @@ The `app` container waits up to a minute for PostgreSQL, then gives up. Check th
 
 ### "Bind for 0.0.0.0:8000 failed: port is already allocated"
 
-Something else on the host is using that port. Either stop it or [change Investbrain's port](self-hosting.md#changing-the-port). The same applies to `5432` if you already run PostgreSQL on the host; in that case remove the `ports` lines from the `pgsql` service (Investbrain doesn't need them).
+Something else on the host is using that port. Either stop it or [change Investbrain's port](self-hosting.md#changing-the-port).
 
 ### I can't find my APP_KEY
 

@@ -134,19 +134,17 @@ MAIL_MAILER=log
 
 ### 4. Start PostgreSQL and Redis
 
-The repository's compose file already defines PostgreSQL with its port published, so you can start just that service:
+The compose file doesn't publish either service to the host, so run separate containers for them:
 
 ```bash
-docker compose up -d pgsql
+docker run -d --name investbrain-dev-pgsql -p 127.0.0.1:5432:5432 -e POSTGRES_DB=investbrain -e POSTGRES_USER=investbrain -e POSTGRES_PASSWORD=investbrain postgres:15-alpine
 ```
-
-Redis isn't published to the host in the compose file, so run a separate container for it:
 
 ```bash
-docker run -d --name investbrain-dev-redis -p 6379:6379 redis:alpine
+docker run -d --name investbrain-dev-redis -p 127.0.0.1:6379:6379 redis:alpine
 ```
 
-The database credentials in `.env.example` (`investbrain` / `investbrain` / `investbrain`) match the compose file.
+The database credentials match the defaults in `.env.example` (`investbrain` / `investbrain` / `investbrain`).
 
 Use PostgreSQL for development rather than SQLite. Some features, such as search, rely on database full-text search that SQLite doesn't support.
 
