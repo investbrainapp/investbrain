@@ -173,6 +173,25 @@ class TransactionsTest extends TestCase
         $this->assertDatabaseCount('transactions', 0);
     }
 
+    public function test_transaction_form_rejects_symbols_the_import_would_reject(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+
+        Livewire::test('manage-transaction-form', ['portfolio' => $portfolio])
+            ->set('symbol', 'AA PL')
+            ->set('transaction_type', 'BUY')
+            ->set('date', now()->toDateString())
+            ->set('quantity', 1)
+            ->set('cost_basis', 100)
+            ->set('currency', 'USD')
+            ->call('save')
+            ->assertHasErrors('symbol')
+            ->assertSee('This field may only contain letters, numbers and . - ^ = : / _ (no spaces).');
+
+        $this->assertDatabaseCount('transactions', 0);
+    }
+
     public function test_transactions_list_cannot_open_a_transaction_from_another_portfolio(): void
     {
         [$member, $ownPortfolio, $readOnlyTransaction] = $this->createReadOnlyMemberWithOwnPortfolio();
