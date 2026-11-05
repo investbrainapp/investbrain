@@ -7,6 +7,7 @@ namespace Tests;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
 use Livewire\Livewire;
 
@@ -27,6 +28,22 @@ class UpdatePasswordTest extends TestCase
             ->call('updatePassword');
 
         $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+    }
+
+    public function test_changing_the_password_cancels_outstanding_reset_links(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+        $token = Password::broker()->createToken($user);
+
+        Livewire::test('update-password-form')
+            ->set('state', [
+                'current_password' => 'password',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])
+            ->call('updatePassword');
+
+        $this->assertFalse(Password::broker()->tokenExists($user, $token));
     }
 
     public function test_current_password_must_be_correct(): void
