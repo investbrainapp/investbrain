@@ -21,11 +21,16 @@ class CreateTransaction
      */
     public function handle(array $data): Transaction
     {
-        $portfolio = Portfolio::find($data['portfolio_id'] ?? null);
+        $portfolio = is_string($data['portfolio_id'] ?? null) ? Portfolio::find($data['portfolio_id']) : null;
+
+        // check access before validating: the quantity rule reads the portfolio's transactions, so validating
+        // first would let the response depend on what someone else's portfolio holds. A portfolio that doesn't
+        // exist is left for validation to report.
+        if ($portfolio) {
+            Gate::authorize('fullAccess', $portfolio);
+        }
 
         $validated = Validator::make($data, $this->rules->build($data, $portfolio))->validate();
-
-        Gate::authorize('fullAccess', $portfolio);
 
         return Transaction::create($validated);
     }

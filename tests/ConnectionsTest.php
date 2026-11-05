@@ -8,6 +8,7 @@ use App\Models\ConnectedAccount;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Laravel\Passport\AuthCode;
 use Laravel\Passport\Client;
 use Laravel\Passport\Passport;
 use Laravel\Passport\Token;
@@ -211,6 +212,27 @@ class ConnectionsTest extends TestCase
         $this->assertFalse($untouched->refreshToken()->first()->revoked);
     }
 
+    public function test_revoking_an_app_revokes_its_unexchanged_authorization_codes(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $client = $this->createClient('Claude Code');
+        $this->createToken($user, $client);
+        $code = $this->createAuthCode($user, $client);
+
+        $otherClient = $this->createClient('Other App');
+        $this->createToken($user, $otherClient);
+        $otherCode = $this->createAuthCode($user, $otherClient);
+
+        Livewire::test('authorized-apps-manager')
+            ->call('confirmRevoke', $client->id)
+            ->call('revoke');
+
+        // otherwise the app could still exchange the code for a new token
+        $this->assertTrue($code->fresh()->revoked);
+        $this->assertFalse($otherCode->fresh()->revoked);
+    }
+
     public function test_cannot_revoke_another_users_app(): void
     {
         $otherUser = User::factory()->create();
@@ -240,6 +262,18 @@ class ConnectionsTest extends TestCase
         $account->save();
 
         return $account;
+    }
+
+    protected function createAuthCode(User $user, Client $client): AuthCode
+    {
+        return Passport::authCode()->forceCreate([
+            'id' => Str::random(80),
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'scopes' => json_encode(['mcp:use']),
+            'revoked' => false,
+            'expires_at' => now()->addMinutes(10),
+        ]);
     }
 
     protected function createClient(string $name): Client

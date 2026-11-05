@@ -87,6 +87,12 @@ new class extends Component
             $token->refreshToken?->revoke();
         });
 
+        // an authorization code the app hasn't exchanged yet would otherwise still get it a new token
+        Passport::authCode()->newQuery()
+            ->where('user_id', Auth::id())
+            ->where('client_id', $this->clientIdBeingRevoked)
+            ->update(['revoked' => true]);
+
         $this->confirmingRevoke = false;
 
         $this->clientIdBeingRevoked = null;

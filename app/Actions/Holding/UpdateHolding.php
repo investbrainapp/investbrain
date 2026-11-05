@@ -18,9 +18,9 @@ class UpdateHolding
      */
     public function handle(Holding $holding, array $data): Holding
     {
-        $validated = Validator::make($data, $this->rules())->validate();
-
         Gate::authorize('fullAccess', $holding->portfolio);
+
+        $validated = Validator::make($data, $this->rules())->validate();
 
         $holding->update($validated);
 

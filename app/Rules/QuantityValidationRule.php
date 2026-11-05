@@ -32,6 +32,8 @@ class QuantityValidationRule implements ValidationRule
         if (is_null($this->portfolio) || is_null($this->symbol) || is_null($this->transactionType) || is_null($this->date)) {
             //
             $fail(__('The quantity must not be greater than the available quantity.'));
+
+            return;
         }
 
         if ($this->transactionType == 'SELL') {
