@@ -9,6 +9,7 @@ use App\Models\Portfolio;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class HoldingsTest extends ApiTestCase
 {
@@ -126,6 +127,18 @@ class HoldingsTest extends ApiTestCase
         $otherUser = User::factory()->create();
         $this->actingAs($otherUser)
             ->putJson(route('api.holding.update', ['portfolio' => $transaction->portfolio_id, 'symbol' => $transaction->symbol]), $data)
+            ->assertForbidden();
+    }
+
+    #[TestWith(['AAPL'])]
+    #[TestWith(['NOPE'])]
+    public function test_updating_a_holding_in_another_users_portfolio_is_forbidden_whether_or_not_it_exists(string $symbol)
+    {
+        $this->actingAs(User::factory()->create());
+        $transaction = Transaction::factory()->create(['symbol' => 'AAPL']);
+
+        $this->actingAs($this->user)
+            ->putJson(route('api.holding.update', ['portfolio' => $transaction->portfolio_id, 'symbol' => $symbol]), ['reinvest_dividends' => true])
             ->assertForbidden();
     }
 }

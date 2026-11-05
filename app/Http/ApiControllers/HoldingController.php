@@ -47,6 +47,9 @@ class HoldingController extends ApiController
 
     public function update(Request $request, Portfolio $portfolio, string $symbol, UpdateHolding $action)
     {
+        // check access before looking the holding up, so a 404 can't reveal what another portfolio holds
+        Gate::authorize('fullAccess', $portfolio);
+
         $holding = $portfolio->holdings()->symbol($symbol)->firstOrFail();
 
         return HoldingResource::make($action->handle($holding, $request->all()));
