@@ -9,6 +9,7 @@ use App\Imports\ImportSheet;
 use App\Models\Currency;
 use App\Models\CurrencyRate;
 use App\Models\Transaction;
+use App\Rules\SymbolValidationRule;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
@@ -105,7 +106,8 @@ class TransactionsSheet extends ImportSheet
     {
         return [
             'transaction_id' => ['nullable', 'uuid'],
-            'symbol' => ['required', 'string', 'max:25', 'regex:/^[A-Za-z0-9.\-^=:\/_]+$/'],
+            // the same format the API and transaction form accept; BackupImport::checkSymbols() looks them up
+            'symbol' => ['required', 'string', ...SymbolValidationRule::formatRules()],
             'portfolio_id' => ['required', 'uuid'],
             'transaction_type' => ['required', 'in:BUY,SELL'],
             // splits are recorded as a share adjustment, which is negative for reverse splits

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Api;
 
+use App\Interfaces\MarketData\MarketDataInterface;
 use App\Models\MarketData;
 use App\Models\Portfolio;
 use App\Models\Transaction;
@@ -280,6 +281,31 @@ class TransactionsTest extends ApiTestCase
             ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('portfolio_id');
+    }
+
+    #[TestWith(['AA PL'])]
+    #[TestWith(["AB'C"])]
+    #[TestWith(['ABCDEFGHIJKLMNOPQRSTUVWXYZ'])]
+    public function test_malformed_symbols_are_rejected_without_asking_the_provider(string $symbol)
+    {
+        Artisan::call('db:seed', [
+            '--class' => CurrencySeeder::class,
+            '--force' => true,
+        ]);
+        $this->mock(MarketDataInterface::class)->shouldNotReceive('exists');
+
+        $this->actingAs($this->user)
+            ->postJson(route('api.transaction.store'), [
+                'symbol' => $symbol,
+                'portfolio_id' => $this->portfolio->id,
+                'transaction_type' => 'BUY',
+                'quantity' => 10,
+                'currency' => 'USD',
+                'date' => now()->toDateString(),
+                'cost_basis' => 150,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('symbol');
     }
 
     public function test_cannot_create_transaction_without_required_fields()

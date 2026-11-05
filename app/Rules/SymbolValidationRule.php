@@ -10,16 +10,24 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class SymbolValidationRule implements ValidationRule
 {
-    public $symbol;
+    /**
+     * The characters a symbol may contain, e.g. AAPL, BRK.B, BTC-USD, BTC/USD, ^GSPC, EURUSD=X.
+     */
+    public const PATTERN = '/^[A-Za-z0-9.\-^=:\/_]+$/';
 
     /**
-     * Create a new rule instance.
-     *
-     * @return void
+     * The longest symbol the symbol columns hold.
      */
-    public function __construct()
+    public const MAX_LENGTH = 25;
+
+    /**
+     * The format checks on their own, for places that look symbols up some other way, like the import.
+     *
+     * @return list<string>
+     */
+    public static function formatRules(): array
     {
-        //
+        return ['max:'.self::MAX_LENGTH, 'regex:'.self::PATTERN];
     }
 
     /**
@@ -27,17 +35,28 @@ class SymbolValidationRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
-        $this->symbol = $value;
+        // check the format first, so a malformed value never reaches the market data provider
+        if (! is_string($value) || mb_strlen($value) > self::MAX_LENGTH) {
+            $fail(__('validation.max.string', ['max' => self::MAX_LENGTH]));
+
+            return;
+        }
+
+        if (! preg_match(self::PATTERN, $value)) {
+            $fail(__('This field may only contain letters, numbers and . - ^ = : / _ (no spaces).'));
+
+            return;
+        }
 
         // Check if the symbol exists in the Market Data table first (avoid API call)
-        if (MarketData::find($this->symbol)) {
+        if (MarketData::find($value)) {
 
             return;
         }
 
         // Then check against market data provider
         if (! app(MarketDataInterface::class)->exists($value)) {
-            $fail('The symbol provided ('.$this->symbol.') is not valid');
+            $fail('The symbol provided ('.$value.') is not valid');
         }
     }
 }
