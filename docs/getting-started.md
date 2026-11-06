@@ -3,7 +3,7 @@ title: "Getting Started"
 description: "The dashboard, portfolios, sharing, transactions, holdings, dividends, splits, search, and AI chat."
 group: "Using Investbrain"
 order: 10
-updated_at: "2026-11-02"
+updated_at: "2026-11-05"
 ---
 # Getting Started
 
@@ -224,6 +224,8 @@ Investbrain tracks prices in the currency each security trades in, and converts 
 - **Display currency** - dashboard and portfolio totals and performance charts are converted into your personal display currency. Change it under [Locale and display currency](account-settings.md#locale-and-display-currency).
 
 Exchange rates are refreshed daily. Some exchanges quote prices in minor units; Investbrain has aliases built-in for GBX (British pence), ZAC (South African cents), and RMB (a.k.a. Chinese Yuan) and adjusts them automatically.
+
+For a worked example and which exchange rate is used for each number, see [How multi-currency works](multi-currency.md).
 
 ## Performance charts
 
