@@ -78,7 +78,8 @@ Every time the `app` container starts, the entrypoint script:
 3. Generates OAuth signing keys (`storage/oauth-private.key` and `storage/oauth-public.key`) if they don't exist. These are used for API tokens and MCP authorization.
 4. Runs database migrations, retrying every 5 seconds for up to a minute while the database starts. If the database still isn't reachable, the container exits.
 5. Clears and rebuilds caches.
-6. Starts Supervisor, which runs Nginx, PHP-FPM, the scheduler, and two queue workers.
+6. Sends anonymous usage statistics, unless you've turned them off. See [Telemetry](#telemetry).
+7. Starts Supervisor, which runs Nginx, PHP-FPM, the scheduler, and two queue workers.
 
 The image also has a health check that requests `/up` every 30 seconds. `docker ps` shows the container as `healthy` once it's serving requests.
 
@@ -168,6 +169,12 @@ docker compose up -d
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_ENCRYPTION` | SMTP server settings. | none |
 | `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` | Sender address and name. | `hello@example.com`, `Investbrain` |
 
+**Telemetry**
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `TELEMETRY_ENABLED` | Send anonymous usage statistics each time the container starts. See [Telemetry](#telemetry). | `true` |
+
 **Database and Redis**
 
 These are already set correctly in the compose file. Only change them if you know you need to.
@@ -208,6 +215,28 @@ The default compose file is designed to get you running quickly. Before exposing
 - **Change the database password** (see step 2 of [Installation](#installation)).
 - **Serve over HTTPS** through a reverse proxy (below).
 - **Turn off registration** if you don't want strangers creating accounts.
+
+## Telemetry
+
+Each time the `app` container starts, Investbrain sends one anonymous report to `https://investbra.in/telemetry`. It helps the maintainers see which versions are running, which databases and platforms to support, and roughly how Investbrain is used.
+
+A report contains:
+
+- A random ID for your instance, created on first start and saved in `storage/app/.instance-id`, so restarts count as the same instance.
+- The Investbrain version.
+- The environment: PHP version, operating system, CPU architecture, database type (`pgsql`, `mysql` or `sqlite`), whether it runs in Docker, and `APP_TIMEZONE`.
+- Which features are on: market data providers (custom providers are reported as `custom`), base currency, whether registration, AI chat (and its provider) and the MCP server are on, which social login providers are enabled, and the mail driver.
+- Counts: users, users active in the last 30 days, users with two-factor authentication, portfolios, transactions, open holdings and symbols, plus how many users pick each language and display currency.
+
+It never includes names, email addresses, portfolio titles, symbols, amounts, API keys, your `APP_URL` or domain. The country is looked up from the address the report comes from, and the address itself isn't stored.
+
+To see exactly what your instance would send:
+
+```bash
+docker exec -it investbrain-app php artisan telemetry:send --show
+```
+
+To turn it off, set `TELEMETRY_ENABLED` to `false` and [apply the change](#applying-configuration-changes). If a report can't be sent, for example because your server has no internet access, Investbrain starts normally.
 
 ## Running behind a reverse proxy (HTTPS)
 

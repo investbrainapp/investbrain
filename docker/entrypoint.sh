@@ -97,6 +97,12 @@ echo $(php artisan event:clear)
 echo $(php artisan route:cache)
 echo $(php artisan event:cache)
 
+echo -e "\n====================== Sending telemetry...  ====================== \n"
+
+# Anonymous usage statistics on every start; TELEMETRY_ENABLED=false turns this off
+php artisan telemetry:send || true
+[ -f storage/app/.instance-id ] && chown www-data:www-data storage/app/.instance-id
+
 echo -e "\n====================== Spinning up Supervisor daemon...  ====================== \n"
 
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
