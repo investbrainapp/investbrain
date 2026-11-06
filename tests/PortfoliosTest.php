@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Models\DailyChange;
 use App\Models\Portfolio;
 use App\Models\User;
+use Carbon\CarbonPeriod;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 
@@ -86,5 +90,76 @@ class PortfoliosTest extends TestCase
 
         Livewire::test('portfolio-performance-chart', ['portfolio' => $portfolio])
             ->set('scopeOptions', [['id' => 'YTD', 'name' => 'Year to date', 'method' => 'subDays', 'args' => [1]]]);
+    }
+
+    public function test_performance_chart_shows_every_day_for_up_to_a_year(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        $days = $this->createDailyChanges($portfolio, now()->subYear());
+
+        $points = $this->chartPoints($portfolio);
+
+        $this->assertEquals($days->all(), array_column($points, 0));
+    }
+
+    public function test_performance_chart_shows_the_last_day_of_each_week_past_a_year(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        $days = $this->createDailyChanges($portfolio, now()->subYears(2));
+
+        $points = $this->chartPoints($portfolio);
+
+        $lastDayOfEachWeek = $days->groupBy(fn ($day) => Carbon::parse($day)->format('o-W'))->map->last()->values();
+
+        $this->assertEquals($lastDayOfEachWeek->all(), array_column($points, 0));
+        $this->assertEquals($days->last(), end($points)[0]);
+    }
+
+    public function test_performance_chart_shows_the_last_day_of_each_month_past_three_years(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        $days = $this->createDailyChanges($portfolio, now()->subYears(4));
+
+        $points = $this->chartPoints($portfolio);
+
+        $lastDayOfEachMonth = $days->groupBy(fn ($day) => Carbon::parse($day)->format('Y-m'))->map->last()->values();
+
+        $this->assertEquals($lastDayOfEachMonth->all(), array_column($points, 0));
+
+        // each point keeps that day's value rather than adding up the month
+        $this->assertEquals($days->search(end($points)[0]), end($points)[1]);
+    }
+
+    /**
+     * Creates a daily change for each weekday since the start date, valued at its position in the series
+     */
+    private function createDailyChanges(Portfolio $portfolio, Carbon $start): Collection
+    {
+        $days = collect(CarbonPeriod::create($start, now()->subDay())->filter('isWeekday'))
+            ->map(fn (Carbon $day) => $day->toDateString())
+            ->values();
+
+        DailyChange::insert($days->map(fn (string $day, int $index) => [
+            'date' => $day,
+            'portfolio_id' => $portfolio->id,
+            'total_market_value' => $index,
+        ])->all());
+
+        return $days;
+    }
+
+    /**
+     * Market value points of the portfolio's all time performance chart
+     *
+     * @return array<int, array{0: string, 1: float}>
+     */
+    private function chartPoints(Portfolio $portfolio): array
+    {
+        return Livewire::withoutLazyLoading()
+            ->test('portfolio-performance-chart', ['portfolio' => $portfolio, 'scope' => 'ALL'])
+            ->get('chartSeries')['series'][1]['data'];
     }
 }
