@@ -49,7 +49,7 @@ Two-factor authentication (2FA) adds a one-time code from your phone to the sign
 
 ## Social logins
 
-Social logins let you sign in with GitHub, Google, Facebook, or LinkedIn instead of (or as well as) your password. The **Social Logins** section on the Connections page lists the providers that are available. On a self-hosted instance, providers only appear if you've [configured them](self-hosting.md#social-login).
+Social logins let you sign in with GitHub, Google, Facebook, LinkedIn, or your organization's single sign-on (SSO) instead of (or as well as) your password. The **Social Logins** section on the Connections page lists the providers that are available. On a self-hosted instance, providers only appear if you've [configured them](self-hosting.md#social-login).
 
 ![The Social Logins section of the Connections page](images/account-settings-social-logins.png)
 

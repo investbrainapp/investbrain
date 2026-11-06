@@ -223,8 +223,10 @@ Logins are limited to five attempts per minute for each email and IP address. Wa
 
 ### Social login fails with "redirect_uri mismatch" or "Could not login using ..."
 
-- The callback URL registered with the provider must be exactly `https://<your-host>/auth/<provider>/callback` (`github`, `google`, `facebook`, or `linkedin-openid`), including the scheme and port.
+- The callback URL registered with the provider must be exactly `https://<your-host>/auth/<provider>/callback` (`github`, `google`, `facebook`, `linkedin-openid`, or `oidc`), including the scheme and port.
 - Check that the client ID and secret are correct and that the provider is listed in `ENABLED_LOGIN_PROVIDERS`.
+- For OpenID Connect, check `storage/logs/laravel.log`. A common cause is an `OIDC_ISSUER` that doesn't match the `issuer` in the provider's discovery document: copy the issuer exactly as your provider shows it.
+- If a user sees **Your ... account doesn't have a verified email address**, the provider didn't send an email address, or didn't mark it as verified. Verify the address in the provider, or see [`OIDC_REQUIRE_VERIFIED_EMAIL`](self-hosting.md#openid-connect-sso).
 - If a user sees **There is no account for your ... login**, nobody has an Investbrain account with that email and [`SSO_AUTO_PROVISION`](self-hosting.md#social-login) is off. Create the account first (or let them register), or turn auto-provisioning on.
 - If a user sees **Account already exists. Check your email...**, an account with that email already exists. They need to click the link in the verification email (so email must be working), or sign in with their password and connect the provider from **Connections** instead.
 

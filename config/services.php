@@ -70,6 +70,16 @@ return [
         'name' => 'Linkedin',
     ],
 
+    'oidc' => [
+        'issuer' => env('OIDC_ISSUER'),
+        'client_id' => env('OIDC_CLIENT_ID'),
+        'client_secret' => env('OIDC_CLIENT_SECRET'),
+        'redirect' => '/auth/oidc/callback',
+        'require_verified_email' => env('OIDC_REQUIRE_VERIFIED_EMAIL', true),
+        'color' => env('OIDC_BUTTON_COLOR', '#4b5563'),
+        'name' => env('OIDC_NAME', 'SSO'),
+    ],
+
     //
     'enabled_login_providers' => env('ENABLED_LOGIN_PROVIDERS', ''),
     'sso_auto_provision' => env('SSO_AUTO_PROVISION', false),

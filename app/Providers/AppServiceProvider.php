@@ -8,6 +8,7 @@ use App\Http\ApiControllers\Controller as ApiController;
 use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\MarketDataInterface;
 use App\Models\User;
+use App\Support\OidcProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
+use Laravel\Socialite\Facades\Socialite;
 use NumberFormatter;
 
 class AppServiceProvider extends ServiceProvider
@@ -64,6 +66,14 @@ class AppServiceProvider extends ServiceProvider
         Passport::tokensCan([
             'mcp:use' => __('View and manage your portfolios, transactions, and holdings'),
         ]);
+
+        Socialite::extend('oidc', function (): OidcProvider {
+            $config = config('services.oidc');
+
+            return Socialite::buildProvider(OidcProvider::class, $config)
+                ->setIssuer((string) $config['issuer'])
+                ->setRequireVerifiedEmail((bool) $config['require_verified_email']);
+        });
 
         Arr::macro('skipEmptyValues', function (array $array) {
 
