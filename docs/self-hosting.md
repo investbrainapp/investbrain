@@ -218,7 +218,7 @@ The default compose file is designed to get you running quickly. Before exposing
 
 ## Telemetry
 
-Each time the `app` container starts, Investbrain sends one anonymous report to `https://investbra.in/telemetry`. It helps the maintainers see which versions are running, which databases and platforms to support, and roughly how Investbrain is used.
+Each time the `app` container starts, the entrypoint runs `docker/telemetry.sh`, which sends one anonymous report to `https://investbra.in/telemetry`. It helps the maintainers see which versions are running, which databases and platforms to support, and roughly how Investbrain is used.
 
 A report contains:
 
@@ -233,7 +233,7 @@ It never includes names, email addresses, portfolio titles, symbols, amounts, AP
 To see exactly what your instance would send:
 
 ```bash
-docker exec -it investbrain-app php artisan telemetry:send --show
+docker exec -it investbrain-app bash docker/telemetry.sh --show
 ```
 
 To turn it off, set `TELEMETRY_ENABLED` to `false` and [apply the change](#applying-configuration-changes). If a report can't be sent, for example because your server has no internet access, Investbrain starts normally.

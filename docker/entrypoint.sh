@@ -100,7 +100,7 @@ echo $(php artisan event:cache)
 echo -e "\n====================== Sending telemetry...  ====================== \n"
 
 # Anonymous usage statistics on every start; TELEMETRY_ENABLED=false turns this off
-php artisan telemetry:send || true
+bash ./docker/telemetry.sh
 [ -f storage/app/.instance-id ] && chown www-data:www-data storage/app/.instance-id
 
 echo -e "\n====================== Spinning up Supervisor daemon...  ====================== \n"
