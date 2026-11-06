@@ -333,18 +333,84 @@ class ConnectedAccountTest extends TestCase
             'verified_at' => now(),
         ]);
         $user = User::factory()->create();
-        $this->mockProviderUser('github', $this->providerUser('777', $owner->email));
+        $this->mockProviderUser('github', $this->providerUser('777', $owner->email, ['token' => 'new-token']));
 
         $response = $this->actingAs($user)->get(route('oauth.callback', ['provider' => 'github']));
 
         $response->assertRedirect(route('connections.index'));
         $this->assertStringContainsString('already connected to another user', session('toast'));
         $this->assertEquals($owner->id, $account->fresh()->user_id);
+        $this->assertSame('token', $account->fresh()->token);
         $this->assertEquals($user->id, Auth::id());
         $this->assertCount(0, $user->connectedAccounts);
     }
 
-    protected function providerUser(string $id, string $email): object
+    public function test_new_account_stores_token_expiry_as_a_time_from_now(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $this->travelTo('2026-01-01 00:00:00');
+        $this->mockProviderUser('github', $this->providerUser('777', 'new@example.com', ['expiresIn' => 3600]));
+
+        $this->get(route('oauth.callback', ['provider' => 'github']))->assertRedirect(route('dashboard'));
+
+        $this->assertSame('2026-01-01 01:00:00', ConnectedAccount::sole()->expires_at->toDateTimeString());
+    }
+
+    public function test_account_without_token_lifetime_stores_no_expiry(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $this->mockProviderUser('github', $this->providerUser('777', 'new@example.com'));
+
+        $this->get(route('oauth.callback', ['provider' => 'github']))->assertRedirect(route('dashboard'));
+
+        $this->assertNull(ConnectedAccount::sole()->expires_at);
+    }
+
+    public function test_signed_in_user_linking_an_account_stores_token_expiry_as_a_time_from_now(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $this->travelTo('2026-01-01 00:00:00');
+        $user = User::factory()->create();
+        $this->mockProviderUser('github', $this->providerUser('777', $user->email, ['expiresIn' => 7200]));
+
+        $this->actingAs($user)->get(route('oauth.callback', ['provider' => 'github']))
+            ->assertRedirect(route('connections.index'));
+
+        $this->assertSame('2026-01-01 02:00:00', $user->connectedAccounts()->sole()->expires_at->toDateTimeString());
+    }
+
+    public function test_returning_sign_in_replaces_stored_tokens_and_keeps_refresh_token_the_provider_omits(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $this->travelTo('2026-01-01 00:00:00');
+        $user = User::factory()->create();
+        $account = ConnectedAccount::forceCreate([
+            'provider' => 'github',
+            'provider_id' => '777',
+            'user_id' => $user->id,
+            'token' => 'old-token',
+            'refresh_token' => 'old-refresh-token',
+            'expires_at' => '2025-12-01 00:00:00',
+            'verified_at' => now(),
+        ]);
+        $this->mockProviderUser('github', $this->providerUser('777', $user->email, [
+            'token' => 'new-token',
+            'expiresIn' => 3600,
+        ]));
+
+        $this->get(route('oauth.callback', ['provider' => 'github']))->assertRedirect(route('dashboard'));
+
+        $account->refresh();
+        $this->assertSame('new-token', $account->token);
+        $this->assertSame('old-refresh-token', $account->refresh_token);
+        $this->assertSame('2026-01-01 01:00:00', $account->expires_at->toDateTimeString());
+        $this->assertSame($user->id, Auth::id());
+    }
+
+    /**
+     * @param  array{token?: string, tokenSecret?: ?string, refreshToken?: ?string, expiresIn?: ?int}  $tokens
+     */
+    protected function providerUser(string $id, string $email, array $tokens = []): object
     {
         return (object) [
             'id' => $id,
@@ -354,6 +420,7 @@ class ConnectedAccountTest extends TestCase
             'tokenSecret' => null,
             'refreshToken' => null,
             'expiresIn' => null,
+            ...$tokens,
         ];
     }
 
