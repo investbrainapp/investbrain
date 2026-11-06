@@ -180,4 +180,29 @@ class DividendsTest extends TestCase
         $this->assertEquals(10, $dividends[1]->shares_owned);
         $this->assertEqualsWithDelta(10 * 1.89, $dividends[1]->total_received, 0.01);
     }
+
+    public function test_reinvested_shares_earn_later_dividends_from_the_same_refresh(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy(10)->yearsAgo()->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('ACME')->first();
+        $holding->update(['reinvest_dividends' => true]);
+
+        $market_data = MarketData::symbol('ACME')->first();
+
+        Dividend::reinvestDividends([
+            ['date' => now()->subMonths(9)->toDateString(), 'dividend_amount' => 1],
+            ['date' => now()->subMonths(6)->toDateString(), 'dividend_amount' => 1],
+        ], $market_data);
+
+        $reinvested = Transaction::where(['reinvested_dividend' => true])->portfolio($portfolio->id)->orderBy('date')->pluck('quantity');
+
+        $first = 10 / $market_data->market_value;
+
+        $this->assertEqualsWithDelta($first, $reinvested[0], 0.0001);
+        $this->assertEqualsWithDelta((10 + $first) / $market_data->market_value, $reinvested[1], 0.0001);
+    }
 }

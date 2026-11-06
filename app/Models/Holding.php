@@ -270,22 +270,16 @@ class Holding extends Model
         $this->save();
     }
 
-    public function qtyOwned(?Carbon $date = null)
+    /**
+     * Shares owned at the end of a day, today by default
+     */
+    public function qtyOwned(?Carbon $date = null): float
     {
-        if ($date == null) {
-            $date = now();
-        }
-
-        // the transactions relation covers the whole portfolio, not just this symbol
-        $transactions = $this->transactions
-            ->where('symbol', $this->symbol)
-            ->where('date', '<=', $date);
-
-        $purchases = $transactions->where('transaction_type', 'BUY')->sum('quantity');
-
-        $sales = $transactions->where('transaction_type', 'SELL')->sum('quantity');
-
-        return $purchases - $sales;
+        return Transaction::where([
+            'portfolio_id' => $this->portfolio_id,
+            'symbol' => $this->symbol,
+        ])->whereDate('date', '<=', ($date ?? now())->toDateString())
+            ->sharesOwned();
     }
 
     /**

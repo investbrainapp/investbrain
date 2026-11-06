@@ -71,4 +71,22 @@ class DashboardTest extends TestCase
             0.01
         );
     }
+
+    public function test_recent_activity_shows_the_five_latest_transactions(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        $transactions = collect(range(1, 8))->map(fn (int $daysAgo) => Transaction::factory()
+            ->buy()
+            ->date(now()->subDays($daysAgo)->toDateString())
+            ->portfolio($portfolio->id)
+            ->symbol('AAPL')
+            ->create());
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertViewHas('recentTransactions', fn ($recent) => $recent->pluck('id')->all() === $transactions->take(5)->pluck('id')->all());
+    }
 }
