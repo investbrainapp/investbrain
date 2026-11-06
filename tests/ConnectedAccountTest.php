@@ -124,6 +124,20 @@ class ConnectedAccountTest extends TestCase
         $this->assertSame(0, ConnectedAccount::count());
     }
 
+    public function test_a_provider_login_without_an_email_does_not_create_an_account(): void
+    {
+        config(['services.enabled_login_providers' => 'github', 'services.sso_auto_provision' => true]);
+        $this->mockProviderUser('github', (object) [...(array) $this->providerUser('12345', ''), 'email' => null]);
+
+        $response = $this->get(route('oauth.callback', ['provider' => 'github']));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('errors');
+        $this->assertFalse(Auth::check());
+        $this->assertSame(0, User::count());
+        $this->assertSame(0, ConnectedAccount::count());
+    }
+
     public function test_existing_users_can_still_connect_a_provider_when_auto_provisioning_is_off(): void
     {
         config(['services.enabled_login_providers' => 'github', 'services.sso_auto_provision' => false]);
