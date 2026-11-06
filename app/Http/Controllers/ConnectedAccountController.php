@@ -83,10 +83,10 @@ class ConnectedAccountController extends Controller
             return redirect(route('dashboard'));
         }
 
-        // an address the provider hasn't verified can't be used to find or create an account
-        if (blank($providerUser->email) || ! ($providerUser->email_verified ?? true)) {
+        // without an email there's no account to match or create
+        if (blank($providerUser->email)) {
 
-            return $this->redirectToLoginWithError(__('Your :provider account doesn\'t have a verified email address.', ['provider' => config("services.$provider.name")]));
+            return $this->redirectToLoginWithError(__('Your :provider account didn\'t share an email address.', ['provider' => config("services.$provider.name")]));
         }
 
         // new user, let's create one
@@ -94,7 +94,7 @@ class ConnectedAccountController extends Controller
 
             if (! config('services.sso_auto_provision')) {
 
-                return $this->redirectToLoginWithError(__('There is no account for your :provider login. Create an account or ask an administrator for one first.', ['provider' => config("services.$provider.name")]));
+                return $this->redirectToLoginWithError(__('You don\'t have an account yet, and automatic account provisioning is not enabled.'));
             }
 
             $user = User::make([

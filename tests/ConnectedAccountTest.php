@@ -75,7 +75,7 @@ class ConnectedAccountTest extends TestCase
     public function test_handle_provider_callback_with_new_user()
     {
         $provider = 'github';
-        config(['services.enabled_login_providers' => 'github,google', 'services.sso_auto_provision' => true]);
+        config(['services.enabled_login_providers' => 'github,google']);
         $providerUser = (object) [
             'id' => '12345',
             'name' => 'John Doe',
@@ -110,9 +110,9 @@ class ConnectedAccountTest extends TestCase
         $response->assertRedirect(route('dashboard'));
     }
 
-    public function test_new_users_are_not_provisioned_from_a_provider_login_by_default(): void
+    public function test_new_users_are_not_provisioned_from_a_provider_login_when_auto_provisioning_is_off(): void
     {
-        config(['services.enabled_login_providers' => 'github']);
+        config(['services.enabled_login_providers' => 'github', 'services.sso_auto_provision' => false]);
         $this->mockProviderUser('github', $this->providerUser('12345', 'john@example.com'));
 
         $response = $this->get(route('oauth.callback', ['provider' => 'github']));
@@ -126,7 +126,7 @@ class ConnectedAccountTest extends TestCase
 
     public function test_a_provider_login_without_an_email_does_not_create_an_account(): void
     {
-        config(['services.enabled_login_providers' => 'github', 'services.sso_auto_provision' => true]);
+        config(['services.enabled_login_providers' => 'github']);
         $this->mockProviderUser('github', (object) [...(array) $this->providerUser('12345', ''), 'email' => null]);
 
         $response = $this->get(route('oauth.callback', ['provider' => 'github']));

@@ -71,8 +71,7 @@ class AppServiceProvider extends ServiceProvider
             $config = config('services.oidc');
 
             return Socialite::buildProvider(OidcProvider::class, $config)
-                ->setIssuer((string) $config['issuer'])
-                ->setRequireVerifiedEmail((bool) $config['require_verified_email']);
+                ->setIssuer((string) $config['issuer']);
         });
 
         Arr::macro('skipEmptyValues', function (array $array) {

@@ -155,7 +155,7 @@ docker compose up -d
 | Option | Description | Default |
 | --- | --- | --- |
 | `ENABLED_LOGIN_PROVIDERS` | Comma-separated list of `github`, `google`, `facebook`, `linkedin-openid`, `oidc`. | none |
-| `SSO_AUTO_PROVISION` | Create a new Investbrain account when someone signs in with a provider and no account has their email. | `false` |
+| `SSO_AUTO_PROVISION` | Create a new Investbrain account when someone signs in with any login provider and no account has their email. | `true` |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth app credentials. | none |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth client credentials. | none |
 | `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET` | Facebook app credentials. | none |
@@ -164,7 +164,6 @@ docker compose up -d
 | `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | OpenID Connect client credentials. | none |
 | `OIDC_NAME` | Name shown on the **Login with ...** button. | `SSO` |
 | `OIDC_BUTTON_COLOR` | Background color of the login button. | `#4b5563` |
-| `OIDC_REQUIRE_VERIFIED_EMAIL` | Only use email addresses the provider marks as verified. | `true` |
 
 **Email**
 
@@ -375,7 +374,7 @@ Users can sign in with GitHub, Google, Facebook, LinkedIn, or your own single si
 
 When someone signs in with a provider using an email that already belongs to an Investbrain account, Investbrain emails a verification link before linking them, so [email](#email) must be working for that case.
 
-By default, social login only works for people who already have an Investbrain account. If someone signs in with a provider and no account has their email, they're sent back to the login page and no account is created. To let anyone who can sign in with your providers get an account automatically, set `SSO_AUTO_PROVISION: true`. It works independently of `REGISTRATION_ENABLED`, so you can turn off the registration form and still let your providers create accounts.
+By default, when someone signs in with a provider and no account has their email, Investbrain creates an account for them. This works independently of `REGISTRATION_ENABLED`, so you can turn off the registration form and still let your providers create accounts. To only allow people who already have an Investbrain account, set `SSO_AUTO_PROVISION: false`; anyone else is sent back to the login page and no account is created.
 
 ### OpenID Connect (SSO)
 
@@ -402,8 +401,6 @@ If you run your own identity provider, such as Authentik, Keycloak, Authelia, or
 4. [Apply the change](#applying-configuration-changes).
 
 The login page then shows a **Login with Authelia** button (or whatever `OIDC_NAME` is).
-
-Investbrain only uses an email address that the identity provider marks as verified (the `email_verified` claim) to find or create an account. If your provider doesn't send that claim and you control which email addresses your users can have, set `OIDC_REQUIRE_VERIFIED_EMAIL: false`.
 
 Accounts are linked by the user's ID at the identity provider (the `sub` claim), so if you change `OIDC_ISSUER` to a different provider, users have to connect their accounts again.
 

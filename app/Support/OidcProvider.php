@@ -31,24 +31,12 @@ class OidcProvider extends AbstractProvider
 
     protected string $issuer = '';
 
-    protected bool $requireVerifiedEmail = true;
-
     /**
      * Set the issuer whose discovery document configures this provider.
      */
     public function setIssuer(string $issuer): static
     {
         $this->issuer = rtrim($issuer, '/');
-
-        return $this;
-    }
-
-    /**
-     * Set whether an email address only counts as verified when the issuer says so.
-     */
-    public function setRequireVerifiedEmail(bool $requireVerifiedEmail): static
-    {
-        $this->requireVerifiedEmail = $requireVerifiedEmail;
 
         return $this;
     }
@@ -103,15 +91,12 @@ class OidcProvider extends AbstractProvider
      */
     protected function mapUserToObject(array $user): User
     {
-        $emailVerified = filter_var($user['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN);
-
         return (new User)->setRaw($user)->map([
             'id' => $user['sub'],
             'nickname' => $user['preferred_username'] ?? null,
             'name' => $user['name'] ?? $user['preferred_username'] ?? $user['email'] ?? null,
             'email' => $user['email'] ?? null,
             'avatar' => $user['picture'] ?? null,
-            'email_verified' => $emailVerified || ! $this->requireVerifiedEmail,
         ]);
     }
 

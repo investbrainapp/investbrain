@@ -6,13 +6,11 @@ namespace Tests;
 
 use App\Models\ConnectedAccount;
 use App\Models\User;
-use App\Notifications\VerifyConnectedAccountNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Testing\TestResponse;
 use RuntimeException;
 
@@ -26,11 +24,9 @@ class OidcProviderTest extends TestCase
 
         config([
             'services.enabled_login_providers' => 'oidc',
-            'services.sso_auto_provision' => true,
             'services.oidc.issuer' => 'https://idp.example.com/realms/home/',
             'services.oidc.client_id' => 'investbrain',
             'services.oidc.client_secret' => 'se:cret',
-            'services.oidc.require_verified_email' => true,
         ]);
     }
 
@@ -98,33 +94,6 @@ class OidcProviderTest extends TestCase
             && $request['client_secret'] === 'se:cret');
     }
 
-    public function test_an_unverified_email_is_not_linked_to_the_account_that_owns_it(): void
-    {
-        Notification::fake();
-        $owner = User::factory()->create(['email' => 'ada@example.com']);
-        $this->fakeIssuer(claims: ['email_verified' => false]);
-
-        $response = $this->returnFromIssuer();
-
-        $response->assertRedirect(route('login'));
-        $response->assertSessionHas('errors');
-        $this->assertFalse(Auth::check());
-        $this->assertSame(0, ConnectedAccount::count());
-        $this->assertSame(1, User::count());
-        Notification::assertNotSentTo($owner, VerifyConnectedAccountNotification::class);
-    }
-
-    public function test_emails_can_be_trusted_without_the_verified_claim_when_the_admin_allows_it(): void
-    {
-        config(['services.oidc.require_verified_email' => false]);
-        $this->fakeIssuer(claims: ['email_verified' => null]);
-
-        $response = $this->returnFromIssuer();
-
-        $response->assertRedirect(route('dashboard'));
-        $this->assertSame('ada@example.com', User::sole()->email);
-    }
-
     public function test_an_issuer_that_does_not_match_its_discovery_document_sends_the_user_back_to_login(): void
     {
         Exceptions::fake();
@@ -150,9 +119,8 @@ class OidcProviderTest extends TestCase
      * Fake the issuer's discovery, token, and userinfo endpoints.
      *
      * @param  array<string, mixed>  $discovery
-     * @param  array<string, mixed>  $claims
      */
-    protected function fakeIssuer(array $discovery = [], array $claims = []): void
+    protected function fakeIssuer(array $discovery = []): void
     {
         $base = 'https://idp.example.com/realms/home';
 
@@ -171,13 +139,11 @@ class OidcProviderTest extends TestCase
                 'token_type' => 'Bearer',
                 'refresh_token' => 'refresh-123',
             ]),
-            "$base/protocol/openid-connect/userinfo" => Http::response(array_filter([
+            "$base/protocol/openid-connect/userinfo" => Http::response([
                 'sub' => 'idp-user-1',
                 'name' => 'Ada Lovelace',
                 'email' => 'ada@example.com',
-                'email_verified' => true,
-                ...$claims,
-            ], fn (mixed $value) => ! is_null($value))),
+            ]),
         ]);
     }
 }
