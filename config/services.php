@@ -72,6 +72,7 @@ return [
 
     //
     'enabled_login_providers' => env('ENABLED_LOGIN_PROVIDERS', ''),
+    'sso_auto_provision' => env('SSO_AUTO_PROVISION', false),
     'ai_chat_enabled' => env('AI_CHAT_ENABLED', false),
     'mcp_server_enabled' => env('MCP_SERVER_ENABLED', true),
 ];

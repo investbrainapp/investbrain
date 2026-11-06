@@ -75,7 +75,7 @@ class ConnectedAccountTest extends TestCase
     public function test_handle_provider_callback_with_new_user()
     {
         $provider = 'github';
-        config(['services.enabled_login_providers' => 'github,google']);
+        config(['services.enabled_login_providers' => 'github,google', 'services.sso_auto_provision' => true]);
         $providerUser = (object) [
             'id' => '12345',
             'name' => 'John Doe',
@@ -108,6 +108,34 @@ class ConnectedAccountTest extends TestCase
 
         $this->assertTrue(Auth::check());
         $response->assertRedirect(route('dashboard'));
+    }
+
+    public function test_new_users_are_not_provisioned_from_a_provider_login_by_default(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $this->mockProviderUser('github', $this->providerUser('12345', 'john@example.com'));
+
+        $response = $this->get(route('oauth.callback', ['provider' => 'github']));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('errors');
+        $this->assertFalse(Auth::check());
+        $this->assertSame(0, User::count());
+        $this->assertSame(0, ConnectedAccount::count());
+    }
+
+    public function test_existing_users_can_still_connect_a_provider_when_auto_provisioning_is_off(): void
+    {
+        config(['services.enabled_login_providers' => 'github', 'services.sso_auto_provision' => false]);
+        $user = User::factory()->create(['email' => 'jane@example.com']);
+        $this->mockProviderUser('github', $this->providerUser('54321', 'jane@example.com'));
+
+        $this->get(route('oauth.callback', ['provider' => 'github']))
+            ->assertRedirect(route('login'));
+
+        $this->assertSame(1, User::count());
+        $this->assertSame($user->id, ConnectedAccount::sole()->user_id);
+        Notification::assertSentTo($user, VerifyConnectedAccountNotification::class);
     }
 
     public function test_handle_provider_callback_with_existing_account()

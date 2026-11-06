@@ -76,6 +76,12 @@ class ConnectedAccountController extends Controller
         // new user, let's create one
         if (! $user = User::where('email', Str::lower(trim((string) $providerUser->email)))->first()) {
 
+            if (! config('services.sso_auto_provision')) {
+
+                return redirect(route('login'))
+                    ->with('errors', new MessageBag([__('There is no account for your :provider login. Create an account or ask an administrator for one first.', ['provider' => config("services.$provider.name")])]));
+            }
+
             $user = User::make([
                 'name' => $providerUser->name,
                 'email' => $providerUser->email,

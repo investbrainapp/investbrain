@@ -155,6 +155,7 @@ docker compose up -d
 | Option | Description | Default |
 | --- | --- | --- |
 | `ENABLED_LOGIN_PROVIDERS` | Comma-separated list of `github`, `google`, `facebook`, `linkedin-openid`. | none |
+| `SSO_AUTO_PROVISION` | Create a new Investbrain account when someone signs in with a provider and no account has their email. | `false` |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth app credentials. | none |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth client credentials. | none |
 | `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET` | Facebook app credentials. | none |
@@ -368,6 +369,8 @@ Users can sign in with GitHub, Google, Facebook, or LinkedIn once you register a
 **Login with ...** buttons appear on the login page, and users can link accounts from **Connections** (see [Social logins](account-settings.md#social-logins)).
 
 When someone signs in with a provider using an email that already belongs to an Investbrain account, Investbrain emails a verification link before linking them, so [email](#email) must be working for that case.
+
+By default, social login only works for people who already have an Investbrain account. If someone signs in with a provider and no account has their email, they're sent back to the login page and no account is created. To let anyone who can sign in with your providers get an account automatically, set `SSO_AUTO_PROVISION: true`. It works independently of `REGISTRATION_ENABLED`, so you can turn off the registration form and still let your providers create accounts.
 
 ## Email
 

@@ -225,6 +225,7 @@ Logins are limited to five attempts per minute for each email and IP address. Wa
 
 - The callback URL registered with the provider must be exactly `https://<your-host>/auth/<provider>/callback` (`github`, `google`, `facebook`, or `linkedin-openid`), including the scheme and port.
 - Check that the client ID and secret are correct and that the provider is listed in `ENABLED_LOGIN_PROVIDERS`.
+- If a user sees **There is no account for your ... login**, nobody has an Investbrain account with that email and [`SSO_AUTO_PROVISION`](self-hosting.md#social-login) is off. Create the account first (or let them register), or turn auto-provisioning on.
 - If a user sees **Account already exists. Check your email...**, an account with that email already exists. They need to click the link in the verification email (so email must be working), or sign in with their password and connect the provider from **Connections** instead.
 
 ## Import and export
