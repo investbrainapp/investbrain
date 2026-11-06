@@ -55,18 +55,17 @@ class ConnectedAccountController extends Controller
         $connected_account = ConnectedAccount::firstOrNew([
             'provider' => $provider,
             'provider_id' => $providerUser->id,
-        ], [
-            'token' => $providerUser->token,
-            'secret' => $providerUser->tokenSecret,
-            'refresh_token' => $providerUser->refreshToken,
-            'expires_at' => $providerUser->expiresIn,
         ]);
+
+        $this->fillTokens($connected_account, $providerUser);
 
         // already linked and verified, let's go login!
         if (
             $connected_account->exists
             && ! is_null($connected_account->verified_at)
         ) {
+
+            $connected_account->save();
 
             Auth::login($connected_account->user, true);
 
@@ -117,11 +116,6 @@ class ConnectedAccountController extends Controller
         $connected_account = ConnectedAccount::firstOrNew([
             'provider' => $provider,
             'provider_id' => $providerUser->id,
-        ], [
-            'token' => $providerUser->token,
-            'secret' => $providerUser->tokenSecret,
-            'refresh_token' => $providerUser->refreshToken,
-            'expires_at' => $providerUser->expiresIn,
         ]);
 
         if ($connected_account->exists && ! $user->ownsConnectedAccount($connected_account)) {
@@ -134,6 +128,7 @@ class ConnectedAccountController extends Controller
             );
         }
 
+        $this->fillTokens($connected_account, $providerUser);
         $connected_account->user_id = $user->id;
         $connected_account->verified_at ??= now();
         $connected_account->save();
@@ -142,6 +137,21 @@ class ConnectedAccountController extends Controller
             route('connections.index'),
             __('Your :provider account has been connected.', ['provider' => $providerName]),
         );
+    }
+
+    /**
+     * Copy the provider's current tokens onto the connected account, so a returning sign-in replaces stale ones.
+     */
+    protected function fillTokens(ConnectedAccount $connectedAccount, mixed $providerUser): ConnectedAccount
+    {
+        return $connectedAccount->fill([
+            'token' => $providerUser->token,
+            'secret' => $providerUser->tokenSecret,
+            // providers such as Google only issue a refresh token on first consent, so keep the one we have
+            'refresh_token' => $providerUser->refreshToken ?? $connectedAccount->refresh_token,
+            // Socialite reports a lifetime in seconds, not a timestamp
+            'expires_at' => isset($providerUser->expiresIn) ? now()->addSeconds((int) $providerUser->expiresIn) : null,
+        ]);
     }
 
     /**
