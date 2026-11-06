@@ -136,8 +136,8 @@ new #[Lazy] class extends Component
         $last = Carbon::parse($dailyChange->last()->date);
 
         $period = match (true) {
-            $first->lt($last->copy()->subYears(3)) => 'Y-m',
-            $first->lt($last->copy()->subYear()) => 'o-W',
+            $first->lt($last->copy()->subYears(3)) => 'Y-m', // group by month
+            $first->lt($last->copy()->subYear()) => 'o-W', // group by week
             default => null,
         };
 
