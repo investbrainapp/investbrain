@@ -53,6 +53,6 @@ Investbrain uses daily reference rates from [Frankfurter](https://frankfurter.de
 - Frankfurter has no rates before 4 January 1999.
 - Some exchanges quote prices in minor units. Investbrain has built-in aliases for GBX (British pence), ZAC (South African cents), and RMB (Chinese yuan) and adjusts them automatically.
 
-## Self-hosted instances
+## Base currency
 
-The base currency is set with `BASE_CURRENCY` and should be chosen before you add any data. See [Currency](self-hosting.md#currency) for details. To add a currency that isn't in the seeded list, see [Custom currencies](custom-currencies.md).
+The base currency is set with `BASE_CURRENCY`. Because it's used as a consistent translation layer between varying other currencies, it should be chosen before you add any transactions. See [Currency](self-hosting.md#currency) for details. To add a currency that isn't in the seeded list, see [Custom currencies](custom-currencies.md).
