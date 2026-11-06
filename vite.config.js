@@ -13,4 +13,8 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    build: {
+        // ApexCharts is lazy-loaded as its own ~530 kB chunk and cannot be split further.
+        chunkSizeWarningLimit: 600,
+    },
 });

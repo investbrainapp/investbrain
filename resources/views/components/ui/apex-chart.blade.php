@@ -82,7 +82,9 @@
     wire:key="{{ rand() }}"
     x-data="{
         data: {{ $seriesData }},
-        init(){
+        async init(){
+
+            const ApexCharts = await window.loadApexCharts();
 
             this.data.chart.events = {
                 mounted: function (chartContext, config) {
