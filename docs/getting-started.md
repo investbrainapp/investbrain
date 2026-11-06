@@ -24,7 +24,7 @@ Investbrain is built around four key things:
 
 The dashboard is the first thing you see after logging in. It rolls up every portfolio you have access to, **except [wishlists](#wishlists)**.
 
-- **Performance chart** - your combined market gain over time. You can switch to market value or cost basis and pick a time range (1 month, 3 months, year to date, 1 year, 3 years, all time).
+- **Performance chart** - your combined market gain over time. You can switch to market value or cost basis and pick a time range (1 month, 3 months, year to date, 1 year, 3 years, all time). Ranges longer than a year show one point per week, and longer than three years one per month, each taken from the last trading day of that week or month.
 - **Summary cards** - market gain/loss, total cost basis, total market value, realized gain/loss, and dividends earned. These are shown in your [display currency](account-settings.md#locale-and-display-currency).
 - **My portfolios** - every portfolio you own or that has been shared with you. Wishlists are marked with a badge.
 - **Recent activity** - your latest transactions across all portfolios.

@@ -118,9 +118,7 @@ class Split extends Model
                 'portfolio_id' => $split->portfolio_id,
             ])
                 ->whereDate('transactions.date', '<', $split->date->toDateString())
-                ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) -
-                            SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_owned")
-                ->value('qty_owned');
+                ->sharesOwned();
 
             if ($qty_owned > 0) {
 

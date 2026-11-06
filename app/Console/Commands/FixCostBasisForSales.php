@@ -74,25 +74,8 @@ class FixCostBasisForSales extends Command
 
             dispatch(function () use ($chunk) {
 
-                $chunk->each(function ($transaction) {
-
-                    $cost_basis = Transaction::where([
-                        'portfolio_id' => $transaction->portfolio_id,
-                        'symbol' => $transaction->symbol,
-                        'transaction_type' => 'BUY',
-                    ])->whereDate('date', '<=', $transaction->date)
-                        ->selectRaw('SUM(transactions.cost_basis * transactions.quantity) as total_cost_basis')
-                        ->selectRaw('SUM(transactions.quantity) as total_quantity')
-                        ->first();
-
-                    $average_cost_basis = empty($cost_basis->total_quantity)
-                        ? 0
-                        : $cost_basis->total_cost_basis / $cost_basis->total_quantity;
-
-                    $transaction->cost_basis = $average_cost_basis ?? 0;
-
-                    $transaction->save();
-                });
+                // saving a sale runs EnsureCostBasisAddedToSale, which recalculates its cost basis
+                $chunk->each->save();
             });
         });
 

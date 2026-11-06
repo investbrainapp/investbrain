@@ -56,11 +56,11 @@
 
             </x-ui.card>
 
-            @if (!$user->transactions->isEmpty())
+            @if ($recentTransactions->isNotEmpty())
             <x-ui.card title="{{ __('Recent activity') }}" class="md:col-span-3">
                     
                 @livewire('transactions-list', [
-                    'transactions' => $user->transactions,
+                    'transactions' => $recentTransactions,
                     'showPortfolio' => true,
                     'paginate' => false
                 ])

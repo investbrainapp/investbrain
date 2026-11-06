@@ -182,22 +182,14 @@ class DailyChangeTest extends TestCase
             ->whereDate('daily_change.date', '=', $dividends->first()->date->nextWeekday())
             ->first();
 
-        $owned = $dividends->first()->purchased - $dividends->first()->sold;
-
-        $this->assertEqualsWithDelta($dividends->first()->dividend_amount * $owned, $first_dividend_change->total_dividends_earned, 0.01);
+        $this->assertEqualsWithDelta($dividends->first()->total_received, $first_dividend_change->total_dividends_earned, 0.01);
 
         $last_dividend_change = DailyChange::withDailyPerformance()
             ->portfolio($this->portfolio->id)
             ->whereDate('daily_change.date', '=', $dividends->last()->date->nextWeekday())
             ->first();
 
-        $total_dividends = $dividends->reduce(function (?float $carry, $dividend) {
-            return $carry + ($dividend['dividend_amount'] * ($dividend['purchased'] - $dividend['sold']));
-        });
-
-        $owned = $dividends->last()->purchased - $dividends->last()->sold;
-
-        $this->assertEqualsWithDelta($total_dividends, $last_dividend_change->total_dividends_earned, 0.01);
+        $this->assertEqualsWithDelta($dividends->sum('total_received'), $last_dividend_change->total_dividends_earned, 0.01);
     }
 
     public function test_daily_changes_synced_into_past_for_older_transactions(): void
@@ -257,5 +249,21 @@ class DailyChangeTest extends TestCase
     private function firstWeekdayOnOrAfter(Carbon $date): string
     {
         return ($date->isWeekday() ? $date->copy() : $date->copy()->nextWeekday())->toDateString();
+    }
+
+    public function test_cost_basis_includes_transactions_made_that_day(): void
+    {
+        $date = now()->subMonths(2)->nextWeekday()->toDateString();
+
+        $transaction = Transaction::factory()->buy(3)->costBasis(50)->date($date)->portfolio($this->portfolio->id)->symbol('ACME')->create();
+
+        $this->portfolio->syncDailyChanges();
+
+        $daily_change = DailyChange::withDailyPerformance()
+            ->portfolio($this->portfolio->id)
+            ->whereDate('daily_change.date', '=', $date)
+            ->first();
+
+        $this->assertEqualsWithDelta($transaction->quantity * $transaction->cost_basis, $daily_change->total_cost_basis, 0.01);
     }
 }

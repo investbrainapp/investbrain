@@ -8,8 +8,10 @@ use App\Jobs\QueuedCurrencyRateInsertJob;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Investbrain\Frankfurter\Frankfurter;
 
 class CurrencyRate extends Model
@@ -49,6 +51,27 @@ class CurrencyRate extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Join condition for the rate on a given date, for use with leftJoin('currency_rates as cr', ...).
+     * A missing rate is NULL, so callers wrap the rate in COALESCE(cr.rate, 1).
+     */
+    public static function joinOnDate(string $dateColumn, string $currency, string $alias = 'cr'): \Closure
+    {
+        return function (JoinClause $join) use ($dateColumn, $currency, $alias) {
+            $join->where("{$alias}.currency", '=', $currency);
+
+            if (DB::connection()->getDriverName() !== 'sqlite') {
+                $join->on("{$alias}.date", '=', $dateColumn);
+
+                return;
+            }
+
+            // rates are stored as 'Y-m-d' or (by Eloquent) 'Y-m-d 00:00:00'; matching both spellings keeps the
+            // (date, currency) key usable, which DATE(cr.date) = DATE(...) and a range on cr.date don't
+            $join->whereRaw("{$alias}.date IN (DATE({$dateColumn}), DATE({$dateColumn}) || ' 00:00:00')");
+        };
     }
 
     public static function current(string $currency): float

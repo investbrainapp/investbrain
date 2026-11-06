@@ -110,12 +110,7 @@ class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
         return $this->hasManyDeep(Transaction::class, ['portfolio_user', Portfolio::class])
             ->withMarketData()
             ->withAggregate('portfolio', 'title')
-            ->selectRaw('
-                CASE
-                    WHEN transaction_type = \'SELL\' 
-                    THEN COALESCE(transactions.sale_price - transactions.cost_basis, 0)
-                    ELSE COALESCE(market_data.market_value - transactions.cost_basis, 0)
-                END AS gain_dollars');
+            ->withGainDollars();
     }
 
     public function getCurrency(): string

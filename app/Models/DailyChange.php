@@ -58,107 +58,83 @@ class DailyChange extends Model
         });
     }
 
+    /**
+     * Adds the cost basis, realized gains and dividends earned up to each day, in the user's display currency
+     */
     public function scopeWithDailyPerformance($query)
     {
         $currency = auth()->user()?->getCurrency() ?? config('investbrain.base_currency');
 
-        $dividendSub = DB::table('holdings')
-            ->join('dividends', 'dividends.symbol', '=', 'holdings.symbol')
-            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                $join->on('cr.date', '=', 'dividends.date')
-                    ->where('cr.currency', '=', $currency);
-            })
-            ->join('transactions as tx', function ($join) {
-                $join->on('tx.symbol', '=', 'holdings.symbol')
-                    ->on('tx.portfolio_id', '=', 'holdings.portfolio_id')
-                    ->whereColumn('tx.date', '<=', 'dividends.date');
-            })
-            ->select(['holdings.portfolio_id', 'dividends.date'])
-            ->selectRaw("
-                ((CASE WHEN tx.transaction_type = 'BUY'
-                    THEN tx.quantity ELSE 0 END)
-                - (CASE WHEN tx.transaction_type = 'SELL'
-                    THEN tx.quantity ELSE 0 END))
-                * SUM(
-                    dividends.dividend_amount_base
-                    * COALESCE(cr.rate, 1)
-                )
-                AS total_dividends_earned")
-            ->groupBy(['holdings.portfolio_id', 'dividends.date', 'tx.transaction_type', 'tx.quantity']);
+        // only aggregate the portfolios being asked about, not every portfolio in the database
+        $portfolioIds = $query->clone()->select('daily_change.portfolio_id');
 
-        $transactionTotals = DB::table('transactions')
-            ->select(['transactions.portfolio_id', 'transactions.date'])
+        $transactionChanges = DB::table('transactions')
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('transactions.date', $currency))
+            ->select('transactions.portfolio_id')
+            ->selectRaw(Transaction::dateSql('transactions.date').' AS date')
+            ->selectRaw('('.Transaction::signedQuantitySql().') * transactions.cost_basis_base * COALESCE(cr.rate, 1) AS cost_basis')
             ->selectRaw("
-                SUM(
-                    (CASE WHEN transactions.transaction_type = 'BUY' THEN 1 ELSE -1 END) 
-                    * transactions.quantity 
-                    * transactions.cost_basis_base 
-                    * COALESCE(cr.rate, 1)
-                ) AS daily_cost_basis
+                CASE WHEN transactions.transaction_type = 'SELL'
+                    THEN (transactions.sale_price_base - transactions.cost_basis_base) * transactions.quantity * COALESCE(cr.rate, 1)
+                    ELSE 0
+                END AS realized_gains
             ")
-            ->selectRaw("
-                SUM(
-                    (CASE 
-                        WHEN transactions.transaction_type = 'SELL' 
-                        THEN ( transactions.sale_price_base - transactions.cost_basis_base ) 
-                             * transactions.quantity
-                             * COALESCE(cr.rate, 1)
-                    END)
-                ) AS daily_realized_gains
-            ")
-            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                $join
-                    ->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(transactions.date)'))
-                    ->where('cr.currency', $currency);
-            })
-            ->groupBy('transactions.portfolio_id', 'transactions.date');
+            ->selectRaw('0 AS dividends_earned')
+            ->whereIn('transactions.portfolio_id', $portfolioIds);
 
-        $cumulativeCostBasis = DB::table(DB::raw("({$transactionTotals->toSql()}) AS transaction_totals"))
-            ->mergeBindings($transactionTotals)
+        $dividendChanges = DB::table('dividends')
+            ->join('transactions', Dividend::joinTransactionsUpToDate())
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('dividends.date', $currency))
+            ->select('transactions.portfolio_id')
+            ->selectRaw(Transaction::dateSql('dividends.date').' AS date')
+            ->selectRaw('0 AS cost_basis')
+            ->selectRaw('0 AS realized_gains')
+            ->selectRaw('('.Transaction::signedQuantitySql().') * dividends.dividend_amount_base * COALESCE(cr.rate, 1) AS dividends_earned')
+            ->whereIn('transactions.portfolio_id', $portfolioIds);
+
+        // running totals for each day a portfolio changed, which hold until the next change (next_date)
+        $window = 'OVER (PARTITION BY portfolio_id ORDER BY date)';
+        $runningTotals = DB::query()
+            ->fromSub($transactionChanges->unionAll($dividendChanges), 'changes')
             ->select(['portfolio_id', 'date'])
-            ->selectRaw('SUM(daily_cost_basis) AS cumulative_cost_basis')
-            ->selectRaw('SUM(daily_realized_gains) AS cumulative_realized_gains')
-            ->groupBy('portfolio_id', 'date');
+            ->selectRaw("LEAD(date) {$window} AS next_date")
+            ->selectRaw("SUM(SUM(cost_basis)) {$window} AS cost_basis")
+            ->selectRaw("SUM(SUM(realized_gains)) {$window} AS realized_gains")
+            ->selectRaw("SUM(SUM(dividends_earned)) {$window} AS dividends_earned")
+            ->groupBy(['portfolio_id', 'date']);
+
+        $marketValue = 'daily_change.total_market_value * COALESCE(cr.rate, 1)';
 
         return $query
             ->select(['daily_change.date', 'daily_change.portfolio_id'])
-            ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) AS total_market_value')
-            ->selectRaw('SUM(COALESCE(ccb.cumulative_cost_basis, 0)) AS total_cost_basis')
-            ->selectRaw('daily_change.total_market_value * COALESCE(cr.rate, 1) 
-                - SUM(COALESCE(ccb.cumulative_cost_basis, 0)) 
-                AS total_market_gain')
-            ->selectRaw('SUM(COALESCE(ccb.cumulative_realized_gains, 0)) AS realized_gain_dollars')
-            ->selectSub(function ($query) use ($dividendSub) {
-                $query->fromSub($dividendSub, 'd')
-                    ->selectRaw('SUM(d.total_dividends_earned)')
-                    ->whereColumn('d.date', '<=', 'daily_change.date')
-                    ->whereColumn('d.portfolio_id', '=', 'daily_change.portfolio_id');
-            }, 'total_dividends_earned')
-            ->leftJoin('currency_rates as cr', function ($join) use ($currency) {
-                $join
-                    ->on(DB::raw('DATE(cr.date)'), '=', DB::raw('DATE(daily_change.date)'))
-                    ->where('cr.currency', $currency);
+            ->selectRaw("{$marketValue} AS total_market_value")
+            ->selectRaw('COALESCE(running_totals.cost_basis, 0) AS total_cost_basis')
+            ->selectRaw("{$marketValue} - COALESCE(running_totals.cost_basis, 0) AS total_market_gain")
+            ->selectRaw('COALESCE(running_totals.realized_gains, 0) AS realized_gain_dollars')
+            ->selectRaw('COALESCE(running_totals.dividends_earned, 0) AS total_dividends_earned')
+            ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('daily_change.date', $currency))
+            ->leftJoinSub($runningTotals, 'running_totals', function ($join) {
+                $join->on('running_totals.portfolio_id', '=', 'daily_change.portfolio_id')
+                    ->on('running_totals.date', '<=', 'daily_change.date')
+                    ->where(fn ($join) => $join
+                        ->whereColumn('running_totals.next_date', '>', 'daily_change.date')
+                        ->orWhereNull('running_totals.next_date'));
             })
-            ->leftJoinSub($cumulativeCostBasis, 'ccb', function ($join) {
-                $join
-                    ->on('ccb.portfolio_id', '=', 'daily_change.portfolio_id')
-                    ->whereRaw('ccb.date <= daily_change.date');
-            })
-            ->groupBy(['daily_change.date', 'daily_change.portfolio_id', 'cr.rate'])
             ->orderBy('daily_change.date');
     }
 
     public function scopeWithMultipleDailyPerformance($query)
     {
-        return DB::table(DB::raw("({$query->toSql()}) AS daily_query"))
-            ->addBinding($query->getQuery()->getBindings(), 'join')
+        return DB::query()
+            ->fromSub($query, 'daily_query')
             ->select('date')
             ->selectRaw('SUM(total_market_value) AS total_market_value')
             ->selectRaw('SUM(total_cost_basis) AS total_cost_basis')
             ->selectRaw('SUM(total_market_gain) AS total_market_gain')
             ->selectRaw('SUM(realized_gain_dollars) AS realized_gain_dollars')
             ->selectRaw('SUM(total_dividends_earned) AS total_dividends_earned')
-            ->groupBy('date');
+            ->groupBy('date')
+            ->orderBy('date');
     }
 
     public function portfolio()

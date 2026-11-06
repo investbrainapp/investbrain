@@ -250,4 +250,20 @@ class TransactionsTest extends TestCase
 
         return [$member, $ownPortfolio, $readOnlyTransaction];
     }
+
+    public function test_gain_dollars_uses_sale_price_for_sales_and_market_value_otherwise(): void
+    {
+        $this->actingAs($user = User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        $purchase = Transaction::factory()->buy(2)->costBasis(100)->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $sale = Transaction::factory()->sell(1)->salePrice(250)->recent()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $gains = Transaction::query()->myTransactions()->addSelect(['transactions.*'])->withGainDollars()->pluck('gain_dollars', 'id');
+
+        $this->assertEqualsWithDelta($purchase->market_data->market_value - 100, $gains[$purchase->id], 0.01);
+        $this->assertEqualsWithDelta(250 - $sale->fresh()->cost_basis, $gains[$sale->id], 0.01);
+        $this->assertEquals($gains->all(), $user->transactions->pluck('gain_dollars', 'id')->all());
+    }
 }

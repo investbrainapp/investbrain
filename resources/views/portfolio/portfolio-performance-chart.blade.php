@@ -2,6 +2,8 @@
 
 use App\Models\DailyChange;
 use App\Models\Portfolio;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
@@ -48,7 +50,7 @@ new #[Lazy] class extends Component
     {
         $filterMethod = collect($this->scopeOptions)->where('id', $this->scope)->first();
 
-        $dailyChangeQuery = DailyChange::withDailyPerformance();
+        $dailyChangeQuery = DailyChange::query();
 
         if (isset($this->portfolio)) {
 
@@ -66,11 +68,14 @@ new #[Lazy] class extends Component
             $dailyChangeQuery->whereDate('daily_change.date', '>=', now()->{$filterMethod['method']}(...$filterMethod['args']));
         }
 
+        // after the filters, so performance is only calculated for the portfolios shown
+        $dailyChangeQuery->withDailyPerformance();
+
         $dailyChange = cache()->remember(
             'graph-'.$this->scope.'-'.(isset($this->portfolio) ? $this->portfolio->id : request()->user()->id),
             10,
             function () use ($dailyChangeQuery) {
-                return $dailyChangeQuery->withMultipleDailyPerformance()->get();
+                return $this->groupIntoPeriods($dailyChangeQuery->withMultipleDailyPerformance()->get());
             }
         );
 
@@ -115,6 +120,35 @@ new #[Lazy] class extends Component
                 // ],
             ],
         ];
+    }
+
+    /**
+     * Keeps one point per week when the data covers more than a year, and one per month past three years.
+     * The values are balances, so each period shows its last day rather than a sum.
+     */
+    protected function groupIntoPeriods(Collection $dailyChange): Collection
+    {
+        if ($dailyChange->isEmpty()) {
+            return $dailyChange;
+        }
+
+        $first = Carbon::parse($dailyChange->first()->date);
+        $last = Carbon::parse($dailyChange->last()->date);
+
+        $period = match (true) {
+            $first->lt($last->copy()->subYears(3)) => 'Y-m',
+            $first->lt($last->copy()->subYear()) => 'o-W',
+            default => null,
+        };
+
+        if ($period === null) {
+            return $dailyChange;
+        }
+
+        return $dailyChange
+            ->groupBy(fn ($day) => Carbon::parse($day->date)->format($period))
+            ->map->last()
+            ->values();
     }
 
     public function changeScope($scope)

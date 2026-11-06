@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Pipeline;
 
 class Transaction extends Model
@@ -147,6 +148,48 @@ class Transaction extends Model
     public function scopeBeforeDate($query, $date): Builder
     {
         return $query->whereDate('date', '<=', $date);
+    }
+
+    /**
+     * Quantity of a transaction as SQL, positive for a buy and negative for a sale. Summed over a
+     * holding's transactions it gives the shares owned.
+     */
+    public static function signedQuantitySql(): string
+    {
+        return "CASE transactions.transaction_type WHEN 'BUY' THEN transactions.quantity WHEN 'SELL' THEN -transactions.quantity ELSE 0 END";
+    }
+
+    /**
+     * The calendar date of a date column as SQL.
+     *
+     * SQLite has no date type, and the same table can hold 'Y-m-d' and 'Y-m-d H:i:s' text depending
+     * on whether the row was written by Eloquent or as a plain string, so comparing columns as text
+     * fails on the same day. PostgreSQL stores real dates, so the column is left bare to keep its index.
+     */
+    public static function dateSql(string $column): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite' ? "DATE({$column})" : $column;
+    }
+
+    /**
+     * Adds the gain per share: the sale price for a sale, otherwise the current market value, less the cost basis
+     */
+    public function scopeWithGainDollars($query): Builder
+    {
+        return $query->selectRaw("
+            (CASE WHEN transactions.transaction_type = 'SELL'
+                THEN COALESCE(transactions.sale_price, 0)
+                ELSE COALESCE((SELECT market_data.market_value FROM market_data WHERE market_data.symbol = transactions.symbol), 0)
+            END) - COALESCE(transactions.cost_basis, 0) AS gain_dollars
+        ");
+    }
+
+    /**
+     * Shares owned across the transactions matching the query
+     */
+    public function scopeSharesOwned($query): float
+    {
+        return (float) $query->sum(DB::raw(self::signedQuantitySql()));
     }
 
     public function scopeMyTransactions($query): Builder
