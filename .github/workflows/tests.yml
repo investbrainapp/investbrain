@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          touch .env
+          echo "APP_KEY=" > .env
           composer install --no-interaction --no-progress
           php artisan key:generate
 
