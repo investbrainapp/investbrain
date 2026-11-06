@@ -39,7 +39,7 @@ Everything else is in the [docs](docs/_index.md):
 - [MCP server](docs/mcp.md) - connecting AI assistants such as Claude, ChatGPT, Cursor, or VS Code
 - [Self-hosting](docs/self-hosting.md) - installation, configuration options, market data providers, AI chat, updating, and command line utilities
 - [Troubleshooting](docs/troubleshooting.md) - fixes for common problems
-- [Contributing](docs/contributing.md) and [developing market data providers](docs/market-data-providers.md) - development setup, running tests, and making pull requests
+- [Contributing](docs/contributing.md) - "under the hood", development setup, running tests, and making pull requests
 
 ## Contributing
 
