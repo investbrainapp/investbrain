@@ -25,7 +25,16 @@ class ConnectedAccountController extends Controller
     {
         $this->validateProvider($provider);
 
-        return Socialite::driver($provider)->redirect();
+        try {
+
+            return Socialite::driver($provider)->redirect();
+
+        } catch (Exception $e) {
+
+            report($e);
+
+            return $this->redirectToLoginWithError(__('Could not login using :provider. Try again later.', ['provider' => config("services.$provider.name")]));
+        }
     }
 
     /**
@@ -41,8 +50,9 @@ class ConnectedAccountController extends Controller
 
         } catch (Exception $e) {
 
-            return redirect(route('login'))
-                ->with('errors', new MessageBag([__('Could not login using :provider. Try again later.', ['provider' => config("services.$provider.name")])]));
+            report($e);
+
+            return $this->redirectToLoginWithError(__('Could not login using :provider. Try again later.', ['provider' => config("services.$provider.name")]));
         }
 
         // signed-in users are linking an account, not logging in
@@ -72,8 +82,19 @@ class ConnectedAccountController extends Controller
             return redirect(route('dashboard'));
         }
 
+        // without an email there's no account to match or create
+        if (blank($providerUser->email)) {
+
+            return $this->redirectToLoginWithError(__('Your :provider account didn\'t share an email address.', ['provider' => config("services.$provider.name")]));
+        }
+
         // new user, let's create one
         if (! $user = User::where('email', Str::lower(trim((string) $providerUser->email)))->first()) {
+
+            if (! config('services.sso_auto_provision')) {
+
+                return $this->redirectToLoginWithError(__('You don\'t have an account yet, and automatic account provisioning is not enabled.'));
+            }
 
             $user = User::make([
                 'name' => $providerUser->name,
@@ -137,6 +158,14 @@ class ConnectedAccountController extends Controller
             route('connections.index'),
             __('Your :provider account has been connected.', ['provider' => $providerName]),
         );
+    }
+
+    /**
+     * Send the user back to the login page with an error.
+     */
+    protected function redirectToLoginWithError(string $message): RedirectResponse
+    {
+        return redirect(route('login'))->with('errors', new MessageBag([$message]));
     }
 
     /**

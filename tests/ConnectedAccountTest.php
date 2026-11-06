@@ -110,6 +110,48 @@ class ConnectedAccountTest extends TestCase
         $response->assertRedirect(route('dashboard'));
     }
 
+    public function test_new_users_are_not_provisioned_from_a_provider_login_when_auto_provisioning_is_off(): void
+    {
+        config(['services.enabled_login_providers' => 'github', 'services.sso_auto_provision' => false]);
+        $this->mockProviderUser('github', $this->providerUser('12345', 'john@example.com'));
+
+        $response = $this->get(route('oauth.callback', ['provider' => 'github']));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('errors');
+        $this->assertFalse(Auth::check());
+        $this->assertSame(0, User::count());
+        $this->assertSame(0, ConnectedAccount::count());
+    }
+
+    public function test_a_provider_login_without_an_email_does_not_create_an_account(): void
+    {
+        config(['services.enabled_login_providers' => 'github']);
+        $this->mockProviderUser('github', (object) [...(array) $this->providerUser('12345', ''), 'email' => null]);
+
+        $response = $this->get(route('oauth.callback', ['provider' => 'github']));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('errors');
+        $this->assertFalse(Auth::check());
+        $this->assertSame(0, User::count());
+        $this->assertSame(0, ConnectedAccount::count());
+    }
+
+    public function test_existing_users_can_still_connect_a_provider_when_auto_provisioning_is_off(): void
+    {
+        config(['services.enabled_login_providers' => 'github', 'services.sso_auto_provision' => false]);
+        $user = User::factory()->create(['email' => 'jane@example.com']);
+        $this->mockProviderUser('github', $this->providerUser('54321', 'jane@example.com'));
+
+        $this->get(route('oauth.callback', ['provider' => 'github']))
+            ->assertRedirect(route('login'));
+
+        $this->assertSame(1, User::count());
+        $this->assertSame($user->id, ConnectedAccount::sole()->user_id);
+        Notification::assertSentTo($user, VerifyConnectedAccountNotification::class);
+    }
+
     public function test_handle_provider_callback_with_existing_account()
     {
         $provider = 'github';

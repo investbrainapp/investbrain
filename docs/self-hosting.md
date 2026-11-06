@@ -154,11 +154,16 @@ docker compose up -d
 
 | Option | Description | Default |
 | --- | --- | --- |
-| `ENABLED_LOGIN_PROVIDERS` | Comma-separated list of `github`, `google`, `facebook`, `linkedin-openid`. | none |
+| `ENABLED_LOGIN_PROVIDERS` | Comma-separated list of `github`, `google`, `facebook`, `linkedin-openid`, `oidc`. | none |
+| `SSO_AUTO_PROVISION` | Create a new Investbrain account when someone signs in with any login provider and no account has their email. | `true` |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth app credentials. | none |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth client credentials. | none |
 | `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET` | Facebook app credentials. | none |
 | `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET` | LinkedIn app credentials. | none |
+| `OIDC_ISSUER` | Issuer URL of your [OpenID Connect](#openid-connect-sso) provider. | none |
+| `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | OpenID Connect client credentials. | none |
+| `OIDC_NAME` | Name shown on the **Login with ...** button. | `SSO` |
+| `OIDC_BUTTON_COLOR` | Background color of the login button. | `#4b5563` |
 
 **Email**
 
@@ -339,7 +344,7 @@ Questions and portfolio details are sent to the provider you configure. Choose a
 
 ## Social login
 
-Users can sign in with GitHub, Google, Facebook, or LinkedIn once you register an OAuth app with each provider.
+Users can sign in with GitHub, Google, Facebook, LinkedIn, or your own single sign-on provider ([OpenID Connect](#openid-connect-sso)) once you register an OAuth app with each provider.
 
 1. Create an OAuth app (sometimes called a client or application) in the provider's developer console:
    - GitHub: **Settings > Developer settings > OAuth Apps**
@@ -352,7 +357,7 @@ Users can sign in with GitHub, Google, Facebook, or LinkedIn once you register a
    https://<your-investbrain-host>/auth/<provider>/callback
    ```
 
-   where `<provider>` is `github`, `google`, `facebook`, or `linkedin-openid`. It must match exactly, including `http` vs `https` and any port.
+   where `<provider>` is `github`, `google`, `facebook`, `linkedin-openid`, or `oidc`. It must match exactly, including `http` vs `https` and any port.
 3. Add the credentials and enable the provider:
 
    ```yaml
@@ -368,6 +373,36 @@ Users can sign in with GitHub, Google, Facebook, or LinkedIn once you register a
 **Login with ...** buttons appear on the login page, and users can link accounts from **Connections** (see [Social logins](account-settings.md#social-logins)).
 
 When someone signs in with a provider using an email that already belongs to an Investbrain account, Investbrain emails a verification link before linking them, so [email](#email) must be working for that case.
+
+By default, when someone signs in with a provider and no account has their email, Investbrain creates an account for them. This works independently of `REGISTRATION_ENABLED`, so you can turn off the registration form and still let your providers create accounts. To only allow people who already have an Investbrain account, set `SSO_AUTO_PROVISION: false`; anyone else is sent back to the login page and no account is created.
+
+### OpenID Connect (SSO)
+
+If you run your own identity provider, such as Authentik, Keycloak, Authelia, or Pocket ID, users can sign in with it through OpenID Connect (OIDC). Investbrain reads the provider's settings from its discovery document (`<issuer>/.well-known/openid-configuration`), so you only need the issuer URL and a client.
+
+1. In your identity provider, create an OIDC client (sometimes called an application or relying party):
+   - Client type: **confidential**, using the authorization code flow
+   - Redirect URI: `https://<your-investbrain-host>/auth/oidc/callback`
+   - Scopes: `openid`, `profile`, and `email`
+2. Note the client ID, the client secret, and the issuer URL. The issuer is usually shown on the client's page. For example:
+   - Authentik: `https://authentik.example.com/application/o/<application-slug>/`
+   - Keycloak: `https://keycloak.example.com/realms/<realm>`
+   - Authelia or Pocket ID: the base URL, such as `https://auth.example.com`
+3. Add the settings and enable the `oidc` provider:
+
+   ```yaml
+         ENABLED_LOGIN_PROVIDERS: "oidc"
+         OIDC_ISSUER: "https://auth.example.com"
+         OIDC_CLIENT_ID: "..."
+         OIDC_CLIENT_SECRET: "..."
+         OIDC_NAME: "Authelia"
+   ```
+
+4. [Apply the change](#applying-configuration-changes).
+
+The login page then shows a **Login with Authelia** button (or whatever `OIDC_NAME` is).
+
+Accounts are linked by the user's ID at the identity provider (the `sub` claim), so if you change `OIDC_ISSUER` to a different provider, users have to connect their accounts again.
 
 ## Email
 

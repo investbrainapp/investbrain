@@ -70,8 +70,18 @@ return [
         'name' => 'Linkedin',
     ],
 
+    'oidc' => [
+        'issuer' => env('OIDC_ISSUER'),
+        'client_id' => env('OIDC_CLIENT_ID'),
+        'client_secret' => env('OIDC_CLIENT_SECRET'),
+        'redirect' => '/auth/oidc/callback',
+        'color' => env('OIDC_BUTTON_COLOR', '#4b5563'),
+        'name' => env('OIDC_NAME', 'SSO'),
+    ],
+
     //
     'enabled_login_providers' => env('ENABLED_LOGIN_PROVIDERS', ''),
+    'sso_auto_provision' => env('SSO_AUTO_PROVISION', true),
     'ai_chat_enabled' => env('AI_CHAT_ENABLED', false),
     'mcp_server_enabled' => env('MCP_SERVER_ENABLED', true),
 ];
