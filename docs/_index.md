@@ -2,7 +2,7 @@
 title: "Investbrain"
 description: "Investbrain is a smart open-source investment tracker that helps you manage, track, and make informed decisions about your investments."
 order: 0
-updated_at: "2026-11-02"
+updated_at: "2026-11-05"
 ---
 # Investbrain
 
@@ -29,6 +29,7 @@ Both self-hosted and cloud run the same open-source app. You can switch between 
 
 - [Contributing](contributing.md) - how the project is built, setting up a development environment, coding conventions, and making pull requests
 - [Developing market data providers](market-data-providers.md) - writing, testing, and contributing a new market data provider
+- [How multi-currency works](multi-currency.md) - how transactions, prices, and dividends are converted between currencies, and which exchange rate is used for each number
 
 ## API Reference
 
