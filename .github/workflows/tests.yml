@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cp .env.example .env
+          touch .env
           composer install --no-interaction --no-progress
           php artisan key:generate
 
