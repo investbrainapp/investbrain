@@ -82,10 +82,14 @@ new #[Lazy] class extends Component
         $marketValueData = [];
         $costBasisData = [];
         $marketGainData = [];
+        $marketGainPercentages = [];
 
         foreach ($dailyChange as $data) {
             $date = $data->date;
             $marketGainData[] = [$date, round($data->total_market_gain, 2)];
+            $marketGainPercentages[] = $data->total_cost_basis == 0
+                ? null
+                : round($data->total_market_gain / $data->total_cost_basis * 100, 2);
             $marketValueData[] = [$date, round($data->total_market_value, 2)];
             $costBasisData[] = [$date, round($data->total_cost_basis, 2)];
 
@@ -119,7 +123,30 @@ new #[Lazy] class extends Component
                 //     'data' => $realizedGainSeries
                 // ],
             ],
+
+            // shown next to each value in the tooltip, in the same order as the series
+            'percentages' => [
+                $marketGainPercentages,
+                $this->changeSinceStart($marketValueData),
+                $this->changeSinceStart($costBasisData),
+            ],
         ];
+    }
+
+    /**
+     * Percentage change of each point from the first point in the range, or null when the range starts at zero
+     *
+     * @param  array<int, array{0: mixed, 1: float}>  $points
+     * @return array<int, float|null>
+     */
+    protected function changeSinceStart(array $points): array
+    {
+        $first = $points[0][1] ?? 0;
+
+        return array_map(
+            fn (array $point) => $first == 0 ? null : round(($point[1] - $first) / abs($first) * 100, 2),
+            $points
+        );
     }
 
     /**
