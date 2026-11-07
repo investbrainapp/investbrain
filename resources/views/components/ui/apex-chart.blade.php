@@ -4,12 +4,8 @@
     $seriesData = array_merge([
       'chart' => [
         'type' => "area",
-        'stacked' => false,
         'height' => 300,
         'foreColor' => "#999",
-        'dropShadow' => [
-           'enabled' => false,
-        ],
         'toolbar' => [
             'show' => false,
         ],
@@ -19,18 +15,14 @@
       ],
       'colors' => ['#3185FC', '#48435C', '#9792E3', '#00E396', '#B74F6F'],
       'stroke' => [
-        'curve' => "smooth",
         'width' => 3
       ],
       'dataLabels' => [
         'enabled' => false
       ],
       'markers' => [
-        'size' => 0,
-        'strokeColor' => "#fff",
         'strokeWidth' => 3,
         'strokeOpacity' => 1,
-        'fillOpacity' => 1,
         'hover' => [
           'size' => 6
         ]
@@ -45,7 +37,6 @@
         ],
         'labels' => [
           'offsetX' => 15,
-          'offsetY' => 0
         ],
         'tooltip' => [
           'enabled' => false
@@ -61,9 +52,7 @@
         ]
       ],
       'grid' => [
-        'strokeColor' => "#000",
         'padding' => [
-            'top' => 0,
             'left' => -30,
             'right' => 0,
             'bottom' => -5
@@ -72,15 +61,13 @@
       'legend' => [
         'show' => false,
       ],
-      
     ], $seriesData);
     // percentages for the tooltip are not ApexCharts options, so keep them out of its config
     $percentages = json_encode(Arr::pull($seriesData, 'percentages', []));
     $seriesData = json_encode($seriesData)
 @endphp
 
-<div 
-    id="chart"
+<div
     wire:key="{{ rand() }}"
     x-data="{
         data: {{ $seriesData }},
@@ -97,9 +84,6 @@
                 mounted: function (chartContext, config) {
                     renderLegend(chartContext);
                 },
-                {{-- updated: function (chartContext, config) {
-                    renderLegend(chartContext);
-                } --}}
             }
 
             @if ($currency)
@@ -108,7 +92,6 @@
             }
 
             this.data.tooltip = {
-                enabled: true,
                 shared: false,
                 y: {
                     formatter: (value, { seriesIndex, dataPointIndex }) => {
@@ -121,18 +104,12 @@
             }
             @endif
 
-            var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
+            var chart = new ApexCharts(this.$refs.chart, this.data);
 
             // kept off Alpine's reactive data, so the chart instance is not wrapped in proxies
             this.$el.apexChart = chart;
 
             chart.render();
-
-            {{-- // reset custom zoom button
-            var resetZoomButton = document.querySelector('#chart-reset-zoom-{{ $name }}');
-            resetZoomButton.addEventListener('click', function () {
-              chart.resetSeries()
-            }); --}}
 
             // generate custom legend view
             function renderLegend(chartContext) {
@@ -195,6 +172,6 @@
         }
     }"
 >
-  <div id="chart-{{ $name }}" class="apex-chart"></div>
+  <div x-ref="chart" class="apex-chart"></div>
 </div>
 

@@ -92,9 +92,6 @@ new #[Lazy] class extends Component
                 : round($data->total_market_gain / $data->total_cost_basis * 100, 2);
             $marketValueData[] = [$date, round($data->total_market_value, 2)];
             $costBasisData[] = [$date, round($data->total_cost_basis, 2)];
-
-            // $dividendSeries[] = [$date, round($data->total_dividends_earned, 2)];
-            // $realizedGainSeries[] = [$date, round($data->realized_gains, 2)];
         }
 
         return [
@@ -113,15 +110,6 @@ new #[Lazy] class extends Component
                     'data' => $costBasisData,
                     'hidden' => true,
                 ],
-
-                // [
-                //     'name' => __('Dividends Earned'),
-                //     'data' => $dividendSeries
-                // ],
-                // [
-                //     'name' => __('Realized Gains'),
-                //     'data' => $realizedGainSeries
-                // ],
             ],
 
             // shown next to each value in the tooltip, in the same order as the series
@@ -205,8 +193,6 @@ new #[Lazy] class extends Component
         </div>
         
         <div class="flex items-center" x-data="{ loading: false }">
-            {{-- <x-ui.button title="{{ __('Reset chart') }}" icon="o-arrow-path" class="btn-ghost btn-sm btn-circle mr-2" id="chart-reset-zoom-{{ $name }}" /> --}}
-
             <x-ui.loading x-show="loading" x-cloak class="text-gray-400 ml-2" />
 
             <x-ui.dropdown title="{{ __('Choose time period') }}" label="{{ $scope }}" class="btn-xs md:btn-sm btn-outline" x-bind:disabled="loading">
