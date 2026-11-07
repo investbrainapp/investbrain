@@ -31,18 +31,8 @@
     openSpotlight() {
         this.$dispatch('open-spotlight')
     },
-    isTypingInField(element) {
-        return element.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)
-    },
     handleShortcut(event) {
         if ((event.metaKey || event.ctrlKey) && !event.altKey && event.key?.toLowerCase() === 'k') {
-            event.preventDefault()
-            this.openSpotlight()
-
-            return
-        }
-
-        if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !this.isTypingInField(event.target)) {
             event.preventDefault()
             this.openSpotlight()
         }
