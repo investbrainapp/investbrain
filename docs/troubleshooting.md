@@ -3,7 +3,7 @@ title: "Troubleshooting"
 description: "Fixes for the most common problems on self-hosted instances."
 group: "Running your own instance"
 order: 31
-updated_at: "2026-11-03"
+updated_at: "2026-11-07"
 ---
 # Troubleshooting
 
@@ -225,7 +225,7 @@ Logins are limited to five attempts per minute for each email and IP address. Wa
 
 - The callback URL registered with the provider must be exactly `https://<your-host>/auth/<provider>/callback` (`github`, `google`, `facebook`, `linkedin-openid`, or `oidc`), including the scheme and port.
 - Check that the client ID and secret are correct and that the provider is listed in `ENABLED_LOGIN_PROVIDERS`.
-- For OpenID Connect, check `storage/logs/laravel.log`. A common cause is an `OIDC_ISSUER` that doesn't match the `issuer` in the provider's discovery document: copy the issuer exactly as your provider shows it.
+- For OpenID Connect, check `storage/logs/laravel.log`, and see [Single Sign-On troubleshooting](single-sign-on.md#troubleshooting) for the common causes.
 - If a user sees **Your ... account didn't share an email address**, the provider didn't send one. For OpenID Connect, make sure the client is allowed the `email` scope and the user has an email address set in the provider.
 - If a user sees **You don't have an account yet, and automatic account provisioning is not enabled**, nobody has an Investbrain account with that email and [`SSO_AUTO_PROVISION`](self-hosting.md#social-login) is `false`. Create the account first (or let them register), or set `SSO_AUTO_PROVISION: true`.
 - If a user sees **Account already exists. Check your email...**, an account with that email already exists. They need to click the link in the verification email (so email must be working), or sign in with their password and connect the provider from **Connections** instead.
