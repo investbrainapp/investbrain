@@ -168,8 +168,15 @@
                                 <div x-text="item.name" class="font-semibold truncate"></div>
 
                                 {{-- DESCRIPTION --}}
-                                <template x-if="item.description">
-                                    <div x-text="item.description" class="text-base-content/50 text-sm truncate"></div>
+                                <template x-if="item.description || item.badge">
+                                    <div class="flex items-center gap-2 text-base-content/50 text-sm">
+                                        <span x-text="item.description" class="truncate"></span>
+
+                                        {{-- BADGE --}}
+                                        <template x-if="item.badge">
+                                            <span x-text="item.badge" class="badge badge-secondary badge-outline badge-xs select-none shrink-0"></span>
+                                        </template>
+                                    </div>
                                 </template>
                             </div>
                         </div>

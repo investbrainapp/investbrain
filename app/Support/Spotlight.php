@@ -31,7 +31,7 @@ class Spotlight
      * Every word in the search must appear somewhere in the result (case-insensitive, partial matches allowed).
      * Results are ranked by how closely they match: exact, then prefix, then word prefix, then anywhere.
      *
-     * @return Collection<int, array{name: string, description: ?string, link: string, avatar: null}>
+     * @return Collection<int, array{name: string, description: ?string, badge: ?string, link: string, avatar: null}>
      */
     public function search(Request $request): Collection
     {
@@ -50,7 +50,7 @@ class Spotlight
     }
 
     /**
-     * @return Collection<int, array{name: string, description: ?string, link: string, avatar: null}>
+     * @return Collection<int, array{name: string, description: ?string, badge: ?string, link: string, avatar: null}>
      */
     private function searchPortfolios(User $user, string $search): Collection
     {
@@ -68,6 +68,7 @@ class Spotlight
             ->map(fn (Portfolio $portfolio): array => [
                 'name' => 'Portfolio: '.$portfolio->title,
                 'description' => null,
+                'badge' => null,
                 'link' => route('portfolio.show', ['portfolio' => $portfolio->id]),
                 'avatar' => null,
             ]);
@@ -76,7 +77,7 @@ class Spotlight
     /**
      * Includes closed positions and wishlist holdings, ranked below open positions that match equally well.
      *
-     * @return Collection<int, array{name: string, description: ?string, link: string, avatar: null}>
+     * @return Collection<int, array{name: string, description: ?string, badge: ?string, link: string, avatar: null}>
      */
     private function searchHoldings(User $user, string $search): Collection
     {
@@ -101,23 +102,20 @@ class Spotlight
             ->get()
             ->map(fn (Holding $holding): array => [
                 'name' => 'Holding: '.($holding->market_data_name ?? $holding->symbol).' ('.$holding->symbol.')',
-                'description' => $this->describeHolding($holding),
+                'description' => $holding->portfolio->title,
+                'badge' => $this->holdingBadge($holding),
                 'link' => route('holding.show', ['portfolio' => $holding->portfolio_id, 'symbol' => $holding->symbol]),
                 'avatar' => null,
             ]);
     }
 
-    private function describeHolding(Holding $holding): string
+    private function holdingBadge(Holding $holding): ?string
     {
-        $status = match (true) {
+        return match (true) {
             $holding->portfolio->wishlist => __('Wishlist'),
             $holding->quantity <= 0 => __('Closed'),
             default => null,
         };
-
-        return $status === null
-            ? $holding->portfolio->title
-            : $holding->portfolio->title.' - '.$status;
     }
 
     /**
