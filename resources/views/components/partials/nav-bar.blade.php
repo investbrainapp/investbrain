@@ -44,7 +44,7 @@ new class extends Component
                     <span class="flex items-center text-gray-400">
                         <x-ui.icon name="o-magnifying-glass" class="mr-2" />
                         <span class=" truncate hidden sm:block">
-                            @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm" x-data x-text="/Mac|iPhone|iPad/.test(navigator.userAgent) ? \'⌘K\' : \'Ctrl K\'">Ctrl K</kbd>'])
+                            @lang('Click or press :key to search', ['key' => '<kbd class="kbd kbd-sm text-gray-400" x-data x-text="/Mac|iPhone|iPad/.test(navigator.userAgent) ? \'⌘K\' : \'Ctrl K\'">Ctrl K</kbd>'])
                         </span>
                         <span class=" truncate block sm:hidden">
                             @lang('Click to search')

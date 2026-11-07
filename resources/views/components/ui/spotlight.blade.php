@@ -110,7 +110,7 @@
                 @click="close()" 
                 @focus="$focus.lastFocused().focus()"
             >
-                <kbd class="kbd kbd-sm">ESC</kbd>
+                <kbd class="kbd kbd-sm text-secondary">ESC</kbd>
             </x-ui.button>
 
             {{-- INPUT --}}
