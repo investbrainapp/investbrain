@@ -2,7 +2,7 @@
 title: "Investbrain"
 description: "Investbrain is a smart open-source investment tracker that helps you manage, track, and make informed decisions about your investments."
 order: 0
-updated_at: "2026-11-07"
+updated_at: "2026-11-05"
 ---
 # Investbrain
 
@@ -24,7 +24,6 @@ Both self-hosted and cloud run the same open-source app. You can switch between 
 - [Self-hosting](self-hosting.md) - installing with the supported Docker Compose file, configuration, reverse proxies, updates, backups, and command line utilities
 - [Troubleshooting](troubleshooting.md) - fixes for the most common problems on self-hosted instances
 - [Custom currencies](custom-currencies.md) - adding extra Frankfurter-supported currencies that are not in the seeded list
-- [Single sign-on (OIDC)](single-sign-on.md) - letting users sign in with your own identity provider, with settings for Authelia, Authentik, and Keycloak
 
 ## Contributing
 

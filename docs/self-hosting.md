@@ -3,7 +3,7 @@ title: "Self-Hosting"
 description: "Install with the supported Docker Compose file, then configure, update, and maintain your instance."
 group: "Running your own instance"
 order: 30
-updated_at: "2026-11-07"
+updated_at: "2026-11-02"
 ---
 # Self-Hosting
 
@@ -160,7 +160,7 @@ docker compose up -d
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth client credentials. | none |
 | `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET` | Facebook app credentials. | none |
 | `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET` | LinkedIn app credentials. | none |
-| `OIDC_ISSUER` | Issuer URL of your [OpenID Connect](single-sign-on.md) provider. | none |
+| `OIDC_ISSUER` | Issuer URL of your [OpenID Connect](#openid-connect-sso) provider. | none |
 | `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | OpenID Connect client credentials. | none |
 | `OIDC_NAME` | Name shown on the **Login with ...** button. | `SSO` |
 | `OIDC_BUTTON_COLOR` | Background color of the login button. | `#4b5563` |
@@ -378,7 +378,31 @@ By default, when someone signs in with a provider and no account has their email
 
 ### OpenID Connect (SSO)
 
-If you run your own identity provider, such as Authelia, Authentik, or Keycloak, users can sign in with it through OpenID Connect. Set `ENABLED_LOGIN_PROVIDERS: "oidc"` plus the `OIDC_*` [options](#options). See [Single Sign-On (OIDC)](single-sign-on.md) for what to configure in Investbrain and step-by-step settings for each of those providers.
+If you run your own identity provider, such as Authentik, Keycloak, Authelia, or Pocket ID, users can sign in with it through OpenID Connect (OIDC). Investbrain reads the provider's settings from its discovery document (`<issuer>/.well-known/openid-configuration`), so you only need the issuer URL and a client.
+
+1. In your identity provider, create an OIDC client (sometimes called an application or relying party):
+   - Client type: **confidential**, using the authorization code flow
+   - Redirect URI: `https://<your-investbrain-host>/auth/oidc/callback`
+   - Scopes: `openid`, `profile`, and `email`
+2. Note the client ID, the client secret, and the issuer URL. The issuer is usually shown on the client's page. For example:
+   - Authentik: `https://authentik.example.com/application/o/<application-slug>/`
+   - Keycloak: `https://keycloak.example.com/realms/<realm>`
+   - Authelia or Pocket ID: the base URL, such as `https://auth.example.com`
+3. Add the settings and enable the `oidc` provider:
+
+   ```yaml
+         ENABLED_LOGIN_PROVIDERS: "oidc"
+         OIDC_ISSUER: "https://auth.example.com"
+         OIDC_CLIENT_ID: "..."
+         OIDC_CLIENT_SECRET: "..."
+         OIDC_NAME: "Authelia"
+   ```
+
+4. [Apply the change](#applying-configuration-changes).
+
+The login page then shows a **Login with Authelia** button (or whatever `OIDC_NAME` is).
+
+Accounts are linked by the user's ID at the identity provider (the `sub` claim), so if you change `OIDC_ISSUER` to a different provider, users have to connect their accounts again.
 
 ## Email
 
