@@ -11,6 +11,13 @@
         ],
         'zoom' => [
           'enabled' => false
+        ],
+        // the chart is rebuilt on every time period change, so keep its entrance short
+        'animations' => [
+          'speed' => 300,
+          'animateGradually' => [
+            'enabled' => false
+          ]
         ]
       ],
       'colors' => ['#3185FC', '#48435C', '#9792E3', '#00E396', '#B74F6F'],
