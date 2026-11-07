@@ -1,10 +1,10 @@
 @props([
     'id' => null,
-    'title' => null
+    'title' => null,
     'icon' => null,
     'description' => null,
     'shadow' => false,
-    'dismissable' => false
+    'dismissable' => false,
 ])
 
 <div
@@ -14,7 +14,7 @@
     x-data="{ show: true }" x-show="show"
 >
     @if($icon)
-        <x-icon :name="$icon" class="self-center" />
+        <x-ui.icon :name="$icon" class="self-center" />
     @endif
 
     @if($title)
@@ -26,11 +26,13 @@
         <span>{{ $slot }}</span>
     @endif
 
-    <div class="flex items-center gap-3">
-        {{ $actions }}
-    </div>
+    @isset($actions)
+        <div class="flex items-center gap-3">
+            {{ $actions }}
+        </div>
+    @endisset
 
-    @if($dismissible)
+    @if($dismissable)
         <x-ui.button icon="o-x-mark" @click="show = false" class="btn-xs btn-circle btn-ghost static self-start end-0" />
     @endif
 </div>
