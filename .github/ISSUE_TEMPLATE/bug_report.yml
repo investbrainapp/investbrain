@@ -83,12 +83,20 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: market-data-provider
+  - type: textarea
+    id: environment
     attributes:
-      label: Market data provider
-      description: Self-hosted only, and only if the bug involves prices, dividends, splits, or symbols. This is your `MARKET_DATA_PROVIDER` setting.
-      placeholder: e.g. yahoo
+      label: Environment
+      description: |
+        Self-hosted only. Anything about your setup that might matter, such as the settings below, your host OS, and whether you use a reverse proxy.
+        **Leave out API keys, passwords, and other secrets.**
+      placeholder: |
+        MARKET_DATA_PROVIDER: yahoo
+        BASE_CURRENCY: USD
+        CHAT_PROVIDER: openai
+        Host OS: Ubuntu 24.04
+        Reverse proxy: Caddy
+      render: yaml
 
   - type: textarea
     id: logs
