@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/investbrainapp/investbrain/security/advisories/new
+    about: Please report security issues privately, not as a public issue.
+  - name: Troubleshooting guide
+    url: https://github.com/investbrainapp/investbrain/blob/main/docs/troubleshooting.md
+    about: Fixes for common self-hosting problems, such as containers not starting or prices not updating.
+  - name: Documentation
+    url: https://github.com/investbrainapp/investbrain/blob/main/docs/_index.md
+    about: Guides for using, self-hosting, and contributing to Investbrain.

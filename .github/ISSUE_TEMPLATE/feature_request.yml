@@ -1,0 +1,75 @@
+name: Feature request
+description: Suggest an idea or improvement for Investbrain.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion! Describing the problem you're running into matters more than the exact solution, so start there.
+
+        Planning to build it yourself? Agreeing on the approach here first saves you from reworking a finished pull request. See the [contributing guide](https://github.com/investbrainapp/investbrain/blob/main/docs/contributing.md).
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you start
+      options:
+        - label: I've searched the [existing issues](https://github.com/investbrainapp/investbrain/issues?q=is%3Aissue) and this hasn't been suggested yet.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: What are you trying to do, and what gets in the way today?
+      placeholder: When I record a dividend reinvestment, I have to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to happen?
+      description: Describe how you picture it working.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Workarounds you use today, or other ways this could be solved.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the app?
+      options:
+        - Dashboard
+        - Portfolios and holdings
+        - Transactions
+        - Dividends and splits
+        - Market data and prices
+        - Currencies
+        - Import and export
+        - Search
+        - AI chat
+        - API or MCP server
+        - Sign-in, accounts, or single sign-on
+        - Installation or updating
+        - Something else
+
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Would you like to work on this?
+      options:
+        - Yes, I'd like to open a pull request
+        - Maybe, with some guidance
+        - No
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else?
+      description: Screenshots, mockups, or examples from other apps.

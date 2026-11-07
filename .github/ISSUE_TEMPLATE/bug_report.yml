@@ -1,0 +1,114 @@
+name: Bug report
+description: Something in Investbrain isn't working as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this! A clear report with steps to reproduce is the fastest way to get it fixed.
+
+        Self-hosting? Many setup problems are covered in the [troubleshooting guide](https://github.com/investbrainapp/investbrain/blob/main/docs/troubleshooting.md).
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you start
+      options:
+        - label: I've searched the [existing issues](https://github.com/investbrainapp/investbrain/issues?q=is%3Aissue) and this hasn't been reported yet.
+          required: true
+        - label: This is not a security vulnerability. Those go to a [private security advisory](https://github.com/investbrainapp/investbrain/security/advisories/new) instead.
+          required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: How are you running Investbrain?
+      options:
+        - Investbrain Cloud (investbra.in)
+        - Self-hosted with Docker Compose
+        - Self-hosted another way
+        - Local development
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Investbrain version
+      description: Self-hosted only. It's printed at the top of the app container's log on startup (`docker compose logs app`).
+      placeholder: e.g. 1.4.2
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the app?
+      options:
+        - Dashboard
+        - Portfolios and holdings
+        - Transactions
+        - Dividends and splits
+        - Market data and prices
+        - Currencies
+        - Import and export
+        - Search
+        - AI chat
+        - API or MCP server
+        - Sign-in, accounts, or single sign-on
+        - Installation or updating
+        - Something else
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include any error message you saw.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Self-hosted only. Anything about your setup that might matter, such as the settings below, your host OS, and whether you use a reverse proxy.
+        **Leave out API keys, passwords, and other secrets.**
+      placeholder: |
+        MARKET_DATA_PROVIDER: yahoo
+        BASE_CURRENCY: USD
+        CHAT_PROVIDER: openai
+        Host OS: Ubuntu 24.04
+        Reverse proxy: Caddy
+      render: yaml
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: |
+        Self-hosted only. Paste the relevant lines from `docker compose logs app` and `storage/logs/laravel.log`.
+        **Remove any API keys, passwords, or other secrets first.**
+      render: shell
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else?
+      description: Screenshots, your browser, a symbol or currency that triggers it, or anything else that might help.
