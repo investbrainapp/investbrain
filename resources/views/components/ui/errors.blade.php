@@ -12,7 +12,7 @@
             <div class="grid gap-3">
                 <div class="flex gap-2">
                     @if($title)
-                        <x-icon :name="$icon" class="w-6 h-6 mt-0.5" />
+                        <x-ui.icon :name="$icon" class="w-6 h-6 mt-0.5" />
                     @endif
                     <div>
                         @if($title)

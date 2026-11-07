@@ -11,6 +11,16 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_login_screen_shows_a_flashed_status_message(): void
+    {
+        $response = $this->withoutVite()
+            ->withSession(['status' => 'Account already exists. Check your email.'])
+            ->get('/login');
+
+        $response->assertOk();
+        $response->assertSee('Account already exists. Check your email.');
+    }
+
     public function test_first_user_is_admin(): void
     {
         $response = $this->post('/register', [
