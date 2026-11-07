@@ -82,9 +82,13 @@
     wire:key="{{ rand() }}"
     x-data="{
         data: {{ $seriesData }},
+        removed: false,
         async init(){
 
             const ApexCharts = await window.loadApexCharts();
+
+            // Livewire may have replaced this element while ApexCharts was loading
+            if (this.removed) return;
 
             this.data.chart.events = {
                 mounted: function (chartContext, config) {
@@ -114,6 +118,9 @@
             @endif
 
             var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
+
+            // kept off Alpine's reactive data, so the chart instance is not wrapped in proxies
+            this.$el.apexChart = chart;
 
             chart.render();
 
@@ -173,6 +180,14 @@
                 });
             }
 
+        },
+
+        // wire:key changes on every render, so Livewire swaps in a new element each time;
+        // without this the old chart and its window resize listener are never released
+        destroy() {
+            this.removed = true;
+            this.$el.apexChart?.destroy();
+            delete this.$el.apexChart;
         }
     }"
 >
