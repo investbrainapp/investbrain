@@ -46,6 +46,11 @@ class AlpacaMarketData implements MarketDataInterface
         return (bool) $this->quote($symbol);
     }
 
+    public function search(string $query): Collection
+    {
+        throw new \Exception('Symbol search is not supported by Alpaca');
+    }
+
     public function quote(string $symbol): Quote
     {
         $response = $this->client->baseUrl($this->dataBaseUrl)->get("v2/stocks/{$symbol}/trades/latest");
