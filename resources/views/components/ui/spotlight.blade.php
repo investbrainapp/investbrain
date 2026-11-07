@@ -174,7 +174,7 @@
 
                                         {{-- BADGE --}}
                                         <template x-if="item.badge">
-                                            <span x-text="item.badge" class="badge badge-secondary badge-outline badge-xs select-none shrink-0"></span>
+                                            <span x-text="item.badge.label" :class="item.badge.class" class="badge badge-outline badge-xs select-none shrink-0"></span>
                                         </template>
                                     </div>
                                 </template>

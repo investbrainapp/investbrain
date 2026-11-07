@@ -76,7 +76,7 @@ class SpotlightTest extends TestCase
             [
                 'name' => 'Holding: Apple Inc (AAPL)',
                 'description' => 'Bonds',
-                'badge' => 'Closed',
+                'badge' => ['label' => 'Closed', 'class' => 'badge-error'],
                 'link' => route('holding.show', ['portfolio' => $portfolio->id, 'symbol' => 'AAPL']),
                 'avatar' => null,
             ],
@@ -91,7 +91,7 @@ class SpotlightTest extends TestCase
 
         $this->search('nvda')
             ->assertJsonPath('0.description', 'Ideas')
-            ->assertJsonPath('0.badge', 'Wishlist');
+            ->assertJsonPath('0.badge', ['label' => 'Wishlist', 'class' => 'badge-secondary']);
     }
 
     public function test_treats_like_wildcards_literally(): void
@@ -129,7 +129,7 @@ class SpotlightTest extends TestCase
     /**
      * The transaction factory creates a randomly titled portfolio per transaction, so ranking assertions filter by type.
      *
-     * @return list<array{name: string, description: ?string, badge: ?string, link: string, avatar: null}>
+     * @return list<array{name: string, description: ?string, badge: array{label: string, class: string}|null, link: string, avatar: null}>
      */
     private function results(TestResponse $response, ?string $type = null): array
     {

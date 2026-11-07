@@ -31,7 +31,7 @@ class Spotlight
      * Every word in the search must appear somewhere in the result (case-insensitive, partial matches allowed).
      * Results are ranked by how closely they match: exact, then prefix, then word prefix, then anywhere.
      *
-     * @return Collection<int, array{name: string, description: ?string, badge: ?string, link: string, avatar: null}>
+     * @return Collection<int, array{name: string, description: ?string, badge: array{label: string, class: string}|null, link: string, avatar: null}>
      */
     public function search(Request $request): Collection
     {
@@ -50,7 +50,7 @@ class Spotlight
     }
 
     /**
-     * @return Collection<int, array{name: string, description: ?string, badge: ?string, link: string, avatar: null}>
+     * @return Collection<int, array{name: string, description: ?string, badge: array{label: string, class: string}|null, link: string, avatar: null}>
      */
     private function searchPortfolios(User $user, string $search): Collection
     {
@@ -77,7 +77,7 @@ class Spotlight
     /**
      * Includes closed positions and wishlist holdings, ranked below open positions that match equally well.
      *
-     * @return Collection<int, array{name: string, description: ?string, badge: ?string, link: string, avatar: null}>
+     * @return Collection<int, array{name: string, description: ?string, badge: array{label: string, class: string}|null, link: string, avatar: null}>
      */
     private function searchHoldings(User $user, string $search): Collection
     {
@@ -109,11 +109,14 @@ class Spotlight
             ]);
     }
 
-    private function holdingBadge(Holding $holding): ?string
+    /**
+     * @return array{label: string, class: string}|null
+     */
+    private function holdingBadge(Holding $holding): ?array
     {
         return match (true) {
-            $holding->portfolio->wishlist => __('Wishlist'),
-            $holding->quantity <= 0 => __('Closed'),
+            $holding->portfolio->wishlist => ['label' => __('Wishlist'), 'class' => 'badge-secondary'],
+            $holding->quantity <= 0 => ['label' => __('Closed'), 'class' => 'badge-error'],
             default => null,
         };
     }
