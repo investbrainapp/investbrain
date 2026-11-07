@@ -87,18 +87,24 @@
             }
 
             @if ($currency)
-            this.data.yaxis.labels.formatter = function (value) {
-              return `{{ Number::currencySymbol(auth()->user()->getCurrency()) }}${value}`
-            }
+            const locale = {{ Js::from(str_replace('_', '-', auth()->user()->getLocale())) }};
+            const currency = { style: 'currency', currency: {{ Js::from(auth()->user()->getCurrency()) }} };
+
+            // short axis labels such as -$5K, full amounts such as -$22,686.48 in the tooltip
+            const axisAmount = new Intl.NumberFormat(locale, { ...currency, notation: 'compact', maximumFractionDigits: 1 });
+            const tooltipAmount = new Intl.NumberFormat(locale, currency);
+            const tooltipPercentage = new Intl.NumberFormat(locale, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            this.data.yaxis.labels.formatter = (value) => axisAmount.format(value);
 
             this.data.tooltip = {
                 shared: false,
                 y: {
                     formatter: (value, { seriesIndex, dataPointIndex }) => {
                         const percentage = this.percentages[seriesIndex]?.[dataPointIndex];
-                        const amount = parseFloat(value.toFixed(2));
+                        const amount = tooltipAmount.format(value);
 
-                        return percentage == null ? `${amount}` : `${amount} (${percentage.toFixed(2)}%)`;
+                        return percentage == null ? amount : `${amount} (${tooltipPercentage.format(percentage / 100)})`;
                     }
                 },
             }
