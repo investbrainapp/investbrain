@@ -139,6 +139,7 @@ class PortfoliosTest extends TestCase
         $this->actingAs(User::factory()->create());
         $portfolio = Portfolio::factory()->create();
         Transaction::factory()->buy(2)->lastMonth()->portfolio($portfolio->id)->symbol('ACME')->create(['cost_basis' => 100]);
+        $this->createDailyChanges($portfolio, now()->subMonth());
         $portfolio->daily_change()->update(['total_market_value' => 150]);
         $portfolio->daily_change()->where('date', $portfolio->daily_change()->max('date'))->update(['total_market_value' => 300]);
 
