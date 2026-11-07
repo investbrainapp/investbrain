@@ -1,6 +1,5 @@
 @props([
     'id' => null,
-    'shortcut' => "meta.g",
     'searchText' => "Search ...",
     'noResultsText' => "Nothing found.",
     'url' => null,
@@ -20,12 +19,51 @@
     controller: new AbortController(),
     query: '',
     searchedWithNoResults: false,
+    openFirstResultWhenLoaded: false,
     init(){
         this.$watch('value', value => {
             this.loading = true
+            this.openFirstResultWhenLoaded = false
 
             this.debounce(() => this.search(), this.maxDebounce)
         })
+    },
+    openSpotlight() {
+        this.$dispatch('open-spotlight')
+    },
+    isTypingInField(element) {
+        return element.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)
+    },
+    handleShortcut(event) {
+        if ((event.metaKey || event.ctrlKey) && !event.altKey && event.key?.toLowerCase() === 'k') {
+            event.preventDefault()
+            this.openSpotlight()
+
+            return
+        }
+
+        if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !this.isTypingInField(event.target)) {
+            event.preventDefault()
+            this.openSpotlight()
+        }
+    },
+    openFirstResult() {
+        if (this.value == '') {
+            return
+        }
+
+        if (this.loading) {
+            this.openFirstResultWhenLoaded = true
+
+            return
+        }
+
+        if (!this.results.length) {
+            return
+        }
+
+        this.$dispatch('close-spotlight')
+        Livewire.navigate(this.results[0].link)
     },
     debounce(fn, waitTime) {
         clearTimeout(this.debounceTimer)
@@ -43,7 +81,8 @@
             this.controller?.abort()
             this.controller = new AbortController();
 
-            let response = await fetch(`{{$url}}?search=${this.value}&${this.query}`, { signal: this.controller.signal })
+            let params = new URLSearchParams({ search: this.value })
+            let response = await fetch(`{{ $url }}?${params}${this.query ? '&' + this.query : ''}`, { signal: this.controller.signal })
             this.results = await response.json()
         } catch(e) {
             console.log(e)
@@ -55,14 +94,20 @@
         Object.keys(this.results).length
             ? this.searchedWithNoResults = false
             : this.searchedWithNoResults = true
+
+        if (this.openFirstResultWhenLoaded) {
+            this.openFirstResultWhenLoaded = false
+            this.openFirstResult()
+        }
     }
-}">
+}"
+    @keydown.window="handleShortcut($event)"
+>
     <x-ui.modal
         key="spotlight"
         class="backdrop-blur-sm shadow-xl"
         box-class="absolute top-10 lg:top-24 w-full lg:max-w-3xl "
         no-card="true"
-        shortcut="slash"
         @keydown.up="$focus.wrap().previous()"
         @keydown.down="$focus.wrap().next()"
     >
@@ -83,6 +128,7 @@
                 id="{{ $id }}"
                 icon="o-magnifying-glass"
                 x-model="value"
+                @keydown.enter.prevent="openFirstResult()"
                 placeholder=" {{ $searchText }}"
                 class="text-xl flex w-full input my-2 py-6 border-none outline-none shadow-none border-transparent focus:shadow-none focus:outline-none focus:border-transparent"
                 @focus="$el.focus()"

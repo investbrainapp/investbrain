@@ -47,6 +47,31 @@
                 @else
                     this.$refs.dialog.show();
                 @endif
+                this.focusAutofocusField();
+            },
+            {{-- The fade-in keeps the dialog visibility:hidden until it ends, so native autofocus and x-trap both skip the field. --}}
+            focusAutofocusField() {
+                const dialog = this.$refs.dialog
+                const field = dialog.querySelector('[autofocus]')
+
+                if (! field) {
+                    return
+                }
+
+                const focusWhenVisible = (event) => {
+                    if (event.target !== dialog) {
+                        return
+                    }
+
+                    dialog.removeEventListener('transitionend', focusWhenVisible)
+
+                    if (this.open) {
+                        field.focus()
+                    }
+                }
+
+                dialog.addEventListener('transitionend', focusWhenVisible)
+                this.$nextTick(() => field.focus())
             }
         }"
 
@@ -63,6 +88,8 @@
         x-ref="dialog"
 
         x-on:toggle-{{ $key }}.window="open ? close() : show();"
+        x-on:open-{{ $key }}.window="show();"
+        x-on:close-{{ $key }}.window="close();"
 
         @if($shortcut)
             @keydown.window.prevent.{{ $shortcut }}="show();"
