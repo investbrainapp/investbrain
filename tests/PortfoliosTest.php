@@ -6,6 +6,7 @@ namespace Tests;
 
 use App\Models\DailyChange;
 use App\Models\Portfolio;
+use App\Models\Transaction;
 use App\Models\User;
 use Carbon\CarbonPeriod;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -133,6 +134,34 @@ class PortfoliosTest extends TestCase
         $this->assertEquals($days->search(end($points)[0]), end($points)[1]);
     }
 
+    public function test_performance_chart_shows_market_gain_as_a_percentage_of_cost_basis(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        Transaction::factory()->buy(2)->lastMonth()->portfolio($portfolio->id)->symbol('ACME')->create(['cost_basis' => 100]);
+        $this->createDailyChanges($portfolio, now()->subMonth());
+        $portfolio->daily_change()->update(['total_market_value' => 150]);
+        $portfolio->daily_change()->where('date', $portfolio->daily_change()->max('date'))->update(['total_market_value' => 300]);
+
+        [$marketGain, $marketValue, $costBasis] = $this->chartPercentages($portfolio);
+
+        $this->assertSame([-25.0, 50.0], [$marketGain[0], end($marketGain)]);
+        $this->assertSame([0.0, 100.0], [$marketValue[0], end($marketValue)]);
+        $this->assertSame([0.0, 0.0], [$costBasis[0], end($costBasis)]);
+    }
+
+    public function test_performance_chart_shows_no_percentage_when_there_is_nothing_to_compare_against(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $portfolio = Portfolio::factory()->create();
+        $days = $this->createDailyChanges($portfolio, now()->subMonth());
+
+        $percentages = $this->chartPercentages($portfolio);
+
+        $noPercentages = array_fill(0, $days->count(), null);
+        $this->assertSame([$noPercentages, $noPercentages, $noPercentages], $percentages);
+    }
+
     /**
      * Creates a daily change for each weekday since the start date, valued at its position in the series
      */
@@ -161,5 +190,17 @@ class PortfoliosTest extends TestCase
         return Livewire::withoutLazyLoading()
             ->test('portfolio-performance-chart', ['portfolio' => $portfolio, 'scope' => 'ALL'])
             ->get('chartSeries')['series'][1]['data'];
+    }
+
+    /**
+     * Tooltip percentages of the portfolio's all time performance chart, in series order
+     *
+     * @return array<int, array<int, float|null>>
+     */
+    private function chartPercentages(Portfolio $portfolio): array
+    {
+        return Livewire::withoutLazyLoading()
+            ->test('portfolio-performance-chart', ['portfolio' => $portfolio, 'scope' => 'ALL'])
+            ->get('chartSeries')['percentages'];
     }
 }

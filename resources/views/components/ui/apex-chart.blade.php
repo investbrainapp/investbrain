@@ -4,33 +4,32 @@
     $seriesData = array_merge([
       'chart' => [
         'type' => "area",
-        'stacked' => false,
         'height' => 300,
         'foreColor' => "#999",
-        'dropShadow' => [
-           'enabled' => false,
-        ],
         'toolbar' => [
             'show' => false,
         ],
         'zoom' => [
           'enabled' => false
+        ],
+        // the chart is rebuilt on every time period change, so keep its entrance short
+        'animations' => [
+          'speed' => 300,
+          'animateGradually' => [
+            'enabled' => false
+          ]
         ]
       ],
       'colors' => ['#3185FC', '#48435C', '#9792E3', '#00E396', '#B74F6F'],
       'stroke' => [
-        'curve' => "smooth",
         'width' => 3
       ],
       'dataLabels' => [
         'enabled' => false
       ],
       'markers' => [
-        'size' => 0,
-        'strokeColor' => "#fff",
         'strokeWidth' => 3,
         'strokeOpacity' => 1,
-        'fillOpacity' => 1,
         'hover' => [
           'size' => 6
         ]
@@ -45,7 +44,6 @@
         ],
         'labels' => [
           'offsetX' => 15,
-          'offsetY' => 0
         ],
         'tooltip' => [
           'enabled' => false
@@ -61,9 +59,7 @@
         ]
       ],
       'grid' => [
-        'strokeColor' => "#000",
         'padding' => [
-            'top' => 0,
             'left' => -30,
             'right' => 0,
             'bottom' => -5
@@ -72,56 +68,61 @@
       'legend' => [
         'show' => false,
       ],
-      
     ], $seriesData);
+    // percentages for the tooltip are not ApexCharts options, so keep them out of its config
+    $percentages = json_encode(Arr::pull($seriesData, 'percentages', []));
     $seriesData = json_encode($seriesData)
 @endphp
 
-<div 
-    id="chart"
+<div
     wire:key="{{ rand() }}"
     x-data="{
         data: {{ $seriesData }},
+        percentages: {{ $percentages }},
+        removed: false,
         async init(){
 
             const ApexCharts = await window.loadApexCharts();
+
+            // Livewire may have replaced this element while ApexCharts was loading
+            if (this.removed) return;
 
             this.data.chart.events = {
                 mounted: function (chartContext, config) {
                     renderLegend(chartContext);
                 },
-                {{-- updated: function (chartContext, config) {
-                    renderLegend(chartContext);
-                } --}}
             }
 
             @if ($currency)
-            this.data.yaxis.labels.formatter = function (value) {
-              return `{{ Number::currencySymbol(auth()->user()->getCurrency()) }}${value}`
-            }
+            const locale = {{ Js::from(str_replace('_', '-', auth()->user()->getLocale())) }};
+            const currency = { style: 'currency', currency: {{ Js::from(auth()->user()->getCurrency()) }} };
+
+            // short axis labels such as -$5K, full amounts such as -$22,686.48 in the tooltip
+            const axisAmount = new Intl.NumberFormat(locale, { ...currency, notation: 'compact', maximumFractionDigits: 1 });
+            const tooltipAmount = new Intl.NumberFormat(locale, currency);
+            const tooltipPercentage = new Intl.NumberFormat(locale, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            this.data.yaxis.labels.formatter = (value) => axisAmount.format(value);
 
             this.data.tooltip = {
-                enabled: true,
                 shared: false,
                 y: {
-                    formatter: (value, { series, seriesIndex, dataPointIndex, w }) => {
-                        const firstDataPoint = this.data.series[seriesIndex].data[0][1]
-                        const percentageChange = ((value - firstDataPoint) / firstDataPoint) * 100;
-                        return `${parseFloat(value.toFixed(2))} (${percentageChange.toFixed(2)}%)`;
+                    formatter: (value, { seriesIndex, dataPointIndex }) => {
+                        const percentage = this.percentages[seriesIndex]?.[dataPointIndex];
+                        const amount = tooltipAmount.format(value);
+
+                        return percentage == null ? amount : `${amount} (${tooltipPercentage.format(percentage / 100)})`;
                     }
                 },
             }
             @endif
 
-            var chart = new ApexCharts(document.querySelector('#chart-{{ $name }}'), this.data);
+            var chart = new ApexCharts(this.$refs.chart, this.data);
+
+            // kept off Alpine's reactive data, so the chart instance is not wrapped in proxies
+            this.$el.apexChart = chart;
 
             chart.render();
-
-            {{-- // reset custom zoom button
-            var resetZoomButton = document.querySelector('#chart-reset-zoom-{{ $name }}');
-            resetZoomButton.addEventListener('click', function () {
-              chart.resetSeries()
-            }); --}}
 
             // generate custom legend view
             function renderLegend(chartContext) {
@@ -173,9 +174,17 @@
                 });
             }
 
+        },
+
+        // wire:key changes on every render, so Livewire swaps in a new element each time;
+        // without this the old chart and its window resize listener are never released
+        destroy() {
+            this.removed = true;
+            this.$el.apexChart?.destroy();
+            delete this.$el.apexChart;
         }
     }"
 >
-  <div id="chart-{{ $name }}" class="apex-chart"></div>
+  <div x-ref="chart" class="apex-chart"></div>
 </div>
 
