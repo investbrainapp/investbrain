@@ -238,7 +238,12 @@ The dashboard and every portfolio page include a performance chart built from a 
 
 ## Search
 
-Press `/` anywhere in the app, or click the search box in the top bar, to search your portfolios by title and your open holdings by symbol or company name. Use the arrow keys to move through results and Enter to open one.
+Press `/` (when you aren't typing in a field) or `Cmd+K` / `Ctrl+K` anywhere in the app, or click the search box in the top bar, to search your portfolios by title and your holdings by symbol or company name.
+
+- Partial words match, so `msf` finds MSFT and `vang total` finds Vanguard Total Stock Market ETF.
+- Closest matches come first: an exact symbol or title, then ones that start with what you typed, then everything else.
+- Holdings you've fully sold are marked **Closed**, and holdings in a wishlist portfolio are marked **Wishlist**. Closed positions are listed after open positions that match equally well.
+- Press Enter to open the top result, or use the arrow keys to pick another one.
 
 ![The search dialog showing portfolio and holding results](images/user-guide-search.png) 
 
