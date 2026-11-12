@@ -11,7 +11,7 @@
         "@tailwindcss/vite": "^4.1.13",
         "autoprefixer": "^10.4.19",
         "axios": "^1.7.4",
-        "daisyui": "^5.1.14",
+        "daisyui": "^5.8.0",
         "laravel-vite-plugin": "^3.2.1",
         "postcss": "^8.4.40",
         "tailwindcss": "^4.1.13",
