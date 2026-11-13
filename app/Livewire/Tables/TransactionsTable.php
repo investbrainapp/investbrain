@@ -75,7 +75,9 @@ class TransactionsTable extends Component implements HasActions, HasSchemas, Has
                     ->sortable(),
                 TextColumn::make('market_data.name')
                     ->label(__('Name'))
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(25)
+                    ->tooltip(fn (TextColumn $column): ?string => mb_strlen((string) $column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
                 TextColumn::make('transaction_type')
                     ->label(__('Type'))
                     ->sortable()
