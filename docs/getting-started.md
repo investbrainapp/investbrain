@@ -137,7 +137,7 @@ When you save a buy or sell transaction, Investbrain:
 ### Rules for sells
 
 - You can't sell more shares than you owned **as of the sale date**. 
-- You don't enter a cost basis for a sale. Investbrain uses the average cost basis of all your buys of that symbol in that portfolio up to the sale date, and uses it to calculate the realized gain.
+- You don't enter a cost basis for a sale. Investbrain uses the average cost of the shares you own on the sale date, and uses it to calculate the realized gain. A sale doesn't change the average cost of the shares you keep, and once you've sold every share the average starts over with your next buy.
 
 ### Editing and deleting transactions
 
