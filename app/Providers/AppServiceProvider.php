@@ -7,21 +7,28 @@ namespace App\Providers;
 use App\Http\ApiControllers\Controller as ApiController;
 use App\Interfaces\MarketData\FallbackInterface;
 use App\Interfaces\MarketData\MarketDataInterface;
+use App\Livewire\Tables\HoldingsTable;
+use App\Livewire\Tables\TransactionsTable;
 use App\Models\User;
 use App\Support\OidcProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
+use Filament\Support\Facades\FilamentView;
+use Filament\Tables\View\TablesRenderHook;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
+use Livewire\Livewire;
 use NumberFormatter;
 
 class AppServiceProvider extends ServiceProvider
@@ -50,6 +57,8 @@ class AppServiceProvider extends ServiceProvider
             'warning' => Color::Amber,
             'danger' => Color::Red,
         ]);
+
+        $this->moveFilterIndicatorsIntoTableToolbar();
 
         JsonResource::withoutWrapping();
 
@@ -96,5 +105,29 @@ class AppServiceProvider extends ServiceProvider
 
             return $formatter->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
         });
+    }
+
+    /**
+     * Render the active filter indicators on the toolbar row, beside the filter trigger, instead of in
+     * Filament's separate bar below it. Both hooks are stock Filament render hooks.
+     */
+    protected function moveFilterIndicatorsIntoTableToolbar(): void
+    {
+        $tables = [HoldingsTable::class, TransactionsTable::class];
+
+        FilamentView::registerRenderHook(
+            TablesRenderHook::TOOLBAR_GROUPING_SELECTOR_AFTER,
+            fn (): View => view('components.ui.table-filter-indicators', [
+                'table' => Livewire::current()->getTable(),
+            ]),
+            scopes: $tables,
+        );
+
+        // Filament renders its own indicator bar unless this hook outputs something non-blank.
+        FilamentView::registerRenderHook(
+            TablesRenderHook::FILTER_INDICATORS,
+            fn (): HtmlString => new HtmlString('<!-- filter indicators are rendered in the toolbar -->'),
+            scopes: $tables,
+        );
     }
 }
