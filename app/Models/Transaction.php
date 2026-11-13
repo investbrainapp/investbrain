@@ -151,6 +151,17 @@ class Transaction extends Model
     }
 
     /**
+     * Oldest first, with a day's purchases ahead of its sales so shares bought and sold the same day
+     * are owned before they're sold
+     */
+    public function scopeInTradingOrder($query): Builder
+    {
+        return $query->orderByRaw(self::dateSql('transactions.date'))
+            ->orderByRaw("CASE WHEN transactions.transaction_type = 'BUY' THEN 0 ELSE 1 END")
+            ->orderBy('transactions.created_at');
+    }
+
+    /**
      * Quantity of a transaction as SQL, positive for a buy and negative for a sale. Summed over a
      * holding's transactions it gives the shares owned.
      */
