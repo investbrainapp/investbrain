@@ -549,7 +549,8 @@ class MultiCurrencyTest extends TestCase
             ->getPortfolioMetrics();
 
         $this->assertEqualsWithDelta(1001.79, $metrics->get('total_cost_basis'), 0.01);
-        $this->assertEqualsWithDelta(381.73, $metrics->get('realized_gain_dollars'), 0.01);
+        // the shares sold cost what they did in USD on the day they were bought, not the day they were sold
+        $this->assertEqualsWithDelta(363.41, $metrics->get('realized_gain_dollars'), 0.01);
         $this->assertEqualsWithDelta(1567.76, $metrics->get('total_market_value'), 0.01);
 
         // switch user display currency
@@ -563,7 +564,7 @@ class MultiCurrencyTest extends TestCase
             ->getPortfolioMetrics();
 
         $this->assertEqualsWithDelta(847.6, $metrics->get('total_cost_basis'), 0.01);
-        $this->assertEqualsWithDelta(339.1, $metrics->get('realized_gain_dollars'), 0.01);
+        $this->assertEqualsWithDelta(322.24, $metrics->get('realized_gain_dollars'), 0.01);
         $this->assertEqualsWithDelta(1332.59, $metrics->get('total_market_value'), 0.01);
     }
 
@@ -698,6 +699,30 @@ class MultiCurrencyTest extends TestCase
 
         // purchases cost 10 * 100 * 0.9 + 10 * 120 * 0.8 = 1860 for 20 shares, of which 15 are still owned
         $this->assertEqualsWithDelta(1395, $metrics->get('total_cost_basis'), 0.01);
+    }
+
+    public function test_portfolio_metrics_convert_cost_basis_at_the_rates_shares_still_owned_were_bought_at(): void
+    {
+        $this->actingAs(User::factory()->create(['options' => ['display_currency' => 'EUR']]));
+
+        $portfolio = Portfolio::factory()->create();
+
+        $firstPurchase = now()->subMonths(3)->toDateString();
+        $soldOut = now()->subMonths(2)->toDateString();
+        $secondPurchase = now()->subMonth()->toDateString();
+
+        CurrencyRate::create(['currency' => 'EUR', 'rate' => 0.9, 'date' => $firstPurchase]);
+        CurrencyRate::create(['currency' => 'EUR', 'rate' => 0.85, 'date' => $soldOut]);
+        CurrencyRate::create(['currency' => 'EUR', 'rate' => 0.8, 'date' => $secondPurchase]);
+
+        Transaction::factory()->buy(10)->costBasis(100)->date($firstPurchase)->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->sell(10)->salePrice(150)->date($soldOut)->portfolio($portfolio->id)->symbol('ACME')->create();
+        Transaction::factory()->buy(10)->costBasis(120)->date($secondPurchase)->portfolio($portfolio->id)->symbol('ACME')->create();
+
+        $metrics = Holding::query()->portfolio($portfolio->id)->getPortfolioMetrics();
+
+        // only the shares bought after selling out count, at the 0.8 rate they were bought at
+        $this->assertEqualsWithDelta(960, $metrics->get('total_cost_basis'), 0.01);
     }
 
     public function test_portfolio_metrics_convert_dividends_at_the_rate_on_the_dividend_date(): void

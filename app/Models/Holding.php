@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Support\AverageCost;
 use App\Traits\HasMarketData;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -177,20 +178,38 @@ class Holding extends Model
         // only aggregate the portfolios being asked about, not every portfolio in the database
         $portfolioIds = $query->clone()->select('holdings.portfolio_id');
 
+        // the last day each holding was left with no shares, after which its current shares were bought
+        $day = Transaction::dateSql('transactions.date');
+        $sharesOwnedByDay = DB::table('transactions')
+            ->select(['transactions.symbol', 'transactions.portfolio_id'])
+            ->selectRaw("{$day} AS day")
+            ->selectRaw('SUM(SUM('.Transaction::signedQuantitySql().")) OVER (PARTITION BY transactions.symbol, transactions.portfolio_id ORDER BY {$day}) AS owned")
+            ->whereIn('transactions.portfolio_id', $portfolioIds)
+            ->groupBy(['transactions.symbol', 'transactions.portfolio_id', DB::raw($day)]);
+
+        $soldOut = DB::query()
+            ->fromSub($sharesOwnedByDay, 'shares_owned_by_day')
+            ->select(['symbol', 'portfolio_id'])
+            ->selectRaw('MAX(day) AS sold_out_on')
+            ->whereRaw('owned < 0.00005')
+            ->groupBy(['symbol', 'portfolio_id']);
+
+        $currentPurchase = "transactions.transaction_type = 'BUY' AND (sold_out.sold_out_on IS NULL OR {$day} > sold_out.sold_out_on)";
+
         $transactions = DB::table('transactions')
             ->leftJoin('currency_rates as cr', CurrencyRate::joinOnDate('transactions.date', $currency))
+            ->leftJoinSub($soldOut, 'sold_out', function ($join) {
+                $join->on('sold_out.symbol', '=', 'transactions.symbol')
+                    ->on('sold_out.portfolio_id', '=', 'transactions.portfolio_id');
+            })
             ->select(['transactions.symbol', 'transactions.portfolio_id'])
             ->selectRaw("
                 SUM(CASE WHEN transactions.transaction_type = 'SELL'
                     THEN (transactions.sale_price_base - transactions.cost_basis_base) * transactions.quantity * COALESCE(cr.rate, 1)
                 END) AS realized_gain_dollars
             ")
-            ->selectRaw("
-                SUM(CASE WHEN transactions.transaction_type = 'BUY'
-                    THEN transactions.cost_basis_base * transactions.quantity * COALESCE(cr.rate, 1)
-                END) AS purchases_cost
-            ")
-            ->selectRaw("SUM(CASE WHEN transactions.transaction_type = 'BUY' THEN transactions.quantity END) AS purchases_quantity")
+            ->selectRaw("SUM(CASE WHEN {$currentPurchase} THEN transactions.cost_basis_base * transactions.quantity * COALESCE(cr.rate, 1) END) AS current_purchases_cost")
+            ->selectRaw("SUM(CASE WHEN {$currentPurchase} THEN transactions.cost_basis * transactions.quantity END) AS current_purchases_cost_native")
             ->whereIn('transactions.portfolio_id', $portfolioIds)
             ->groupBy(['transactions.symbol', 'transactions.portfolio_id']);
 
@@ -203,7 +222,8 @@ class Holding extends Model
             ->groupBy(['dividends.symbol', 'transactions.portfolio_id']);
 
         $marketValue = 'holdings.quantity * market_data.market_value_base * COALESCE(cr.rate, 1)';
-        $costBasis = 'holding_transactions.purchases_cost / NULLIF(holding_transactions.purchases_quantity, 0) * holdings.quantity';
+        // the holding's cost basis is in the market data currency, so convert it at the rates the current shares were bought at
+        $costBasis = 'holdings.total_cost_basis * COALESCE(holding_transactions.current_purchases_cost / NULLIF(holding_transactions.current_purchases_cost_native, 0), 1)';
 
         return $query
             ->select([
@@ -230,40 +250,56 @@ class Holding extends Model
             });
     }
 
+    /**
+     * Recalculates the holding from its transactions and dividends
+     *
+     * Walks the transactions oldest first to give each sale the average cost of the shares owned when
+     * it happened, so selling every share starts the average over for shares bought later.
+     */
     public function syncTransactionsAndDividends()
     {
-        // pull existing transaction data
-        $query = Transaction::where([
+        $transactions = Transaction::where([
             'portfolio_id' => $this->portfolio_id,
             'transactions.symbol' => $this->symbol,
-        ])->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN quantity ELSE 0 END) AS qty_purchases")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sales")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'SELL' THEN (sale_price - cost_basis) * quantity ELSE 0 END) AS realized_gain_dollars")
-            ->selectRaw("SUM(CASE WHEN transaction_type = 'BUY' THEN (quantity * cost_basis) ELSE 0 END) AS total_cost_basis")
-            ->first();
+        ])->inTradingOrder()
+            ->get(['id', 'transaction_type', 'quantity', 'cost_basis', 'cost_basis_base', 'sale_price']);
 
         // delete holding if no transactions
-        if (empty($query->qty_purchases + $query->qty_sales)) {
+        if (empty($transactions->sum('quantity'))) {
 
             $this->delete();
 
             return;
         }
 
-        $total_quantity = round($query->qty_purchases - $query->qty_sales, 4);
+        $averageCost = new AverageCost;
+        $realized_gain_dollars = 0;
 
-        $average_cost_basis = (
-            $query->qty_purchases > 0
-            && $total_quantity > 0
-        ) ? $query->total_cost_basis / $query->qty_purchases
-        : 0;
+        foreach ($transactions as $transaction) {
+
+            $sold = $averageCost->apply($transaction);
+
+            if (is_null($sold)) {
+                continue;
+            }
+
+            $realized_gain_dollars += ($transaction->sale_price - $sold['cost_basis']) * $transaction->quantity;
+
+            // quietly, as saving a transaction is what syncs the holding
+            if (
+                abs($sold['cost_basis'] - $transaction->cost_basis) > 0.000001
+                || abs($sold['cost_basis_base'] - $transaction->cost_basis_base) > 0.000001
+            ) {
+                Transaction::whereKey($transaction->id)->toBase()->update($sold);
+            }
+        }
 
         // update holding
         $this->fill([
-            'quantity' => $total_quantity,
-            'average_cost_basis' => $average_cost_basis,
-            'total_cost_basis' => $total_quantity * $average_cost_basis,
-            'realized_gain_dollars' => $query->realized_gain_dollars ?? 0,
+            'quantity' => round($averageCost->quantity, 4),
+            'average_cost_basis' => $averageCost->averageCostBasis(),
+            'total_cost_basis' => $averageCost->totalCost,
+            'realized_gain_dollars' => $realized_gain_dollars,
             'dividends_earned' => $this->dividends->sum('total_received'),
         ]);
 
@@ -298,12 +334,11 @@ class Holding extends Model
             'portfolio_id' => $this->portfolio_id,
             'symbol' => $this->symbol,
         ])->whereDate('date', '<=', $end_date)
-            ->orderBy('date')
+            ->inTradingOrder()
             ->get(['date', 'transaction_type', 'quantity', 'cost_basis_base', 'sale_price_base'])
             ->values();
 
-        $owned = 0;
-        $purchases_cost = 0;
+        $averageCost = new AverageCost;
         $realized_gains = 0;
         $next = 0;
         $performance = collect();
@@ -315,19 +350,17 @@ class Holding extends Model
             while ($next < $transactions->count() && $transactions[$next]->date->toDateString() <= $date) {
                 $transaction = $transactions[$next++];
 
-                if ($transaction->transaction_type === 'BUY') {
-                    $owned += $transaction->quantity;
-                    $purchases_cost += $transaction->quantity * $transaction->cost_basis_base;
-                } else {
-                    $owned -= $transaction->quantity;
-                    $realized_gains += ($transaction->sale_price_base - $transaction->cost_basis_base) * $transaction->quantity;
+                $sold = $averageCost->apply($transaction);
+
+                if (! is_null($sold)) {
+                    $realized_gains += ($transaction->sale_price_base - $sold['cost_basis_base']) * $transaction->quantity;
                 }
             }
 
             $performance->put($date, (object) [
                 'date' => $date,
-                'owned' => round($owned, 3),
-                'cost_basis' => round($owned, 3) == 0 ? 0 : $purchases_cost,
+                'owned' => round($averageCost->quantity, 3),
+                'cost_basis' => $averageCost->totalCostBase,
                 'realized_gains' => $realized_gains,
             ]);
         }

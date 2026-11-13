@@ -178,7 +178,69 @@ class HoldingsTest extends TestCase
         $this->assertEquals(0, $performance[now()->subDays(3)->toDateString()]->realized_gains);
 
         $this->assertEquals(6, $performance[now()->toDateString()]->owned);
+        $this->assertEquals(600, $performance[now()->toDateString()]->cost_basis);
         $this->assertEquals(200, $performance[now()->toDateString()]->realized_gains);
+    }
+
+    public function test_average_cost_basis_starts_over_after_every_share_is_sold(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(3)->costBasis(21.49)->date(now()->subMonths(6)->toDateString())->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->buy(2)->costBasis(18.48)->date(now()->subMonths(5)->toDateString())->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->sell(5)->salePrice(22.36)->date(now()->subMonth()->toDateString())->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->buy(20)->costBasis(10.08)->date(now()->subDay()->toDateString())->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('AAPL')->sole();
+
+        $this->assertEquals(20, $holding->quantity);
+        $this->assertEqualsWithDelta(10.08, $holding->average_cost_basis, 0.0001);
+        $this->assertEqualsWithDelta(201.6, $holding->total_cost_basis, 0.0001);
+        $this->assertEqualsWithDelta(10.37, $holding->realized_gain_dollars, 0.0001);
+        $this->assertEqualsWithDelta(201.6, Holding::query()->portfolio($portfolio->id)->getPortfolioMetrics()->get('total_cost_basis'), 0.0001);
+        $this->assertEqualsWithDelta(201.6, $holding->dailyPerformance()[now()->toDateString()]->cost_basis, 0.0001);
+    }
+
+    public function test_average_cost_basis_keeps_the_cost_of_shares_left_after_a_partial_sale(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(10)->costBasis(10)->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $sale = Transaction::factory()->sell(5)->salePrice(12)->sixMonthsAgo()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        Transaction::factory()->buy(5)->costBasis(20)->lastMonth()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('AAPL')->sole();
+
+        $this->assertEquals(10, $sale->fresh()->cost_basis);
+        $this->assertEquals(15, $holding->average_cost_basis);
+        $this->assertEquals(150, $holding->total_cost_basis);
+        $this->assertEquals(150, Holding::query()->portfolio($portfolio->id)->getPortfolioMetrics()->get('total_cost_basis'));
+    }
+
+    public function test_backdated_purchase_updates_the_cost_basis_of_later_sales(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $portfolio = Portfolio::factory()->create();
+
+        Transaction::factory()->buy(1)->costBasis(100)->lastYear()->portfolio($portfolio->id)->symbol('AAPL')->create();
+        $sale = Transaction::factory()->sell(1)->salePrice(400)->recent()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $this->assertEquals(100, $sale->fresh()->cost_basis);
+
+        Transaction::factory()->buy(1)->costBasis(300)->sixMonthsAgo()->portfolio($portfolio->id)->symbol('AAPL')->create();
+
+        $sale->refresh();
+        $this->assertEquals(200, $sale->cost_basis);
+        $this->assertEquals(200, $sale->cost_basis_base);
+
+        $holding = Holding::query()->portfolio($portfolio->id)->symbol('AAPL')->sole();
+        $this->assertEquals(200, $holding->realized_gain_dollars);
+        $this->assertEquals(200, $holding->average_cost_basis);
     }
 
     public function test_fix_cost_basis_command_recalculates_cost_basis_of_sales(): void
