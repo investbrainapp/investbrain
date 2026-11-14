@@ -7,10 +7,12 @@ namespace App\Interfaces\MarketData;
 use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\Types\SearchResult;
 use App\Interfaces\MarketData\Types\Split;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class FakeMarketData implements MarketDataInterface
 {
@@ -18,6 +20,41 @@ class FakeMarketData implements MarketDataInterface
     {
 
         return true;
+    }
+
+    public function search(string $query): Collection
+    {
+        $query = Str::lower($query);
+
+        return collect([
+            new SearchResult([
+                'symbol' => 'AAPL',
+                'name' => 'Apple Inc.',
+                'type' => 'Stock',
+                'exchange' => 'NMS',
+            ]),
+            new SearchResult([
+                'symbol' => 'ACME',
+                'name' => 'ACME Company Ltd',
+                'type' => 'Stock',
+                'exchange' => 'NMS',
+            ]),
+            new SearchResult([
+                'symbol' => 'MSFT',
+                'name' => 'Microsoft Corporation',
+                'type' => 'Stock',
+                'exchange' => 'NMS',
+            ]),
+            new SearchResult([
+                'symbol' => 'XEQT',
+                'name' => 'iShares Core Equity ETF Portfolio',
+                'type' => 'ETF',
+                'exchange' => 'TOR',
+            ]),
+        ])->filter(function (SearchResult $result) use ($query) {
+            return Str::contains(Str::lower($result->getSymbol()), $query)
+                || Str::contains(Str::lower($result->getName()), $query);
+        })->values();
     }
 
     public function quote(string $symbol): Quote
