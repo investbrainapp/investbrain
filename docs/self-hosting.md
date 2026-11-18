@@ -306,6 +306,12 @@ docker exec -it investbrain-pgsql psql -U investbrain -d investbrain \
   -c "UPDATE users SET admin = true WHERE email = 'someone@example.com';"
 ```
 
+If the admin account was deleted and no admin is left, this command makes the oldest remaining account the admin:
+
+```bash
+docker exec -it investbrain-app php artisan fix:admin
+```
+
 ## Currency
 
 Investbrain converts between currencies using daily exchange rates from the [Frankfurter](https://frankfurter.dev/) service, refreshed once per day.
@@ -437,6 +443,7 @@ Add `--help` to any command to see its options.
 | `capture:daily-change` | Capture today's snapshot for every portfolio now. |
 | `sync:daily-change <portfolio_id>` | Rebuild a portfolio's entire daily history from market data. Useful for filling gaps in charts. Resource intensive. `--force` skips the confirmation. |
 | `sync:holdings` | Recalculate every holding from its transactions and dividends. `--user=<id>` limits it to one user. |
+| `fix:admin` | Make the oldest account the admin when no admin is left, for example after the admin account was deleted. Does nothing if an admin already exists. Only runs when `SELF_HOSTED` is `true` (the default). |
 | `fix:cost-basis-for-sales` | Recalculate the cost basis of sell transactions. `--portfolio=<id>` or `--user=<id>` limits the scope. |
 
 Find a portfolio's ID in the address bar of its page (`/portfolio/<id>`).
