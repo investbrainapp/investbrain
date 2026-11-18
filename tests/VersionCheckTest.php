@@ -42,15 +42,15 @@ class VersionCheckTest extends TestCase
             ->assertDontSee('No new notifications');
     }
 
-    public function test_bell_is_hidden_when_the_version_is_unknown(): void
+    public function test_no_lookup_happens_when_the_version_is_unknown(): void
     {
         config(['investbrain.version' => null]);
         Http::fake();
 
         $this->actingAs(User::factory()->admin()->create())
             ->get(route('dashboard'))
-            ->assertOk()
-            ->assertDontSee('Notifications');
+            ->assertSee('No new notifications')
+            ->assertDontSee('Update available');
 
         Http::assertNothingSent();
     }
@@ -68,28 +68,28 @@ class VersionCheckTest extends TestCase
         Http::assertNothingSent();
     }
 
-    public function test_non_admins_do_not_see_the_bell_or_trigger_a_lookup(): void
+    public function test_non_admins_see_the_bell_without_the_update_notification_or_a_lookup(): void
     {
-        config(['investbrain.version' => 'v1.4.3']);
+        config(['investbrain.version' => 'v1.4.2']);
         Http::fake();
 
         $this->actingAs(User::factory()->create())
             ->get(route('dashboard'))
-            ->assertOk()
-            ->assertDontSee('Notifications');
+            ->assertSeeInOrder(['Notifications', 'No new notifications'])
+            ->assertDontSee('Update available');
 
         Http::assertNothingSent();
     }
 
-    public function test_hosted_instances_do_not_show_the_bell_even_to_admins(): void
+    public function test_hosted_instances_do_not_show_the_update_notification_even_to_admins(): void
     {
-        config(['investbrain.version' => 'v1.4.3', 'investbrain.self_hosted' => false]);
+        config(['investbrain.version' => 'v1.4.2', 'investbrain.self_hosted' => false]);
         Http::fake();
 
         $this->actingAs(User::factory()->admin()->create())
             ->get(route('dashboard'))
-            ->assertOk()
-            ->assertDontSee('Notifications');
+            ->assertSeeInOrder(['Notifications', 'No new notifications'])
+            ->assertDontSee('Update available');
 
         Http::assertNothingSent();
     }
