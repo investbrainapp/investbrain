@@ -460,5 +460,11 @@
     "Recent failures": "Recent failures",
     "No failures in this period": "No failures in this period",
     "Time": "Time",
-    "Error": "Error"
+    "Error": "Error",
+    "Notifications": "Notifications",
+    "Update available": "Update available",
+    "No new notifications": "No new notifications",
+    "New notifications": "New notifications",
+    ":app :latest is now available.": ":app :latest is now available.",
+    "{1} You are :count version behind.|[2,*] You are :count versions behind.": "{1} You are :count version behind.|[2,*] You are :count versions behind."
 }
