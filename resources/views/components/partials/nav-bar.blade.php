@@ -1,5 +1,7 @@
 <?php
 
+use App\Support\VersionCheck;
+use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -16,6 +18,40 @@ new class extends Component
     ];
 
     // methods
+
+    /**
+     * Everything the bell should list for this user, newest concern first.
+     *
+     * @return Collection<int, array{icon: string, title: string, body: string, link: string}>
+     */
+    public function notifications(): Collection
+    {
+        return collect([
+            $this->updateNotification(),
+        ])->filter()->values();
+    }
+
+    /**
+     * @return array{icon: string, title: string, body: string, link: string}|null
+     */
+    protected function updateNotification(): ?array
+    {
+        $versionCheck = app(VersionCheck::class);
+
+        if (! $versionCheck->visibleTo(auth()->user()) || ! $versionCheck->updateAvailable()) {
+            return null;
+        }
+
+        return [
+            'icon' => 'o-arrow-up-circle',
+            'title' => __('Update available'),
+            'body' => __(':app :latest is now available.', [
+                'app' => config('app.name'),
+                'latest' => $versionCheck->latest(),
+            ]).' '.trans_choice('{1} You are :count version behind.|[2,*] You are :count versions behind.', $versionCheck->versionsBehind()),
+            'link' => VersionCheck::RELEASES_URL,
+        ];
+    }
 
 }; ?>
 
@@ -60,6 +96,47 @@ new class extends Component
         </div>
 
         <div class="flex flex-0 items-center gap-4">
+
+            @php
+                $notifications = $this->notifications();
+            @endphp
+
+            <x-ui.dropdown id="notifications">
+                <x-slot:trigger>
+                    <x-ui.button
+                        title="{{ __('Notifications') }}"
+                        icon="o-bell"
+                        class="btn-circle btn-ghost btn-sm relative"
+                    >
+                        @if ($notifications->isNotEmpty())
+                            <span aria-label="{{ __('New notifications') }}" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-warning"></span>
+                        @endif
+                    </x-ui.button>
+                </x-slot:trigger>
+
+                <div class="w-72 whitespace-normal">
+                    <div class="px-3 py-2 font-semibold">{{ __('Notifications') }}</div>
+
+                    @forelse ($notifications as $notification)
+                        <li class="my-0.5">
+                            <a
+                                href="{{ $notification['link'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-start gap-3"
+                            >
+                                <x-ui.icon :name="$notification['icon']" class="w-5 h-5 mt-0.5 shrink-0 text-warning" />
+                                <span class="flex-1 min-w-0">
+                                    <span class="block font-medium">{{ $notification['title'] }}</span>
+                                    <span class="block text-xs text-base-content/60">{{ $notification['body'] }}</span>
+                                </span>
+                            </a>
+                        </li>
+                    @empty
+                        <div class="px-3 py-6 text-center text-sm text-base-content/60">{{ __('No new notifications') }}</div>
+                    @endforelse
+                </div>
+            </x-ui.dropdown>
 
             <x-ui.button 
                 title="{{ __('Documentation') }}"

@@ -460,5 +460,11 @@
     "Recent failures": "Fallos recientes",
     "No failures in this period": "No hay fallos en este período",
     "Time": "Hora",
-    "Error": "Error"
+    "Error": "Error",
+    "Notifications": "Notificaciones",
+    "Update available": "Actualización disponible",
+    "No new notifications": "No hay notificaciones nuevas",
+    "New notifications": "Notificaciones nuevas",
+    ":app :latest is now available.": ":app :latest ya está disponible.",
+    "{1} You are :count version behind.|[2,*] You are :count versions behind.": "{1} Estás :count versión por detrás.|[2,*] Estás :count versiones por detrás."
 }

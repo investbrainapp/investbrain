@@ -1,6 +1,12 @@
 <?php
 
 declare(strict_types=1);
+use App\Interfaces\MarketData\AlpacaMarketData;
+use App\Interfaces\MarketData\AlphaVantageMarketData;
+use App\Interfaces\MarketData\FakeMarketData;
+use App\Interfaces\MarketData\FinnhubMarketData;
+use App\Interfaces\MarketData\TwelveDataMarketData;
+use App\Interfaces\MarketData\YahooMarketData;
 
 return [
 
@@ -9,15 +15,17 @@ return [
     'provider' => env('MARKET_DATA_PROVIDER', 'yahoo'),
 
     'interfaces' => [
-        'yahoo' => App\Interfaces\MarketData\YahooMarketData::class,
-        'alphavantage' => App\Interfaces\MarketData\AlphaVantageMarketData::class,
-        'alpaca' => App\Interfaces\MarketData\AlpacaMarketData::class,
-        'finnhub' => App\Interfaces\MarketData\FinnhubMarketData::class,
-        'twelvedata' => App\Interfaces\MarketData\TwelveDataMarketData::class,
-        'fake' => App\Interfaces\MarketData\FakeMarketData::class,
+        'yahoo' => YahooMarketData::class,
+        'alphavantage' => AlphaVantageMarketData::class,
+        'alpaca' => AlpacaMarketData::class,
+        'finnhub' => FinnhubMarketData::class,
+        'twelvedata' => TwelveDataMarketData::class,
+        'fake' => FakeMarketData::class,
     ],
 
     'self_hosted' => env('SELF_HOSTED', true),
+
+    'version' => env('VERSION'), // set by the Docker image at build time
 
     'daily_change_time_of_day' => env('DAILY_CHANGE_TIME', '23:00'),
 
