@@ -3,7 +3,7 @@ title: "Contributing"
 description: "How the project is built, setting up a development environment, coding conventions, and making pull requests."
 group: "Contributing"
 order: 40
-updated_at: "2026-11-05"
+updated_at: "2026-11-23"
 ---
 # Contributing
 
@@ -164,14 +164,38 @@ php artisan db:seed
 php artisan db:seed --class=MarketDataSeeder
 ```
 
+### 6. Install the AI agent skills and guidelines
+
+```bash
+php artisan boost:update
+```
+
+**Run this as part of every new setup**, even if you don't plan to use an AI assistant. Investbrain uses [Laravel Boost](https://github.com/laravel/boost) to give AI coding agents its guidelines and skills. The setup is committed in `boost.json`, `AGENTS.md`, `.mcp.json`, and `.ai/rules`, but the skills themselves are not: `boost:update` generates them into `.claude/skills` from the packages installed in `vendor/`, so they always match the versions you have. Git ignores `.claude`.
+
+The `.ai/skills` folder is for overrides only. Boost treats anything in it as a project-specific skill and copies it over the generated skill with the same name, so don't move or copy Boost's generated skills into it. Add a folder there only when you want to replace or add a skill on purpose.
+
+### 7. Start the app
+
+```bash
+php artisan serve
+```
+
+```bash
+npm run dev
+```
+
+Then open <http://localhost:8000>.
+
 ### Keeping your fork up to date
 
 ```bash
 git fetch upstream
 git checkout main
 git merge upstream/main
-composer install && npm install && php artisan migrate
+composer install && npm install && php artisan migrate && php artisan boost:update
 ```
+
+Run `php artisan boost:update` again after any `composer update`, too, so the skills and `AGENTS.md` keep up with the installed packages.
 
 ### Testing the Docker image
 
@@ -292,7 +316,7 @@ Wrap every user-facing string in `__()`, for example `{{ __('Create Portfolio') 
 
 ## Using AI coding assistants
 
-You're welcome to use AI tools. You're still responsible for the code. Read and understand everything you submit, make sure it follows the conventions above, and run the tests yourself.
+You're welcome to use AI tools. Make sure you've run `php artisan boost:update` (see [step 6](#6-install-the-ai-agent-skills-and-guidelines)) so your agent has the project's guidelines and skills. You're still responsible for the code. Read and understand everything you submit, make sure it follows the conventions above, and run the tests yourself.
 
 ## Making a pull request
 
