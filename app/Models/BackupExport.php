@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -63,6 +64,22 @@ class BackupExport extends Model
     public function isFinished(): bool
     {
         return in_array($this->status, ['success', 'failed']);
+    }
+
+    /**
+     * Whether the finished workbook is ready to download.
+     */
+    public function isDownloadable(): bool
+    {
+        return $this->status == 'success' && Storage::disk()->exists($this->path);
+    }
+
+    /**
+     * When the export and its workbook are removed.
+     */
+    public function expiresAt(): Carbon
+    {
+        return $this->created_at->copy()->addHours(static::RETENTION_HOURS);
     }
 
     /**

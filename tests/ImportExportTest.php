@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Actions\Export\StartBackupExport;
 use App\Exports\BackupExport;
 use App\Exports\Sheets\TransactionsSheet as TransactionsExportSheet;
 use App\Imports\Sheets\TransactionsSheet;
@@ -214,6 +215,24 @@ class ImportExportTest extends TestCase
 
         $this->assertSame($running->id, BackupExportModel::sole()->id);
         Queue::assertNothingPushed();
+    }
+
+    public function test_export_button_warns_instead_of_starting_too_many_exports(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $component = Livewire::actingAs($user)->test('export-portfolios-button');
+
+        for ($i = 0; $i < StartBackupExport::EXPORTS_PER_MINUTE; $i++) {
+            $component->call('export');
+            BackupExportModel::sole()->markAsFailed();
+        }
+        $lastExport = BackupExportModel::sole();
+
+        $component->call('export');
+
+        $this->assertStringContainsString("Hang on! You're doing that too much.", json_encode($component->effects['xjs']));
+        $this->assertSame($lastExport->id, BackupExportModel::sole()->id);
     }
 
     public function test_finished_export_can_only_be_downloaded_by_its_owner(): void

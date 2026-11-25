@@ -30,6 +30,10 @@
     {
       "name": "User",
       "description": ""
+    },
+    {
+      "name": "Export",
+      "description": ""
     }
   ],
   "paths": {
@@ -749,6 +753,125 @@
           }
         }
       }
+    },
+    "/export": {
+      "post": {
+        "tags": [
+          "Export"
+        ],
+        "summary": "Start a backup export",
+        "description": "Starts building an Excel workbook of everything in your account, in the same format the Import / Export page imports. The workbook is built in the background: poll `GET /export/{id}` until `status` is `success`, then download it from `download_url`. If an export is already being prepared, that export is returned instead of starting another. Only your latest export is kept, so starting a new one removes the previous one. You can start up to 3 exports per minute.",
+        "responses": {
+          "202": {
+            "description": "The export being prepared",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupExport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/export/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Unique ID of the export",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Export"
+        ],
+        "summary": "Check the status of a backup export",
+        "responses": {
+          "200": {
+            "description": "Export matching the provided ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupExport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/export/{id}/download": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Unique ID of the export",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Export"
+        ],
+        "summary": "Download a finished backup export",
+        "responses": {
+          "200": {
+            "description": "The backup workbook",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "404": {
+            "description": "The export doesn't exist, isn't finished, or has expired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1172,6 +1295,52 @@
                 "example": 50
               }
             }
+          }
+        }
+      },
+      "BackupExport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "success",
+              "failed"
+            ],
+            "description": "`pending` while the workbook is being built, `success` when it's ready to download, or `failed` if something went wrong (start a new export to try again).",
+            "readOnly": true
+          },
+          "download_url": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "Where to download the workbook once `status` is `success`; otherwise `null`.",
+            "example": "https://investbra.in/api/export/9d2f.../download",
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the export succeeded or failed; `null` while pending.",
+            "readOnly": true
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the export and its workbook are deleted, 24 hours after it was started.",
+            "readOnly": true
           }
         }
       }

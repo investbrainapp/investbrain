@@ -1,11 +1,9 @@
 <?php
 
-use App\Jobs\AssembleBackupExportJob;
-use App\Jobs\CalculateDailyPerformanceJob;
+use App\Actions\Export\StartBackupExport;
 use App\Models\BackupExport as BackupExportModel;
 use App\Traits\Toast;
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -22,43 +20,13 @@ new class extends Component
     }
 
     // methods
-    public function export(): void
+    public function export(StartBackupExport $startBackupExport): void
     {
-        // e.g. a second tab or a double click while an export is being prepared
-        $latestExport = BackupExportModel::latestFor(auth()->id());
-
-        if ($latestExport && ! $latestExport->isFinished()) {
-            $this->backupExport = $latestExport;
-
-            return;
+        try {
+            $this->backupExport = $startBackupExport->handle(auth()->user());
+        } catch (ThrottleRequestsException $exception) {
+            $this->error($exception->getMessage());
         }
-
-        if (! RateLimiter::attempt('export:'.auth()->user()->id, $perMinute = 3, fn () => null)) {
-
-            $this->error(__('Hang on! You\'re doing that too much.'));
-
-            return;
-        }
-
-        // only the latest export is kept
-        BackupExportModel::where('user_id', auth()->id())->get()->each->delete();
-
-        $this->backupExport = BackupExportModel::create(['user_id' => auth()->id()]);
-
-        // the performance figures are slow to calculate, so each portfolio gets its own job
-        // and the workbook is built once they have all finished
-        $performanceJobs = auth()->user()->portfolios()->pluck('portfolios.id')
-            ->map(fn ($portfolioId) => new CalculateDailyPerformanceJob($this->backupExport, $portfolioId));
-
-        $jobs = [new AssembleBackupExportJob($this->backupExport)];
-
-        if ($performanceJobs->isNotEmpty()) {
-            array_unshift($jobs, Bus::batch($performanceJobs->all())->name('Backup export '.$this->backupExport->id));
-        }
-
-        Bus::chain($jobs)->dispatch();
-
-        $this->backupExport->refresh();
     }
 
     public function checkExportStatus(): void
