@@ -2,11 +2,11 @@
 title: "REST API"
 description: "Create an API token and call the Investbrain API."
 order: 20
-updated_at: "2026-11-03"
+updated_at: "2026-11-25"
 ---
 # REST API
 
-Investbrain has a [JSON REST API](/docs/api) for reading and managing your portfolios, transactions, and holdings, and for looking up market data. Use it to build scripts, sync data from a brokerage, feed a spreadsheet, or integrate with other tools.
+Investbrain has a [JSON REST API](/docs/api) for reading and managing your portfolios, transactions, and holdings, looking up market data, and exporting a backup of your account. Use it to build scripts, sync data from a brokerage, feed a spreadsheet, or integrate with other tools.
 
 ## Creating an API token
 
@@ -116,6 +116,51 @@ List responses look like this (`links` and `meta` are shortened here):
 
 The `links` keep your other query parameters, so you can follow `next` until it's `null` to read every page.
 
+## Exporting a backup
+
+The API can export the same backup workbook as the [Import / Export](import-export.md) page. The workbook is built in the background, so exporting takes three steps:
+
+1. Start an export with `POST /export`. The response is `202 Accepted` with the export's `id` and a `status` of `pending`.
+2. Check on it with `GET /export/{id}` every few seconds until `status` is `success` (or `failed`).
+3. Download the workbook from the `download_url` in that response (`GET /export/{id}/download`).
+
+_Request:_
+
+```bash
+curl -X POST https://investbra.in/api/export \
+  -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
+  -H "Accept: application/json"
+```
+
+_Response:_
+
+```json
+{
+  "id": "9d2f6c1e-...",
+  "status": "pending",
+  "download_url": null,
+  "created_at": "2026-11-25T14:03:11.000000Z",
+  "completed_at": null,
+  "expires_at": "2026-11-26T14:03:11.000000Z"
+}
+```
+
+Once `status` is `success`, save the workbook:
+
+```bash
+curl https://investbra.in/api/export/9d2f6c1e-.../download \
+  -H "Authorization: Bearer $INVESTBRAIN_TOKEN" \
+  -o investbrain_backup.xlsx
+```
+
+A few things to know:
+
+- Exports are shared with the Import / Export page. If an export is already being prepared, `POST /export` returns that one instead of starting another.
+- Only your latest export is kept. Starting a new one deletes the previous workbook.
+- An export can be downloaded for 24 hours after it's started (see `expires_at`).
+- You can start up to 3 exports per minute. Past that, `POST /export` returns `429 Too Many Requests`.
+- If `status` is `failed`, start a new export to try again.
+
 ## Permissions
 
 The API follows the same permissions as the web app: you can read any portfolio you have access to, but creating, changing, or deleting anything requires [full access](getting-started.md#access-levels) to the portfolio.
@@ -124,10 +169,10 @@ The API follows the same permissions as the web app: you can read any portfolio 
 
 | Status | Meaning |
 | --- | --- |
-| `200 OK`, `201 Created`, `204 No Content` | Success. `201` is returned when a portfolio or transaction is created, and `204` after a delete. |
+| `200 OK`, `201 Created`, `202 Accepted`, `204 No Content` | Success. `201` is returned when a portfolio or transaction is created, `202` when an export is started, and `204` after a delete. |
 | `401 Unauthorized` | Missing, invalid, expired, or revoked token. |
 | `403 Forbidden` | You don't have access to that portfolio, or you only have read-only access and tried to change something. |
-| `404 Not Found` | The record doesn't exist, or the symbol isn't recognized. |
+| `404 Not Found` | The record doesn't exist, the symbol isn't recognized, or the export isn't ready to download. |
 | `422 Unprocessable Content` | Validation failed. See the `errors` object for details. |
 | `429 Too Many Requests` | You've hit a [rate limit](#rate-limits). Wait the number of seconds in the `Retry-After` header, then try again. |
 

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\ApiControllers\ExportController;
 use App\Http\ApiControllers\HoldingController;
 use App\Http\ApiControllers\MarketDataController;
 use App\Http\ApiControllers\PortfolioController;
@@ -27,4 +28,9 @@ Route::middleware(['auth:api', 'throttle:api'])->name('api.')->group(function ()
 
     // market data
     Route::get('/market-data/{symbol}', [MarketDataController::class, 'show'])->name('market-data.show');
+
+    // backup export
+    Route::post('/export', [ExportController::class, 'store'])->name('export.store');
+    Route::get('/export/{backupExport}', [ExportController::class, 'show'])->name('export.show');
+    Route::get('/export/{backupExport}/download', [ExportController::class, 'download'])->name('export.download');
 });

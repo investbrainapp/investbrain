@@ -30,6 +30,8 @@ You'll get a portable Excel file like `2026_11_01_investbrain_backup.xlsx` conta
 - **Daily Change:** Each portfolio's daily history: market value, cost basis, realized gains, dividends earned, and any annotations
 - **Configs:** name, locale, display currency, and which holdings have dividend reinvestment turned on
 
+You can also export a backup with the [REST API](api.md#exporting-a-backup).
+
 ## Importing into Investbrain
 
 Investbrain imports `.xlsx` workbooks of up to 2 MB. The easiest starting point is the import template: click **Download import template** on the Import / Export page to get an empty workbook with the right sheets and headings. An Investbrain export uses the same format, so you can also add rows to an existing export and import it again.
