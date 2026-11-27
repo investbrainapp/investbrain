@@ -7,6 +7,7 @@ namespace App\Interfaces\MarketData;
 use App\Interfaces\MarketData\Types\Dividend;
 use App\Interfaces\MarketData\Types\Ohlc;
 use App\Interfaces\MarketData\Types\Quote;
+use App\Interfaces\MarketData\Types\SearchResult;
 use App\Interfaces\MarketData\Types\Split;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -19,6 +20,23 @@ class AlphaVantageMarketData implements MarketDataInterface
     {
 
         return (bool) $this->quote($symbol);
+    }
+
+    public function search(string $query): Collection
+    {
+        $results = Alphavantage::core()->search($query);
+
+        return collect(Arr::get($results, 'bestMatches', []))
+            ->map(function ($match) {
+                return new SearchResult([
+                    'symbol' => Arr::get($match, '1. symbol'),
+                    'name' => Arr::get($match, '2. name'),
+                    'type' => Arr::get($match, '3. type'),
+                    'exchange' => Arr::get($match, '4. region'),
+                ]);
+            })
+            ->filter(fn (SearchResult $result) => filled($result->getSymbol()))
+            ->values();
     }
 
     public function quote(string $symbol): Quote
